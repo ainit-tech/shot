@@ -25,7 +25,7 @@ Nothing is on the screen but the selection and its toolbars; icons with hints in
 
 The program speaks 50 languages, those of most countries: the six official languages of the UN, Arabic, Chinese, English, French, Russian and Spanish, and 44 more, from German and Japanese to Swahili. On its first start it asks which, with a tile and a flag for each language, the UN's six first; later the settings change it ([decision](decisions/011-languages.md)).
 
-On the program's first start, once the language is chosen, and later from the menu of the icon in the notification area, "How to use" shows six short slides of the main things, each with a moving picture of the frozen screen: taking a screenshot, drawing, putting annotations right, the actions, the queries, with a press and a hold of a conversation's button, and the settings. The slides show the keys from the settings and leave out what the hints of the toolbar already tell, such as every tool.
+On the program's first start, once the language is chosen, and later from the menu of the icon in the notification area, "How to use" plays a clip of the program at work, the one the site shows: short chapters on taking a screenshot, the magic pencil, hiding and masking what is private, putting annotations right, copying the text, saving, the queries to Google, aloud too, the languages and the settings. The clip speaks the program's language and shows the hotkey and the query buttons from the settings; the list of its chapters and the arrow keys go to any of them. Under the clip the window offers to sign in to Google while nobody is signed in, and opens the settings.
 
 ## Tools
 

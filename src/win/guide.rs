@@ -1,13 +1,14 @@
-//! «Как пользоваться»: a short presentation of the main things, from the menu of the icon in
-//! the notification area, and by itself on the program's first start. A page in WebView2, made
-//! with the environment that the Google window keeps, with the keys from the settings in force:
-//! a few slides, each with a moving picture of the frozen screen and a few lines. It is made when
-//! opened and let go when closed.
+//! «Как пользоваться»: the clip of the program at work, from the menu of the icon in the
+//! notification area, and by itself on the program's first start. A page in WebView2, made with
+//! the environment that the Google window keeps, that plays the site's clip (`clip/`) chapter by
+//! chapter in the language in force, with the hotkey and the query buttons of the settings in
+//! force. It is made when opened and let go when closed.
 
 use std::cell::{Cell, RefCell};
+use std::collections::BTreeMap;
 use std::ptr::{null, null_mut};
 
-use serde_json::{Value, json};
+use serde_json::{Map, Value, json};
 use webview2_com::Microsoft::Web::WebView2::Win32::{
     COREWEBVIEW2_COLOR, COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC, ICoreWebView2Controller, ICoreWebView2Controller2,
     ICoreWebView2Environment, ICoreWebView2Settings3,
@@ -32,17 +33,23 @@ use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
 use super::{app, browser, invite, last_error, preferences, tray, wide};
-use crate::annotation::Tool;
 use crate::icons::{self, Part};
 use crate::text::{self, tr};
 
 const CLASS: PCWSTR = w!("ainitShot.guide");
-/// The page of the window, in the program itself.
+/// The page of the window, in the program itself; the clip goes into it where it says so.
 const PAGE: &str = include_str!("guide.html");
+/// The site's clip of the program at work with its player, which `tools/clip.py` takes from the
+/// site.
+const CLIP: &str = include_str!("clip/ainitshot-clip.js");
+/// The program's own words that the clip shows: its name for each, and the section and the key of
+/// the catalogs that have it.
+const TERMS: &str = include_str!("clip/program-terms.json");
 /// The colour of the window until the page is drawn.
 const BACKGROUND: u32 = 0x001C_1C1C;
-/// The window's size at the scale of 100%: a presentation keeps its size.
-const SIZE: (i32, i32) = (900, 640);
+/// The window's size at the scale of 100%: the clip keeps its size, with the list of its chapters
+/// beside the picture.
+const SIZE: (i32, i32) = (960, 600);
 
 thread_local! {
     static WINDOW: RefCell<Option<Guide>> = const { RefCell::new(None) };
@@ -84,7 +91,8 @@ pub fn open() {
     }));
 }
 
-/// The settings in force have changed: the slides show the new keys.
+/// The settings in force have changed: the clip shows the new hotkey and query buttons, in the
+/// language in force.
 pub fn refresh() {
     if let Some(window) = window() {
         unsafe { SetWindowTextW(window, wide(&title()).as_ptr()) };
@@ -92,20 +100,41 @@ pub fn refresh() {
     post(&speaking(json!({ "type": "settings", "settings": in_force() })));
 }
 
-/// A message to the page with what it needs to speak the language in force: its code, the
-/// slides' texts in it, whether it is written from right to left, and the tools with their keys
-/// and their names in it.
+/// A message to the page with what it needs to speak the language in force: its code, whether it
+/// is written from right to left, the window's texts in it, the clip's own words in it and the
+/// program's words that the clip shows.
 fn speaking(mut message: Value) -> Value {
     let language = text::current();
-    let tools: Vec<Value> =
-        Tool::ALL.iter().map(|tool| json!({ "id": format!("{tool:?}"), "key": tool.key().to_string(), "name": tool.name() })).collect();
     if let Value::Object(fields) = &mut message {
         fields.insert("language".into(), language.code().into());
-        fields.insert("texts".into(), text::page("guide"));
         fields.insert("rightToLeft".into(), language.right_to_left().into());
-        fields.insert("tools".into(), tools.into());
+        fields.insert("texts".into(), text::page("guide"));
+        fields.insert("clip".into(), text::page("clip"));
+        fields.insert("terms".into(), terms());
     }
     message
+}
+
+/// The program's words that the clip shows, in the language in force: by the sections and keys of
+/// the catalog, as `clip/program-terms.json` lists them. The clip takes what it needs from them,
+/// and English for what the language lacks.
+fn terms() -> Value {
+    let terms: Vec<Vec<Value>> = serde_json::from_str(TERMS).unwrap_or_default();
+    let mut pages = Map::new();
+    let mut catalog: BTreeMap<&str, Map<String, Value>> = BTreeMap::new();
+    for term in &terms {
+        let (Some(section), Some(key)) = (term.get(1).and_then(Value::as_str), term.get(2).and_then(Value::as_str)) else {
+            continue;
+        };
+        let text = match section {
+            "program" => text::translation(key).map(Value::from),
+            _ => pages.entry(section).or_insert_with(|| text::page(section)).get(key).cloned(),
+        };
+        if let Some(text) = text {
+            catalog.entry(section).or_default().insert(key.into(), text);
+        }
+    }
+    json!(catalog)
 }
 
 fn not_open() -> &'static str {
@@ -117,8 +146,8 @@ fn title() -> String {
     format!("{} — ainitShot", tr("How to use"))
 }
 
-/// Whether someone is signed in to Google in the program's window: the last slide offers to sign
-/// in while nobody is.
+/// Whether someone is signed in to Google in the program's window: the window offers to sign in
+/// while nobody is.
 pub fn account(signed_in: bool) {
     post(&json!({ "type": "account", "signedIn": signed_in }));
 }
@@ -129,7 +158,7 @@ pub fn is_open() -> bool {
 }
 
 /// The invitation to sign in to Google comes once the user has closed the presentation, so that
-/// the two don't show at once; the last slide offers to sign in meanwhile.
+/// the two don't show at once; the presentation offers to sign in meanwhile.
 pub fn invite_when_closed() {
     INVITE.set(true);
 }
@@ -225,7 +254,7 @@ fn attach(controller: &ICoreWebView2Controller, window: HWND) -> windows_core::R
             Ok(())
         }));
         webview.add_WebMessageReceived(&told, &mut token)?;
-        let page = wide(PAGE);
+        let page = wide(&PAGE.replacen("/* The clip. */", CLIP, 1));
         webview.NavigateToString(ComText(page.as_ptr()))?;
         controller.MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC)?;
     }
@@ -253,8 +282,8 @@ fn heard(message: &str) {
     }
 }
 
-/// What the slides need: the settings in force, whether someone is signed in to Google, the
-/// tools with their keys, and the icons of the toolbar, to draw it as the program does.
+/// What the clip needs: the settings in force, whether someone is signed in to Google, and the
+/// icons of the panels, to draw them as the program does.
 fn first_look() -> Value {
     speaking(json!({
         "type": "init",
@@ -424,80 +453,96 @@ mod tests {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
     }
 
-    /// Shows the presentation in every language the program speaks: every text of the slides has
-    /// all three. With `SCREENSHOT_PREVIEW=<folder>` it saves the slide of the queries in each:
-    /// `LOCALAPPDATA=<folder> cargo test -p ainitshot slides_speak -- --ignored`.
+    /// Saves what the window shows, with `SCREENSHOT_PREVIEW=<folder>`.
+    fn save(name: &str) {
+        if let Some(folder) = std::env::var_os("SCREENSHOT_PREVIEW").map(PathBuf::from) {
+            let path = folder.join(name);
+            save_page_of(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), &path.to_string_lossy());
+        }
+    }
+
+    /// What the page lacks in the catalog of the language in force: the window's texts, the
+    /// clip's own words and the program's words that the clip shows. English has them all.
+    const MISSING: &str = "(() => {
+        if (state.language === 'en') return [];
+        const flat = (words, prefix) => Object.entries(words).flatMap(([key, word]) =>
+            typeof word === 'object' ? flat(word, prefix + key + '.') : [prefix + key]);
+        const own = ['ui', 'scenes', 'picture'].flatMap(part => flat(AinitShotClip.english[part], part + '.'));
+        const terms = AinitShotClip.terms.filter(([, section, key]) => !(state.terms[section] || {})[key]);
+        return Object.keys(TEXT).filter(key => !state.texts[key])
+            .concat(own.filter(key => !state.clip[key]), terms.map(([name]) => name));
+    })()";
+
+    /// The chapters whose picture and sentence don't leave room for the buttons under them, each
+    /// shown in turn; then the chapter of asking Google.
+    const UNFIT: &str = "(() => {
+        const room = Math.min(...[...document.querySelectorAll('footer .offer, footer .buttons')]
+            .filter(element => element.offsetParent).map(element => element.getBoundingClientRect().top));
+        const unfit = CHAPTERS.filter((id, i) => {
+            player.go(i);
+            return $('#clip').getBoundingClientRect().bottom > room - 8;
+        });
+        player.go(CHAPTERS.indexOf('ask'));
+        return unfit;
+    })()";
+
+    /// Shows the clip in every language the program speaks: each has all the window's texts, the
+    /// clip's words and the program's words that it shows, and each chapter leaves room for the
+    /// buttons. With `SCREENSHOT_PREVIEW=<folder>` it saves the chapter of asking Google in each:
+    /// `LOCALAPPDATA=<folder> cargo test -p ainitshot clip_speaks -- --ignored`.
     #[test]
     #[ignore]
-    fn the_slides_speak_every_language() {
+    fn the_clip_speaks_every_language() {
         unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
         open();
         let ready = pump_until(30, || controller().is_some() && evaluate("document.body.className") == "\"\"");
-        let preview = std::env::var_os("SCREENSHOT_PREVIEW").map(PathBuf::from);
         let mut seen = Vec::new();
         if ready {
             for language in text::Language::all().chain([text::Language::RU]) {
                 text::set(language);
                 refresh();
-                evaluate("show(4)");
-                pump_until(2, || false);
-                let missing = "Object.keys(TEXT).filter(key => state.language !== 'en' && !state.texts[key])";
-                seen.push(evaluate(&format!("document.documentElement.lang + ' ' + JSON.stringify({missing})")));
-                if let Some(folder) = &preview {
-                    let path = folder.join(format!("guide-{}.png", language.code()));
-                    save_page_of(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), &path.to_string_lossy());
-                }
+                pump_until(1, || false);
+                evaluate(&format!("window.unfit = {UNFIT}"));
+                pump_until(3, || false);
+                let missing = format!("JSON.stringify({MISSING})");
+                seen.push(evaluate(&format!("document.documentElement.lang + ' ' + {missing} + ' ' + JSON.stringify(unfit)")));
+                save(&format!("guide-{}.png", language.code()));
             }
         }
         close();
         browser::close();
         assert!(ready, "the page didn't get its settings");
         let expected: Vec<String> =
-            text::Language::all().chain([text::Language::RU]).map(|l| format!("\"{} []\"", l.code())).collect();
+            text::Language::all().chain([text::Language::RU]).map(|l| format!("\"{} [] []\"", l.code())).collect();
         assert_eq!(seen, expected);
     }
 
-    /// Opens the presentation with the default settings and goes through its slides with the
-    /// keys: every slide has its title and its picture, and the slide of the queries tells how a
-    /// conversation's button is pressed and held. It starts WebView2, whose Google window goes
-    /// online, so it runs only when asked: `LOCALAPPDATA=<folder> cargo test -p ainitshot
-    /// presentation -- --ignored`. With `SCREENSHOT_PREVIEW=<folder>` it also saves each slide.
+    /// Opens the presentation with the default settings and plays the clip's chapters one by one:
+    /// each shows its title in the language of the tests. It starts WebView2, whose Google window
+    /// goes online, so it runs only when asked: `LOCALAPPDATA=<folder> cargo test -p ainitshot
+    /// clip_plays -- --ignored`. With `SCREENSHOT_PREVIEW=<folder>` it also saves each chapter.
     #[test]
     #[ignore]
-    fn the_presentation_goes_through_its_slides() {
+    fn the_clip_plays_its_chapters() {
         unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
         open();
         let ready = pump_until(30, || controller().is_some() && evaluate("document.body.className") == "\"\"");
-        let preview = std::env::var_os("SCREENSHOT_PREVIEW").map(PathBuf::from);
-        let mut titles = Vec::new();
-        let mut held = String::new();
+        let mut shown = Vec::new();
         if ready {
-            let count: usize = evaluate("SLIDES.length").parse().unwrap_or(0);
+            let count: usize = evaluate("CHAPTERS.length").parse().unwrap_or(0);
             for i in 0..count {
-                // Halfway through its moving picture.
-                pump_until(2, || false);
-                titles.push(evaluate("document.querySelector('h1').textContent"));
-                assert_ne!(evaluate("document.querySelector('#scene').childElementCount"), "0", "slide {i} has a picture");
-                let save = |name: String| {
-                    if let Some(folder) = &preview {
-                        let path = folder.join(name);
-                        save_page_of(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), &path.to_string_lossy());
-                    }
-                };
-                save(format!("guide-{}.png", i + 1));
-                if evaluate("document.querySelector('h1').textContent").contains("Google") {
-                    held = evaluate("document.querySelector('#points').textContent");
-                    // And while the key is held.
-                    pump_until(3, || false);
-                    save(format!("guide-{}-held.png", i + 1));
-                }
-                evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }))");
+                evaluate(&format!("player.go({i})"));
+                // Well into the chapter.
+                pump_until(3, || false);
+                let title = "options().words.scenes[CHAPTERS[state.chapter]].title";
+                shown.push(evaluate(&format!("state.chapter === {i} && $('#clip').shadowRoot.textContent.includes({title})")));
+                save(&format!("guide-{}.png", i + 1));
             }
         }
         close();
         browser::close();
         assert!(ready, "the page didn't get its settings");
-        assert!(titles.len() >= 5, "{titles:?}");
-        assert!(held.contains("нажми") && held.contains("зажми"), "{held}");
+        assert!(shown.len() >= 13, "{shown:?}");
+        assert!(shown.iter().all(|shown| shown == "true"), "{shown:?}");
     }
 }

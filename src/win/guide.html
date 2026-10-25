@@ -7,16 +7,11 @@
 <style>
 :root {
   --bg: #1c1c1c;
-  --stage: #121212;
-  --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.14);
   --text: #ededed;
   --muted: #a8a8a8;
-  --faint: #767676;
   --accent: #2f6feb;
   --accent-hover: #4380f3;
-  --accent-text: #8db3ff;
-  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
   font: 15px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -29,42 +24,15 @@ button { font: inherit; color: inherit; cursor: default; }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
 
-/* The slide: its moving picture, then its words. */
-.deck { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 22px 30px 0; }
-.stage {
-  position: relative; flex: none; height: 278px; border-radius: 12px; overflow: hidden;
-  background: var(--stage); box-shadow: inset 0 0 0 1px var(--line);
-}
-/* The picture is a drawing: it stays as drawn in a language written from right to left. */
-#scene { display: block; width: 100%; height: 100%; direction: ltr; }
-.words { flex: 1; min-height: 0; padding: 20px 4px 0; }
-.step { color: var(--accent-text); font-size: 12.5px; font-weight: 600; letter-spacing: 0.04em; }
-h1 { margin: 2px 0 10px; font: 600 27px/1.25 var(--display); }
-#points { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; max-width: 760px; }
-#points li { position: relative; padding-inline-start: 18px; color: #d6d6d6; }
-#points li::before { content: ""; position: absolute; inset-inline-start: 2px; top: 0.62em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-#points b { color: var(--text); font-weight: 600; }
-.quiet { color: var(--muted); }
-kbd {
-  display: inline-grid; place-items: center; min-width: 24px; height: 23px; padding: 0 7px; margin: 0 1px;
-  border: 1px solid rgba(255, 255, 255, 0.14); border-bottom-width: 2px; border-radius: 5px;
-  background: #383838; color: var(--text); font: 600 12.5px/1 "Segoe UI Variable Text", "Segoe UI", sans-serif;
-  vertical-align: 1px;
-}
-.plus { margin: 0 2px; color: var(--faint); font-size: 12px; }
-.inline-btn { margin-left: 8px; height: 26px; padding: 0 12px; vertical-align: 1px; }
-.entering .words, .entering .stage { animation: enter 0.32s ease-out; }
-@keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* The clip: its picture with its sentence, and the list of its chapters beside them. */
+#clip { flex: none; padding: 10px 10px 0; }
 
-/* The way through the slides. */
-footer { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 30px 18px; }
-.dots { display: flex; gap: 6px; }
-.dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 4px; background: #4a4a4a; transition: width 0.2s, background 0.2s; }
-.dots button:hover { background: #6a6a6a; }
-.dots button[aria-current="step"] { width: 22px; background: var(--accent); }
-.buttons { display: flex; gap: 8px; }
+/* The way out: the offer to sign in while nobody is, the settings, and the start. */
+footer { flex: 1; display: flex; align-items: flex-end; gap: 16px; padding: 12px 24px 18px; }
+.offer { display: flex; align-items: center; gap: 12px; min-width: 0; color: var(--muted); font-size: 13.5px; line-height: 1.35; }
+.buttons { display: flex; gap: 8px; margin-inline-start: auto; }
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: none;
   height: 34px; padding: 0 16px; white-space: nowrap;
   border: 1px solid var(--line-strong); border-radius: 6px; background: #383838;
 }
@@ -72,913 +40,121 @@ footer { flex: none; display: flex; align-items: center; justify-content: space-
 .btn:active { background: #333; color: var(--muted); }
 .btn.accent { border-color: transparent; background: var(--accent); color: #fff; }
 .btn.accent:hover { background: var(--accent-hover); }
-.btn.flat { border-color: transparent; background: none; color: var(--muted); }
-.btn.flat:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
 .hidden { display: none !important; }
-
-/* The picture. */
-.ink { font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; }
 </style>
 </head>
 <body class="loading">
-<main class="deck" id="deck">
-  <div class="stage"><svg id="scene" viewBox="0 0 640 250" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg></div>
-  <div class="words">
-    <div class="step" id="step"></div>
-    <h1 id="title"></h1>
-    <ul id="points"></ul>
-  </div>
-</main>
+<div id="clip"></div>
 <footer>
-  <div class="dots" id="dots" role="tablist"></div>
+  <div class="offer hidden" id="offer">
+    <span id="offer-text"></span>
+    <button class="btn" id="sign-in"></button>
+  </div>
   <div class="buttons">
-    <button class="btn flat" id="back"></button>
-    <button class="btn hidden" id="open-settings"></button>
-    <button class="btn accent" id="next"></button>
+    <button class="btn" id="open-settings"></button>
+    <button class="btn accent" id="start"></button>
   </div>
 </footer>
+<script>
+/* The clip. */
+</script>
 <script>
 "use strict";
 
 // The window talks to the program in JSON: it asks with `send`, and hears in `heard` below.
 const webview = window.chrome && window.chrome.webview;
 const send = message => webview && webview.postMessage(JSON.stringify(message));
-const $ = (selector, root = document) => root.querySelector(selector);
+const $ = selector => document.querySelector(selector);
 
-const state = { language: "en", texts: {}, rightToLeft: false, settings: null, signedIn: null, tools: [], icons: {}, slide: 0 };
-
-/** An element of the page with its attributes and children. */
-function h(tag, attributes, ...children) {
-  const element = document.createElement(tag);
-  for (const [name, value] of Object.entries(attributes || {})) {
-    if (value == null || value === false) continue;
-    if (name.startsWith("on")) element.addEventListener(name.slice(2), value);
-    else element.setAttribute(name, value === true ? "" : value);
-  }
-  element.append(...children.flat().filter(child => child != null && child !== false));
-  return element;
-}
-
-/** Keys as caps: "Ctrl+Shift+C" or several of them. */
-function keys(combination) {
-  const parts = combination.split("+").map(part => part.trim());
-  return h("span", {}, ...parts.flatMap((part, i) => [i ? h("span", { class: "plus" }, "+") : null, h("kbd", {}, part)]));
-}
-
-/** A line of a slide: text and keys, as `["text ", keys("Esc"), " text"]`. */
-const line = (...parts) => h("li", {}, ...parts);
-
-// The slides' texts in English; the program gives their translations into the language in force.
-// `{name}` marks where keys go in a line, `**…**` what is bold.
+// The window's own words in English; the program gives their translations into the language in
+// force. The clip has its own words.
 const TEXT = {
-  back: "Back",
-  next: "Next",
   start: "Start",
   openSettings: "Open the settings",
-  slides: "Slides",
-  step: "{n} of {count}",
-  s1: "One key for a screenshot",
-  s1a: "{hotkey} freezes the screen.",
-  s1b: "Draw a frame around what you need, or click a window to take it whole. {all} takes the whole monitor.",
-  s1c: "The frame can be moved and pulled by its edges. A right click starts over, {esc} leaves.",
-  s2: "Draw on top",
-  s2a: "The tools are on the panel under the selection; each one's key is in its hint.",
-  s2b: "The mouse wheel sets the width, the dot on the panel the colour. {shift} makes neat angles and squares.",
-  s2c: "**Magic pencil** {magic}: circle roughly, and get a neat oval or rectangle.",
-  s2d: "**Filled rectangle** {filled} hides what's extra: a password or a face won't go any further.",
-  s3: "Everything can be put right",
-  s3a: "What you've just drawn is picked: pull a circle to put right the tip of an arrow or a corner of a frame.",
-  s3b: "With no tool chosen, any mark can be dragged. A **double click** on a label lets you edit its text.",
-  s3c: "{delete} deletes a mark, {undo} undoes any change.",
-  labelBefore: "Look here",
-  labelAfter: "Look at this!",
-  s4: "Take the result",
-  s4a: "{copy} or {enter}: the picture with its marks in the clipboard.",
-  s4b: "{copyText}: only the text in the picture. Windows reads it by itself, offline.",
-  s4c: "{save}: a PNG file in the folder of screenshots; {saveAs}: choose where.",
-  cardPicture: "Picture",
-  cardText: "Text",
-  cardFile: "PNG file",
-  s5: "Ask Google",
-  s5button: "{key} **{name}**: {doing}.",
-  doingChat: "**press**, and Google's AI answers next to the selection, and you can ask further; **hold** to ask your own question aloud while holding",
-  doingAnswer: "a short answer in a card next to the selection",
-  doingImages: "where this picture comes from and where else it is",
-  doingAi: "the AI's answer above the results in your browser",
-  s5marks: "The screenshot goes with its marks: circle what you're asking about.",
-  s5none: "There are no query buttons: add them in the settings, “Query buttons”.",
-  press: "Press",
-  hold: "Hold",
-  aiMode: "Google's AI Mode",
-  question: "Where was this taken?",
-  speak: "speak while holding",
-  letGo: "let go: the question is sent",
-  s6: "Make it yours",
-  s6a: "The settings are in the menu of the ainitShot icon in the tray: the hotkey, the colours, where the panels stand, your own query buttons with your own questions and keys, and the language.",
-  s6out: "Sign in to Google once: the captcha comes less often, and conversations are kept.",
-  s6in: "One signs in to Google once, in the program's window: fewer captchas, and conversations are kept.",
+  signInOffer: "Sign in to Google once: the captcha comes less often, and conversations are kept.",
   signIn: "Sign in",
-  general: "General",
-  drawing: "Drawing",
-  panels: "Panels",
-  saving: "Saving",
-  queryButtons: "Query buttons",
-  googleAccount: "Google account",
-  hotkey: "Hotkey",
-  colors: "Colours",
-  screenshots: "Pictures\\Screenshots",
-  oneSignIn: "One sign-in, in the program's window",
-  quoted: "“{text}”",
 };
 
-/** A text of the slides in the language in force, with `{name}` filled in from `values`. */
-function say(key, values = {}) {
-  const text = state.texts[key] || TEXT[key] || key;
-  return text.replace(/\{(\w+)\}/g, (all, name) => (name in values && typeof values[name] !== "object" ? String(values[name]) : all));
-}
-
-/** A line of a slide from its text: `{name}` becomes the element given for it, `**…**` bold. */
-function rich(key, nodes = {}) {
-  const parts = say(key, nodes).split(/(\{\w+\}|\*\*[^*]+\*\*)/).filter(Boolean);
-  return parts.map(part => {
-    const node = /^\{(\w+)\}$/.exec(part);
-    if (node && nodes[node[1]] != null) return nodes[node[1]];
-    const bold = /^\*\*([^*]+)\*\*$/.exec(part);
-    return bold ? h("b", {}, bold[1]) : part;
-  });
-}
-
-
-// The picture: an SVG of the frozen screen, moved frame by frame.
-const W = 640, H = 250;
-const SVG = "http://www.w3.org/2000/svg";
-function S(tag, attributes = {}, ...children) {
-  const element = document.createElementNS(SVG, tag);
-  for (const [name, value] of Object.entries(attributes)) if (value != null) element.setAttribute(name, value);
-  element.append(...children.flat().filter(Boolean));
-  return element;
-}
-function set(element, attributes) {
-  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
-}
-const clamp = (x, low, high) => Math.min(high, Math.max(low, x));
-/** How far time `t` has gone from `a` to `b`, eased: 0 before, 1 after. */
-const along = (t, a, b) => {
-  const k = clamp((t - a) / (b - a), 0, 1);
-  return k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
+const state = {
+  language: "en", rightToLeft: false, texts: {}, clip: {}, terms: {},
+  settings: null, signedIn: null, icons: {}, chapter: 0,
 };
-const mix = (a, b, k) => a + (b - a) * k;
-const ACCENT = "#2f6feb";
+let player = null;
 
-/** An icon of the toolbar, as the program draws it, `size` pixels wide with its top left at x, y. */
-function icon(parts, x, y, size, color) {
-  const g = S("g", { transform: `translate(${x} ${y}) scale(${size / 20})` });
-  for (const part of parts || []) {
-    if (part.line) g.append(S("path", { d: part.line, fill: "none", stroke: color, "stroke-width": 1.6, "stroke-linecap": "round", "stroke-linejoin": "round" }));
-    else if (part.fill) g.append(S("path", { d: part.fill, fill: color }));
-    else if (part.dot) g.append(S("circle", { cx: part.dot[0], cy: part.dot[1], r: part.dot[2], fill: color }));
+/** The clip's chapters: those of the site's overview, and saving after copying the text, which the
+ * site shows among the features. */
+const CHAPTERS = AinitShotClip.chapters.includes("save")
+  ? AinitShotClip.chapters
+  : AinitShotClip.chapters.flatMap(id => (id === "copy-text" ? [id, "save"] : [id]));
+
+const say = key => state.texts[key] || TEXT[key];
+
+/** The clip's words from the flat keys of the catalog: "picture.explorer.places.0" is the first
+ * of the places. */
+function unflatten(flat) {
+  const words = {};
+  for (const [key, text] of Object.entries(flat)) {
+    const path = key.split(".");
+    let node = words;
+    path.forEach((part, i) => {
+      if (i === path.length - 1) node[part] = text;
+      else node = node[part] ??= /^\d+$/.test(path[i + 1]) ? [] : {};
+    });
   }
-  return g;
+  return words;
 }
 
-/** Lines of text on a page: grey bars of the given widths. */
-function textLines(x, y, widths, step = 9, color = "#c9ccd1", height = 4) {
-  return S("g", {}, widths.map((w, i) => S("rect", { x, y: y + i * step, width: w, height, rx: 2, fill: color })));
-}
-
-/** The desktop that is frozen: a wallpaper, a page with text, and a photo. */
-function desktop() {
-  const page = S("g", {},
-    S("rect", { x: 40, y: 24, width: 300, height: 200, rx: 7, fill: "#f6f7f9" }),
-    S("rect", { x: 40, y: 24, width: 300, height: 22, rx: 7, fill: "#e9ebef" }),
-    S("rect", { x: 40, y: 38, width: 300, height: 8, fill: "#e9ebef" }),
-    S("circle", { cx: 52, cy: 35, r: 3.2, fill: "#c4c8cf" }),
-    S("rect", { x: 62, y: 32, width: 80, height: 6, rx: 3, fill: "#c4c8cf" }),
-    S("rect", { x: 60, y: 60, width: 150, height: 9, rx: 3, fill: "#2b2f36" }),
-    textLines(60, 80, [250, 238, 246, 180]),
-    S("rect", { x: 60, y: 128, width: 56, height: 5, rx: 2.5, fill: "#8a9099" }),
-    S("rect", { x: 60, y: 138, width: 170, height: 20, rx: 4, fill: "#fff", stroke: "#cfd3da" }),
-    S("text", { x: 68, y: 152, fill: "#2b2f36", "font-size": 11, class: "ink", "letter-spacing": 1.5 }, "•••••••••"),
-    textLines(60, 172, [240, 210, 120]),
-  );
-  const photo = S("g", {},
-    S("rect", { x: 362, y: 40, width: 246, height: 182, rx: 7, fill: "#24272c" }),
-    S("rect", { x: 374, y: 58, width: 222, height: 152, rx: 4, fill: "url(#sky)" }),
-    S("circle", { cx: 548, cy: 92, r: 15, fill: "#ffd166" }),
-    S("path", { d: "M 374 210 L 430 128 L 462 162 L 506 104 L 570 180 L 596 160 L 596 210 Z", fill: "#3d5a80" }),
-    S("path", { d: "M 506 104 L 492 124 L 500 122 L 506 130 L 512 121 L 521 125 Z", fill: "#e8eef7" }),
-    S("path", { d: "M 374 210 L 410 176 L 448 196 L 486 170 L 530 198 L 596 182 L 596 210 Z", fill: "#293d5a" }),
-    S("rect", { x: 374, y: 46, width: 60, height: 5, rx: 2.5, fill: "#5b6270" }),
-  );
-  // The wallpaper reaches past the picture, so that a wider stage shows no edges.
-  return S("g", {},
-    S("rect", { x: -200, y: -50, width: W + 400, height: H + 100, fill: "url(#wall)" }),
-    S("circle", { cx: 520, cy: 250, r: 190, fill: "url(#bloom)" }),
-    page, photo);
-}
-
-function defs() {
-  return S("defs", {},
-    S("linearGradient", { id: "wall", x1: 0, y1: 0, x2: 1, y2: 1 },
-      S("stop", { offset: 0, "stop-color": "#1b3557" }), S("stop", { offset: 1, "stop-color": "#2f5e94" })),
-    S("radialGradient", { id: "bloom" },
-      S("stop", { offset: 0, "stop-color": "#7fb2ff", "stop-opacity": 0.55 }), S("stop", { offset: 1, "stop-color": "#7fb2ff", "stop-opacity": 0 })),
-    S("linearGradient", { id: "sky", x1: 0, y1: 0, x2: 0, y2: 1 },
-      S("stop", { offset: 0, "stop-color": "#8ec5ff" }), S("stop", { offset: 1, "stop-color": "#f7d9b4" })),
-    S("filter", { id: "shade", x: "-20%", y: "-20%", width: "140%", height: "160%" },
-      S("feDropShadow", { dx: 0, dy: 2, stdDeviation: 2.5, "flood-color": "#000", "flood-opacity": 0.45 })),
-    S("mask", { id: "hole", maskUnits: "userSpaceOnUse", x: -200, y: -50, width: W + 400, height: H + 100 },
-      S("rect", { x: -200, y: -50, width: W + 400, height: H + 100, fill: "#fff" }),
-      S("rect", { id: "hole-rect", x: 0, y: 0, width: 0, height: 0, fill: "#000" })),
-  );
-}
-
-/** The frozen screen with what goes over it: the dimming with the selection or a window bright
- *  in it, the selection's frame and handles, the annotations, the panels, and the mouse. */
-class Screen {
-  constructor(svg) {
-    svg.append(defs(), desktop());
-    this.hole = $("#hole-rect", svg);
-    this.dim = S("rect", { x: -200, y: -50, width: W + 400, height: H + 100, fill: "#000", "fill-opacity": 0.53, mask: "url(#hole)" });
-    this.frame = S("rect", { fill: "none" });
-    this.handles = S("g", {});
-    this.marks = S("g", {});
-    this.ui = S("g", {});
-    this.top = S("g", {});
-    this.mouse = S("g", {}, S("path", {
-      d: "M 0 0 L 0 15.5 L 4.2 11.8 L 7 18 L 9.6 16.9 L 6.9 10.9 L 12.2 10.9 Z",
-      fill: "#fff", stroke: "#111", "stroke-width": 1, "stroke-linejoin": "round",
-    }));
-    svg.append(this.dim, this.marks, this.frame, this.handles, this.ui, this.top, this.mouse);
-    this.overlay(1);
-    this.select(null);
-  }
-
-  /** How much the screen is dimmed, from 0 to 1. */
-  overlay(k) {
-    set(this.dim, { opacity: k });
-  }
-
-  /** The bright part: the selection with its frame and handles, a window lit up with a frame in
-   *  the accent colour, or nothing. */
-  select(r, kind = "selection") {
-    if (!r) {
-      set(this.hole, { width: 0, height: 0 });
-      set(this.frame, { width: 0, height: 0, stroke: "none" });
-      this.handles.replaceChildren();
-      return;
-    }
-    set(this.hole, { x: r.x, y: r.y, width: r.w, height: r.h });
-    if (kind === "window") {
-      set(this.frame, { x: r.x + 1, y: r.y + 1, width: r.w - 2, height: r.h - 2, stroke: ACCENT, "stroke-width": 2, rx: 6 });
-      this.handles.replaceChildren();
-      return;
-    }
-    set(this.frame, { x: r.x - 0.5, y: r.y - 0.5, width: r.w + 1, height: r.h + 1, stroke: "#fff", "stroke-width": 1, rx: 0 });
-    const xs = [r.x, r.x + r.w / 2, r.x + r.w], ys = [r.y, r.y + r.h / 2, r.y + r.h];
-    const points = [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [1, 2], [0, 2], [0, 1]];
-    this.handles.replaceChildren(...points.map(([i, j]) =>
-      S("circle", { cx: xs[i], cy: ys[j], r: 2.6, fill: "#fff", stroke: "rgba(0,0,0,0.35)", "stroke-width": 0.8 })));
-  }
-
-  /** The mouse at a point, shown or hidden. */
-  pointer(x, y, shown = true) {
-    set(this.mouse, { transform: `translate(${x} ${y})`, opacity: shown ? 1 : 0 });
-  }
-}
-
-/** The size of the selection next to it, as the program shows it. */
-function sizePill() {
-  const text = S("text", { x: 0, y: 0, fill: "#f2f2f2", "font-size": 9, class: "ink", "text-anchor": "middle" });
-  const back = S("rect", { height: 15, rx: 7.5, fill: "rgba(28,28,28,0.92)" });
-  const g = S("g", {}, back, text);
-  g.show = (r, scale = 3) => {
-    const label = `${Math.round(r.w * scale)} × ${Math.round(r.h * scale)}`;
-    text.textContent = label;
-    const width = 10 + label.length * 5.1;
-    set(back, { x: r.x, y: r.y - 20, width });
-    set(text, { x: r.x + width / 2, y: r.y - 9.5 });
+/** What the clip shows: the language in force, the hotkey and the query buttons of the settings
+ * in force, and the program's icons. */
+function options() {
+  return {
+    language: state.language,
+    direction: state.rightToLeft ? "rtl" : "ltr",
+    theme: "dark",
+    hotkey: state.settings.hotkey,
+    buttons: state.settings.buttons || [],
+    actions: "column",
+    words: { ...unflatten(state.clip), program: AinitShotClip.programWords(state.terms) },
+    icons: state.icons,
   };
-  return g;
 }
 
-/** The width of the main panel: its 11 buttons, 18 wide, its padding and its 2 separators. */
-const BAR_WIDTH = 6 + 11 * 18 + 2 * 6;
-
-/** The main panel as the program draws it, the tool `active` lit up; buttons 18 wide. */
-function toolbar(x, y, active) {
-  const order = ["Pencil", "Brush", "Line", "Arrow", "Rectangle", "FilledRectangle", "Text", "MagicPencil"];
-  const groups = [order, ["color", "undo"], ["close"]];
-  const g = S("g", { transform: `translate(${x} ${y})` });
-  const width = BAR_WIDTH;
-  g.append(S("rect", { x: 0, y: 0, width, height: 24, rx: 7, fill: "rgba(32,32,32,0.97)", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.6, filter: "url(#shade)" }));
-  const lit = {};
-  let at = 3;
-  groups.forEach((group, i) => {
-    if (i) {
-      g.append(S("rect", { x: at + 2.5, y: 7, width: 0.8, height: 10, fill: "rgba(255,255,255,0.14)" }));
-      at += 6;
-    }
-    for (const name of group) {
-      const back = S("rect", { x: at + 1.5, y: 4.5, width: 15, height: 15, rx: 4, fill: "transparent" });
-      g.append(back);
-      lit[name] = back;
-      if (name === "color") {
-        g.append(S("circle", { cx: at + 9, cy: 12, r: 4, fill: "#e53935", stroke: "rgba(255,255,255,0.8)", "stroke-width": 1 }));
-      } else {
-        g.append(icon(state.icons[name], at + 3.5, 6.5, 11, "#ececec"));
-      }
-      at += 18;
-    }
-  });
-  g.width = width;
-  g.light = name => {
-    for (const [key, back] of Object.entries(lit)) set(back, { fill: key === name ? ACCENT : "transparent" });
-  };
-  g.light(active);
-  return g;
-}
-
-/** The panel of the actions, as a column: the first query buttons of the settings, masking, then
- * copying and saving. */
-function queryColumn(x, y) {
-  const buttons = (state.settings.buttons || []).slice(0, 4);
-  const ai = buttons.filter(b => b.mode !== "images"), images = buttons.filter(b => b.mode === "images");
-  const groups = [ai, images, ["mask"], ["copy", "copyText", "save"]].filter(group => group.length);
-  const count = groups.reduce((sum, group) => sum + group.length, 0);
-  const height = 6 + count * 18 + (groups.length - 1) * 6;
-  const g = S("g", { transform: `translate(${x} ${y - height})` });
-  g.append(S("rect", { x: 0, y: 0, width: 24, height, rx: 7, fill: "rgba(32,32,32,0.97)", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.6, filter: "url(#shade)" }));
-  let at = 3;
-  groups.forEach((group, i) => {
-    if (i) {
-      g.append(S("rect", { x: 7, y: at + 2.5, width: 10, height: 0.8, fill: "rgba(255,255,255,0.14)" }));
-      at += 6;
-    }
-    for (const button of group) {
-      // An action by the name of its icon, or a query button from the settings.
-      const look = typeof button === "string" ? button : button.icon || (button.mode === "images" ? "images" : "google");
-      if (look === "google" || look === "translate") {
-        g.append(S("text", { x: 12, y: at + 12.5, fill: "#ececec", "font-size": look === "google" ? 10 : 7.5, "font-weight": 700, class: "ink", "text-anchor": "middle" }, look === "google" ? "G" : "A\u042f"));
-      } else {
-        g.append(icon(state.icons[look], 6.5, at + 3.5, 11, "#ececec"));
-      }
-      at += 18;
-    }
-  });
-  g.height = height;
-  return g;
-}
-
-/** A stroke drawn bit by bit: its path, shown up to `k` of its length. */
-function drawn(path, k) {
-  const length = path.getTotalLength ? path.getTotalLength() : 0;
-  set(path, { "stroke-dasharray": `${length} ${length}`, "stroke-dashoffset": length * (1 - k) });
-}
-
-/** An arrow annotation from one point to another, as the program draws it. */
-function arrowShape(color = "#e53935", width = 3) {
-  const shaft = S("path", { fill: "none", stroke: color, "stroke-width": width, "stroke-linecap": "round" });
-  const head = S("path", { fill: color, stroke: color, "stroke-width": width * 0.4, "stroke-linejoin": "round" });
-  const g = S("g", {}, shaft, head);
-  g.to = (x1, y1, x2, y2) => {
-    const length = Math.hypot(x2 - x1, y2 - y1);
-    if (length < 1) {
-      set(shaft, { d: "" });
-      set(head, { d: "" });
-      return;
-    }
-    const [ux, uy] = [(x2 - x1) / length, (y2 - y1) / length];
-    const size = Math.min(Math.max(width * 3.5, 12), length);
-    const half = size * 0.55;
-    const [bx, by] = [x2 - ux * size, y2 - uy * size];
-    set(shaft, { d: `M ${x1} ${y1} L ${x2 - ux * size * 0.6} ${y2 - uy * size * 0.6}` });
-    set(head, { d: `M ${x2} ${y2} L ${bx - uy * half} ${by + ux * half} L ${bx + uy * half} ${by - ux * half} Z` });
-  };
-  return g;
-}
-
-/** The handles of the annotation picked: white with a ring in the accent colour. */
-function pickHandle() {
-  return S("circle", { r: 3.6, fill: "#fff", stroke: ACCENT, "stroke-width": 1.4 });
-}
-
-/** A label as the program draws it: letters in their colour over a soft shadow. */
-function labelShape(x, y, color = "#e53935") {
-  const shadow = S("text", { x, y: y + 1.5, fill: "#000", opacity: 0.45, "font-size": 15, "font-weight": 600, class: "ink", filter: "url(#shade)" });
-  const text = S("text", { x, y, fill: color, "font-size": 15, "font-weight": 600, class: "ink" });
-  const g = S("g", {}, shadow, text);
-  g.write = value => {
-    shadow.textContent = value;
-    text.textContent = value;
-  };
-  g.end = () => x + (text.getComputedTextLength ? text.getComputedTextLength() : 0);
-  return g;
-}
-
-/** Two quick rings at a point: a double click. */
-function clickRings() {
-  const a = S("circle", { r: 0, fill: "none", stroke: "#fff", "stroke-width": 1.4 });
-  const b = S("circle", { r: 0, fill: "none", stroke: "#fff", "stroke-width": 1.4 });
-  const g = S("g", {}, a, b);
-  g.at = (x, y, t) => {
-    for (const [ring, start] of [[a, 0], [b, 160]]) {
-      const k = clamp((t - start) / 360, 0, 1);
-      set(ring, { cx: x, cy: y, r: 3 + k * 10, opacity: k > 0 && k < 1 ? 1 - k : 0 });
-    }
-  };
-  return g;
-}
-
-/** A key cap drawn in the picture, `width` wide and `size` high, pressed down by `down` from 0
- *  to 1, and lit around while it is `held`. */
-function keyCap(x, y, text, size = 34, width = size) {
-  const base = S("rect", { x, y: y + 3, width, height: size, rx: 7, fill: "#1f1f1f" });
-  const top = S("rect", { width, height: size - 2, rx: 7, fill: "#3b3b3b", stroke: "rgba(255,255,255,0.16)", "stroke-width": 0.8 });
-  const label = S("text", { fill: "#f0f0f0", "font-size": size * 0.42, "font-weight": 700, class: "ink", "text-anchor": "middle" }, text);
-  const glow = S("rect", { x: x - 4, y: y - 4, width: width + 8, height: size + 9, rx: 10, fill: "none", stroke: ACCENT, "stroke-width": 2, opacity: 0 });
-  const g = S("g", {}, glow, base, top, label);
-  g.press = (down, held = 0) => {
-    const dy = down * 3;
-    set(top, { x, y: y + dy });
-    set(label, { x: x + width / 2, y: y + dy + size * 0.64 });
-    set(glow, { opacity: held });
-  };
-  g.press(0);
-  return g;
-}
-
-/** A small window of the program next to the selection, with an answer being written. */
-function answerWindow(x, y, w, h) {
-  const g = S("g", {});
-  g.append(S("rect", { x, y, width: w, height: h, rx: 7, fill: "#202124", stroke: "rgba(255,255,255,0.12)", "stroke-width": 0.6, filter: "url(#shade)" }));
-  g.append(S("text", { x: x + 10, y: y + 15, fill: "#8db3ff", "font-size": 8.5, "font-weight": 600, class: "ink" }, say("aiMode")));
-  const bars = [0.92, 0.84, 0.88, 0.6].map((part, i) =>
-    S("rect", { x: x + 10, y: y + 26 + i * 10, height: 4.5, rx: 2.2, fill: "#5f6368", "data-full": (w - 20) * part, width: 0 }));
-  g.append(...bars);
-  g.write = k => bars.forEach((bar, i) => set(bar, { width: Math.max(0, Math.min(1, k * bars.length - i)) * bar.dataset.full }));
-  return g;
-}
-
-
-// The slides. Each says what it is about in a few lines and shows it in a picture that moves on
-// a loop: `picture(svg)` makes the picture and gives back how it looks at a moment, and how long
-// its loop is.
-const hotkey = () => state.settings.hotkey || "Alt+~";
-const toolKey = id => (state.tools.find(tool => tool.id === id) || {}).key || "?";
-/** The button for a conversation, which is pressed or held: the first one, if any. */
-const chatButton = () => (state.settings.buttons || []).find(button => button.mode === "chat");
-
-/** What a query button does, in a few words, by where it sends the screenshot. */
-function doing(button) {
-  switch (button.mode) {
-    case "chat": return "doingChat";
-    case "answer": return "doingAnswer";
-    case "images": return "doingImages";
-    default: return "doingAi";
-  }
-}
-
-const SLIDES = [
-  {
-    title: "s1",
-    points: () => [
-      line(rich("s1a", { hotkey: keys(hotkey()) })),
-      line(rich("s1b", { all: keys("Ctrl+A") })),
-      line(rich("s1c", { esc: keys("Esc") })),
-    ],
-    picture(svg) {
-      const screen = new Screen(svg);
-      const pill = sizePill();
-      const bar = toolbar(0, 0, null);
-      const column = queryColumn(0, 0);
-      const caps = S("g", {});
-      const parts = hotkey().split("+").map(part => part.trim());
-      // The caps are as wide as their names.
-      const capWidth = part => Math.max(40, part.length * 10 + 22);
-      const total = parts.reduce((sum, part) => sum + capWidth(part), 0) + (parts.length - 1) * 22;
-      let cx = W / 2 - total / 2;
-      const capShapes = parts.map((part, i) => {
-        const cap = keyCap(cx, 104, part, 40, capWidth(part));
-        caps.append(cap);
-        cx += capWidth(part) + 22;
-        if (i < parts.length - 1) caps.append(S("text", { x: cx - 11, y: 130, fill: "#ddd", "font-size": 16, class: "ink", "text-anchor": "middle" }, "+"));
-        return cap;
-      });
-      screen.top.append(caps);
-      screen.ui.append(pill, bar, column);
-      const page = { x: 40, y: 24, w: 300, h: 200 }, photo = { x: 362, y: 40, w: 246, h: 182 };
-      const from = [74, 54], to = [304, 172];
-      return {
-        loop: 8500,
-        at(t) {
-          // The hotkey is pressed, and the screen freezes: dimmed, with the window under the
-          // mouse lit up; then the mouse goes on and draws the selection.
-          const on = along(t, 1300, 1550);
-          set(caps, { opacity: 1 - along(t, 1250, 1450) });
-          capShapes.forEach(cap => cap.press(t > 500 && t < 850 ? 1 : 0));
-          const out = 1 - along(t, 7800, 8300);
-          let x, y;
-          if (t < 2600) [x, y] = [470, 150];
-          else if (t < 3400) [x, y] = [mix(470, from[0], along(t, 2600, 3400)), mix(150, from[1], along(t, 2600, 3400))];
-          else [x, y] = [mix(from[0], to[0], along(t, 3500, 4700)), mix(from[1], to[1], along(t, 3500, 4700))];
-          screen.pointer(x, y, on > 0.5 && t < 5100);
-          const dragging = t >= 3500;
-          if (!dragging) {
-            screen.select(on > 0 ? (x > 345 ? photo : page) : null, "window");
-            set(pill, { opacity: 0 });
-          } else {
-            const r = { x: from[0], y: from[1], w: Math.max(1, x - from[0]), h: Math.max(1, y - from[1]) };
-            screen.select(r);
-            pill.show(r);
-            set(pill, { opacity: out });
-          }
-          const shown = along(t, 4800, 5150) * out;
-          set(bar, { transform: `translate(${to[0] - bar.width} ${to[1] + 7})`, opacity: shown });
-          set(column, { transform: `translate(${to[0] + 7} ${to[1] - column.height})`, opacity: shown });
-          screen.overlay(on * out);
-          if (out < 1) set(screen.frame, { opacity: out });
-          else set(screen.frame, { opacity: 1 });
-          set(screen.handles, { opacity: out });
-        },
-      };
-    },
-  },
-  {
-    title: "s2",
-    points: () => [
-      line(rich("s2a")),
-      line(rich("s2b", { shift: keys("Shift") })),
-      line(rich("s2c", { magic: keys(toolKey("MagicPencil")) })),
-      line(rich("s2d", { filled: keys(toolKey("FilledRectangle")) })),
-    ],
-    picture(svg) {
-      const screen = new Screen(svg);
-      const r = { x: 52, y: 50, w: 540, h: 150 };
-      screen.select(r);
-      const arrow = arrowShape();
-      const loop = S("path", {
-        d: "M 528 74 C 540 66 566 68 572 82 C 580 98 566 112 548 113 C 530 114 520 104 522 92 C 523 84 530 76 541 73",
-        fill: "none", stroke: "#e53935", "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round",
-      });
-      const ellipse = S("ellipse", { cx: 548, cy: 92, rx: 25, ry: 21, fill: "none", stroke: "#e53935", "stroke-width": 3 });
-      const cover = S("rect", { x: 58, y: 137, height: 22, rx: 1, fill: "#212121" });
-      screen.marks.append(arrow, loop, ellipse, cover);
-      const bar = toolbar(r.x + r.w - BAR_WIDTH, r.y + r.h + 7, "Arrow");
-      const column = queryColumn(r.x + r.w + 7, r.y + r.h);
-      screen.ui.append(bar, column);
-      return {
-        loop: 8400,
-        at(t) {
-          // The arrow, to the heading.
-          const a = along(t, 400, 1400);
-          const [x1, y1, x2, y2] = [300, 182, mix(300, 214, a), mix(182, 72, a)];
-          arrow.to(x1, y1, x2, y2);
-          // The magic pencil's rough loop, which becomes a neat oval.
-          const drawing = along(t, 2000, 3300);
-          drawn(loop, drawing);
-          const neat = along(t, 3500, 3900);
-          set(loop, { opacity: t < 2000 ? 0 : 1 - neat });
-          set(ellipse, { opacity: neat, transform: `rotate(-8 548 92)` });
-          // The filled rectangle, over the password.
-          const hiding = along(t, 4600, 5500);
-          set(cover, { width: hiding * 176, opacity: t < 4600 ? 0 : 1 });
-          bar.light(t < 1800 ? "Arrow" : t < 4300 ? "MagicPencil" : "FilledRectangle");
-          let px, py;
-          if (t < 1600) [px, py] = [x2, y2];
-          else if (t < 2000) [px, py] = [mix(214, 541, along(t, 1600, 2000)), mix(72, 73, along(t, 1600, 2000))];
-          else if (t < 3400) {
-            const p = loop.getPointAtLength(loop.getTotalLength() * drawing);
-            [px, py] = [p.x, p.y];
-          } else if (t < 4600) [px, py] = [mix(541, 58, along(t, 3900, 4600)), mix(73, 137, along(t, 3900, 4600))];
-          else [px, py] = [58 + hiding * 176, 159];
-          screen.pointer(px, py, t < 6200);
-          const out = 1 - along(t, 7800, 8300);
-          set(screen.marks, { opacity: out });
-        },
-      };
-    },
-  },
-  {
-    title: "s3",
-    points: () => [
-      line(rich("s3a")),
-      line(rich("s3b")),
-      line(rich("s3c", { delete: keys("Delete"), undo: keys("Ctrl+Z") })),
-    ],
-    picture(svg) {
-      const screen = new Screen(svg);
-      const r = { x: 52, y: 50, w: 540, h: 150 };
-      screen.select(r);
-      const arrow = arrowShape();
-      const tail = pickHandle(), tip = pickHandle();
-      const label = labelShape(316, 190);
-      const caret = S("rect", { width: 1.6, height: 15, fill: "#e53935" });
-      const rings = clickRings();
-      screen.marks.append(arrow, label, caret);
-      screen.ui.append(tail, tip, rings, toolbar(r.x + r.w - BAR_WIDTH, r.y + r.h + 7, null), queryColumn(r.x + r.w + 7, r.y + r.h));
-      return {
-        loop: 8600,
-        at(t) {
-          // The tip of the arrow goes from the heading to the photo.
-          const moving = along(t, 1300, 2500);
-          const [x1, y1] = [300, 182];
-          const [x2, y2] = [mix(214, 470, moving), mix(72, 150, moving)];
-          arrow.to(x1, y1, x2, y2);
-          const picked = t < 3000;
-          set(tail, { cx: x1, cy: y1, opacity: picked ? 1 : 0 });
-          set(tip, { cx: x2, cy: y2, opacity: picked ? 1 : 0 });
-          let px, py;
-          if (t < 1300) [px, py] = [mix(400, x2, along(t, 500, 1200)), mix(120, y2, along(t, 500, 1200))];
-          else if (t < 2700) [px, py] = [x2, y2];
-          else [px, py] = [mix(470, 345, along(t, 2700, 3400)), mix(150, 184, along(t, 2700, 3400))];
-          screen.pointer(px - 2, py - 1, t < 6900);
-          // A double click on the label opens it, and its end is written anew.
-          rings.at(345, 184, t - 3550);
-          const [before, after] = [Array.from(say("labelBefore")), Array.from(say("labelAfter"))];
-          let kept = 0;
-          while (kept < before.length && before[kept] === after[kept]) kept++;
-          let text = before.join("");
-          if (t > 4300) {
-            const erased = Math.min(before.length - kept, Math.floor((t - 4300) / 110));
-            text = before.slice(0, before.length - erased).join("");
-          }
-          if (t > 5000) text = after.slice(0, Math.min(after.length, kept + Math.floor((t - 5000) / 140))).join("");
-          label.write(text);
-          const editing = t > 3800 && t < 6600;
-          set(caret, { x: label.end() + 1.5, y: 177, opacity: editing && Math.floor(t / 400) % 2 === 0 ? 1 : 0 });
-          set(screen.marks, { opacity: 1 - along(t, 8000, 8500) });
-        },
-      };
-    },
-  },
-  {
-    title: "s4",
-    points: () => [
-      line(rich("s4a", { copy: keys("Ctrl+C"), enter: keys("Enter") })),
-      line(rich("s4b", { copyText: keys("Ctrl+Shift+C") })),
-      line(rich("s4c", { save: keys("Ctrl+S"), saveAs: keys("Ctrl+Shift+S") })),
-    ],
-    picture(svg) {
-      svg.append(defs());
-      const cards = [
-        { icon: "copy", title: say("cardPicture"), keys: "Ctrl+C" },
-        { icon: "copyText", title: say("cardText"), keys: "Ctrl+Shift+C" },
-        { icon: "save", title: say("cardFile"), keys: "Ctrl+S" },
-      ].map((card, i) => {
-        const x = 62 + i * 178;
-        const back = S("rect", { x, y: 46, width: 156, height: 158, rx: 12, fill: "#1f1f1f", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.8 });
-        const tile = S("rect", { x: x + 54, y: 70, width: 48, height: 48, rx: 12, fill: "#2c2c2c" });
-        const g = S("g", {}, back, tile, icon(state.icons[card.icon], x + 64, 80, 28, "#ececec"),
-          S("text", { x: x + 78, y: 146, fill: "#ededed", "font-size": 13, "font-weight": 600, class: "ink", "text-anchor": "middle" }, card.title),
-          S("text", { x: x + 78, y: 170, fill: "#8db3ff", "font-size": 10.5, class: "ink", "text-anchor": "middle" }, card.keys));
-        svg.append(g);
-        return { back, tile };
-      });
-      return {
-        loop: 6000,
-        at(t) {
-          const lit = Math.floor(t / 2000) % 3;
-          cards.forEach((card, i) => {
-            const k = i === lit ? Math.sin(Math.PI * clamp((t % 2000) / 2000, 0, 1)) : 0;
-            set(card.back, { stroke: i === lit ? `rgba(47,111,235,${0.35 + 0.6 * k})` : "rgba(255,255,255,0.1)" });
-            set(card.tile, { fill: i === lit ? `rgba(47,111,235,${0.25 + 0.55 * k})` : "#2c2c2c" });
-          });
-        },
-      };
-    },
-  },
-  {
-    title: "s5",
-    points: () => {
-      const buttons = (state.settings.buttons || []).slice(0, 4);
-      if (!buttons.length) return [line(rich("s5none"))];
-      return [
-        ...buttons.map(button => line(rich("s5button", { key: button.key ? keys(button.key) : "", name: button.name, doing: say(doing(button)) }))),
-        line(h("span", { class: "quiet" }, say("s5marks"))),
-      ];
-    },
-    picture(svg) {
-      svg.append(defs());
-      const button = chatButton() || (state.settings.buttons || [])[0] || { key: "G" };
-      const key = (button.key || "G").toUpperCase();
-      const half = (x, title) => svg.append(S("text", { x, y: 40, fill: "#a8a8a8", "font-size": 12, "font-weight": 600, class: "ink", "text-anchor": "middle" }, title));
-      half(160, say("press"));
-      half(480, say("hold"));
-      svg.append(S("rect", { x: 319.5, y: 28, width: 1, height: 200, fill: "rgba(255,255,255,0.08)" }));
-      // A small picture taken, on either side.
-      const thumb = x => svg.append(S("g", { transform: `translate(${x} 62) scale(0.5)` },
-        S("rect", { x: 0, y: 0, width: 160, height: 120, rx: 6, fill: "url(#sky)" }),
-        S("circle", { cx: 120, cy: 32, r: 12, fill: "#ffd166" }),
-        S("path", { d: "M 0 120 L 40 60 L 64 86 L 96 46 L 160 112 L 160 120 Z", fill: "#3d5a80" }),
-        S("path", { d: "M 96 46 L 86 60 L 92 59 L 96 65 L 101 58 L 107 61 Z", fill: "#e8eef7" }),
-        S("rect", { x: 0.5, y: 0.5, width: 159, height: 119, rx: 6, fill: "none", stroke: "#fff", "stroke-width": 1.4 })));
-      thumb(46);
-      thumb(366);
-      const tap = keyCap(70, 140, key, 40), hold = keyCap(390, 140, key, 40);
-      svg.append(tap, hold);
-      const answerLeft = answerWindow(142, 62, 150, 74);
-      const answerRight = answerWindow(462, 62, 150, 74);
-      svg.append(answerLeft, answerRight);
-      // The microphone and what is heard.
-      const mic = S("g", { transform: "translate(462 160)" },
-        S("circle", { cx: 0, cy: 0, r: 13, fill: "rgba(47,111,235,0.2)" }),
-        S("rect", { x: -3.5, y: -7, width: 7, height: 11, rx: 3.5, fill: "#8db3ff" }),
-        S("path", { d: "M -6.5 0 C -6.5 4.5 -3.5 7 0 7 C 3.5 7 6.5 4.5 6.5 0 M 0 7 V 10", fill: "none", stroke: "#8db3ff", "stroke-width": 1.4, "stroke-linecap": "round" }));
-      const waves = [0, 1, 2].map(() => S("circle", { cx: 462, cy: 160, r: 13, fill: "none", stroke: "#8db3ff", "stroke-width": 1 }));
-      const heardBack = S("rect", { x: 484, y: 150, height: 20, rx: 10, fill: "#2a2a2a" });
-      const heard = S("text", { x: 494, y: 164, fill: "#ededed", "font-size": 10, class: "ink" });
-      svg.append(...waves, mic, heardBack, heard);
-      const hint = S("text", { x: 480, y: 218, fill: "#767676", "font-size": 10, class: "ink", "text-anchor": "middle" });
-      svg.append(hint);
-      const question = say("question");
-      return {
-        loop: 9600,
-        at(t) {
-          // A press: the answer comes next to the selection.
-          tap.press(t > 500 && t < 680 ? 1 : 0);
-          set(answerLeft, { opacity: along(t, 750, 1000) * (1 - along(t, 9000, 9400)) });
-          answerLeft.write(along(t, 1000, 2800));
-          // Held: the microphone listens while the key is down, and the question goes when it
-          // is let go.
-          const down = t > 3400 && t < 7000;
-          hold.press(down ? 1 : 0, down ? 0.6 + 0.4 * Math.sin(t / 180) : 0);
-          const listening = down && t > 3700;
-          set(mic, { opacity: listening ? 1 : 0 });
-          waves.forEach((wave, i) => {
-            const k = ((t / 1100) + i / 3) % 1;
-            set(wave, { r: 13 + k * 14, opacity: listening ? (1 - k) * 0.7 : 0 });
-          });
-          const typed = question.slice(0, clamp(Math.floor((t - 4000) / 160), 0, question.length));
-          heard.textContent = typed ? say("quoted", { text: typed }) : "";
-          set(heardBack, { width: typed ? 22 + typed.length * 5.6 : 0, opacity: t < 7300 ? 1 : 0 });
-          set(heard, { opacity: t < 7300 ? 1 : 0 });
-          hint.textContent = t < 3400 ? "" : t < 7000 ? say("speak") : say("letGo");
-          set(answerRight, { opacity: along(t, 7150, 7400) * (1 - along(t, 9000, 9400)) });
-          answerRight.write(along(t, 7400, 8900));
-        },
-      };
-    },
-  },
-  {
-    title: "s6",
-    points: () => [
-      line(rich("s6a")),
-      state.signedIn === false
-        ? line(rich("s6out"), h("button", { class: "btn accent inline-btn", onclick: () => send({ type: "account" }) }, say("signIn")))
-        : line(rich("s6in")),
-    ],
-    picture(svg) {
-      svg.append(defs());
-      const x = 120, y = 26, w = 400, h = 198;
-      svg.append(S("rect", { x, y, width: w, height: h, rx: 10, fill: "#202020", stroke: "rgba(255,255,255,0.12)", "stroke-width": 0.8, filter: "url(#shade)" }));
-      svg.append(S("rect", { x, y, width: 120, height: h, rx: 10, fill: "#1b1b1b" }));
-      svg.append(S("rect", { x: x + 110, y, width: 10, height: h, fill: "#1b1b1b" }));
-      const sections = ["general", "drawing", "panels", "saving", "queryButtons", "googleAccount"].map(key => say(key));
-      const rows = sections.map((name, i) => {
-        const back = S("rect", { x: x + 8, y: y + 22 + i * 26, width: 104, height: 21, rx: 5, fill: "transparent" });
-        const mark = S("rect", { x: x + 8, y: y + 28 + i * 26, width: 2.5, height: 9, rx: 1.2, fill: ACCENT, opacity: 0 });
-        svg.append(back, mark, S("text", { x: x + 18, y: y + 36 + i * 26, fill: "#dcdcdc", "font-size": 9.5, class: "ink" }, name));
-        return { back, mark };
-      });
-      // What each section shows, in small.
-      const area = { x: x + 136, y: y + 22 };
-      const pages = [
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("hotkey")),
-          ...hotkey().split("+").map((part, i, all) => S("g", {},
-            S("rect", { x: area.x + i * 52, y: area.y + 30, width: 42, height: 28, rx: 6, fill: "#383838", stroke: "rgba(255,255,255,0.14)" }),
-            S("text", { x: area.x + i * 52 + 21, y: area.y + 49, fill: "#f0f0f0", "font-size": 12, "font-weight": 700, class: "ink", "text-anchor": "middle" }, part),
-            i < all.length - 1 ? S("text", { x: area.x + i * 52 + 47, y: area.y + 49, fill: "#888", "font-size": 11, class: "ink", "text-anchor": "middle" }, "+") : null))),
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("colors")),
-          ...(state.settings.colors || []).slice(0, 8).map((color, i) => S("circle", { cx: area.x + 12 + i * 28, cy: area.y + 44, r: 10, fill: color, stroke: "rgba(255,255,255,0.2)" }))),
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("panels")),
-          S("rect", { x: area.x + 40, y: area.y + 34, width: 120, height: 70, fill: "#343434", stroke: "rgba(255,255,255,0.7)", "stroke-width": 0.8 }),
-          S("rect", { x: area.x + 80, y: area.y + 110, width: 80, height: 10, rx: 3, fill: "#2c2c2c", stroke: "rgba(255,255,255,0.2)", "stroke-width": 0.6 }),
-          S("rect", { x: area.x + 166, y: area.y + 70, width: 10, height: 34, rx: 3, fill: "#2c2c2c", stroke: "#8db3ff", "stroke-width": 0.8 })),
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("saving")),
-          S("rect", { x: area.x, y: area.y + 30, width: 230, height: 26, rx: 6, fill: "#1d1d1d", stroke: "rgba(255,255,255,0.12)" }),
-          S("text", { x: area.x + 10, y: area.y + 47, fill: "#a8a8a8", "font-size": 10, class: "ink" }, say("screenshots"))),
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("queryButtons")),
-          ...(state.settings.buttons || []).slice(0, 3).map((button, i) => S("g", {},
-            S("rect", { x: area.x, y: area.y + 28 + i * 34, width: 230, height: 28, rx: 6, fill: "#2b2b2b" }),
-            S("text", { x: area.x + 12, y: area.y + 46 + i * 34, fill: "#ededed", "font-size": 10, class: "ink" }, button.name),
-            button.key ? S("text", { x: area.x + 218, y: area.y + 46 + i * 34, fill: "#8db3ff", "font-size": 10, "font-weight": 700, class: "ink", "text-anchor": "end" }, button.key) : null))),
-        S("g", {}, S("text", { x: area.x, y: area.y + 14, fill: "#ededed", "font-size": 12, "font-weight": 600, class: "ink" }, say("googleAccount")),
-          S("rect", { x: area.x, y: area.y + 30, width: 230, height: 40, rx: 8, fill: "rgba(47,111,235,0.16)", stroke: "rgba(47,111,235,0.45)" }),
-          S("text", { x: area.x + 12, y: area.y + 54, fill: "#ededed", "font-size": 10.5, class: "ink" }, say("oneSignIn"))),
-      ];
-      svg.append(...pages);
-      return {
-        loop: sections.length * 1400,
-        at(t) {
-          const now = Math.floor(t / 1400) % sections.length;
-          const k = along(t % 1400, 0, 260);
-          rows.forEach((row, i) => {
-            set(row.back, { fill: i === now ? "rgba(255,255,255,0.08)" : "transparent" });
-            set(row.mark, { opacity: i === now ? 1 : 0 });
-          });
-          pages.forEach((page, i) => set(page, { opacity: i === now ? k : 0 }));
-        },
-      };
-    },
-  },
-];
-
-
-// Going through the slides.
-let playing = 0;
-
-function show(index) {
-  const count = SLIDES.length;
-  state.slide = clamp(index, 0, count - 1);
-  const slide = SLIDES[state.slide];
-  $("#step").textContent = say("step", { n: state.slide + 1, count });
-  $("#title").textContent = say(slide.title);
-  $("#points").replaceChildren(...slide.points());
-  for (const [i, dot] of [...$("#dots").children].entries()) {
-    if (i === state.slide) dot.setAttribute("aria-current", "step");
-    else dot.removeAttribute("aria-current");
-  }
-  const last = state.slide === count - 1;
-  $("#back").classList.toggle("hidden", state.slide === 0);
-  $("#open-settings").classList.toggle("hidden", !last);
-  $("#next").textContent = last ? say("start") : say("next");
-  $("#back").textContent = say("back");
-  $("#open-settings").textContent = say("openSettings");
-  const deck = $("#deck");
-  deck.classList.remove("entering");
-  void deck.offsetWidth;
-  deck.classList.add("entering");
-  play(slide);
-}
-
-/** Draws the slide's picture anew and moves it on a loop until another slide is shown. */
-function play(slide) {
-  cancelAnimationFrame(playing);
-  const svg = $("#scene");
-  svg.replaceChildren();
-  const picture = slide.picture(svg);
-  const start = performance.now();
-  const frame = now => {
-    picture.at((now - start) % picture.loop);
-    playing = requestAnimationFrame(frame);
-  };
-  picture.at(0);
-  playing = requestAnimationFrame(frame);
-}
-
-function next() {
-  if (state.slide === SLIDES.length - 1) send({ type: "close" });
-  else show(state.slide + 1);
-}
-
-$("#next").addEventListener("click", next);
-$("#back").addEventListener("click", () => show(state.slide - 1));
-$("#open-settings").addEventListener("click", () => send({ type: "settings" }));
-document.addEventListener("keydown", event => {
-  if (event.target.closest && event.target.closest("button") && (event.key === "Enter" || event.key === " ")) return;
-  switch (event.key) {
-    case "ArrowRight": case "PageDown": case "Enter": case " ":
-      event.preventDefault();
-      return next();
-    case "ArrowLeft": case "PageUp": case "Backspace":
-      event.preventDefault();
-      return show(state.slide - 1);
-    case "Home": return show(0);
-    case "End": return show(SLIDES.length - 1);
-    case "Escape": return send({ type: "close" });
-  }
-});
-document.addEventListener("contextmenu", event => event.preventDefault());
-
-
-// What the program tells the page.
-/** The dots of the slides, named in the language in force. */
-function renderDots() {
+/** The window's own words, and the offer to sign in while nobody is. */
+function render() {
   document.documentElement.lang = state.language;
   document.documentElement.dir = state.rightToLeft ? "rtl" : "ltr";
-  $("#dots").setAttribute("aria-label", say("slides"));
-  $("#dots").replaceChildren(...SLIDES.map((slide, i) =>
-    h("button", { role: "tab", title: say(slide.title), "aria-label": say(slide.title), onclick: () => show(i) })));
+  $("#offer-text").textContent = say("signInOffer");
+  $("#sign-in").textContent = say("signIn");
+  $("#offer").classList.toggle("hidden", state.signedIn !== false);
+  $("#open-settings").textContent = say("openSettings");
+  $("#start").textContent = say("start");
 }
 
-/** The language in force, from the program: its code, the slides' texts in it, its direction. */
+/** The language in force, from the program: its code, its direction, the window's words in it,
+ * the clip's own and the program's that the clip shows. */
 function speak(message) {
   state.language = message.language || "en";
-  state.texts = message.texts || {};
   state.rightToLeft = !!message.rightToLeft;
-  if (message.tools) state.tools = message.tools;
-  renderDots();
+  state.texts = message.texts || {};
+  state.clip = message.clip || {};
+  state.terms = message.terms || {};
 }
 
 function init(message) {
   speak(message);
   state.settings = message.settings || {};
   state.signedIn = message.signedIn;
-  state.tools = message.tools || [];
   state.icons = message.icons || {};
+  render();
   document.body.classList.remove("loading");
-  show(0);
+  player = AinitShotClip.mount($("#clip"), {
+    ...options(),
+    chapters: CHAPTERS,
+    autoplay: true,
+    caption: true,
+    keyboard: true,
+    onChapter: i => { state.chapter = i; },
+  });
 }
 
 function heard(message) {
@@ -987,13 +163,21 @@ function heard(message) {
     case "settings":
       state.settings = message.settings || state.settings;
       if (message.language) speak(message);
-      return show(state.slide);
+      render();
+      return player && player.update(options());
     case "account":
       state.signedIn = message.signedIn;
-      if (state.slide === SLIDES.length - 1) $("#points").replaceChildren(...SLIDES[state.slide].points());
-      return;
+      return render();
   }
 }
+
+$("#start").addEventListener("click", () => send({ type: "close" }));
+$("#open-settings").addEventListener("click", () => send({ type: "settings" }));
+$("#sign-in").addEventListener("click", () => send({ type: "account" }));
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") send({ type: "close" });
+});
+document.addEventListener("contextmenu", event => event.preventDefault());
 
 if (webview) webview.addEventListener("message", event => heard(event.data));
 send({ type: "ready" });

@@ -216,6 +216,11 @@ pub fn tr_in(language: Language, english: &'static str) -> &'static str {
     catalog(language).and_then(|catalog| catalog.program.get(english)).copied().unwrap_or(english)
 }
 
+/// A text of the program in the language in force, by its English, where the language has it.
+pub fn translation(english: &str) -> Option<&'static str> {
+    catalog(current()).and_then(|catalog| catalog.program.get(english)).copied()
+}
+
 /// The texts of a page of the program's windows in the language in force, by their names; the
 /// page has its English itself.
 pub fn page(name: &str) -> Value {
