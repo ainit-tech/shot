@@ -24,7 +24,9 @@ cargo "+$toolchain" xwin build --release --locked --target x86_64-pc-windows-msv
 exe="${CARGO_TARGET_DIR:-target}/x86_64-pc-windows-msvc/release/ainitshot.exe"
 
 # Inno Setup under Wine, the same version every time: its installer is checked before it runs, and
-# it installs itself only once into the Wine of the build.
+# it installs itself only once into the Wine of the build. jrsoftware publishes no checksums; this
+# file's Authenticode signature was checked on Windows on 2026-10-25: Valid, signed by Pyrsys B.V.
+# (Sectigo Public Code Signing CA R36), with a Sectigo timestamp.
 inno=6.7.3
 inno_sha256=9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732
 export WINEPREFIX="${WINEPREFIX:-$HOME/.wine-inno}" WINEDEBUG=-all WINEDLLOVERRIDES="mscoree,mshtml="
