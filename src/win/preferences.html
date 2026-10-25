@@ -168,6 +168,28 @@ body.searching.nothing #nothing { display: block; }
 .error { display: none; margin-top: 6px; color: var(--danger); font-size: 12.5px; }
 .error.shown { display: block; }
 .note { margin-top: 5px; color: var(--faint); font-size: 12px; }
+/* About: the program, its license and the open source components it is made of. */
+.about-head { display: flex; align-items: center; gap: 16px; margin: 0 0 14px; }
+.about-head svg { width: 48px; height: 48px; flex: none; }
+.about-head .name { font: 600 20px var(--display); }
+.about-head .version { margin-top: 2px; color: var(--muted); font-size: 12.5px; }
+.license-text, .component-text {
+  margin: 0; max-height: 320px; overflow: auto; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--field); color: var(--muted);
+  font: 11.5px/1.45 Consolas, "Cascadia Mono", monospace; white-space: pre-wrap; user-select: text; cursor: text;
+}
+.components { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; }
+.components:empty { display: none; }
+.components .group { position: sticky; top: 0; padding: 8px 12px 5px; background: var(--card); color: var(--faint); font-size: 12px; }
+.components .component { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 12px; border: 0; background: none; text-align: start; }
+.components .component:hover { background: rgba(255, 255, 255, 0.04); }
+.components .component .version { color: var(--faint); font-size: 12px; }
+.components .component .license { margin-inline-start: auto; color: var(--muted); font-size: 12px; direction: ltr; }
+.components .component-text { margin: 2px 12px 10px; }
+/* A model and how its download goes. */
+.meter { height: 4px; margin: 4px 0 8px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.meter .fill { height: 100%; width: 0; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
+.model-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 32px; color: var(--muted); font-size: 12.5px; }
 /* Controls. */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -421,10 +443,12 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     <symbol id="i-warning" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 3.5 L 17.5 16.5 H 2.5 Z M 10 8 V 11.5"/><circle cx="10" cy="14" r="0.6" fill="currentColor"/></symbol>
     <symbol id="i-sliders" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M 3.5 6.5 H 6.5 M 10.5 6.5 H 16.5 M 3.5 13.5 H 9.5 M 13.5 13.5 H 16.5"/><circle cx="8.5" cy="6.5" r="2"/><circle cx="11.5" cy="13.5" r="2"/></symbol>
     <symbol id="i-sparkle" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M 10 3 C 10.5 7 13 9.5 17 10 C 13 10.5 10.5 13 10 17 C 9.5 13 7 10.5 3 10 C 7 9.5 9.5 7 10 3 Z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M 10 9 V 13.5"/><circle cx="10" cy="6.5" r="0.4" fill="currentColor"/></symbol>
     <symbol id="i-person" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="7" r="3"/><path d="M 4.5 16.5 C 5.2 13.9 7.4 12.3 10 12.3 C 12.6 12.3 14.8 13.9 15.5 16.5"/></symbol>
     <symbol id="i-file" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 11.5 2.5 H 6 C 5.2 2.5 4.5 3.2 4.5 4 V 16 C 4.5 16.8 5.2 17.5 6 17.5 H 14 C 14.8 17.5 15.5 16.8 15.5 16 V 6.5 Z M 11.5 2.5 V 6.5 H 15.5 M 7.5 10.5 H 12.5 M 7.5 13.5 H 12.5"/></symbol>
     <symbol id="i-swap" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 7 H 15.5 M 12.5 4 L 15.5 7 L 12.5 10 M 16 13 H 4.5 M 7.5 10 L 4.5 13 L 7.5 16"/></symbol>
     <symbol id="i-panels" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="10.5" height="8.5" rx="1.5" stroke-width="1.5"/><path d="M 6.5 15.5 H 13.5 M 16.5 5.5 V 11.5" stroke-width="2.6"/></symbol>
+    <symbol id="i-model" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 2.5 L 16.5 6 V 14 L 10 17.5 L 3.5 14 V 6 Z M 3.5 6 L 10 9.5 L 16.5 6 M 10 9.5 V 17.5"/></symbol>
     <symbol id="i-open" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 11 3.5 H 16.5 V 9 M 16.5 3.5 L 9.5 10.5 M 14.5 12 V 15 C 14.5 15.8 13.8 16.5 13 16.5 H 5 C 4.2 16.5 3.5 15.8 3.5 15 V 7 C 3.5 6.2 4.2 5.5 5 5.5 H 8"/></symbol>
   </defs>
 </svg>
@@ -445,7 +469,9 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     <button data-section="panels"><svg class="glyph"><use href="#i-panels"/></svg><span data-t="panels"></span><span class="count"></span></button>
     <button data-section="saving"><span class="nav-icon" data-icon="save"></span><span data-t="saving"></span><span class="count"></span></button>
     <button data-section="buttons"><svg class="glyph"><use href="#i-sparkle"/></svg><span data-t="queryButtons"></span><span class="count"></span></button>
+    <button data-section="models"><svg class="glyph"><use href="#i-model"/></svg><span data-t="models"></span><span class="count"></span></button>
     <button data-section="account"><svg class="glyph"><use href="#i-person"/></svg><span data-t="googleAccount"></span><span class="alert hidden" id="account-alert" data-t-title="notSignedIn"></span><span class="count"></span></button>
+    <button data-section="about"><svg class="glyph"><use href="#i-info"/></svg><span data-t="about"></span><span class="count"></span></button>
   </nav>
   <div class="side-foot">
     <div id="status"><svg><use href="#i-check"/></svg><span id="status-text"></span></div>
@@ -557,6 +583,10 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
         <div><div class="label find" data-t="ask"></div><div class="desc find" data-t="askDesc"></div></div>
         <div class="control"><button class="switch" id="ask" role="switch" data-t-aria="ask"><span class="state"></span><span class="track"></span></button></div>
       </div>
+      <div class="row item" data-k="kSaveCopy">
+        <div><div class="label find" data-t="saveCopy"></div><div class="desc find" data-t="saveCopyDesc"></div></div>
+        <div class="control"><button class="switch" id="save-copy" role="switch" data-t-aria="saveCopy"><span class="state"></span><span class="track"></span></button></div>
+      </div>
       <div class="row wide item" data-k="kFolder">
         <div><div class="label find" data-t="folder"></div><div class="desc find" data-t="folderDesc"></div></div>
         <div class="control"><button class="btn quiet" id="folder-reset" data-t="byDefault"></button></div>
@@ -592,6 +622,21 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     </div>
   </section>
 
+  <section id="models">
+    <h1 data-t="models"></h1>
+    <p class="intro" data-t="modelsIntro"></p>
+    <div class="rows">
+      <div class="row wide item" data-k="kModels">
+        <div><div class="label find">OpenAI Privacy Filter</div><div class="desc find" data-t="privacyFilterDesc"></div></div>
+        <div class="control"><button class="switch" id="privacy-filter" role="switch" aria-label="OpenAI Privacy Filter"><span class="state"></span><span class="track"></span></button></div>
+        <div class="body model">
+          <div class="meter" id="filter-meter"><div class="fill" id="filter-fill"></div></div>
+          <div class="model-line"><span id="filter-state"></span><button class="btn quiet" id="filter-pause"></button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="account">
     <h1 data-t="googleAccount"></h1>
     <p class="intro" data-t="accountIntro"></p>
@@ -599,6 +644,41 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
       <div class="row item" data-k="kAccount">
         <div><div class="label find" id="account-title"></div><div class="desc find" id="account-desc"></div></div>
         <div class="control"><button class="btn" id="account-open"></button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h1 data-t="about"></h1>
+    <div class="about-head">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <div class="name">ainitShot</div>
+        <div class="version">© 2026 ainit</div>
+      </div>
+    </div>
+    <p class="intro" data-t="aboutIntro"></p>
+    <div class="rows">
+      <div class="row item" data-k="kUpdates">
+        <div><div class="label find" data-t="updates"></div><div class="desc" id="updates-state"></div></div>
+        <div class="control"><button class="btn hidden" id="updates-button"></button></div>
+      </div>
+      <div class="row item" data-k="kUpdates">
+        <div><div class="label find" data-t="autoupdate"></div><div class="desc find" data-t="autoupdateDesc"></div></div>
+        <div class="control"><button class="switch" id="autoupdate" role="switch" data-t-aria="autoupdate"><span class="state"></span><span class="track"></span></button></div>
+      </div>
+      <div class="row item" data-k="kAbout">
+        <div><div class="label find" data-t="aboutSite"></div><div class="desc find">shot.ainit.tech</div></div>
+        <div class="control"><button class="btn" id="about-site"><svg class="glyph"><use href="#i-open"/></svg><span data-t="open"></span></button></div>
+      </div>
+      <div class="row wide item" data-k="kAbout">
+        <div><div class="label find" data-t="aboutLicense"></div><div class="desc find" data-t="aboutLicenseDesc"></div></div>
+        <div class="control"><button class="btn" id="license-toggle"></button></div>
+        <div class="body hidden" id="license-body"><pre class="license-text" id="license-text"></pre></div>
+      </div>
+      <div class="row wide item" data-k="kAbout">
+        <div><div class="label find" data-t="aboutComponents"></div><div class="desc" id="components-desc"></div></div>
+        <div class="body"><div class="components" id="components"></div></div>
       </div>
     </div>
   </section>
@@ -659,6 +739,19 @@ const TEXT = {
   languageAuto: "As in Windows",
   autostart: "Start with Windows",
   autostartDesc: "The program will wait for the hotkey right after you sign in to Windows.",
+  updates: "Updates",
+  updatesVersion: "Version {version}",
+  updatesLatest: "the latest",
+  updatesAvailable: "{version} is available",
+  updatesChecking: "checking…",
+  updatesDownloading: "downloading {version}…",
+  updatesReady: "{version} is ready to install",
+  updatesSource: "a program run from its source doesn't update itself",
+  updatesChecked: "checked {time}",
+  checkUpdates: "Check for updates",
+  updateTo: "Update to {version}",
+  autoupdate: "Install updates automatically",
+  autoupdateDesc: "The program looks for a new version as it starts and once a day, and installs it when none of its windows is open.",
   file: "Settings file",
   fileDesc: "All settings are kept in a text file with comments. You can edit it by hand too: the program picks the changes up at once.",
   drawingIntro: "Colours and the width of the line for the pencil, the brush, arrows and frames.",
@@ -686,7 +779,9 @@ const TEXT = {
   placeLeftTop: "Left, top",
   savingIntro: "What the Save button and Ctrl+S do while the screen is frozen.",
   ask: "Ask where to save",
-  askDesc: "If off, the screenshot is saved into the folder below at once.",
+  askDesc: "If off, the screenshot is saved into the folder below at once. Ctrl+Shift+S always asks.",
+  saveCopy: "Also copy to the clipboard",
+  saveCopyDesc: "The saved screenshot goes into the clipboard too, ready to paste.",
   folder: "Folder for screenshots",
   folderDesc: "Screenshots are saved here, and the Save As window opens here too.",
   byDefault: "Default",
@@ -705,6 +800,31 @@ const TEXT = {
   buttonsIntro: "The buttons send the screenshot to Google; their panel stands next to the selection where the Panels section says. Click a button to change it; to change the order, drag it by the dots on the left.",
   addButton: "Add a button",
   resetButtons: "Bring back the standard buttons",
+  models: "Models",
+  modelsIntro: "Some features find more with a model. The program downloads it by itself, in the background, and works without it meanwhile; a model runs on the computer, without the internet.",
+  privacyFilterDesc: "With it masking finds names, addresses, dates and links too, not only keys, passwords, cards, e-mail and phones. Off removes it from the computer.",
+  modelOff: "Not downloaded · {size} MB",
+  modelWaiting: "Will be downloaded in a moment · {size} MB",
+  modelDownloading: "{percent}% · {done} of {total} MB · {speed} MB/s",
+  modelPaused: "Paused · {done} of {total} MB",
+  modelReady: "Downloaded · {size} MB",
+  modelOffline: "No connection: trying again in two minutes · {done} of {total} MB",
+  modelServer: "The server answered with an error: trying again in two minutes",
+  modelDamaged: "A file came damaged: it is downloaded again in two minutes",
+  modelDisk: "The model couldn't be saved: is there room on the disk? Trying again in two minutes",
+  pause: "Pause",
+  resume: "Resume",
+  about: "About",
+  aboutIntro: "A small program by ainit: it takes a part of the screen, lets you draw on it, and copies it, saves it or asks Google about it.",
+  aboutSite: "Website",
+  aboutLicense: "License",
+  aboutLicenseDesc: "ainitShot is free software under the GNU General Public License, version 3 or later: you may use, share and change it on its terms. It comes with no warranty.",
+  aboutComponents: "Open source components",
+  componentsDesc: "Open source libraries in the program: {count}, each under its own license; a click on one shows it.",
+  builtIn: "Built into the program",
+  downloadedModels: "Downloaded for masking",
+  show: "Show",
+  hide: "Hide",
   accountIntro: "The program's window is a browser of its own with its own sign-in to Google: AI Mode and the image search work in it under this account.",
   accountUnknownTitle: "Signing in to Google",
   accountUnknownDesc: "Sign in, switch the account or sign out: the account's page opens in the program's window.",
@@ -772,14 +892,18 @@ const TEXT = {
   kHotkey: "hotkey shortcut key combination freeze screen screenshot capture printscreen prtsc",
   kLanguage: "language interface english arabic chinese french hindi russian spanish translation",
   kAutostart: "autostart startup start launch windows sign in boot",
+  kUpdates: "updates update version new upgrade install automatic check download",
   kFile: "settings file toml text by hand editor notepad comments",
   kColors: "colours colors colour color palette paint marker drawing",
   kWidth: "line width thickness size brush pencil pixels mouse wheel",
   kPanels: "panels toolbar tools query buttons position place side bottom top left right end align order row column",
   kAsk: "ask where to save dialog save as at once",
+  kSaveCopy: "clipboard copy paste also",
   kFolder: "folder path directory place saving pictures screenshots",
   kName: "file name pattern date time format png",
   kButtons: "add new button query standard default bring back",
+  kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
+  kAbout: "about program version license gpl copyright open source components libraries website site authors ainit",
   kAccount: "google account sign in sign out switch profile user login",
 };
 
@@ -877,9 +1001,11 @@ function toSettings(draft) {
     hotkey: draft.hotkey,
     language: draft.language,
     autostart: draft.autostart,
+    autoupdate: draft.autoupdate,
+    privacy_filter: draft.privacy_filter,
     colors: [...draft.colors],
     width: draft.width,
-    save: { ask: draft.save.ask, folder: draft.save.folder, name: draft.save.name },
+    save: { ask: draft.save.ask, copy: draft.save.copy, folder: draft.save.folder, name: draft.save.name },
     panels: clone(draft.panels),
     buttons: draft.buttons.map(button => ({
       name: button.name.trim(),
@@ -1025,6 +1151,7 @@ function banner(text) {
 // Sections, and the search over all of them.
 function showSection(id) {
   state.section = id;
+  if (id === "about") askLicenses();
   for (const button of $$("nav button")) {
     if (button.dataset.section === id) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
@@ -1166,14 +1293,22 @@ function pressed(event) {
   return MODIFIERS.filter(name => ({ Win: event.metaKey, Ctrl: event.ctrlKey, Alt: event.altKey, Shift: event.shiftKey })[name]);
 }
 
-/** The key's name as the program reads it, or nothing for a key it can't take. */
-function keyName(code) {
+/** The key's name as the program reads it, or nothing for a key it can't take. The key left of 1
+ * is "~" by its place, whatever the layout; a letter or a digit is named as Windows knows it in
+ * the layout: the key with that Latin letter, or where English has it. */
+function keyName(event) {
   let found;
-  if ((found = /^Key([A-Z])$/.exec(code))) return found[1];
-  if ((found = /^Digit([0-9])$/.exec(code))) return found[1];
-  if ((found = /^F([0-9]{1,2})$/.exec(code)) && +found[1] >= 1 && +found[1] <= 24) return code;
-  if (code === "Backquote") return "~";
-  return NAMED.includes(code) ? code : null;
+  if (event.code === "Backquote") return "~";
+  const letter = latinKey(event);
+  if (letter) return letter;
+  if ((found = /^F([0-9]{1,2})$/.exec(event.code)) && +found[1] >= 1 && +found[1] <= 24) return event.code;
+  return NAMED.includes(event.code) ? event.code : null;
+}
+
+/** The Latin letter or the digit of a key, as Windows knows it in the layout, or nothing. */
+function latinKey(event) {
+  const code = event.keyCode;
+  return (code >= 65 && code <= 90) || (code >= 48 && code <= 57) ? String.fromCharCode(code) : null;
 }
 
 function startRecording() {
@@ -1204,7 +1339,7 @@ function stopRecording(hotkey) {
 /** A new hotkey pressed while the field listens, or why it doesn't do. */
 function recordKey(event) {
   const held = pressed(event);
-  const name = keyName(event.code);
+  const name = keyName(event);
   if (!name) {
     fieldError("hotkey-error", t("keyUnknown"));
     return;
@@ -1280,9 +1415,155 @@ $("#autostart").addEventListener("click", () => {
   renderSwitch("autostart", state.draft.autostart);
   changed();
 });
+$("#autoupdate").addEventListener("click", () => {
+  state.draft.autoupdate = !state.draft.autoupdate;
+  renderSwitch("autoupdate", state.draft.autoupdate);
+  changed();
+});
+$("#privacy-filter").addEventListener("click", () => {
+  state.draft.privacy_filter = !state.draft.privacy_filter;
+  renderSwitch("privacy-filter", state.draft.privacy_filter);
+  changed();
+});
+$("#filter-pause").addEventListener("click", () => send({ type: "pauseModels", paused: !!state.models && state.models.state !== "paused" }));
+
+/** How the download of OpenAI Privacy Filter goes: a line filled as far as it has come while it
+ * is downloaded, what is going on, and the button that pauses it or goes on. */
+function renderModels() {
+  const models = state.models;
+  if (!models) return;
+  const number = (value, digits = 0) => {
+    try {
+      return new Intl.NumberFormat(state.language, { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(value);
+    } catch {
+      return value.toFixed(digits);
+    }
+  };
+  const mb = bytes => number(Math.round(bytes / 1e6));
+  const share = models.total ? models.done / models.total : 0;
+  const sizes = { size: mb(models.total), done: mb(models.done), total: mb(models.total) };
+  const problems = { offline: "modelOffline", server: "modelServer", damaged: "modelDamaged", disk: "modelDisk" };
+  const says = {
+    off: () => t("modelOff", sizes),
+    waiting: () => t(problems[models.problem] || "modelWaiting", sizes),
+    downloading: () => t("modelDownloading", { ...sizes, percent: number(Math.min(99, Math.floor(share * 100))), speed: number(models.speed / 1e6, 1) }),
+    paused: () => t("modelPaused", sizes),
+    ready: () => t("modelReady", sizes),
+  }[models.state];
+  $("#filter-state").textContent = says ? says() : "";
+  const coming = ["waiting", "downloading", "paused"].includes(models.state);
+  $("#filter-meter").classList.toggle("hidden", !coming);
+  $("#filter-fill").style.width = `${(share * 100).toFixed(1)}%`;
+  const pause = $("#filter-pause");
+  pause.classList.toggle("hidden", !coming);
+  pause.textContent = t(models.state === "paused" ? "resume" : "pause");
+}
+
+// About: the program's version, its license, and the open source components it is made of, which
+// the program gives when the section is first opened.
+let licensesAsked = false;
+function askLicenses() {
+  if (licensesAsked) return;
+  licensesAsked = true;
+  send({ type: "licenses" });
+}
+
+function renderAbout() {
+  $("#license-toggle").textContent = t($("#license-body").classList.contains("hidden") ? "show" : "hide");
+  renderComponents();
+}
+
+$("#license-toggle").addEventListener("click", () => {
+  $("#license-body").classList.toggle("hidden");
+  askLicenses();
+  renderAbout();
+});
+$("#about-site").addEventListener("click", () => send({ type: "openSite" }));
+
+/** The components in two groups, those built into the program and those downloaded with the
+ * model of masking, each opening the text of its license with a click. */
+function renderComponents() {
+  const licenses = state.licenses;
+  const list = $("#components");
+  if (!licenses) {
+    $("#components-desc").textContent = "";
+    return list.replaceChildren();
+  }
+  $("#license-text").textContent = licenses.license;
+  const built = licenses.components.filter(c => !c.downloaded), downloaded = licenses.components.filter(c => c.downloaded);
+  $("#components-desc").textContent = t("componentsDesc", { count: built.length });
+  const row = component => {
+    const text = h("pre", { class: "component-text hidden" });
+    const button = h("button", {
+      class: "component", "aria-expanded": "false",
+      onclick: () => {
+        const open = !text.classList.toggle("hidden");
+        button.setAttribute("aria-expanded", String(open));
+        if (open && !text.textContent) {
+          const texts = component.texts.map(i => licenses.texts[i]);
+          text.textContent = [component.url, ...texts].filter(Boolean).join("\n\n");
+        }
+      },
+    }, h("span", { class: "name" }, component.name), h("span", { class: "version" }, component.version), h("span", { class: "license" }, component.license));
+    return [button, text];
+  };
+  list.replaceChildren(
+    h("div", { class: "group" }, t("builtIn")), ...built.flatMap(row),
+    h("div", { class: "group" }, t("downloadedModels")), ...downloaded.flatMap(row));
+}
+
+$("#updates-button").addEventListener("click", () => {
+  const newer = state.updates && ["available", "ready"].includes(state.updates.state);
+  send({ type: newer ? "installUpdate" : "checkUpdates" });
+});
+
+/** When the last check ended, from the program's "YYYY-MM-DD HH:MM": the time alone today. */
+function checkedAt(text) {
+  const [day, time] = text.split(" ");
+  const [year, month, date] = day.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+  const when = new Date(year, month - 1, date, hour, minute);
+  const today = new Date().toDateString() === when.toDateString();
+  const parts = today ? { hour: "2-digit", minute: "2-digit" } : { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
+  try {
+    return new Intl.DateTimeFormat(state.language, parts).format(when);
+  } catch {
+    return text;
+  }
+}
+
+/** Where the program stands with updates: the version installed, the one available or what kept
+ * the last check from succeeding, and the button that checks or installs. */
+function renderUpdates() {
+  const updates = state.updates;
+  if (!updates) return;
+  const says = {
+    source: t("updatesSource"),
+    checking: t("updatesChecking"),
+    latest: t("updatesLatest"),
+    available: t("updatesAvailable", { version: updates.version }),
+    downloading: t("updatesDownloading", { version: updates.version }),
+    ready: t("updatesReady", { version: updates.version }),
+    failed: updates.problem,
+  }[updates.state];
+  const parts = [t("updatesVersion", { version: updates.current }), says];
+  if (updates.checked && !["checking", "downloading"].includes(updates.state)) parts.push(t("updatesChecked", { time: checkedAt(updates.checked) }));
+  $("#updates-state").textContent = parts.filter(Boolean).join(" · ");
+  const button = $("#updates-button");
+  const newer = ["available", "ready"].includes(updates.state);
+  button.classList.toggle("hidden", updates.state === "source");
+  button.classList.toggle("accent", newer);
+  button.disabled = ["checking", "downloading"].includes(updates.state);
+  button.textContent = newer ? t("updateTo", { version: updates.version }) : t("checkUpdates");
+}
 $("#ask").addEventListener("click", () => {
   state.draft.save.ask = !state.draft.save.ask;
   renderSwitch("ask", state.draft.save.ask);
+  changed();
+});
+$("#save-copy").addEventListener("click", () => {
+  state.draft.save.copy = !state.draft.save.copy;
+  renderSwitch("save-copy", state.draft.save.copy);
   changed();
 });
 $("#file-open").addEventListener("click", () => send({ type: "openFile" }));
@@ -1571,6 +1852,7 @@ $("#panels-reset").addEventListener("click", () => {
 // Saving: the folder comes from Windows' dialog; the name shows what it becomes.
 function renderSave() {
   renderSwitch("ask", state.draft.save.ask);
+  renderSwitch("save-copy", state.draft.save.copy);
   const folder = state.draft.save.folder.trim();
   const shown = folder || state.defaultFolder;
   // A long path wraps after a backslash rather than inside a name.
@@ -1797,13 +2079,12 @@ function editor(button) {
     let chosen;
     if (event.key === "Backspace" || event.key === "Delete") chosen = null;
     else {
-      const found = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(event.code);
-      if (!found) {
+      chosen = latinKey(event);
+      if (!chosen) {
         keyError.textContent = t("needLetter");
         keyError.classList.add("shown");
         return;
       }
-      chosen = found[1] || found[2];
       const owner = keyOwner(chosen, button);
       if (owner) {
         keyError.textContent = t(owner.button ? "keyTakenButton" : "keyTakenTool", { key: chosen, owner: owner.text });
@@ -1995,6 +2276,11 @@ function renderAll() {
   renderHotkey();
   renderLanguage();
   renderSwitch("autostart", state.draft.autostart);
+  renderSwitch("autoupdate", state.draft.autoupdate);
+  renderUpdates();
+  renderSwitch("privacy-filter", state.draft.privacy_filter);
+  renderModels();
+  renderAbout();
   renderColors();
   renderWidth();
   renderPanels();
@@ -2050,8 +2336,11 @@ function init(message) {
   state.defaultFolder = message.defaultFolder;
   $("#file-path").textContent = message.file;
   $("#version").textContent = `ainitShot ${message.version}`;
+  state.version = message.version;
   for (const holder of $$(".nav-icon")) holder.replaceWith(glyph(state.icons[holder.dataset.icon]));
   state.signedIn = message.signedIn;
+  state.updates = message.updates;
+  state.models = message.models;
   renderAccount();
   adopt(message.settings);
   showSection("general");
@@ -2077,6 +2366,15 @@ function heard(message) {
     case "account":
       state.signedIn = message.signedIn;
       return renderAccount();
+    case "updates":
+      state.updates = message.updates;
+      return renderUpdates();
+    case "models":
+      state.models = message.models;
+      return renderModels();
+    case "licenses":
+      state.licenses = message;
+      return renderComponents();
     case "close":
       // The window is closing: what is still being typed is saved first.
       flush();

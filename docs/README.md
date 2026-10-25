@@ -4,7 +4,7 @@
 - [Русский](ru/README.md) — translation
 - [हिन्दी](hi/README.md) — translation
 
-The documentation site and the data for AI agents are built from these files by [tools/docs](../tools/docs/README.md). From the repository root, `docker compose up -d` starts the site at http://screenshot.ainit.localhost.
+The documentation site and the data for AI agents are built from these files by [tools/docs](../tools/docs/README.md). From the repository root, `docker compose up -d` starts the site at http://shot-docs.ainit.localhost.
 
 ## Translation rules
 

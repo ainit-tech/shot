@@ -1,6 +1,6 @@
 [package]
 name = "ainitshot"
-version = "0.1.0"
+version = "0.2.1"
 description = "A small screenshot program for one person that replaces Lightshot"
 license = "GPL-3.0-or-later"
 edition.workspace = true
@@ -14,10 +14,23 @@ members = ["tools/docs/engine"]
 edition = "2024"
 
 [dependencies]
+# Checks the signature of the description of the latest release (decision 13).
+minisign-verify = "0.3.0"
+# Inflates ONNX Runtime, the one file the program takes out of Microsoft's zip archive of it.
+miniz_oxide = "0.9.1"
+# Runs OpenAI Privacy Filter for masking, with the ONNX Runtime the program downloads beside the
+# model: nothing of it is built into the program.
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "load-dynamic", "api-31"] }
 png = "0.18.1"
+# The shapes of private data that masking finds in the text of a screenshot.
+regex = "1.13.1"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
+# Checks the installer of a new version against the SHA-256 the description gives.
+sha2 = "0.11.1"
 tiny-skia = { version = "0.12.0", default-features = false, features = ["std", "simd"] }
+# Splits text into the tokens of OpenAI Privacy Filter, from the tokenizer.json downloaded with it.
+tokenizers = { version = "0.23.2", default-features = false, features = ["fancy-regex"] }
 toml = "1.1.6"
 # The program's own browser window: WebView2, the Edge engine built into Windows, is a COM API,
 # and these crates give its interfaces and the types they take.
@@ -25,7 +38,7 @@ webview2-com = "0.39.1"
 # The text recognition of Windows, for copying the text of a screenshot, is a WinRT API.
 windows = { version = "0.62", features = ["Win32_Foundation", "Win32_System_Com", "Win32_UI_Shell", "Win32_UI_Shell_Common", "Media_Ocr", "Graphics_Imaging", "Security_Cryptography", "Storage_Streams", "Foundation_Collections", "Globalization", "System_UserProfile"] }
 windows-core = "0.62"
-windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_System_LibraryLoader", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_System_Ole", "Win32_System_Threading", "Win32_Security", "Win32_UI_Controls_Dialogs", "Win32_System_Registry", "Win32_System_Com", "Win32_System_SystemInformation", "Win32_System_Console"] }
+windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Input_Ime", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_System_LibraryLoader", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_System_Ole", "Win32_System_Threading", "Win32_Security", "Win32_UI_Controls_Dialogs", "Win32_System_Registry", "Win32_System_Com", "Win32_System_SystemInformation", "Win32_System_Console", "Win32_Networking_WinHttp"] }
 
 # The program redraws whole screens of pixels, which unoptimized code does too slowly to use
 # even while it is being developed.

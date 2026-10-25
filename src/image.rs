@@ -35,6 +35,22 @@ impl Image {
         Ok(file)
     }
 
+    /// A picture from a PNG file of 8 bits a channel, with or without opacity.
+    #[cfg(test)]
+    pub fn from_png(file: &[u8]) -> Result<Image, String> {
+        let mut decoder = png::Decoder::new(std::io::Cursor::new(file));
+        decoder.set_transformations(png::Transformations::EXPAND | png::Transformations::STRIP_16);
+        let mut reader = decoder.read_info().map_err(|e| e.to_string())?;
+        let mut data = vec![0; reader.output_buffer_size().ok_or("the picture is too big")?];
+        let info = reader.next_frame(&mut data).map_err(|e| e.to_string())?;
+        let channels = info.color_type.samples();
+        if channels < 3 {
+            return Err(format!("a picture in {:?} isn't read", info.color_type));
+        }
+        let pixels = data[..info.buffer_size()].chunks_exact(channels).flat_map(|p| [p[2], p[1], p[0], 255]).collect();
+        Ok(Image { width: info.width, height: info.height, pixels })
+    }
+
     /// The part of the picture inside `rect`, which must lie within it.
     pub fn crop(&self, rect: Rect) -> Image {
         debug_assert_eq!(rect.intersect(self.bounds()), rect);

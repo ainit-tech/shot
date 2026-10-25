@@ -17,9 +17,13 @@ use windows_sys::Win32::Graphics::Dwm::{
 };
 use windows_sys::Win32::Graphics::Gdi::{BeginPaint, BitBlt, EndPaint, InvalidateRect, PAINTSTRUCT, SRCCOPY, UpdateWindow};
 use windows_sys::Win32::System::Com::{COINIT_MULTITHREADED, CoInitializeEx};
+use windows_sys::Win32::UI::Input::Ime::{
+    CFS_POINT, COMPOSITIONFORM, IACE_DEFAULT, ImmAssociateContextEx, ImmGetContext, ImmReleaseContext,
+    ImmSetCompositionWindow,
+};
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
     GetAsyncKeyState, GetKeyState, ReleaseCapture, SetCapture, VK_A, VK_BACK, VK_C, VK_CONTROL, VK_DELETE, VK_END,
-    VK_ESCAPE, VK_HOME, VK_LBUTTON, VK_LEFT, VK_RBUTTON, VK_RETURN, VK_RIGHT, VK_S, VK_SHIFT, VK_V, VK_Y, VK_Z,
+    VK_ESCAPE, VK_HOME, VK_LBUTTON, VK_LEFT, VK_M, VK_RBUTTON, VK_RETURN, VK_RIGHT, VK_S, VK_SHIFT, VK_V, VK_Y, VK_Z,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CS_DBLCLKS, CreateWindowExW, DefWindowProcW, GetCursorPos, GetSystemMetrics, HTCLIENT, HWND_TOPMOST, IDC_APPSTARTING,
@@ -35,7 +39,7 @@ use windows_sys::w;
 use super::capture::{self, Screen};
 use super::gdi::{self, Buffer, Font};
 use super::browser::{self, Heard};
-use super::{app, card, clipboard, last_error, ocr, shell};
+use super::{app, card, clipboard, last_error, masking, models, ocr, shell};
 use crate::annotation::{self, Annotation, Draft, Grip, History, Label, Shape, Tool};
 use crate::color::Rgba;
 use crate::draw::{self, Text, ToolbarLook};
@@ -53,6 +57,8 @@ const CLASS: PCWSTR = w!("ainitShot.overlay");
 const WM_ANSWER: u32 = WM_APP + 2;
 /// The text of the screenshot has been read: a [`Read`] in a box in `lparam`.
 const WM_READ: u32 = WM_APP + 4;
+/// The private data of the screenshot has been looked for: a [`Masked`] in a box in `lparam`.
+const WM_MASKED: u32 = WM_APP + 5;
 const HINT_TIMER: usize = 1;
 const RING_TIMER: usize = 2;
 const HOLD_TIMER: usize = 3;
@@ -89,6 +95,8 @@ const DRAG_START: f32 = 3.0;
 type Answer = Result<Way, String>;
 /// The text read in the screenshot, or what went wrong.
 type Read = Result<String, String>;
+/// What covers the private data of the screenshot, on the screen, or what went wrong.
+type Masked = Result<Vec<Rect>, String>;
 
 thread_local! {
     static OVERLAY: RefCell<Option<Overlay>> = const { RefCell::new(None) };
@@ -129,8 +137,8 @@ struct Session {
     pressing: Option<Press>,
     /// A question asked aloud, while its button is held and until it has gone.
     listening: Option<Listening>,
-    /// Whether the text of the screenshot is being read, to be copied.
-    reading: bool,
+    /// The button whose text of the screenshot is being read: copying it, or masking.
+    reading: Option<Button>,
     /// What happened to the last question asked aloud, or to reading the text, next to its
     /// button for a few seconds.
     note: Option<(Button, String)>,
@@ -302,6 +310,7 @@ pub fn open() {
         Some((overlay.window, place))
     });
     let Some((window, place)) = opened else { return };
+    input_method(window, false);
     unsafe {
         // Shown hidden from view and painted first, so that the screen doesn't flash.
         set_flag(window, DWMWA_CLOAK, true);
@@ -340,6 +349,18 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
         });
         return 0;
     }
+    if message == WM_MASKED {
+        // Taken over first, like an answer.
+        let masked = unsafe { Box::from_raw(lparam as *mut Masked) };
+        OVERLAY.with(|cell| {
+            if let Ok(mut overlay) = cell.try_borrow_mut()
+                && let Some(overlay) = overlay.as_mut()
+            {
+                overlay.masked(*masked);
+            }
+        });
+        return 0;
+    }
     if message == WM_ANSWER {
         // The answer is taken over first, so that it is freed even if nobody waits for it.
         let answer = unsafe { Box::from_raw(lparam as *mut Answer) };
@@ -371,6 +392,9 @@ enum Action {
     Copy,
     CopyText,
     Save,
+    /// Saving where the user says, whatever the settings.
+    SaveAs,
+    Mask,
     Undo,
     Redo,
     SelectMonitor,
@@ -699,7 +723,9 @@ impl Overlay {
             VK_RETURN => Action::Copy,
             VK_C if ctrl && shift => Action::CopyText,
             VK_C if ctrl => Action::Copy,
+            VK_S if ctrl && shift => Action::SaveAs,
             VK_S if ctrl => Action::Save,
+            VK_M if ctrl => Action::Mask,
             VK_Z if ctrl && shift => Action::Redo,
             VK_Z if ctrl => Action::Undo,
             VK_Y if ctrl => Action::Redo,
@@ -735,7 +761,9 @@ impl Overlay {
             Action::Close => self.close(),
             Action::Copy => self.copy(),
             Action::CopyText => self.copy_text(),
-            Action::Save => self.save(),
+            Action::Save => self.save(false),
+            Action::SaveAs => self.save(true),
+            Action::Mask => self.mask(),
             Action::Undo => self.change_history(History::undo),
             Action::Redo => self.change_history(History::redo),
             Action::SelectMonitor => self.select_monitor(),
@@ -764,9 +792,10 @@ impl Overlay {
                 }
             }
             Button::Undo => self.change_history(History::undo),
+            Button::Mask => self.mask(),
             Button::Copy => self.copy(),
             Button::CopyText => self.copy_text(),
-            Button::Save => self.save(),
+            Button::Save => self.save(false),
             Button::Query(i) => self.query(i),
             Button::Close => self.close(),
         }
@@ -853,7 +882,7 @@ impl Overlay {
             return;
         }
         let Some(picture) = session.picture() else { return };
-        session.reading = true;
+        session.reading = Some(Button::CopyText);
         session.show_hint = false;
         session.palette = false;
         session.refresh(window);
@@ -872,10 +901,10 @@ impl Overlay {
     fn text_read(&mut self, read: Read) {
         let window = self.window;
         let Some(session) = &mut self.session else { return };
-        if !session.reading {
+        if session.reading != Some(Button::CopyText) {
             return;
         }
-        session.reading = false;
+        session.reading = None;
         let note = match read {
             Ok(text) if !text.trim().is_empty() => match clipboard::put_text(window, &text) {
                 Ok(()) => return self.close(),
@@ -887,9 +916,73 @@ impl Overlay {
         session.set_note(window, Button::CopyText, note);
     }
 
-    /// Saves the selection with its annotations to a PNG file: where the user says, or straight
-    /// into the folder from the settings.
-    fn save(&mut self) {
+    /// Covers the private data in the selection: its text is read, and the words of what the
+    /// finder marks in it go under filled rectangles of the colour chosen, all in one step of
+    /// Ctrl+Z. The overlay waits with a hint meanwhile.
+    fn mask(&mut self) {
+        let window = self.window;
+        let Some(session) = &mut self.session else { return };
+        if session.busy() {
+            return;
+        }
+        let Some(selection) = session.selection.rect().filter(|r| !r.is_empty()) else { return };
+        let Some(picture) = session.picture() else { return };
+        session.reading = Some(Button::Mask);
+        session.show_hint = false;
+        session.palette = false;
+        session.refresh(window);
+        let target = window as isize;
+        thread::spawn(move || {
+            unsafe { CoInitializeEx(null(), COINIT_MULTITHREADED as u32) };
+            let masked: Masked = masking::mask(&picture).map(|masking| {
+                eprintln!("Masking:\n{}", masking.report);
+                // For looking into masking that went wrong: what it read, found and covered.
+                if let Some(folder) = std::env::var_os("SCREENSHOT_MASKING_KEEP") {
+                    let since = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default();
+                    let name = format!("mask-{}", since.as_millis());
+                    if let Err(problem) = masking::keep(std::path::Path::new(&folder), &name, &picture, &masking) {
+                        eprintln!("The masking wasn't kept: {problem}");
+                    }
+                }
+                let covers = masking.covers.into_iter();
+                covers.map(|rect| rect.offset(selection.left, selection.top).intersect(selection)).collect()
+            });
+            let masked = Box::into_raw(Box::new(masked));
+            if unsafe { PostMessageW(target as HWND, WM_MASKED, 0, masked as isize) } == 0 {
+                drop(unsafe { Box::from_raw(masked) });
+            }
+        });
+    }
+
+    /// The private data of the screenshot has been looked for: it is covered, or the toolbar
+    /// says that there is none, or why it wasn't looked for.
+    fn masked(&mut self, masked: Masked) {
+        let window = self.window;
+        let Some(session) = &mut self.session else { return };
+        if session.reading != Some(Button::Mask) {
+            return;
+        }
+        session.reading = None;
+        // While the model is downloaded, only the rules have looked: the note says so.
+        let coming = models::coming().map(|coming| {
+            tr("Names and addresses aren't looked for until the model is downloaded: {}%").replace("{}", &percent(coming))
+        });
+        match masked {
+            Ok(covers) if !covers.is_empty() => {
+                session.cover(window, &covers);
+                if let Some(coming) = coming {
+                    session.set_note(window, Button::Mask, coming);
+                }
+            }
+            Ok(_) => session.set_note(window, Button::Mask, coming.unwrap_or_else(|| tr("No private data found").into())),
+            Err(problem) => session.set_note(window, Button::Mask, problem),
+        }
+    }
+
+    /// Saves the selection with its annotations to a PNG file: straight into the folder from the
+    /// settings, or where the user says, if `ask` or the settings ask where; and into the
+    /// clipboard too, as the settings say.
+    fn save(&mut self, ask: bool) {
         let window = self.window;
         let Some(session) = &self.session else { return };
         let Some(picture) = session.picture() else { return };
@@ -899,7 +992,8 @@ impl Overlay {
             folder => PathBuf::from(folder),
         };
         let name = shell::file_name(&save.name);
-        let path = if save.ask {
+        let ask = ask || save.ask;
+        let path = if ask {
             match shell::ask_where_to_save(window, &folder, &name) {
                 Some(path) => path,
                 None => return,
@@ -913,8 +1007,13 @@ impl Overlay {
         };
         match picture.to_png().and_then(|png| fs::write(&path, png).map_err(|e| e.to_string())) {
             Ok(()) => {
-                if !save.ask {
-                    app::notify(tr("Screenshot saved"), &path.display().to_string());
+                // The screenshot goes into the clipboard too, if the settings say so. A problem
+                // with that is what the user hears of; otherwise the notification says where the
+                // file is, unless the user has just said it.
+                match save.copy.then(|| clipboard::put(window, &picture)) {
+                    Some(Err(error)) => app::notify(cannot_copy(), &error.to_string()),
+                    copied if !ask => app::saved(&path, copied.is_some()),
+                    _ => {}
                 }
                 self.close();
             }
@@ -1206,7 +1305,7 @@ impl Session {
             sending: None,
             pressing: None,
             listening: None,
-            reading: false,
+            reading: None,
             note: None,
             typing: None,
             picked: None,
@@ -1275,7 +1374,7 @@ impl Session {
     /// The cursor shows what the mouse would do: draw, move or resize the selection, press a
     /// button, or nothing.
     fn cursor_shape(&self) -> PCWSTR {
-        if self.sending.is_some() || self.reading {
+        if self.sending.is_some() || self.reading.is_some() {
             return IDC_APPSTARTING;
         }
         let p = self.cursor();
@@ -1404,6 +1503,7 @@ impl Session {
             caret_on: true,
             editing: Some((index, original)),
         });
+        input_method(window, true);
         self.retype(window);
     }
 
@@ -1421,6 +1521,7 @@ impl Session {
             caret_on: true,
             editing: None,
         });
+        input_method(window, true);
         self.retype(window);
     }
 
@@ -1438,6 +1539,7 @@ impl Session {
                 let at = Point::new(typing.at.x - room, typing.at.y - room);
                 let bar = (1.5 * scale).round().max(1.0) as i32;
                 typing.caret = Rect::new(at.x + x, at.y + y, at.x + x + bar, at.y + y + height);
+                compose_at(window, typing.caret);
                 typing.label = (!typing.text.is_empty()).then(|| Annotation {
                     shape: Shape::Text(Label { text: typing.text.clone(), size, at, coverage }),
                     color,
@@ -1458,6 +1560,7 @@ impl Session {
     /// a label rewritten empty is removed.
     fn put_down_text(&mut self, window: HWND) {
         let Some(typing) = self.typing.take() else { return };
+        input_method(window, false);
         unsafe { KillTimer(window, CARET_TIMER) };
         invalidate(window, typing.caret);
         let label = typing.label.filter(|_| !typing.text.trim().is_empty());
@@ -1483,6 +1586,7 @@ impl Session {
     /// Lets the text being written go; a label being rewritten comes back as it was.
     fn drop_text(&mut self, window: HWND) {
         let Some(typing) = self.typing.take() else { return };
+        input_method(window, false);
         unsafe { KillTimer(window, CARET_TIMER) };
         invalidate(window, typing.label.as_ref().map_or(Rect::default(), Annotation::bounds).union(typing.caret));
         if let Some((index, original)) = typing.editing {
@@ -1492,6 +1596,23 @@ impl Session {
             self.layers = None;
         }
         self.draft_changed = true;
+        self.refresh(window);
+    }
+
+    /// Covers parts of the screen with filled rectangles of the colour chosen, as one change.
+    fn cover(&mut self, window: HWND, covers: &[Rect]) {
+        let color = self.colors[self.color];
+        self.history.remember();
+        for &rect in covers {
+            let scale = self.screen.monitor_at(rect.top_left()).scale;
+            let (a, b) = (PointF::new(rect.left as f32, rect.top as f32), PointF::new(rect.right as f32, rect.bottom as f32));
+            let annotation = Annotation { shape: Shape::FilledRectangle(a, b), color, width: self.width * scale };
+            invalidate(window, annotation.bounds());
+            let end = self.history.items().len();
+            self.history.insert(end, annotation);
+        }
+        self.picked = None;
+        self.layers = None;
         self.refresh(window);
     }
 
@@ -1527,7 +1648,7 @@ impl Session {
 
     /// Whether a query is on its way or a button is held: other keys and clicks wait.
     fn busy(&self) -> bool {
-        self.sending.is_some() || self.pressing.is_some() || self.listening.is_some() || self.reading
+        self.sending.is_some() || self.pressing.is_some() || self.listening.is_some() || self.reading.is_some()
     }
 
     /// Whether the query button asks for a conversation: held, it asks its question aloud.
@@ -1584,11 +1705,20 @@ impl Session {
                 tr("Colour · the width with the mouse wheel").into()
             }
             Button::Undo => tr("Undo · Ctrl+Z").into(),
+            Button::Mask => match models::coming() {
+                Some(coming) => tr("Mask private data · Ctrl+M · names and addresses once the model is downloaded, {}%")
+                    .replace("{}", &percent(coming)),
+                None => tr("Mask private data · Ctrl+M").into(),
+            },
             Button::Copy => tr("Copy · Ctrl+C").into(),
             Button::CopyText => {
                 tr("Copy the text · Ctrl+Shift+C").into()
             }
-            Button::Save => tr("Save · Ctrl+S").into(),
+            // Ctrl+Shift+S asks where to save when the button doesn't.
+            Button::Save => match self.settings.save.ask {
+                true => tr("Save · Ctrl+S").into(),
+                false => tr("Save · Ctrl+S · choose where · Ctrl+Shift+S").into(),
+            },
             Button::Query(i) => {
                 let button = &self.settings.buttons[i];
                 match button.key() {
@@ -1640,7 +1770,8 @@ impl Session {
     /// asked aloud, or what happened to it, next to its toolbar.
     fn hint(&mut self, main: Option<&Toolbar>, search: Option<&Toolbar>) -> Option<(Rect, Text)> {
         let (button, text) = match (&self.sending, &self.listening, &self.note) {
-            _ if self.reading => (Button::CopyText, tr("Reading the text…").to_string()),
+            _ if self.reading == Some(Button::Mask) => (Button::Mask, tr("Looking for private data…").to_string()),
+            _ if self.reading.is_some() => (Button::CopyText, tr("Reading the text…").to_string()),
             (Some(sending), _, _) => {
                 (Button::Query(sending.button), tr("Sending to Google…").to_string())
             }
@@ -1714,6 +1845,7 @@ impl Session {
             can_undo: !self.history.is_empty(),
             busy: self.sending.as_ref().map(|s| s.button).or(self.listening.as_ref().map(|l| l.button)),
             queries: &queries,
+            coming: models::coming(),
         };
         if let Some(search) = &scene.search {
             texts.extend(draw::toolbar(&mut frame, search, &look));
@@ -1884,6 +2016,49 @@ fn key_down(key: u16) -> bool {
     unsafe { GetKeyState(key as i32) < 0 }
 }
 
+/// A share from 0 to 1 in whole percents.
+fn percent(share: f32) -> String {
+    ((share * 100.0).floor() as i32).clamp(0, 99).to_string()
+}
+
+/// The model of masking has come further, or is in place: the toolbar of the frozen screen shows it.
+pub fn models_changed() {
+    OVERLAY.with(|cell| {
+        if let Ok(mut overlay) = cell.try_borrow_mut()
+            && let Some(overlay) = overlay.as_mut()
+        {
+            let window = overlay.window;
+            if let Some(session) = &mut overlay.session {
+                session.refresh(window);
+            }
+        }
+    });
+}
+
+/// Turns the input method of the window on or off. An input method for Chinese, Japanese or
+/// Korean takes the letters typed for itself, and the keys of the tools and buttons would do
+/// nothing; so the overlay has one only while text is written, in whatever language.
+fn input_method(window: HWND, on: bool) {
+    unsafe { ImmAssociateContextEx(window, null_mut(), if on { IACE_DEFAULT } else { 0 }) };
+}
+
+/// Shows what the input method is composing at the caret of the text being written.
+fn compose_at(window: HWND, caret: Rect) {
+    unsafe {
+        let context = ImmGetContext(window);
+        if context.is_null() {
+            return;
+        }
+        let form = COMPOSITIONFORM {
+            dwStyle: CFS_POINT,
+            ptCurrentPos: POINT { x: caret.left, y: caret.top },
+            ..Default::default()
+        };
+        ImmSetCompositionWindow(context, &form);
+        ImmReleaseContext(window, context);
+    }
+}
+
 /// The point under the mouse as a point to draw at, kept inside the selection. Lines go
 /// through the middles of pixels, so that thin ones stay sharp.
 fn inside(p: Point, selection: Rect) -> PointF {
@@ -1917,5 +2092,32 @@ fn set_flag(window: HWND, attribute: DWMWINDOWATTRIBUTE, on: bool) {
     let value = BOOL::from(on);
     unsafe {
         DwmSetWindowAttribute(window, attribute as u32, (&value as *const BOOL).cast(), size_of::<BOOL>() as u32);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use windows_sys::Win32::UI::WindowsAndMessaging::DestroyWindow;
+
+    use super::*;
+
+    /// A window, hidden, gives up its input method and takes it back.
+    #[test]
+    fn the_input_method_goes_and_comes_back() {
+        let window =
+            unsafe { CreateWindowExW(0, w!("STATIC"), w!(""), WS_POPUP, 0, 0, 0, 0, null_mut(), null_mut(), null_mut(), null()) };
+        assert!(!window.is_null());
+        let has_one = || unsafe {
+            let context = ImmGetContext(window);
+            ImmReleaseContext(window, context);
+            !context.is_null()
+        };
+        let before = has_one();
+        input_method(window, false);
+        let off = has_one();
+        input_method(window, true);
+        let on = has_one();
+        unsafe { DestroyWindow(window) };
+        assert_eq!((before, off, on), (true, false, true));
     }
 }

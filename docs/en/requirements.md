@@ -9,11 +9,13 @@ ainitShot is a small program made for its author's everyday work and published a
 
 ## How it works
 
-1. **Alt+~**, Alt with the key left of 1 (Ё on the Russian layout), freezes the screen.
+1. **Alt+~**, Alt with the key left of 1 in any keyboard layout (Ё in Russian, ^ in German), freezes the screen.
 2. The mouse draws the selection, as in Lightshot; the screen around it is dimmed. While nothing is selected, the window under the mouse is lit up, and a click without dragging selects it: the window stays lit until the mouse goes a few pixels away, and from there on the mouse draws the selection. Ctrl+A selects the monitor under the mouse. The selection can then be moved and resized by its edges.
 3. Two toolbars appear next to the selection, as in Lightshot: the tools and the actions in a row under it at its right end, the query buttons in a column to the right of it at its bottom. The settings put either toolbar on any side of the selection, pressed to either end of that side: above and below the selection a toolbar is a row, beside it a column, and two toolbars pressed to the same end of one side stand in a row in the order chosen. A toolbar with no room on its side goes to the opposite one, or inside the selection's edge.
 4. Tools draw annotations on the selection, and any annotation can be put right afterwards (see below); Ctrl+Z undoes the last change, Ctrl+Y brings it back.
 5. An action finishes the work: copy the picture or its text, save it, or a query. Esc closes everything and does nothing; a right click starts over, and a second one closes.
+
+The keys work in any keyboard layout. A letter is the key with that Latin letter on it or, in a layout without Latin letters, the key where English has it: in Russian the text tool's N is the key with Т. An input method for Chinese, Japanese or Korean leaves the letters to the program, except while text is being written.
 
 ## Design
 
@@ -42,6 +44,8 @@ All tools share the colour and the line width. The colours are in the settings, 
 
 Text is written as typed: Enter puts it down, Shift+Enter starts a new line, Ctrl+V pastes, the arrow keys, Home and End move the caret, Delete takes away the letter after it, Esc lets the text go. While text is being written, the keys of the tools and buttons type letters.
 
+**Masking**, with its button between the colour and Undo or with Ctrl+M, covers the private data of the screenshot with filled rectangles of the colour chosen: keys, passwords, card and account numbers, e-mail addresses, phone numbers and IP addresses, and with OpenAI Privacy Filter, a model that runs on the computer and that the program downloads by itself, names, addresses, dates and links too. Ctrl+Z takes all the rectangles back at once ([decision](decisions/015-masking-private-data.md)).
+
 ## Changing annotations
 
 What is drawn can be put right until the screenshot leaves:
@@ -60,7 +64,7 @@ The mouse shows what it would do: a hand over a handle, a cross of arrows over a
 |---|---|---|
 | Copy | Ctrl+C, Enter | Puts the screenshot into the clipboard |
 | Copy text | Ctrl+Shift+C | Reads the text in the screenshot with the text recognition built into Windows, on the computer, and puts it into the clipboard ([decision](decisions/010-copying-text-with-windows.md)) |
-| Save | Ctrl+S | Saves the screenshot to a PNG file: asks where, or saves into the folder from the settings |
+| Save | Ctrl+S | Saves the screenshot to a PNG file in the folder from the settings and puts it into the clipboard too; Ctrl+Shift+S asks where |
 | Ask Google | G | A query to Google's AI mode: who or what is in the picture; the conversation comes out next to the selection, to ask further; held, it asks one's own question aloud |
 | Translate | T | A query to Google's AI mode: translate the text in the picture; the translation alone shows in a card next to the selection |
 | Search by image in Google | I | An image search in Google: the picture alone, to find where it comes from and where else it is; the exact matches, the pages with this very picture, come out next to the selection |
@@ -71,7 +75,7 @@ The query buttons are of two kinds and stand in two groups on their toolbar ([de
 
 How the screenshot reaches Google is a separate [decision](decisions/005-how-the-picture-reaches-a-search-engine.md). Google's pages open in the program's own window, where the user signs in to Google once, as the program offers to when nobody is signed in, and the program puts the screenshot into them itself: "Ask Google" and "Translate" into AI Mode with the question, and "Search by image in Google" into Google Images, with its results on the tab of exact matches ([decision](decisions/008-google-in-the-programs-own-window.md)).
 
-Saving asks where to save, starting in the folder from the settings, or saves straight into it, as the settings say. The folder is Windows' own folder of screenshots by default, "Pictures\Screenshots", where Win+PrintScreen saves too; it is inside OneDrive when OneDrive backs up the Pictures folder. A file is named by the pattern from the settings, by default "Screenshot {date} {time}" in the language of the program. Only the screenshots saved with the button are kept.
+Saving puts the file straight into the folder from the settings, and the picture into the clipboard as well, ready to paste, unless the settings say otherwise; a notification says where the file is, and a click on it shows the file in its folder. The folder is Windows' own folder of screenshots by default, "Pictures\Screenshots", where Win+PrintScreen saves too; it is inside OneDrive when OneDrive backs up the Pictures folder. Ctrl+Shift+S asks where to save, starting in that folder, and the settings can have the button and Ctrl+S ask as well. A file is named by the pattern from the settings, by default "Screenshot {date} {time}" in the language of the program. Only the screenshots saved this way are kept.
 
 ## What is left out
 
@@ -79,4 +83,4 @@ Whatever Lightshot has and this page doesn't: uploading to prnt.sc with public s
 
 ## Where it runs
 
-Only on Windows ([why](decisions/002-windows-only.md)). The program is written in Rust and waits in the background for the hotkey ([why](decisions/003-rust.md)). The settings are in a text file, changed in a settings window with sections and a search ([decision](decisions/007-settings-in-a-file.md)).
+Only on Windows ([why](decisions/002-windows-only.md)). The program is written in Rust and waits in the background for the hotkey ([why](decisions/003-rust.md)). The settings are in a text file, changed in a settings window with sections and a search ([decision](decisions/007-settings-in-a-file.md)); its section "About" shows the version, the license and the open source components with theirs ([decision](decisions/012-license.md)). An installer puts it in place for the current user, without administrator rights, and has it start with Windows; then the program keeps itself up to date, installing a newer version by itself unless the settings say otherwise and never going back to an older one ([decision](decisions/013-updates-and-releases.md)).

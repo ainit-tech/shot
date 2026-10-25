@@ -14,11 +14,14 @@ mod geometry;
 mod icons;
 mod image;
 mod magic;
+mod mask;
+mod privacy;
 mod query;
 mod selection;
 mod settings;
 mod text;
 mod toolbar;
+mod update;
 mod win;
 
 fn main() {

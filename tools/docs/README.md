@@ -3,7 +3,7 @@
 Builds the documentation site from `docs/`, together with Markdown for AI agents and a JSON API for programs.
 
 - `engine/` — `docs`, a Rust command-line tool. It checks the sources and writes the site data.
-- `ui/` — the site itself: Vite and TypeScript without a framework. It reads the same JSON API that programs use. Text is set in Inter and code in JetBrains Mono; the fonts are served with the site from `ui/src/fonts` under the SIL Open Font License, so pages load nothing from other addresses. Hindi uses the system's Devanagari font. The top bar shows the site's address, screenshot.ainit.localhost, and every tab title starts with its first part, `screenshot`, so the site's tabs stand out among those of other local sites.
+- `ui/` — the site itself: Vite and TypeScript without a framework. It reads the same JSON API that programs use. Text is set in Inter and code in JetBrains Mono; the fonts are served with the site from `ui/src/fonts` under the SIL Open Font License, so pages load nothing from other addresses. Hindi uses the system's Devanagari font. The top bar shows the site's address, shot-docs.ainit.localhost, and every tab title starts with its first part, `shot-docs`, so the site's tabs stand out among those of other local sites.
 
 ## Commands
 
@@ -32,7 +32,7 @@ The site can also run in Docker, on its own, apart from any terminal session. Fr
 
 | Command | What it does |
 |---|---|
-| `docker compose up -d` | Builds the image the first time and starts the site at http://screenshot.ainit.localhost (through the machine's shared local gateway; no port is opened on the host). The site keeps running, and Docker starts it again whenever Docker itself starts |
+| `docker compose up -d` | Builds the image the first time and starts the site at http://shot-docs.ainit.localhost (through the machine's shared local gateway; no port is opened on the host). The site keeps running, and Docker starts it again whenever Docker itself starts |
 | `docker compose logs -f docs` | Shows the output: the rebuilds after every change and the errors of the checks |
 | `docker compose down` | Stops the site and removes its container, so Docker no longer starts it |
 

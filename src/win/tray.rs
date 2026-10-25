@@ -1,6 +1,6 @@
 //! The icon in the notification area. A click on it takes a screenshot; its menu also opens the
 //! settings and the presentation of how to use the program, and closes the program. It is also
-//! where the program tells the user about problems.
+//! where the program tells the user about problems and news, such as a screenshot saved.
 
 use std::io;
 use std::ptr::{self, null, null_mut};
@@ -9,8 +9,8 @@ use windows_sys::Win32::Foundation::{HWND, POINT};
 use windows_sys::Win32::Graphics::Gdi::{CreateBitmap, CreateDIBSection, DIB_RGB_COLORS, DeleteObject};
 use windows_sys::Win32::UI::HiDpi::{GetDpiForSystem, GetDpiForWindow, GetSystemMetricsForDpi};
 use windows_sys::Win32::UI::Shell::{
-    NIF_ICON, NIF_INFO, NIF_MESSAGE, NIF_TIP, NIIF_WARNING, NIM_ADD, NIM_DELETE, NIM_MODIFY, NOTIFYICONDATAW,
-    Shell_NotifyIconW,
+    NIF_ICON, NIF_INFO, NIF_MESSAGE, NIF_TIP, NIIF_INFO, NIIF_LARGE_ICON, NIIF_NOSOUND, NIIF_USER, NIIF_WARNING, NIM_ADD,
+    NIM_DELETE, NIM_MODIFY, NOTIFYICONDATAW, Shell_NotifyIconW,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     AppendMenuW, CreateIconIndirect, CreatePopupMenu, DestroyIcon, DestroyMenu, GetCursorPos, HICON, ICON_BIG,
@@ -30,6 +30,7 @@ pub enum Command {
     Capture,
     Settings,
     Guide,
+    Update,
     Exit,
 }
 
@@ -37,15 +38,19 @@ const CAPTURE: usize = 1;
 const SETTINGS: usize = 2;
 const EXIT: usize = 3;
 const GUIDE: usize = 4;
+const UPDATE: usize = 5;
 
 pub struct Tray {
     window: HWND,
     icon: HICON,
+    /// The program's icon at the size notifications show it, if it could be drawn.
+    big: HICON,
 }
 
 impl Tray {
     pub fn add(window: HWND) -> io::Result<Tray> {
-        let tray = Tray { window, icon: create_icon()? };
+        let big = create_icon_of(unsafe { GetSystemMetricsForDpi(SM_CXICON, GetDpiForSystem()) }).unwrap_or(null_mut());
+        let tray = Tray { window, icon: create_icon()?, big };
         tray.show()?;
         Ok(tray)
     }
@@ -63,11 +68,17 @@ impl Tray {
         Ok(())
     }
 
-    /// Shows a notification next to the icon.
-    pub fn notify(&self, title: &str, text: &str) {
+    /// Shows a notification next to the icon: a problem with the sign of a warning, news with the
+    /// program's icon and without a sound.
+    pub fn notify(&self, title: &str, text: &str, problem: bool) {
         let mut data = self.data();
         data.uFlags = NIF_INFO;
-        data.dwInfoFlags = NIIF_WARNING;
+        data.dwInfoFlags = match problem {
+            true => NIIF_WARNING,
+            false if self.big.is_null() => NIIF_INFO | NIIF_NOSOUND,
+            false => NIIF_USER | NIIF_LARGE_ICON | NIIF_NOSOUND,
+        };
+        data.hBalloonIcon = self.big;
         copy_into(&mut data.szInfoTitle, title);
         copy_into(&mut data.szInfo, text);
         unsafe { Shell_NotifyIconW(NIM_MODIFY, &data) };
@@ -83,6 +94,9 @@ impl Drop for Tray {
         unsafe {
             Shell_NotifyIconW(NIM_DELETE, &self.data());
             DestroyIcon(self.icon);
+            if !self.big.is_null() {
+                DestroyIcon(self.big);
+            }
         }
     }
 }
@@ -95,18 +109,23 @@ fn copy_into(buffer: &mut [u16], text: &str) {
 }
 
 /// Shows the icon's menu at the mouse and returns what was chosen. `hotkey` is shown next to
-/// the screenshot item. Google's account isn't here: one signs in once, from the offer as the
-/// program starts or from the settings window.
-pub fn menu(window: HWND, hotkey: &str) -> Option<Command> {
+/// the screenshot item, and `update` is the item of updates, if the program updates itself.
+/// Google's account isn't here: one signs in once, from the offer as the program starts or from
+/// the settings window.
+pub fn menu(window: HWND, hotkey: &str, update: Option<&str>) -> Option<Command> {
     let capture = wide(&format!("{}\t{hotkey}", tr("Take a screenshot")));
     let settings = wide(tr("Settings"));
     let guide = wide(tr("How to use"));
+    let update = update.map(wide);
     let exit = wide(tr("Exit"));
     unsafe {
         let menu = CreatePopupMenu();
         AppendMenuW(menu, MF_STRING, CAPTURE, capture.as_ptr());
         AppendMenuW(menu, MF_STRING, SETTINGS, settings.as_ptr());
         AppendMenuW(menu, MF_STRING, GUIDE, guide.as_ptr());
+        if let Some(update) = &update {
+            AppendMenuW(menu, MF_STRING, UPDATE, update.as_ptr());
+        }
         AppendMenuW(menu, MF_SEPARATOR, 0, null());
         AppendMenuW(menu, MF_STRING, EXIT, exit.as_ptr());
         let mut at = POINT::default();
@@ -120,6 +139,7 @@ pub fn menu(window: HWND, hotkey: &str) -> Option<Command> {
             CAPTURE => Some(Command::Capture),
             SETTINGS => Some(Command::Settings),
             GUIDE => Some(Command::Guide),
+            UPDATE => Some(Command::Update),
             EXIT => Some(Command::Exit),
             _ => None,
         }

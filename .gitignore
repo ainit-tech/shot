@@ -1,6 +1,12 @@
 # Rust build output
 /target/
 
+# Temporary files, kept out of git in every repository
+/tmp/
+
+# A release built by ci/build.sh
+/dist/
+
 # Node.js dependencies
 node_modules/
 

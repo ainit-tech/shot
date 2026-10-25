@@ -9,7 +9,8 @@ use std::time::{Duration, SystemTime};
 use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, SYSTEMTIME};
 use windows_sys::Win32::System::Com::CoTaskMemFree;
 use windows_sys::Win32::System::Registry::{
-    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RegCloseKey, RegDeleteValueW, RegOpenKeyExW, RegSetValueExW,
+    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_SZ, RegCloseKey, RegDeleteValueW, RegGetValueW,
+    RegOpenKeyExW, RegSetValueExW,
 };
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::UI::Controls::Dialogs::{
@@ -118,6 +119,26 @@ fn file_url(path: &Path) -> String {
     let parts: Vec<String> =
         text.split('/').enumerate().map(|(i, part)| if i == 0 { part.to_string() } else { crate::query::encode(part) }).collect();
     format!("file:///{}", parts.join("/"))
+}
+
+/// Opens a file's folder in Explorer with the file selected, in a window already open there, if
+/// there is one.
+pub fn show_in_folder(path: &Path) -> Result<(), String> {
+    use windows::Win32::UI::Shell::{ILCreateFromPathW, ILFree, SHOpenFolderAndSelectItems};
+    use windows_core::PCWSTR as ComText;
+    let text = path.to_string_lossy();
+    let wide_path = wide(&text);
+    unsafe {
+        let item = ILCreateFromPathW(ComText(wide_path.as_ptr()));
+        if item.is_null() {
+            return Err(cannot_open(&text));
+        }
+        // Explorer may come to the front only if the program lets it.
+        AllowSetForegroundWindow(ASFW_ANY);
+        let shown = SHOpenFolderAndSelectItems(item, None, 0);
+        ILFree(Some(item));
+        shown.map_err(|_| cannot_open(&text))
+    }
 }
 
 /// Opens a text file in its program, or in Notepad if no program is set for its kind.
@@ -237,6 +258,12 @@ pub fn pick_folder(owner: HWND, folder: &Path) -> Option<PathBuf> {
         ComFree(Some(name.0.cast()));
         path
     }
+}
+
+/// Whether Windows starts the program as it starts: the installer may have said so.
+pub fn starts_with_windows() -> bool {
+    let run = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+    unsafe { RegGetValueW(HKEY_CURRENT_USER, run, w!("ainitShot"), RRF_RT_REG_SZ, null_mut(), null_mut(), null_mut()) == 0 }
 }
 
 /// Starts the program together with Windows, or stops doing so (decision 3).

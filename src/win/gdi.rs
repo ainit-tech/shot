@@ -12,6 +12,7 @@ use windows_sys::Win32::Graphics::Gdi::{
     FF_DONTCARE, FONT_QUALITY, FW_NORMAL, FW_SEMIBOLD, GdiFlush, GetTextExtentPoint32W, HBITMAP, HDC, HFONT, HGDIOBJ,
     OUT_DEFAULT_PRECIS, SelectObject, SetBkMode, SetTextColor, TRANSPARENT, TextOutW,
 };
+use windows_sys::core::PCWSTR;
 use windows_sys::w;
 
 use super::last_error;
@@ -105,6 +106,16 @@ impl Font {
     }
 
     fn with_quality(pixels: i32, bold: bool, quality: FONT_QUALITY) -> io::Result<Font> {
+        Font::of(w!("Segoe UI Variable Text"), pixels, bold, quality)
+    }
+
+    /// Consolas, the font of terminals, for pictures of what terminals show.
+    #[cfg(test)]
+    pub fn consolas(pixels: i32) -> io::Result<Font> {
+        Font::of(w!("Consolas"), pixels, false, CLEARTYPE_QUALITY)
+    }
+
+    fn of(face: PCWSTR, pixels: i32, bold: bool, quality: FONT_QUALITY) -> io::Result<Font> {
         let weight = if bold { FW_SEMIBOLD } else { FW_NORMAL };
         let handle = unsafe {
             CreateFontW(
@@ -121,7 +132,7 @@ impl Font {
                 CLIP_DEFAULT_PRECIS as u32,
                 quality as u32,
                 (DEFAULT_PITCH | FF_DONTCARE) as u32,
-                w!("Segoe UI Variable Text"),
+                face,
             )
         };
         if handle.is_null() { Err(last_error()) } else { Ok(Font(handle)) }

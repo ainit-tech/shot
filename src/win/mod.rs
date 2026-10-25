@@ -12,13 +12,17 @@ mod clipboard;
 mod gdi;
 mod guide;
 mod hotkey;
+mod http;
 mod invite;
 mod languages;
+mod masking;
+mod models;
 mod ocr;
 mod overlay;
 mod preferences;
 mod shell;
 mod tray;
+mod update;
 
 use std::io;
 

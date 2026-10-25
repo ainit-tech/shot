@@ -60,8 +60,8 @@ const ui = {
   toc: $('#toc'),
 };
 
-/** Tab titles start with the first part of the site's address in the top bar, `screenshot` for
- * screenshot.ainit.localhost, so the site's tabs stand out among those of other local sites. */
+/** Tab titles start with the first part of the site's address in the top bar, `shot-docs` for
+ * shot-docs.ainit.localhost, so the site's tabs stand out among those of other local sites. */
 const tabName = (ui.brand.textContent ?? '').trim().split('.')[0];
 
 const manifests = new Map<string, Manifest>([[LATEST, latest]]);

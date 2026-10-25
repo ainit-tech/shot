@@ -40,6 +40,12 @@ pub const MAGIC_PENCIL: &[Part] = &[
     Part::Fill("M 15.5 1.5 L 16.4 3.6 L 18.5 4.5 L 16.4 5.4 L 15.5 7.5 L 14.6 5.4 L 12.5 4.5 L 14.6 3.6 Z"),
 ];
 
+/// Masking private data: lines of text, one word of them blacked out.
+pub const MASK: &[Part] = &[
+    Part::Line("M 3.5 4.5 H 16.5 M 14.5 10 H 16.5 M 3.5 15.5 H 11"),
+    Part::Fill("M 4.5 8 H 11.5 C 12.1 8 12.5 8.4 12.5 9 V 11 C 12.5 11.6 12.1 12 11.5 12 H 4.5 C 3.9 12 3.5 11.6 3.5 11 V 9 C 3.5 8.4 3.9 8 4.5 8 Z"),
+];
+
 pub const UNDO: &[Part] = &[Part::Line(
     "M 7.5 4.5 L 4 8 L 7.5 11.5 M 4 8 H 12 C 14.5 8 16.5 10 16.5 12.5 C 16.5 15 14.5 16 12 16 H 8",
 )];
@@ -117,7 +123,7 @@ mod tests {
     #[test]
     fn every_icon_reads() {
         let icons = [
-            PENCIL, BRUSH, LINE_TOOL, ARROW, RECTANGLE, FILLED_RECTANGLE, MAGIC_PENCIL, UNDO, COPY, SAVE, CLOSE,
+            PENCIL, BRUSH, LINE_TOOL, ARROW, RECTANGLE, FILLED_RECTANGLE, MAGIC_PENCIL, MASK, UNDO, COPY, SAVE, CLOSE,
             IMAGES, QUESTION,
         ];
         for icon in icons {

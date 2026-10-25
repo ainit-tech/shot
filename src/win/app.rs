@@ -6,7 +6,7 @@
 use std::cell::RefCell;
 use std::fs;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::ptr::{null, null_mut};
 use std::rc::Rc;
 use std::sync::OnceLock;
@@ -19,7 +19,7 @@ use windows_sys::Win32::System::Console::{CTRL_CLOSE_EVENT, SetConsoleCtrlHandle
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::System::Threading::CreateMutexW;
 use windows_sys::Win32::UI::HiDpi::{DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, SetProcessDpiAwarenessContext};
-use windows_sys::Win32::UI::Input::KeyboardAndMouse::{RegisterHotKey, UnregisterHotKey};
+use windows_sys::Win32::UI::Shell::NIN_BALLOONUSERCLICK;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW, MB_ICONERROR, MB_ICONINFORMATION,
     MB_OK, MESSAGEBOX_STYLE, MSG, MessageBoxW, PostMessageW, PostQuitMessage, RegisterClassExW, RegisterWindowMessageW,
@@ -30,11 +30,10 @@ use windows_sys::w;
 
 use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
-use super::{browser, guide, invite, languages, last_error, overlay, preferences, shell, wide};
+use super::{browser, guide, invite, languages, last_error, models, overlay, preferences, shell, update, wide};
 use crate::settings::{self, Settings};
 use crate::text::{self, tr};
 
-const HOTKEY_ID: i32 = 1;
 /// How often the settings file is looked at, in milliseconds.
 const SETTINGS_TICK: u32 = 1000;
 const SETTINGS_TIMER: usize = 1;
@@ -42,6 +41,8 @@ const SETTINGS_TIMER: usize = 1;
 thread_local! {
     static TRAY: RefCell<Option<Tray>> = const { RefCell::new(None) };
     static STATE: RefCell<Option<State>> = const { RefCell::new(None) };
+    /// The screenshot the last notification told of: a click on it shows the file in its folder.
+    static SAVED: RefCell<Option<PathBuf>> = const { RefCell::new(None) };
 }
 
 /// The message Explorer sends to every window when it starts again: the icon has to be added
@@ -102,10 +103,9 @@ pub fn save_settings(new: Settings) -> Result<(), String> {
     let mut registered = hotkey;
     if new.hotkey != old.hotkey {
         let taken = hotkey::parse(&new.hotkey)?;
-        unsafe { UnregisterHotKey(window, HOTKEY_ID) };
-        if unsafe { RegisterHotKey(window, HOTKEY_ID, taken.modifiers, taken.key as u32) } == 0 {
+        if !hotkey::take(window, taken) {
             if let Some(old) = hotkey {
-                unsafe { RegisterHotKey(window, HOTKEY_ID, old.modifiers, old.key as u32) };
+                hotkey::take(window, old);
             }
             return Err(taken_by_another(&new.hotkey));
         }
@@ -121,6 +121,9 @@ pub fn save_settings(new: Settings) -> Result<(), String> {
         && let Err(problem) = shell::set_autostart(new.autostart)
     {
         notify(tr("Starting with Windows hasn't changed"), &problem);
+    }
+    if new.privacy_filter != old.privacy_filter {
+        models::want(new.privacy_filter);
     }
     let now = modified(&path);
     change_state(|state| {
@@ -151,11 +154,9 @@ fn cannot_write(path: &std::path::Path, error: &io::Error) -> String {
 /// old one doesn't freeze the screen, and gives it back after.
 pub fn hold_hotkey(held: bool) {
     let Some((window, hotkey)) = STATE.with(|s| s.borrow().as_ref().map(|s| (s.window, s.hotkey))) else { return };
-    unsafe {
-        UnregisterHotKey(window, HOTKEY_ID);
-        if !held && let Some(hotkey) = hotkey {
-            RegisterHotKey(window, HOTKEY_ID, hotkey.modifiers, hotkey.key as u32);
-        }
+    hotkey::release(window);
+    if !held && let Some(hotkey) = hotkey {
+        hotkey::take(window, hotkey);
     }
 }
 
@@ -195,12 +196,29 @@ fn change_state(change: impl FnOnce(&mut State)) {
     });
 }
 
-/// Tells the user something next to the icon in the notification area.
+/// Tells the user of a problem next to the icon in the notification area.
 pub fn notify(title: &str, text: &str) {
+    show_notice(title, text, true, None);
+}
+
+/// Tells the user good news next to the icon, quietly.
+pub fn announce(title: &str, text: &str) {
+    show_notice(title, text, false, None);
+}
+
+/// Tells the user where a screenshot is saved, and whether it is copied too; a click on the
+/// notification shows the file in its folder.
+pub fn saved(path: &Path, copied: bool) {
+    let title = if copied { tr("Screenshot saved and copied") } else { tr("Screenshot saved") };
+    show_notice(title, &path.display().to_string(), false, Some(path.to_path_buf()));
+}
+
+fn show_notice(title: &str, text: &str, problem: bool, file: Option<PathBuf>) {
     eprintln!("{title}: {text}");
+    SAVED.set(file);
     TRAY.with(|tray| {
         if let Some(tray) = &*tray.borrow() {
-            tray.notify(title, text);
+            tray.notify(title, text, problem);
         }
     });
 }
@@ -258,12 +276,19 @@ pub fn run() -> io::Result<()> {
         overlay::create(module)?;
         let tray = Tray::add(window)?;
         TRAY.with(|t| *t.borrow_mut() = Some(tray));
+        // The installer of an update starts the new version with this, which says so.
+        if std::env::args().any(|argument| argument == "--updated") {
+            let version = crate::update::Version::current().to_string();
+            announce(tr("ainitShot is updated"), &tr("Version {version} is installed.").replace("{version}", &version));
+        }
+        update::start(window);
 
         if let Some(problem) = problem {
             let meanwhile = tr("The default settings are in force meanwhile.");
             notify(settings_mistake(), &format!("{problem} {meanwhile}"));
         }
         let settings = settings();
+        models::start(window, settings.privacy_filter);
         match register(window, &settings.hotkey) {
             Ok(hotkey) => change_state(|state| state.hotkey = Some(hotkey)),
             Err(problem) => {
@@ -314,7 +339,10 @@ pub fn run() -> io::Result<()> {
 /// a mistake, the defaults are used and the mistake is returned too.
 fn first_settings(path: &PathBuf) -> (Settings, Option<String>) {
     if !path.exists() {
-        let written = path.parent().map_or(Ok(()), fs::create_dir_all).and_then(|()| fs::write(path, settings::default_file()));
+        // The installer turns starting with Windows on unless told not to; the first settings
+        // keep what it chose.
+        let first = Settings { autostart: shell::starts_with_windows(), ..Settings::default() };
+        let written = path.parent().map_or(Ok(()), fs::create_dir_all).and_then(|()| fs::write(path, first.to_file()));
         if let Err(error) = written {
             return (Settings::default(), Some(cannot_write(path, &error)));
         }
@@ -370,12 +398,11 @@ fn apply(new: Settings) {
     text::set(new.language.resolve(shell::windows_language()));
     let mut registered = hotkey;
     if new.hotkey != old.hotkey || hotkey.is_none() {
-        unsafe { UnregisterHotKey(window, HOTKEY_ID) };
         match register(window, &new.hotkey) {
             Ok(hotkey) => registered = Some(hotkey),
             Err(problem) => {
                 notify(tr("The hotkey hasn't changed"), &problem);
-                registered = hotkey.filter(|old| unsafe { RegisterHotKey(window, HOTKEY_ID, old.modifiers, old.key as u32) } != 0);
+                registered = hotkey.filter(|&old| hotkey::take(window, old));
             }
         }
     }
@@ -383,6 +410,9 @@ fn apply(new: Settings) {
         && let Err(problem) = shell::set_autostart(new.autostart)
     {
         notify(tr("Starting with Windows hasn't changed"), &problem);
+    }
+    if new.privacy_filter != old.privacy_filter {
+        models::want(new.privacy_filter);
     }
     change_state(|state| {
         state.settings = Rc::new(new);
@@ -393,7 +423,7 @@ fn apply(new: Settings) {
 
 fn register(window: HWND, text: &str) -> Result<Hotkey, String> {
     let hotkey = hotkey::parse(text)?;
-    if unsafe { RegisterHotKey(window, HOTKEY_ID, hotkey.modifiers, hotkey.key as u32) } == 0 {
+    if !hotkey::take(window, hotkey) {
         return Err(taken_by_another(text));
     }
     Ok(hotkey)
@@ -414,18 +444,33 @@ fn tell(text: &str, icon: MESSAGEBOX_STYLE) {
 unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     match message {
         WM_HOTKEY => overlay::open(),
-        WM_TIMER if wparam == SETTINGS_TIMER => reread(),
+        WM_TIMER if wparam == SETTINGS_TIMER => {
+            reread();
+            hotkey::follow(window);
+        }
+        WM_TIMER if wparam == hotkey::TIMER => hotkey::follow(window),
+        WM_TIMER if wparam == update::TIMER => update::tick(),
+        update::MESSAGE => update::heard(lparam),
+        models::MESSAGE => models::heard(wparam != 0),
         tray::MESSAGE => match lparam as u32 {
             WM_LBUTTONUP => overlay::open(),
-            WM_RBUTTONUP => match tray::menu(window, &settings().hotkey) {
+            WM_RBUTTONUP => match tray::menu(window, &settings().hotkey, update::menu_item().as_deref()) {
                 Some(tray::Command::Capture) => overlay::open(),
                 Some(tray::Command::Settings) => preferences::open(),
                 Some(tray::Command::Guide) => guide::open(),
+                Some(tray::Command::Update) => update::menu_chosen(),
                 Some(tray::Command::Exit) => unsafe {
                     DestroyWindow(window);
                 },
                 None => {}
             },
+            NIN_BALLOONUSERCLICK => {
+                if let Some(path) = SAVED.with_borrow(Clone::clone)
+                    && let Err(problem) = shell::show_in_folder(&path)
+                {
+                    notify(tr("The folder didn't open"), &problem);
+                }
+            }
             _ => {}
         },
         WM_DESTROY => {
@@ -436,10 +481,8 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             invite::close();
             browser::close();
             shell::remove_pages(Duration::ZERO);
-            unsafe {
-                UnregisterHotKey(window, HOTKEY_ID);
-                PostQuitMessage(0);
-            }
+            hotkey::release(window);
+            unsafe { PostQuitMessage(0) };
         }
         _ if TASKBAR_CREATED.get() == Some(&message) => TRAY.with(|t| {
             if let Some(tray) = &*t.borrow() {

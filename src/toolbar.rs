@@ -1,5 +1,5 @@
-//! The panels next to the selection. The main one has the tools, the colour, undo, copying the
-//! picture or its text, saving and closing; the other one has the query buttons from the
+//! The panels next to the selection. The main one has the tools, the colour, masking, undo,
+//! copying the picture or its text, saving and closing; the other one has the query buttons from the
 //! settings. The settings say on which side of the selection each panel stands and to which end
 //! of that side it is pressed: above and below the selection a panel is a row, beside it a
 //! column. Here is where their buttons go and which one is under the mouse; how they look is in
@@ -13,6 +13,8 @@ use crate::settings::{Panel, Panels, Place, Side};
 pub enum Button {
     Tool(Tool),
     Color,
+    /// Covers the private data in the screenshot.
+    Mask,
     Undo,
     Copy,
     /// Copies the text in the screenshot.
@@ -58,7 +60,7 @@ impl Toolbar {
     ) -> (Toolbar, Option<Toolbar>) {
         let tools = vec![
             Tool::ALL.iter().map(|&tool| Button::Tool(tool)).collect(),
-            vec![Button::Color, Button::Undo],
+            vec![Button::Color, Button::Mask, Button::Undo],
             vec![Button::Copy, Button::CopyText, Button::Save],
             vec![Button::Close],
         ];
@@ -336,7 +338,7 @@ mod tests {
         assert_eq!(toolbar.rect.top, 708);
         assert!(!toolbar.column);
         assert_eq!(toolbar.hit(Point::new(1400 - 20, 708 + 20)), Some(Button::Close));
-        assert_eq!(toolbar.buttons.len(), 8 + 2 + 3 + 1);
+        assert_eq!(toolbar.buttons.len(), 8 + 3 + 3 + 1);
     }
 
     #[test]

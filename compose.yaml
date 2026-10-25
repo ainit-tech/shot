@@ -1,6 +1,6 @@
 # The documentation site, running on its own, apart from any terminal session:
 #
-#   docker compose up -d          start it at http://screenshot.ainit.localhost
+#   docker compose up -d          start it at http://shot-docs.ainit.localhost
 #   docker compose logs -f docs   watch it rebuild the docs after every change
 #   docker compose down           stop it
 #
@@ -14,13 +14,13 @@
 services:
   docs:
     build: tools/docs
-    image: screenshot-docs
+    image: shot-docs
     networks: [default, gateway]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ainit-screenshot.rule=Host(`screenshot.ainit.localhost`)
-      - traefik.http.routers.ainit-screenshot.entrypoints=web
-      - traefik.http.services.ainit-screenshot.loadbalancer.server.port=5176
+      - traefik.http.routers.ainit-shot-docs.rule=Host(`shot-docs.ainit.localhost`)
+      - traefik.http.routers.ainit-shot-docs.entrypoints=web
+      - traefik.http.services.ainit-shot-docs.loadbalancer.server.port=5176
     volumes:
       - .:/repo
       # The container's own packages, build output and generated site data. Writing them

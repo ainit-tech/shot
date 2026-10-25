@@ -3,7 +3,7 @@ name = "docs-engine"
 version = "0.1.0"
 edition.workspace = true
 publish = false
-description = "Checks the screenshot documentation and builds data for the docs site and for AI agents."
+description = "Checks the documentation of ainitShot and builds data for the docs site and for AI agents."
 
 [[bin]]
 name = "docs"

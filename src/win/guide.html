@@ -155,7 +155,7 @@ const TEXT = {
   s4: "Take the result",
   s4a: "{copy} or {enter}: the picture with its marks in the clipboard.",
   s4b: "{copyText}: only the text in the picture. Windows reads it by itself, offline.",
-  s4c: "{save}: save as a PNG file.",
+  s4c: "{save}: a PNG file in the folder of screenshots; {saveAs}: choose where.",
   cardPicture: "Picture",
   cardText: "Text",
   cardFile: "PNG file",
@@ -362,12 +362,15 @@ function sizePill() {
   return g;
 }
 
+/** The width of the main panel: its 15 buttons, 18 wide, its padding and its 3 separators. */
+const BAR_WIDTH = 6 + 15 * 18 + 3 * 6;
+
 /** The main panel as the program draws it, the tool `active` lit up; buttons 18 wide. */
 function toolbar(x, y, active) {
   const order = ["Pencil", "Brush", "Line", "Arrow", "Rectangle", "FilledRectangle", "Text", "MagicPencil"];
-  const groups = [order, ["color", "undo"], ["copy", "copyText", "save"], ["close"]];
+  const groups = [order, ["color", "mask", "undo"], ["copy", "copyText", "save"], ["close"]];
   const g = S("g", { transform: `translate(${x} ${y})` });
-  const width = 6 + 14 * 18 + 3 * 6;
+  const width = BAR_WIDTH;
   g.append(S("rect", { x: 0, y: 0, width, height: 24, rx: 7, fill: "rgba(32,32,32,0.97)", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.6, filter: "url(#shade)" }));
   const lit = {};
   let at = 3;
@@ -619,7 +622,7 @@ const SLIDES = [
       const ellipse = S("ellipse", { cx: 548, cy: 92, rx: 25, ry: 21, fill: "none", stroke: "#e53935", "stroke-width": 3 });
       const cover = S("rect", { x: 58, y: 137, height: 22, rx: 1, fill: "#212121" });
       screen.marks.append(arrow, loop, ellipse, cover);
-      const bar = toolbar(r.x + r.w - (6 + 14 * 18 + 18), r.y + r.h + 7, "Arrow");
+      const bar = toolbar(r.x + r.w - BAR_WIDTH, r.y + r.h + 7, "Arrow");
       const column = queryColumn(r.x + r.w + 7, r.y + r.h);
       screen.ui.append(bar, column);
       return {
@@ -671,7 +674,7 @@ const SLIDES = [
       const caret = S("rect", { width: 1.6, height: 15, fill: "#e53935" });
       const rings = clickRings();
       screen.marks.append(arrow, label, caret);
-      screen.ui.append(tail, tip, rings, toolbar(r.x + r.w - (6 + 14 * 18 + 18), r.y + r.h + 7, null), queryColumn(r.x + r.w + 7, r.y + r.h));
+      screen.ui.append(tail, tip, rings, toolbar(r.x + r.w - BAR_WIDTH, r.y + r.h + 7, null), queryColumn(r.x + r.w + 7, r.y + r.h));
       return {
         loop: 8600,
         at(t) {
@@ -712,7 +715,7 @@ const SLIDES = [
     points: () => [
       line(rich("s4a", { copy: keys("Ctrl+C"), enter: keys("Enter") })),
       line(rich("s4b", { copyText: keys("Ctrl+Shift+C") })),
-      line(rich("s4c", { save: keys("Ctrl+S") })),
+      line(rich("s4c", { save: keys("Ctrl+S"), saveAs: keys("Ctrl+Shift+S") })),
     ],
     picture(svg) {
       svg.append(defs());

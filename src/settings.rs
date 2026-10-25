@@ -15,8 +15,8 @@ pub fn chooses_language(text: &str) -> bool {
     toml::from_str::<toml::Table>(text).is_ok_and(|table| table.contains_key("language"))
 }
 
-/// The settings file as the program writes it the first time: the defaults, in the language in
-/// force.
+/// The settings file with the defaults, in the language in force.
+#[cfg(test)]
 pub fn default_file() -> String {
     Settings::default().to_file()
 }
@@ -27,6 +27,9 @@ pub struct Settings {
     pub hotkey: String,
     pub language: Choice,
     pub autostart: bool,
+    pub autoupdate: bool,
+    /// Whether masking has OpenAI Privacy Filter: the program downloads it, or removes it.
+    pub privacy_filter: bool,
     pub colors: Vec<String>,
     pub width: f32,
     pub save: Save,
@@ -87,6 +90,8 @@ pub enum Panel {
 #[serde(default, deny_unknown_fields)]
 pub struct Save {
     pub ask: bool,
+    /// Whether the screenshot saved goes into the clipboard too.
+    pub copy: bool,
     pub folder: String,
     pub name: String,
 }
@@ -147,7 +152,7 @@ impl Default for Save {
 
 impl Save {
     fn defaults(language: Language) -> Save {
-        Save { ask: true, folder: String::new(), name: tr_in(language, "Screenshot {date} {time}").into() }
+        Save { ask: false, copy: true, folder: String::new(), name: tr_in(language, "Screenshot {date} {time}").into() }
     }
 }
 
@@ -184,6 +189,8 @@ impl Settings {
             hotkey: "Alt+~".into(),
             language: Choice::Auto,
             autostart: false,
+            autoupdate: true,
+            privacy_filter: true,
             colors: ["#E53935", "#FB8C00", "#FDD835", "#43A047", "#1E88E5", "#8E24AA", "#212121", "#FFFFFF"]
                 .map(String::from)
                 .into(),
@@ -199,11 +206,19 @@ impl Settings {
     }
 
     /// The settings moved to another language: what is still as the defaults of the language
-    /// they were in, the query buttons and the file's name, becomes the defaults of the new one.
+    /// they were in becomes the defaults of the new one. A query button's name and mini prompt
+    /// each follow while they are a standard button's, whatever else was changed, so that the
+    /// standard "Translate" translates into the new language; the file's name follows too.
     pub fn speaking(mut self, from: Language, to: Language) -> Settings {
         let (was, now) = (Settings::defaults(from), Settings::defaults(to));
-        if self.buttons == was.buttons {
-            self.buttons = now.buttons;
+        for button in &mut self.buttons {
+            if let Some(i) = was.buttons.iter().position(|standard| standard.name == button.name) {
+                button.name.clone_from(&now.buttons[i].name);
+            }
+            let prompt = |standard: &QueryButton| !standard.prompt.is_empty() && standard.prompt == button.prompt;
+            if let Some(i) = was.buttons.iter().position(prompt) {
+                button.prompt.clone_from(&now.buttons[i].prompt);
+            }
         }
         if self.save.name == was.save.name {
             self.save.name = now.save.name;
@@ -242,6 +257,12 @@ language = \"{language}\"
 {autostart_note}
 autostart = {autostart}
 
+{autoupdate_note}
+autoupdate = {autoupdate}
+
+{privacy_filter_note}
+privacy_filter = {privacy_filter}
+
 {colors_note}
 colors = [{colors}]
 
@@ -251,6 +272,8 @@ width = {width}
 [save]
 {ask_note}
 ask = {ask}
+{copy_note}
+copy = {copy}
 {folder_note}
 folder = {folder}
 {name_note}
@@ -274,11 +297,17 @@ first = \"{first}\"
             language = self.language.name(),
             autostart_note = notes.autostart,
             autostart = self.autostart,
+            autoupdate_note = notes.autoupdate,
+            autoupdate = self.autoupdate,
+            privacy_filter_note = notes.privacy_filter,
+            privacy_filter = self.privacy_filter,
             colors_note = notes.colors,
             colors = colors.join(", "),
             width_note = notes.width,
             ask_note = notes.ask,
             ask = self.save.ask,
+            copy_note = notes.copy,
+            copy = self.save.copy,
             folder_note = notes.folder,
             folder = toml_string(&self.save.folder),
             name_note = notes.name,
@@ -383,9 +412,12 @@ impl Notes {
             hotkey: tr_in(language, self.hotkey),
             language: tr_in(language, self.language),
             autostart: tr_in(language, self.autostart),
+            autoupdate: tr_in(language, self.autoupdate),
+            privacy_filter: tr_in(language, self.privacy_filter),
             colors: tr_in(language, self.colors),
             width: tr_in(language, self.width),
             ask: tr_in(language, self.ask),
+            copy: tr_in(language, self.copy),
             folder: tr_in(language, self.folder),
             name: tr_in(language, self.name),
             panels: tr_in(language, self.panels),
@@ -399,9 +431,27 @@ impl Notes {
 
 /// The comments of the settings file in English, for the test that every catalog has them.
 #[cfg(test)]
-pub fn notes() -> [&'static str; 14] {
-    let Notes { head, hotkey, language, autostart, colors, width, ask, folder, name, panels, tools, queries, first, buttons } = NOTES;
-    [head, hotkey, language, autostart, colors, width, ask, folder, name, panels, tools, queries, first, buttons]
+pub fn notes() -> [&'static str; 17] {
+    let Notes {
+        head,
+        hotkey,
+        language,
+        autostart,
+        autoupdate,
+        privacy_filter,
+        colors,
+        width,
+        ask,
+        copy,
+        folder,
+        name,
+        panels,
+        tools,
+        queries,
+        first,
+        buttons,
+    } = NOTES;
+    [head, hotkey, language, autostart, autoupdate, privacy_filter, colors, width, ask, copy, folder, name, panels, tools, queries, first, buttons]
 }
 
 /// The comments of the settings file, in English: one before each setting or group.
@@ -410,9 +460,12 @@ struct Notes {
     hotkey: &'static str,
     language: &'static str,
     autostart: &'static str,
+    autoupdate: &'static str,
+    privacy_filter: &'static str,
     colors: &'static str,
     width: &'static str,
     ask: &'static str,
+    copy: &'static str,
     folder: &'static str,
     name: &'static str,
     panels: &'static str,
@@ -427,13 +480,21 @@ const NOTES: Notes = Notes {
 # If it has a mistake, the program says where and keeps the settings it had.
 # The settings window changes them too: the menu of the icon in the tray, \"Settings\".",
     hotkey: "# The hotkey that freezes the screen; ~ is the key left of 1.
-# Other examples: \"Ctrl+~\", \"PrintScreen\", \"Ctrl+Shift+S\".",
+# Other examples: \"Ctrl+~\", \"PrintScreen\", \"Ctrl+PrintScreen\".",
     language: "# The program's language: \"auto\" is that of Windows, or a language's code, such as \"en\",
 # \"es\", \"ru\" or \"zh\"; the settings window lists them all.",
     autostart: "# Start the program with Windows.",
+    autoupdate: "# Install new versions by itself. The program looks for them as it starts and once a day
+# and installs one once none of its windows is open; if false, it only shows a new version in the
+# settings window and the tray menu.",
+    privacy_filter: "# OpenAI Privacy Filter, a model with which masking finds names, addresses, dates and links
+# too, not only keys, passwords, cards, e-mail and phones. It runs on the computer. The program
+# downloads it by itself, about 950 MB, and masks without it meanwhile; false removes it.",
     colors: "# The colours for drawing, as \"#RRGGBB\"; the first one is chosen at once.",
     width: "# The width of the line in pixels at the screen's scale of 100%. While drawing, the mouse wheel changes it.",
-    ask: "# Ask where to save. If false, the screenshot is saved into the folder at once.",
+    ask: "# Ask where to save. If false, the screenshot is saved into the folder at once.
+# Ctrl+Shift+S always asks.",
+    copy: "# Copy the saved screenshot into the clipboard too.",
     folder: "# The folder for screenshots. Empty means \"Pictures\\Screenshots\".",
     name: "# The file's name without its extension: {date} is the date, {time} the time.",
     panels: "# The panels next to the selection.
@@ -651,11 +712,20 @@ mod tests {
         let english = Settings::defaults(Language::RU).speaking(Language::RU, Language::EN);
         assert_eq!(english, Settings::defaults(Language::EN));
         assert_eq!(english.buttons[0].name, "Ask Google");
+        // One's own mini prompt, key, button and file's name stay; the standard names and mini
+        // prompts follow, whatever else was changed: "Translate" translates into the new language.
         let mut own = Settings::defaults(Language::RU);
-        own.buttons[1].prompt = "Переведи на английский.".into();
+        own.buttons[0].prompt = "Что это за растение?".into();
+        own.buttons[2].key = Some("Y".into());
+        own.buttons.push(QueryButton { name: "Свой".into(), mode: Mode::Ai, prompt: "Кто это?".into(), key: None, icon: None });
         own.save.name = "Снимок {date}".into();
         let moved = own.clone().speaking(Language::RU, Language::HI);
-        assert_eq!((moved.buttons, moved.save.name), (own.buttons, own.save.name));
+        let hindi = Settings::defaults(Language::HI);
+        assert_eq!((&moved.buttons[0].name, &moved.buttons[0].prompt), (&hindi.buttons[0].name, &own.buttons[0].prompt));
+        assert_eq!(moved.buttons[1], hindi.buttons[1]);
+        assert!(moved.buttons[1].prompt.contains("हिंदी"), "{}", moved.buttons[1].prompt);
+        assert_eq!((&moved.buttons[2].name, &moved.buttons[2].key), (&hindi.buttons[2].name, &own.buttons[2].key));
+        assert_eq!((&moved.buttons[3], &moved.save.name), (&own.buttons[3], &own.save.name));
     }
 
     #[test]
@@ -673,6 +743,12 @@ mod tests {
         let settings = Settings::parse("hotkey = \"Ctrl+~\"").unwrap();
         assert_eq!(settings.hotkey, "Ctrl+~");
         assert_eq!(settings.colors, Settings::default().colors);
+    }
+
+    #[test]
+    fn a_file_from_before_copying_on_save_copies() {
+        let settings = Settings::parse("[save]\nask = true").unwrap();
+        assert!(settings.save.ask && settings.save.copy);
     }
 
     #[test]

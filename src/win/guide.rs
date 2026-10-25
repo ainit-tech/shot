@@ -269,6 +269,7 @@ fn first_look() -> Value {
             "FilledRectangle": parts(icons::FILLED_RECTANGLE),
             "Text": parts(icons::TEXT),
             "MagicPencil": parts(icons::MAGIC_PENCIL),
+            "mask": parts(icons::MASK),
             "undo": parts(icons::UNDO),
             "copy": parts(icons::COPY),
             "copyText": parts(icons::TEXT_COPY),

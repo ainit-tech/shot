@@ -33,7 +33,7 @@ Copying text is quick and often private: it should be instant and stay on the co
 ## How it works
 
 - The button "Copy text" on the toolbar and Ctrl+Shift+C read the screenshot with its annotations, so that text hidden under a filled rectangle stays hidden. Meanwhile the toolbar says that it is reading the text.
-- A picture that fits the recognition twice as big is made twice as big, since small letters of the screen are read better bigger; one too big for it is made smaller.
+- A picture that fits the recognition twice as big is made twice as big and smoothed, since small letters of the screen are read better bigger, and dots and zeros come out right only smoothed ([decision](015-masking-private-data.md)); one too big for it is made smaller.
 - The lines go into the clipboard one under another, and the frozen screen closes. If there is no text, the toolbar says so and the screen stays.
 
 ## Consequences

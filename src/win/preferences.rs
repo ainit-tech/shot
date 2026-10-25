@@ -32,7 +32,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, browser, last_error, shell, tray, wide};
+use super::{app, browser, last_error, models, shell, tray, update, wide};
 use crate::annotation::Tool;
 use crate::icons::{self, Part};
 use crate::settings::Settings;
@@ -115,6 +115,19 @@ pub fn refresh() {
         "settings": in_force(),
         "defaults": serde_json::to_value(Settings::default()).unwrap_or_default(),
     })));
+    updates(&update::describe());
+    models(&models::describe());
+}
+
+/// Where the program stands with updates: the window shows the version installed and the one
+/// available, and what came of the last check.
+pub fn updates(state: &Value) {
+    post(&json!({ "type": "updates", "updates": state }));
+}
+
+/// How the download of the model of masking goes: the window shows it in the section of models.
+pub fn models(state: &Value) {
+    post(&json!({ "type": "models", "models": state }));
 }
 
 /// A message to the page with what it needs to speak the language in force: its code, the
@@ -301,8 +314,29 @@ fn heard(message: &str) {
                 app::notify(browser::window_not_open(), &problem);
             }
         }
+        "checkUpdates" => update::check_now(),
+        "installUpdate" => update::install_now(),
+        "pauseModels" => models::pause(message["paused"].as_bool().unwrap_or(false)),
+        "licenses" => post(&licenses()),
+        "openSite" => {
+            if let Err(problem) = shell::open(SITE) {
+                app::notify(tr("The site didn't open"), &problem);
+            }
+        }
         _ => {}
     }
+}
+
+/// The program's site.
+const SITE: &str = "https://shot.ainit.tech";
+
+/// The program's own license and the open source components it is made of, each with its
+/// license, for the section "About". The list is written by `tools/licenses.py`.
+fn licenses() -> Value {
+    let mut licenses: Value = serde_json::from_str(include_str!("licenses.json")).unwrap_or_default();
+    licenses["type"] = "licenses".into();
+    licenses["license"] = include_str!("../../LICENSE").into();
+    licenses
 }
 
 /// What the page needs to show the settings: the settings in force and the defaults, where the
@@ -313,6 +347,8 @@ fn first_look() -> Value {
         "settings": in_force(),
         "defaults": serde_json::to_value(Settings::default()).unwrap_or_default(),
         "signedIn": app::signed_in(),
+        "updates": update::describe(),
+        "models": models::describe(),
         "file": app::settings_path().to_string_lossy(),
         "defaultFolder": shell::screenshots_folder().to_string_lossy(),
         "icons": {
@@ -495,6 +531,35 @@ mod tests {
     use super::super::browser::tests::{evaluate_on, pump_until, save_page_of};
     use super::*;
 
+    /// The list of components holds what the program is made of, at the versions it is built
+    /// with, each with the text of its license: after the dependencies change, `tools/licenses.py`
+    /// writes it again.
+    #[test]
+    fn every_component_comes_with_its_license() {
+        let licenses = licenses();
+        let texts = licenses["texts"].as_array().unwrap().len();
+        let components = licenses["components"].as_array().unwrap();
+        let lock: toml::Table = toml::from_str(include_str!("../../Cargo.lock")).unwrap();
+        let locked: Vec<(&str, &str)> = lock["package"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|package| (package["name"].as_str().unwrap(), package["version"].as_str().unwrap()))
+            .collect();
+        let manifest: toml::Table = toml::from_str(include_str!("../../Cargo.toml")).unwrap();
+        for name in manifest["dependencies"].as_table().unwrap().keys() {
+            assert!(components.iter().any(|c| c["name"] == name.as_str()), "{name} isn't listed");
+        }
+        for component in components {
+            let numbers = component["texts"].as_array().unwrap();
+            assert!(!numbers.is_empty() && numbers.iter().all(|n| (n.as_u64().unwrap() as usize) < texts), "{component}");
+            let (name, version) = (component["name"].as_str().unwrap(), component["version"].as_str().unwrap());
+            let crate_of_ours = component["downloaded"].is_null() && !name.contains(' ');
+            assert!(!crate_of_ours || locked.contains(&(name, version)), "{name} {version} isn't the version built");
+        }
+        assert!(licenses["license"].as_str().unwrap().contains("GNU GENERAL PUBLIC LICENSE"));
+    }
+
     /// What a script returns on the settings page, as JSON.
     fn evaluate(script: &str) -> String {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
@@ -584,28 +649,74 @@ mod tests {
             look("nothing");
             seen.push(evaluate("document.body.classList.contains('nothing')"));
             evaluate("clearSearch()");
+            // About: the page asks the program for the licenses as the section opens; every
+            // component comes, and a click on one shows its license.
+            evaluate("document.querySelector('nav [data-section=about]').click()");
+            pump_until(5, || evaluate("document.querySelectorAll('#components .component').length") != "0");
+            seen.push(evaluate("document.querySelectorAll('#components .component').length + ' ' + document.querySelectorAll('#components .group').length"));
+            evaluate("document.querySelector('#components .component').click()");
+            seen.push(evaluate("document.querySelector('#components .component-text').textContent.includes('Permission is hereby granted')"));
+            look("about");
             // What the page sends the program is kept, without the program behind it.
             evaluate("window.told = []; chrome.webview.postMessage = m => told.push(JSON.parse(m))");
             let told = |what: &str| evaluate(&format!("JSON.stringify(told.map(m => {what}))"));
             evaluate("document.querySelector('#autostart').click()");
             seen.push(told("m.type + ':' + m.settings.autostart"));
+            // Updates: the switch is saved as the other settings are, and the button asks the
+            // program to check, or to install the version available.
+            evaluate("told.length = 0; document.querySelector('#autoupdate').click()");
+            seen.push(told("m.type + ':' + m.settings.autoupdate"));
+            evaluate("told.length = 0; heard({ type: 'updates', updates: { current: '0.1.0', state: 'latest', checked: '2026-10-25 14:05' } })");
+            evaluate("document.querySelector('#updates-button').click()");
+            seen.push(told("m.type"));
+            evaluate("told.length = 0; heard({ type: 'updates', updates: { current: '0.1.0', state: 'available', version: '0.2.0' } })");
+            evaluate("document.querySelector('#updates-button').click()");
+            seen.push(told("m.type"));
+            seen.push(evaluate("document.querySelector('#updates-state').textContent + ' | ' + document.querySelector('#updates-button').textContent"));
+            // The model of masking: its switch is saved as the other settings are; its download
+            // shows how far it has come, and its button pauses it.
+            evaluate("document.querySelector('nav [data-section=models]').click()");
+            evaluate("told.length = 0; document.querySelector('#privacy-filter').click()");
+            seen.push(told("m.type + ':' + m.settings.privacy_filter"));
+            evaluate("heard({ type: 'models', models: { state: 'downloading', problem: null, done: 380000000, total: 951000000, speed: 12300000 } })");
+            look("models");
+            seen.push(evaluate("document.querySelector('#filter-state').textContent + ' | ' + document.querySelector('#filter-fill').style.width"));
+            evaluate("told.length = 0; document.querySelector('#filter-pause').click()");
+            seen.push(told("m.type + ':' + m.paused"));
+            evaluate("document.querySelector('nav [data-section=about]').click()");
+            look("updates");
             evaluate("told.length = 0; document.querySelector('#hotkey').click()");
-            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', ctrlKey: true, shiftKey: true }))");
+            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', keyCode: 83, ctrlKey: true, shiftKey: true }))");
             seen.push(told("m.type + ':' + (m.type === 'save' ? m.settings.hotkey : m.on)"));
             evaluate("told.length = 0; heard({ type: 'saved' }); heard({ type: 'saved' })");
             // A bare letter would get in the way of typing: the field keeps listening.
             evaluate("document.querySelector('#hotkey').click()");
-            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyQ', key: 'q' }))");
+            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyQ', key: 'q', keyCode: 81 }))");
             seen.push(evaluate("document.querySelector('#hotkey-error').textContent"));
             evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape' }))");
             seen.push(told("m.type + ':' + m.on"));
+            // In any layout the key left of 1 is ~, ^ in German too, and a letter is the key with
+            // it, Z in German where English has Y.
+            evaluate("told.length = 0; document.querySelector('#hotkey').click()");
+            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Backquote', key: 'Dead', keyCode: 220, altKey: true }))");
+            evaluate("heard({ type: 'saved' }); document.querySelector('#hotkey').click()");
+            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyY', key: 'z', keyCode: 90, ctrlKey: true, altKey: true }))");
+            evaluate("heard({ type: 'saved' })");
+            seen.push(evaluate("JSON.stringify(told.filter(m => m.type === 'save').map(m => m.settings.hotkey))"));
             // A tool's key isn't taken by a button, and nothing is saved.
-            evaluate("told.length = 0; document.querySelector('.card .key-field').dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyP', key: 'p', bubbles: true }))");
+            evaluate("told.length = 0; document.querySelector('.card .key-field').dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyP', key: 'p', keyCode: 80, bubbles: true }))");
             seen.push(evaluate("document.querySelector('.card .key-field + .error').textContent + ' ' + told.length"));
+            // A button's key is the letter on the key too: Z in French, where English has W.
+            evaluate("document.querySelector('.card .key-field').dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW', key: 'z', keyCode: 90, bubbles: true }))");
+            seen.push(told("m.settings.buttons[0].key"));
             // A colour removed goes, and comes back with «Вернуть».
-            evaluate("document.querySelector('.swatch[data-index=\"1\"] .remove').click()");
+            evaluate("told.length = 0; document.querySelector('.swatch[data-index=\"1\"] .remove').click()");
             evaluate("document.querySelector('#toast .btn').click()");
             seen.push(told("m.settings.colors.length"));
+            // Saving: by default the screenshot goes straight into the folder and into the
+            // clipboard too; the switches are saved as the other settings are.
+            evaluate("told.length = 0; document.querySelector('#ask').click(); document.querySelector('#save-copy').click()");
+            seen.push(told("m.settings.save.ask + '/' + m.settings.save.copy"));
             // An empty name isn't saved; a name is, a moment after the typing.
             evaluate("told.length = 0; { const n = document.querySelector('#name'); n.value = '  '; n.dispatchEvent(new Event('input')); }");
             pump_until(1, || false);
@@ -644,12 +755,24 @@ mod tests {
                 "false",
                 "\"2\"",
                 "true",
+                "\"122 2\"",
+                "true",
                 r#""[\"save:true\"]""#,
+                r#""[\"save:false\"]""#,
+                r#""[\"checkUpdates\"]""#,
+                r#""[\"installUpdate\"]""#,
+                "\"Версия 0.1.0 · доступна 0.2.0 | Обновить до 0.2.0\"",
+                r#""[\"save:false\"]""#,
+                "\"39% · 380 из 951 МБ · 12,3 МБ/с | 40%\"",
+                r#""[\"pauseModels:true\"]""#,
                 r#""[\"record:true\",\"record:false\",\"save:Ctrl+Shift+S\"]""#,
                 "\"Q мешала бы печатать: добавь Ctrl, Alt или Win.\"",
                 r#""[\"record:true\",\"record:false\"]""#,
+                r#""[\"Alt+~\",\"Ctrl+Alt+Z\"]""#,
                 "\"Клавиша P уже у инструмента «Карандаш». 0\"",
+                r#""[\"Z\"]""#,
                 "\"[7,8]\"",
+                r#""[\"true/true\",\"true/false\"]""#,
                 "\"Имя не может быть пустым. 0\"",
                 r#""[\"Снимок {date}\"]""#,
                 r#""[\"bottom/right\"]""#,

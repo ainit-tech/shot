@@ -36,7 +36,7 @@ The buttons differ only in where the picture goes and what is asked about it. Th
 | Button | Where | Mini prompt |
 |---|---|---|
 | Ask Google | AI mode: AI Mode in the program's window next to the selection, to ask further | Who or what is in the picture? Explain. |
-| Translate | AI mode: AI Mode in the program's hidden window, the answer in a card next to the selection | Translate the text in the picture into Russian. Answer with the translation only. |
+| Translate | AI mode: AI Mode in the program's hidden window, the answer in a card next to the selection | Translate the text in the picture into the program's language, such as English. Answer with the translation only. |
 | Search by image in Google | Image search: the exact matches in the program's window next to the selection | None |
 
 - The query buttons stand on a toolbar of their own, by default a column to the right of the selection at its bottom, which the settings move to any side (see the [requirements](../requirements.md)): those that ask the AI mode come first, and the image search buttons after them as a group of their own.

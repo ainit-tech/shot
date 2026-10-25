@@ -33,6 +33,8 @@ const PILL: Rgba = [28, 28, 28, 232];
 const HOVER: Rgba = [255, 255, 255, 26];
 const INK: Rgba = [236, 236, 236, 255];
 const INK_OFF: Rgba = [236, 236, 236, 80];
+/// The track of a progress line, under what has come.
+const TRACK: Rgba = [236, 236, 236, 46];
 const SEPARATOR: Rgba = [255, 255, 255, 30];
 pub const TEXT: Rgba = [242, 242, 242, 255];
 
@@ -476,6 +478,9 @@ pub struct ToolbarLook<'a> {
     pub busy: Option<usize>,
     /// The icons of the query buttons.
     pub queries: &'a [Icon],
+    /// How far the model of masking has come while it is downloaded, from 0 to 1: a thin line
+    /// under the icon of masking shows it.
+    pub coming: Option<f32>,
 }
 
 /// Draws the toolbar and returns the letters that some buttons show instead of icons.
@@ -533,6 +538,7 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
                 color_dot(&mut pixmap, rect, look.color, look.width, scale);
                 continue;
             }
+            Button::Mask => icons::MASK,
             Button::Undo => icons::UNDO,
             Button::Copy => icons::COPY,
             Button::CopyText => icons::TEXT_COPY,
@@ -559,8 +565,25 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
             }
         };
         icon(&mut pixmap, glyph, rect, ink, scale);
+        if button == Button::Mask
+            && let Some(coming) = look.coming
+        {
+            progress(&mut pixmap, rect, coming, scale);
+        }
     }
     letters
+}
+
+/// A thin line along the bottom of a button, filled as far as something has come.
+fn progress(pixmap: &mut PixmapMut, rect: Rect, coming: f32, scale: f32) {
+    let (left, width) = (rect.left as f32 + 8.0 * scale, rect.width() as f32 - 16.0 * scale);
+    let (top, height) = (rect.bottom as f32 - 6.0 * scale, (2.0 * scale).max(1.5));
+    if let Some(track) = rounded_rect(left, top, width, height, height / 2.0) {
+        pixmap.fill_path(&track, &solid(TRACK), FillRule::Winding, Transform::identity(), None);
+    }
+    if let Some(done) = rounded_rect(left, top, (width * coming.clamp(0.0, 1.0)).max(height), height, height / 2.0) {
+        pixmap.fill_path(&done, &solid(ACCENT), FillRule::Winding, Transform::identity(), None);
+    }
 }
 
 /// The panel under the toolbar and the palette: dark, rounded, with a soft shadow.
@@ -791,6 +814,7 @@ mod tests {
             can_undo: true,
             busy: None,
             queries: &queries,
+            coming: Some(0.4),
         };
         toolbar(&mut frame, &bar, &look);
         toolbar(&mut frame, &column, &look);
