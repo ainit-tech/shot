@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Hələlik defolt ayarlar qüvvədədir.",
     "A click on the icon takes a screenshot.": "Nişana klikləməklə ekran şəkli çəkə bilərsiniz.",
     "The hotkey doesn't work": "Qısayol klavişi işləmir",
-    "Starting with Windows isn't set up": "Windows ilə başlatma qurulmayıb",
     "The settings from before are in force meanwhile.": "Hələlik əvvəlki ayarlar qüvvədədir.",
     "The settings have a mistake": "Ayarlarda xəta var",
     "The hotkey hasn't changed": "Qısayol klavişi dəyişmədi",
@@ -419,5 +418,13 @@
     "windows": "Windows-dakı kimi",
     "un": "BMT dilləri",
     "all": "Bütün dillər"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} quraşdırılması",
+    "installedTitle": "ainitShot quraşdırıldı",
+    "autostart": "Windows ilə başlat",
+    "run": "ainitShot-u işə sal",
+    "done": "Hazırdır",
+    "removeData": "ainitShot ayarları və Google-a giriş də silinsin?"
   }
 }

@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Засега са в сила настройките по подразбиране.",
     "A click on the icon takes a screenshot.": "Екранна снимка се прави и с щракване върху иконата.",
     "The hotkey doesn't work": "Клавишната комбинация не работи",
-    "Starting with Windows isn't set up": "Стартирането с Windows не е настроено",
     "The settings from before are in force meanwhile.": "Засега са в сила предишните настройки.",
     "The settings have a mistake": "В настройките има грешка",
     "The hotkey hasn't changed": "Клавишната комбинация не се промени",
@@ -419,5 +418,13 @@
     "windows": "Както в Windows",
     "un": "Езици на ООН",
     "all": "Всички езици"
+  },
+  "installer": {
+    "installTitle": "Инсталиране на ainitShot {version}",
+    "installedTitle": "ainitShot е инсталиран",
+    "autostart": "Стартиране с Windows",
+    "run": "Стартиране на ainitShot",
+    "done": "Готово",
+    "removeData": "Да се премахнат ли и настройките на ainitShot и входът в Google?"
   }
 }

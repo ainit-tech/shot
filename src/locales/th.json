@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "ระหว่างนี้จะใช้การตั้งค่าเริ่มต้น",
     "A click on the icon takes a screenshot.": "คลิกไอคอนเพื่อจับภาพหน้าจอได้",
     "The hotkey doesn't work": "คีย์ลัดไม่ทำงาน",
-    "Starting with Windows isn't set up": "ยังไม่ได้ตั้งค่าการเปิดพร้อม Windows",
     "The settings from before are in force meanwhile.": "ระหว่างนี้จะใช้การตั้งค่าเดิม",
     "The settings have a mistake": "การตั้งค่ามีข้อผิดพลาด",
     "The hotkey hasn't changed": "คีย์ลัดไม่ได้เปลี่ยน",
@@ -419,5 +418,13 @@
     "windows": "เหมือนใน Windows",
     "un": "ภาษาของ UN",
     "all": "ภาษาทั้งหมด"
+  },
+  "installer": {
+    "installTitle": "ติดตั้ง ainitShot {version}",
+    "installedTitle": "ติดตั้ง ainitShot แล้ว",
+    "autostart": "เปิดพร้อม Windows",
+    "run": "เปิด ainitShot",
+    "done": "เสร็จสิ้น",
+    "removeData": "ลบการตั้งค่าของ ainitShot และการลงชื่อเข้าใช้ Google ด้วยหรือไม่"
   }
 }

@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Zatiaľ platia predvolené nastavenia.",
     "A click on the icon takes a screenshot.": "Kliknutím na ikonu urobíte snímku obrazovky.",
     "The hotkey doesn't work": "Klávesová skratka nefunguje",
-    "Starting with Windows isn't set up": "Spúšťanie so systémom Windows nie je nastavené",
     "The settings from before are in force meanwhile.": "Zatiaľ platia predchádzajúce nastavenia.",
     "The settings have a mistake": "V nastaveniach je chyba",
     "The hotkey hasn't changed": "Klávesová skratka sa nezmenila",
@@ -419,5 +418,13 @@
     "windows": "Ako vo Windows",
     "un": "Jazyky OSN",
     "all": "Všetky jazyky"
+  },
+  "installer": {
+    "installTitle": "Inštalácia ainitShot {version}",
+    "installedTitle": "ainitShot je nainštalovaný",
+    "autostart": "Spúšťať so systémom Windows",
+    "run": "Spustiť ainitShot",
+    "done": "Hotovo",
+    "removeData": "Odstrániť aj nastavenia ainitShot a prihlásenie do účtu Google?"
   }
 }

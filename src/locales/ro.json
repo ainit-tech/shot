@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Deocamdată se aplică setările implicite.",
     "A click on the icon takes a screenshot.": "Un clic pe pictogramă face o captură de ecran.",
     "The hotkey doesn't work": "Tasta rapidă nu funcționează",
-    "Starting with Windows isn't set up": "Pornirea odată cu Windows nu este configurată",
     "The settings from before are in force meanwhile.": "Deocamdată se aplică setările anterioare.",
     "The settings have a mistake": "Setările conțin o greșeală",
     "The hotkey hasn't changed": "Tasta rapidă nu s-a modificat",
@@ -419,5 +418,13 @@
     "windows": "Ca în Windows",
     "un": "Limbile ONU",
     "all": "Toate limbile"
+  },
+  "installer": {
+    "installTitle": "Instalarea ainitShot {version}",
+    "installedTitle": "ainitShot a fost instalat",
+    "autostart": "Pornește odată cu Windows",
+    "run": "Porniți ainitShot",
+    "done": "Gata",
+    "removeData": "Ștergeți și setările ainitShot și conectarea la Google?"
   }
 }

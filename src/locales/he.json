@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "בינתיים פועלות הגדרות ברירת המחדל.",
     "A click on the icon takes a screenshot.": "לחיצה על הסמל מצלמת את המסך.",
     "The hotkey doesn't work": "מקש הקיצור לא עובד",
-    "Starting with Windows isn't set up": "ההפעלה עם Windows לא הוגדרה",
     "The settings from before are in force meanwhile.": "בינתיים פועלות ההגדרות הקודמות.",
     "The settings have a mistake": "יש שגיאה בהגדרות",
     "The hotkey hasn't changed": "מקש הקיצור לא השתנה",
@@ -419,5 +418,13 @@
     "windows": "כמו ב-Windows",
     "un": "שפות האו\"ם",
     "all": "כל השפות"
+  },
+  "installer": {
+    "installTitle": "התקנת ainitShot {version}",
+    "installedTitle": "ainitShot הותקן",
+    "autostart": "הפעלה עם Windows",
+    "run": "הפעלת ainitShot",
+    "done": "סיום",
+    "removeData": "להסיר גם את ההגדרות של ainitShot ואת ההתחברות ל-Google?"
   }
 }

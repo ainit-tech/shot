@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Medtem veljajo privzete nastavitve.",
     "A click on the icon takes a screenshot.": "Klik na ikono naredi posnetek zaslona.",
     "The hotkey doesn't work": "Bližnjična tipka ne deluje",
-    "Starting with Windows isn't set up": "Zagon s sistemom Windows ni nastavljen",
     "The settings from before are in force meanwhile.": "Medtem veljajo prejšnje nastavitve.",
     "The settings have a mistake": "V nastavitvah je napaka",
     "The hotkey hasn't changed": "Bližnjična tipka se ni spremenila",
@@ -419,5 +418,13 @@
     "windows": "Kot v sistemu Windows",
     "un": "Jeziki OZN",
     "all": "Vsi jeziki"
+  },
+  "installer": {
+    "installTitle": "Namestitev programa ainitShot {version}",
+    "installedTitle": "ainitShot je nameščen",
+    "autostart": "Zaženi s sistemom Windows",
+    "run": "Zaženi ainitShot",
+    "done": "Končano",
+    "removeData": "Ali želite odstraniti tudi nastavitve ainitShot in prijavo v Google?"
   }
 }

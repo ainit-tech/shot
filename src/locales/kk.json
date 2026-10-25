@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Әзірге әдепкі параметрлер қолданылады.",
     "A click on the icon takes a screenshot.": "Белгішені шертсеңіз, скриншот түсіріледі.",
     "The hotkey doesn't work": "Жылдам перне жұмыс істемейді",
-    "Starting with Windows isn't set up": "Windows-пен бірге іске қосу бапталмаған",
     "The settings from before are in force meanwhile.": "Әзірге бұрынғы параметрлер қолданылады.",
     "The settings have a mistake": "Параметрлерде қате бар",
     "The hotkey hasn't changed": "Жылдам перне өзгермеді",
@@ -419,5 +418,13 @@
     "windows": "Windows-тағыдай",
     "un": "БҰҰ тілдері",
     "all": "Барлық тілдер"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} орнату",
+    "installedTitle": "ainitShot орнатылды",
+    "autostart": "Windows-пен бірге іске қосу",
+    "run": "ainitShot іске қосу",
+    "done": "Дайын",
+    "removeData": "ainitShot баптаулары мен Google-ға кіру де жойылсын ба?"
   }
 }

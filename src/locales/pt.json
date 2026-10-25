@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Por enquanto, valem as configurações padrão.",
     "A click on the icon takes a screenshot.": "Um clique no ícone faz uma captura de tela.",
     "The hotkey doesn't work": "A tecla de atalho não funciona",
-    "Starting with Windows isn't set up": "A inicialização com o Windows não foi configurada",
     "The settings from before are in force meanwhile.": "Por enquanto, valem as configurações anteriores.",
     "The settings have a mistake": "As configurações têm um erro",
     "The hotkey hasn't changed": "A tecla de atalho não mudou",
@@ -419,5 +418,13 @@
     "windows": "Como no Windows",
     "un": "Idiomas da ONU",
     "all": "Todos os idiomas"
+  },
+  "installer": {
+    "installTitle": "Instalar o ainitShot {version}",
+    "installedTitle": "O ainitShot está instalado",
+    "autostart": "Iniciar com o Windows",
+    "run": "Abrir o ainitShot",
+    "done": "Concluído",
+    "removeData": "Remover também as configurações do ainitShot e o login no Google?"
   }
 }

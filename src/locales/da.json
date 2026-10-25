@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Standardindstillingerne gælder indtil videre.",
     "A click on the icon takes a screenshot.": "Et klik på ikonet tager et skærmbillede.",
     "The hotkey doesn't work": "Genvejstasten virker ikke",
-    "Starting with Windows isn't set up": "Automatisk start er ikke konfigureret",
     "The settings from before are in force meanwhile.": "De tidligere indstillinger gælder indtil videre.",
     "The settings have a mistake": "Indstillingerne indeholder en fejl",
     "The hotkey hasn't changed": "Genvejstasten er ikke ændret",
@@ -419,5 +418,13 @@
     "windows": "Som i Windows",
     "un": "FN-sprog",
     "all": "Alle sprog"
+  },
+  "installer": {
+    "installTitle": "Installer ainitShot {version}",
+    "installedTitle": "ainitShot er installeret",
+    "autostart": "Start med Windows",
+    "run": "Start ainitShot",
+    "done": "Færdig",
+    "removeData": "Skal indstillingerne for ainitShot og logindet på Google også fjernes?"
   }
 }

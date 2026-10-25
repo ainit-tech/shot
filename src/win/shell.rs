@@ -9,8 +9,8 @@ use std::time::{Duration, SystemTime};
 use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, SYSTEMTIME};
 use windows_sys::Win32::System::Com::CoTaskMemFree;
 use windows_sys::Win32::System::Registry::{
-    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_SZ, RegCloseKey, RegDeleteValueW, RegGetValueW,
-    RegOpenKeyExW, RegSetValueExW,
+    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_SZ, RegCloseKey, RegDeleteValueW,
+    RegGetValueW, RegOpenKeyExW, RegSetValueExW,
 };
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::UI::Controls::Dialogs::{
@@ -21,7 +21,7 @@ use windows_sys::Win32::UI::Shell::{
     SHGetKnownFolderPath, ShellExecuteW,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{ASFW_ANY, AllowSetForegroundWindow, SW_SHOWNORMAL};
-use windows_sys::core::{GUID, PWSTR};
+use windows_sys::core::{GUID, PCWSTR, PWSTR};
 use windows_sys::w;
 
 use super::wide;
@@ -260,18 +260,39 @@ pub fn pick_folder(owner: HWND, folder: &Path) -> Option<PathBuf> {
     }
 }
 
-/// Whether Windows starts the program as it starts: the installer may have said so.
+const RUN: PCWSTR = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+/// The list of programs that start with Windows, in Task Manager and in Settings: a program of Run
+/// turned off there has a record whose first byte is odd.
+const STARTUP_APPROVED: PCWSTR = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run");
+
+/// Whether Windows starts the program as it starts: it is in Run, and the list of programs that
+/// start with Windows hasn't turned it off. The installer reads it so too.
 pub fn starts_with_windows() -> bool {
-    let run = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
-    unsafe { RegGetValueW(HKEY_CURRENT_USER, run, w!("ainitShot"), RRF_RT_REG_SZ, null_mut(), null_mut(), null_mut()) == 0 }
+    let listed =
+        unsafe { RegGetValueW(HKEY_CURRENT_USER, RUN, w!("ainitShot"), RRF_RT_REG_SZ, null_mut(), null_mut(), null_mut()) } == 0;
+    let mut record = [0u8; 64];
+    let mut size = record.len() as u32;
+    let found = unsafe {
+        let value = w!("ainitShot");
+        RegGetValueW(HKEY_CURRENT_USER, STARTUP_APPROVED, value, RRF_RT_REG_BINARY, null_mut(), record.as_mut_ptr().cast(), &mut size)
+    } == 0;
+    listed && !(found && size > 0 && record[0] & 1 == 1)
 }
 
-/// Starts the program together with Windows, or stops doing so (decision 3).
+/// Starts the program together with Windows, or stops doing so (decision 3). Its record in the
+/// list of programs that start with Windows goes either way, so that the list doesn't keep it
+/// off; the installer does the same.
 pub fn set_autostart(on: bool) -> Result<(), String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
+    let mut approved: HKEY = null_mut();
+    if unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, STARTUP_APPROVED, 0, KEY_SET_VALUE, &mut approved) } == 0 {
+        unsafe {
+            RegDeleteValueW(approved, w!("ainitShot"));
+            RegCloseKey(approved);
+        }
+    }
     let mut key: HKEY = null_mut();
-    let run = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
-    let opened = unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, run, 0, KEY_SET_VALUE, &mut key) };
+    let opened = unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, RUN, 0, KEY_SET_VALUE, &mut key) };
     if opened != 0 {
         return Err(std::io::Error::from_raw_os_error(opened as i32).to_string());
     }

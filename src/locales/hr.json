@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Zasad vrijede zadane postavke.",
     "A click on the icon takes a screenshot.": "Klik na ikonu stvara snimku zaslona.",
     "The hotkey doesn't work": "Tipkovnički prečac ne radi",
-    "Starting with Windows isn't set up": "Pokretanje sa sustavom Windows nije postavljeno",
     "The settings from before are in force meanwhile.": "Zasad vrijede prethodne postavke.",
     "The settings have a mistake": "U postavkama je pogreška",
     "The hotkey hasn't changed": "Tipkovnički prečac nije promijenjen",
@@ -419,5 +418,13 @@
     "windows": "Kao u sustavu Windows",
     "un": "Jezici UN-a",
     "all": "Svi jezici"
+  },
+  "installer": {
+    "installTitle": "Instalacija programa ainitShot {version}",
+    "installedTitle": "ainitShot je instaliran",
+    "autostart": "Pokreni sa sustavom Windows",
+    "run": "Pokreni ainitShot",
+    "done": "Gotovo",
+    "removeData": "Ukloniti i postavke ainitShota i prijavu na Google?"
   }
 }

@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "En attendant, les réglages par défaut s’appliquent.",
     "A click on the icon takes a screenshot.": "Un clic sur l’icône fait une capture.",
     "The hotkey doesn't work": "Le raccourci ne fonctionne pas",
-    "Starting with Windows isn't set up": "Le démarrage avec Windows n’est pas configuré",
     "The settings from before are in force meanwhile.": "En attendant, les réglages précédents s’appliquent.",
     "The settings have a mistake": "Les réglages contiennent une erreur",
     "The hotkey hasn't changed": "Le raccourci n’a pas changé",
@@ -419,5 +418,13 @@
     "windows": "Comme Windows",
     "un": "Langues de l’ONU",
     "all": "Toutes les langues"
+  },
+  "installer": {
+    "installTitle": "Installer ainitShot {version}",
+    "installedTitle": "ainitShot est installé",
+    "autostart": "Lancer avec Windows",
+    "run": "Lancer ainitShot",
+    "done": "Terminé",
+    "removeData": "Supprimer aussi les réglages d’ainitShot et sa connexion à Google ?"
   }
 }

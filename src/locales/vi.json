@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Tạm thời chương trình dùng cài đặt mặc định.",
     "A click on the icon takes a screenshot.": "Nhấp vào biểu tượng để chụp màn hình.",
     "The hotkey doesn't work": "Phím tắt không hoạt động",
-    "Starting with Windows isn't set up": "Chưa thiết lập được việc khởi động cùng Windows",
     "The settings from before are in force meanwhile.": "Tạm thời chương trình dùng cài đặt trước đó.",
     "The settings have a mistake": "Cài đặt có lỗi",
     "The hotkey hasn't changed": "Không đổi được phím tắt",
@@ -419,5 +418,13 @@
     "windows": "Theo Windows",
     "un": "Ngôn ngữ của Liên Hợp Quốc",
     "all": "Tất cả ngôn ngữ"
+  },
+  "installer": {
+    "installTitle": "Cài đặt ainitShot {version}",
+    "installedTitle": "Đã cài đặt ainitShot",
+    "autostart": "Khởi động cùng Windows",
+    "run": "Mở ainitShot",
+    "done": "Xong",
+    "removeData": "Xóa cả cài đặt của ainitShot và thông tin đăng nhập Google?"
   }
 }

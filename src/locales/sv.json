@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Standardinställningarna gäller så länge.",
     "A click on the icon takes a screenshot.": "Ett klick på ikonen tar en skärmbild.",
     "The hotkey doesn't work": "Snabbtangenten fungerar inte",
-    "Starting with Windows isn't set up": "Automatisk start är inte inställd",
     "The settings from before are in force meanwhile.": "De tidigare inställningarna gäller så länge.",
     "The settings have a mistake": "Inställningarna innehåller ett fel",
     "The hotkey hasn't changed": "Snabbtangenten har inte ändrats",
@@ -419,5 +418,13 @@
     "windows": "Som i Windows",
     "un": "FN-språk",
     "all": "Alla språk"
+  },
+  "installer": {
+    "installTitle": "Installera ainitShot {version}",
+    "installedTitle": "ainitShot är installerat",
+    "autostart": "Starta med Windows",
+    "run": "Starta ainitShot",
+    "done": "Klar",
+    "removeData": "Ta även bort inställningarna för ainitShot och inloggningen på Google?"
   }
 }

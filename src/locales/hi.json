@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "तब तक डिफ़ॉल्ट सेटिंग्स लागू हैं।",
     "A click on the icon takes a screenshot.": "आइकन पर क्लिक करके स्क्रीनशॉट लिया जा सकता है।",
     "The hotkey doesn't work": "हॉटकी काम नहीं कर रही",
-    "Starting with Windows isn't set up": "Windows के साथ शुरू होना सेट नहीं हुआ",
     "The settings from before are in force meanwhile.": "तब तक पिछली सेटिंग्स लागू हैं।",
     "The settings have a mistake": "सेटिंग्स में ग़लती है",
     "The hotkey hasn't changed": "हॉटकी नहीं बदली",
@@ -419,5 +418,13 @@
     "windows": "Windows जैसी",
     "un": "संयुक्त राष्ट्र की भाषाएँ",
     "all": "सभी भाषाएँ"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} इंस्टॉल करें",
+    "installedTitle": "ainitShot इंस्टॉल हो गया",
+    "autostart": "Windows के साथ शुरू करें",
+    "run": "ainitShot चलाएँ",
+    "done": "हो गया",
+    "removeData": "क्या ainitShot की सेटिंग्स और Google में साइन इन भी हटाएँ?"
   }
 }

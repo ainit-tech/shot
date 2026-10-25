@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Şimdilik varsayılan ayarlar geçerli.",
     "A click on the icon takes a screenshot.": "Simgeye tıklayarak ekran görüntüsü alabilirsiniz.",
     "The hotkey doesn't work": "Kısayol tuşu çalışmıyor",
-    "Starting with Windows isn't set up": "Windows ile başlatma ayarlanmadı",
     "The settings from before are in force meanwhile.": "Şimdilik önceki ayarlar geçerli.",
     "The settings have a mistake": "Ayarlarda bir hata var",
     "The hotkey hasn't changed": "Kısayol tuşu değişmedi",
@@ -419,5 +418,13 @@
     "windows": "Windows'taki gibi",
     "un": "BM dilleri",
     "all": "Tüm diller"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} kurulumu",
+    "installedTitle": "ainitShot kuruldu",
+    "autostart": "Windows ile başlat",
+    "run": "ainitShot'u başlat",
+    "done": "Bitti",
+    "removeData": "ainitShot ayarları ve Google oturumu da kaldırılsın mı?"
   }
 }

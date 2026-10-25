@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Tot die tijd gelden de standaardinstellingen.",
     "A click on the icon takes a screenshot.": "Klik op het pictogram om een schermafbeelding te maken.",
     "The hotkey doesn't work": "De sneltoets werkt niet",
-    "Starting with Windows isn't set up": "Starten met Windows is niet ingesteld",
     "The settings from before are in force meanwhile.": "Tot die tijd gelden de vorige instellingen.",
     "The settings have a mistake": "De instellingen bevatten een fout",
     "The hotkey hasn't changed": "De sneltoets is niet gewijzigd",
@@ -419,5 +418,13 @@
     "windows": "Zoals in Windows",
     "un": "VN-talen",
     "all": "Alle talen"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} installeren",
+    "installedTitle": "ainitShot is geïnstalleerd",
+    "autostart": "Starten met Windows",
+    "run": "ainitShot starten",
+    "done": "Klaar",
+    "removeData": "Ook de instellingen van ainitShot en de aanmelding bij Google verwijderen?"
   }
 }

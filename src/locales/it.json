@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Nel frattempo valgono le impostazioni predefinite.",
     "A click on the icon takes a screenshot.": "Un clic sull'icona fa uno screenshot.",
     "The hotkey doesn't work": "Il tasto di scelta rapida non funziona",
-    "Starting with Windows isn't set up": "L'avvio con Windows non è configurato",
     "The settings from before are in force meanwhile.": "Nel frattempo valgono le impostazioni precedenti.",
     "The settings have a mistake": "Le impostazioni contengono un errore",
     "The hotkey hasn't changed": "Il tasto di scelta rapida non è cambiato",
@@ -419,5 +418,13 @@
     "windows": "Come in Windows",
     "un": "Lingue dell'ONU",
     "all": "Tutte le lingue"
+  },
+  "installer": {
+    "installTitle": "Installa ainitShot {version}",
+    "installedTitle": "ainitShot è installato",
+    "autostart": "Avvia con Windows",
+    "run": "Avvia ainitShot",
+    "done": "Fine",
+    "removeData": "Rimuovere anche le impostazioni di ainitShot e l’accesso a Google?"
   }
 }

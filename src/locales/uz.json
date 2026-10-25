@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Hozircha standart sozlamalar amalda.",
     "A click on the icon takes a screenshot.": "Belgini bossangiz, skrinshot olinadi.",
     "The hotkey doesn't work": "Tezkor klavish ishlamayapti",
-    "Starting with Windows isn't set up": "Windows bilan birga ishga tushirish sozlanmagan",
     "The settings from before are in force meanwhile.": "Hozircha avvalgi sozlamalar amalda.",
     "The settings have a mistake": "Sozlamalarda xato bor",
     "The hotkey hasn't changed": "Tezkor klavish oʻzgarmadi",
@@ -419,5 +418,13 @@
     "windows": "Windows’dagidek",
     "un": "BMT tillari",
     "all": "Barcha tillar"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} oʻrnatish",
+    "installedTitle": "ainitShot oʻrnatildi",
+    "autostart": "Windows bilan birga ishga tushirish",
+    "run": "ainitShot dasturini ishga tushirish",
+    "done": "Tayyor",
+    "removeData": "ainitShot sozlamalari va Googleʼga kirish ham oʻchirilsinmi?"
   }
 }

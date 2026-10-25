@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "ለጊዜው ነባሪ ቅንብሮች በሥራ ላይ ናቸው።",
     "A click on the icon takes a screenshot.": "አዶውን ጠቅ ማድረግ ቅጽበታዊ ገጽ እይታ ያነሳል።",
     "The hotkey doesn't work": "አቋራጭ ቁልፉ አይሰራም",
-    "Starting with Windows isn't set up": "ከWindows ጋር መጀመር አልተዋቀረም",
     "The settings from before are in force meanwhile.": "ለጊዜው የቀድሞዎቹ ቅንብሮች በሥራ ላይ ናቸው።",
     "The settings have a mistake": "ቅንብሮቹ ስህተት አለባቸው",
     "The hotkey hasn't changed": "አቋራጭ ቁልፉ አልተቀየረም",
@@ -419,5 +418,13 @@
     "windows": "እንደ Windows",
     "un": "የተባበሩት መንግሥታት ቋንቋዎች",
     "all": "ሁሉም ቋንቋዎች"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} መጫን",
+    "installedTitle": "ainitShot ተጭኗል",
+    "autostart": "ከWindows ጋር ጀምር",
+    "run": "ainitShotን አስጀምር",
+    "done": "ጨርስ",
+    "removeData": "የainitShot ቅንብሮች እና የGoogle መግቢያውም ይወገዱ?"
   }
 }

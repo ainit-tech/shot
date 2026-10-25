@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Προς το παρόν ισχύουν οι προεπιλεγμένες ρυθμίσεις.",
     "A click on the icon takes a screenshot.": "Με ένα κλικ στο εικονίδιο τραβάτε στιγμιότυπο.",
     "The hotkey doesn't work": "Το πλήκτρο συντόμευσης δεν λειτουργεί",
-    "Starting with Windows isn't set up": "Η εκκίνηση με τα Windows δεν ρυθμίστηκε",
     "The settings from before are in force meanwhile.": "Προς το παρόν ισχύουν οι προηγούμενες ρυθμίσεις.",
     "The settings have a mistake": "Οι ρυθμίσεις έχουν σφάλμα",
     "The hotkey hasn't changed": "Το πλήκτρο συντόμευσης δεν άλλαξε",
@@ -419,5 +418,13 @@
     "windows": "Όπως στα Windows",
     "un": "Γλώσσες του ΟΗΕ",
     "all": "Όλες οι γλώσσες"
+  },
+  "installer": {
+    "installTitle": "Εγκατάσταση του ainitShot {version}",
+    "installedTitle": "Το ainitShot εγκαταστάθηκε",
+    "autostart": "Εκκίνηση με τα Windows",
+    "run": "Εκκίνηση του ainitShot",
+    "done": "Τέλος",
+    "removeData": "Να αφαιρεθούν και οι ρυθμίσεις του ainitShot και η σύνδεση στο Google;"
   }
 }

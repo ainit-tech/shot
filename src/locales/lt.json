@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Kol kas galioja numatytieji nustatymai.",
     "A click on the icon takes a screenshot.": "Ekrano kopiją galima padaryti spustelėjus piktogramą.",
     "The hotkey doesn't work": "Spartusis klavišas neveikia",
-    "Starting with Windows isn't set up": "Paleidimas kartu su „Windows“ nenustatytas",
     "The settings from before are in force meanwhile.": "Kol kas galioja ankstesni nustatymai.",
     "The settings have a mistake": "Nustatymuose yra klaida",
     "The hotkey hasn't changed": "Spartusis klavišas nepakeistas",
@@ -419,5 +418,13 @@
     "windows": "Kaip „Windows“",
     "un": "JT kalbos",
     "all": "Visos kalbos"
+  },
+  "installer": {
+    "installTitle": "Įdiegti „ainitShot“ {version}",
+    "installedTitle": "„ainitShot“ įdiegta",
+    "autostart": "Paleisti kartu su „Windows“",
+    "run": "Paleisti „ainitShot“",
+    "done": "Atlikta",
+    "removeData": "Ar pašalinti ir „ainitShot“ nustatymus bei prisijungimą prie „Google“?"
   }
 }

@@ -30,7 +30,7 @@ The program lives in the tray and is started with Windows, so its users rarely t
 - **Versions** are X.Y.Z, as in `Cargo.toml`. A release is the tag vX.Y.Z of that version; CI refuses a tag that differs.
 - **A release:** on the tag, CI on SourceCraft does the following:
   - builds the program for Windows on a Linux worker (cargo-xwin, target `x86_64-pc-windows-msvc`);
-  - makes the installer with NSIS;
+  - makes the installer with Inno Setup 6.7.3 under Wine, the same version every time, checked by its SHA-256;
   - writes `latest.json` with the version and the size and SHA-256 of the installer;
   - signs both with minisign (Ed25519);
   - copies them to https://shot.ainit.tech/download/: the installer to `<version>/ainitShot-<version>-windows-x64-setup.exe`, the version's files first and `latest.json` last.
@@ -41,16 +41,20 @@ The program lives in the tray and is started with Windows, so its users rarely t
   - The installer is downloaded to `%LOCALAPPDATA%\ainitShot\updates` and checked.
   - The program waits until none of its windows is open: no frozen screen, settings or conversation.
   - Then it closes as "Exit" does and runs the installer silently, which replaces the program and starts it again.
+  - The command never changes, since an installed version runs the installer of the next one with it: `ainitShot-X.Y.Z-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE`. Every installer from 0.2.1 on takes it: it closes the program, replaces it, leaves starting with Windows as it is and starts the new version with `--updated`.
   - After the start, a notification names the new version.
 - **Automatically by default:** `autoupdate = true` in the settings file, "Install updates automatically" in the settings window. When it is off, the program only checks and shows; "Update" installs the new version.
 - **Only an installed program updates itself.** A program built and started from the source never replaces itself.
-- **The installer:**
+- **The installer** is made with Inno Setup, in its dark look, as the program is:
+  - its first page has the version, the box "Start with Windows" and "Install"; there is no choice of the folder and no summary;
   - installs for the current user, without administrator rights, into `%LOCALAPPDATA%\Programs\ainitShot`;
-  - adds a shortcut to the Start menu and turns on "Start with Windows" unless its box is cleared;
-  - registers the program in Settings → Apps, where it is uninstalled;
-  - closes a running ainitShot as "Exit" does before replacing it.
+  - adds a shortcut to the Start menu and registers the program in Settings → Apps, where it is uninstalled;
+  - closes a running ainitShot as "Exit" does before replacing it;
+  - its last page says that the program is installed and offers to run it;
+  - speaks the language of Windows in every language of the program: Inno Setup's translations, and ours of what it shows in Amharic, Swahili, Filipino and Burmese, which Inno Setup lacks; its own texts come from the program's catalogs, and the build stops if a language lacks one.
 
-  The uninstaller asks whether to remove the settings and the sign-in to Google too.
+  The uninstaller takes starting with Windows away, and the models and updates the program downloaded; it asks whether to remove the settings and the sign-in to Google too.
+- **Starting with Windows** is what Windows has: the program's entry in Run, unless the list of startup apps in Task Manager or Settings turns it off. The box of the installer and the switch in the settings are this one setting. A first installation turns it on; installing over the program shows it as it is and keeps it; an update doesn't touch it. The program shows it as Windows has it, and turning it on in the program really turns it on.
 
 ## Consequences
 

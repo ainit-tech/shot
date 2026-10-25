@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Пока действуют настройки по умолчанию.",
     "A click on the icon takes a screenshot.": "Скриншот можно сделать щелчком по значку.",
     "The hotkey doesn't work": "Горячая клавиша не работает",
-    "Starting with Windows isn't set up": "Автозапуск не настроен",
     "The settings from before are in force meanwhile.": "Пока действуют прежние настройки.",
     "The settings have a mistake": "В настройках ошибка",
     "The hotkey hasn't changed": "Горячая клавиша не изменилась",
@@ -419,5 +418,13 @@
     "windows": "Как в Windows",
     "un": "Языки ООН",
     "all": "Все языки"
+  },
+  "installer": {
+    "installTitle": "Установка ainitShot {version}",
+    "installedTitle": "ainitShot установлен",
+    "autostart": "Запускать вместе с Windows",
+    "run": "Запустить ainitShot",
+    "done": "Готово",
+    "removeData": "Удалить заодно настройки ainitShot и вход в Google?"
   }
 }

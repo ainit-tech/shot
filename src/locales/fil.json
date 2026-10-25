@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Ang mga default na setting ang ginagamit pansamantala.",
     "A click on the icon takes a screenshot.": "Mag-click sa icon para kumuha ng screenshot.",
     "The hotkey doesn't work": "Hindi gumagana ang hotkey",
-    "Starting with Windows isn't set up": "Hindi na-set up ang pagsisimula kasabay ng Windows",
     "The settings from before are in force meanwhile.": "Ang mga dating setting ang ginagamit pansamantala.",
     "The settings have a mistake": "May mali sa mga setting",
     "The hotkey hasn't changed": "Hindi nabago ang hotkey",
@@ -419,5 +418,13 @@
     "windows": "Gaya ng sa Windows",
     "un": "Mga wika ng UN",
     "all": "Lahat ng wika"
+  },
+  "installer": {
+    "installTitle": "I-install ang ainitShot {version}",
+    "installedTitle": "Naka-install na ang ainitShot",
+    "autostart": "Magsimula kasabay ng Windows",
+    "run": "Buksan ang ainitShot",
+    "done": "Tapos na",
+    "removeData": "Alisin din ang mga setting ng ainitShot at ang pag-sign in nito sa Google?"
   }
 }

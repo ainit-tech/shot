@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "За сада важе подразумевана подешавања.",
     "A click on the icon takes a screenshot.": "Клик на икону прави снимак екрана.",
     "The hotkey doesn't work": "Тастерска пречица не ради",
-    "Starting with Windows isn't set up": "Покретање са системом Windows није подешено",
     "The settings from before are in force meanwhile.": "За сада важе претходна подешавања.",
     "The settings have a mistake": "Подешавања имају грешку",
     "The hotkey hasn't changed": "Тастерска пречица није промењена",
@@ -419,5 +418,13 @@
     "windows": "Као у систему Windows",
     "un": "Језици УН",
     "all": "Сви језици"
+  },
+  "installer": {
+    "installTitle": "Инсталација програма ainitShot {version}",
+    "installedTitle": "ainitShot је инсталиран",
+    "autostart": "Покрени са системом Windows",
+    "run": "Покрени ainitShot",
+    "done": "Готово",
+    "removeData": "Да ли да се уклоне и подешавања ainitShot-а и пријава на Google?"
   }
 }

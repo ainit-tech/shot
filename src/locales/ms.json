@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Buat sementara, tetapan lalai digunakan.",
     "A click on the icon takes a screenshot.": "Klik ikon untuk mengambil tangkapan skrin.",
     "The hotkey doesn't work": "Kekunci pintas tidak berfungsi",
-    "Starting with Windows isn't set up": "Mula bersama Windows tidak dapat ditetapkan",
     "The settings from before are in force meanwhile.": "Buat sementara, tetapan sebelumnya digunakan.",
     "The settings have a mistake": "Tetapan mempunyai kesilapan",
     "The hotkey hasn't changed": "Kekunci pintas tidak berubah",
@@ -419,5 +418,13 @@
     "windows": "Seperti Windows",
     "un": "Bahasa PBB",
     "all": "Semua bahasa"
+  },
+  "installer": {
+    "installTitle": "Pasang ainitShot {version}",
+    "installedTitle": "ainitShot telah dipasang",
+    "autostart": "Mula bersama Windows",
+    "run": "Jalankan ainitShot",
+    "done": "Selesai",
+    "removeData": "Buang juga tetapan ainitShot dan log masuk Google?"
   }
 }

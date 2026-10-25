@@ -296,9 +296,7 @@ pub fn run() -> io::Result<()> {
                 notify(tr("The hotkey doesn't work"), &format!("{problem} {click}"));
             }
         }
-        if let Err(problem) = shell::set_autostart(settings.autostart) {
-            notify(tr("Starting with Windows isn't set up"), &problem);
-        }
+        follow_autostart();
         SetTimer(window, SETTINGS_TIMER, SETTINGS_TICK, None);
         // Pages of queries left from the last run hold screenshots.
         shell::remove_pages(Duration::ZERO);
@@ -333,6 +331,32 @@ pub fn run() -> io::Result<()> {
     }
     ENDED.store(true, Ordering::Release);
     Ok(())
+}
+
+/// Starting with Windows as Windows has it: the installer, Task Manager or Settings may have
+/// changed it since the settings were written, and the settings, with their file, follow it.
+/// Whether they changed.
+pub fn follow_autostart() -> bool {
+    let on = shell::starts_with_windows();
+    let Some((path, settings)) = STATE.with(|s| s.borrow().as_ref().map(|s| (s.path.clone(), s.settings.clone()))) else {
+        return false;
+    };
+    if settings.autostart == on {
+        return false;
+    }
+    let new = Settings { autostart: on, ..(*settings).clone() };
+    // Written beside it first, so that a half-written file is never read.
+    let fresh = path.with_extension("toml.new");
+    if let Err(error) = fs::write(&fresh, new.to_file()).and_then(|()| fs::rename(&fresh, &path)) {
+        eprintln!("{}", cannot_write(&path, &error));
+    }
+    let now = modified(&path);
+    change_state(|state| {
+        state.settings = Rc::new(new);
+        state.read = now;
+        state.seen = now;
+    });
+    true
 }
 
 /// The settings at the start. The file is written with the defaults if there is none; if it has

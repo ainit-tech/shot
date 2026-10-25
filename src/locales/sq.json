@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Ndërkohë janë në fuqi cilësimet e parazgjedhura.",
     "A click on the icon takes a screenshot.": "Një klikim në ikonë bën një pamje ekrani.",
     "The hotkey doesn't work": "Tasti i shpejtë nuk funksionon",
-    "Starting with Windows isn't set up": "Nisja me Windows nuk është konfiguruar",
     "The settings from before are in force meanwhile.": "Ndërkohë janë në fuqi cilësimet e mëparshme.",
     "The settings have a mistake": "Cilësimet kanë një gabim",
     "The hotkey hasn't changed": "Tasti i shpejtë nuk ndryshoi",
@@ -419,5 +418,13 @@
     "windows": "Si në Windows",
     "un": "Gjuhët e OKB-së",
     "all": "Të gjitha gjuhët"
+  },
+  "installer": {
+    "installTitle": "Instalo ainitShot {version}",
+    "installedTitle": "ainitShot u instalua",
+    "autostart": "Nis me Windows",
+    "run": "Hap ainitShot",
+    "done": "U krye",
+    "removeData": "Të hiqen edhe cilësimet e ainitShot dhe hyrja në Google?"
   }
 }

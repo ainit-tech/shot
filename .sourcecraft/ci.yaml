@@ -16,8 +16,10 @@ workflows:
             # cargo-xwin for x86_64-pc-windows-msvc, pinned, so that a release builds as the one
             # before it did; ci/build.sh puts in the version of Rust it builds with.
             image: docker.io/messense/cargo-xwin@sha256:9856b895265d4966f212228ba64802cf89337e2a2a537aa2533c1b8784cbc81b
+            # The image has Wine, under which Inno Setup makes the installer, and Python; Xvfb is
+            # the screen that Inno Setup's own installer needs.
             script:
-              - apt-get update -qq && apt-get install -y -qq nsis
+              - apt-get update -qq && apt-get install -y -qq xvfb xauth
               - bash ci/build.sh "$SOURCECRAFT_COMMIT_REF_NAME"
             artifacts:
               paths:

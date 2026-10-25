@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "فی الحال ڈیفالٹ ترتیبات نافذ ہیں۔",
     "A click on the icon takes a screenshot.": "آئیکن پر کلک کرنے سے اسکرین شاٹ لیا جاتا ہے۔",
     "The hotkey doesn't work": "ہاٹ کی کام نہیں کر رہی",
-    "Starting with Windows isn't set up": "Windows کے ساتھ شروع ہونا سیٹ اپ نہیں ہوا",
     "The settings from before are in force meanwhile.": "فی الحال پچھلی ترتیبات نافذ ہیں۔",
     "The settings have a mistake": "ترتیبات میں غلطی ہے",
     "The hotkey hasn't changed": "ہاٹ کی نہیں بدلی",
@@ -419,5 +418,13 @@
     "windows": "Windows کی طرح",
     "un": "اقوام متحدہ کی زبانیں",
     "all": "تمام زبانیں"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} انسٹال کریں",
+    "installedTitle": "ainitShot انسٹال ہو گیا",
+    "autostart": "Windows کے ساتھ شروع کریں",
+    "run": "ainitShot چلائیں",
+    "done": "ہو گیا",
+    "removeData": "کیا ainitShot کی ترتیبات اور Google میں سائن ان بھی ہٹا دیں؟"
   }
 }

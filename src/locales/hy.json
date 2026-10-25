@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Առայժմ գործում են կանխադրված կարգավորումները։",
     "A click on the icon takes a screenshot.": "Սեղմեք պատկերակին՝ սքրինշոթ անելու համար։",
     "The hotkey doesn't work": "Արագ ստեղնը չի աշխատում",
-    "Starting with Windows isn't set up": "Windows-ի հետ գործարկումը կարգավորված չէ",
     "The settings from before are in force meanwhile.": "Առայժմ գործում են նախկին կարգավորումները։",
     "The settings have a mistake": "Կարգավորումներում սխալ կա",
     "The hotkey hasn't changed": "Արագ ստեղնը չփոխվեց",
@@ -419,5 +418,13 @@
     "windows": "Ինչպես Windows-ում",
     "un": "ՄԱԿ-ի լեզուներ",
     "all": "Բոլոր լեզուները"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version}-ի տեղադրում",
+    "installedTitle": "ainitShot-ը տեղադրված է",
+    "autostart": "Գործարկել Windows-ի հետ",
+    "run": "Գործարկել ainitShot-ը",
+    "done": "Պատրաստ է",
+    "removeData": "Հեռացնե՞լ նաև ainitShot-ի կարգավորումները և Google-ի մուտքը։"
   }
 }

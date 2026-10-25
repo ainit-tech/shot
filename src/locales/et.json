@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Seni kehtivad vaikesätted.",
     "A click on the icon takes a screenshot.": "Ikoonil klõpsamine teeb kuvatõmmise.",
     "The hotkey doesn't work": "Kiirklahv ei tööta",
-    "Starting with Windows isn't set up": "Windowsiga käivitumine pole seadistatud",
     "The settings from before are in force meanwhile.": "Seni kehtivad varasemad sätted.",
     "The settings have a mistake": "Sätetes on viga",
     "The hotkey hasn't changed": "Kiirklahv ei muutunud",
@@ -419,5 +418,13 @@
     "windows": "Nagu Windowsis",
     "un": "ÜRO keeled",
     "all": "Kõik keeled"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} paigaldamine",
+    "installedTitle": "ainitShot on paigaldatud",
+    "autostart": "Käivita koos Windowsiga",
+    "run": "Käivita ainitShot",
+    "done": "Valmis",
+    "removeData": "Kas eemaldada ka ainitShoti sätted ja Google’isse sisselogimine?"
   }
 }

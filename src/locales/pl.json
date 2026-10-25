@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Na razie obowiązują ustawienia domyślne.",
     "A click on the icon takes a screenshot.": "Kliknięcie ikony robi zrzut ekranu.",
     "The hotkey doesn't work": "Skrót klawiszowy nie działa",
-    "Starting with Windows isn't set up": "Nie skonfigurowano uruchamiania z systemem Windows",
     "The settings from before are in force meanwhile.": "Na razie obowiązują wcześniejsze ustawienia.",
     "The settings have a mistake": "W ustawieniach jest błąd",
     "The hotkey hasn't changed": "Skrót klawiszowy się nie zmienił",
@@ -419,5 +418,13 @@
     "windows": "Jak w Windows",
     "un": "Języki ONZ",
     "all": "Wszystkie języki"
+  },
+  "installer": {
+    "installTitle": "Instalacja ainitShot {version}",
+    "installedTitle": "ainitShot jest zainstalowany",
+    "autostart": "Uruchamiaj z systemem Windows",
+    "run": "Uruchom ainitShot",
+    "done": "Gotowe",
+    "removeData": "Usunąć też ustawienia ainitShot i logowanie do Google?"
   }
 }

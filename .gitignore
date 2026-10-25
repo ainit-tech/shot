@@ -4,8 +4,10 @@
 # Temporary files, kept out of git in every repository
 /tmp/
 
-# A release built by ci/build.sh
+# A release built by ci/build.sh, and the languages of its installer, which it writes from the
+# catalogs (tools/installer-texts.py)
 /dist/
+/installer/languages.iss
 
 # Node.js dependencies
 node_modules/

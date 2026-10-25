@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Standardinnstillingene gjelder inntil videre.",
     "A click on the icon takes a screenshot.": "Et klikk på ikonet tar et skjermbilde.",
     "The hotkey doesn't work": "Hurtigtasten virker ikke",
-    "Starting with Windows isn't set up": "Automatisk oppstart er ikke satt opp",
     "The settings from before are in force meanwhile.": "De forrige innstillingene gjelder inntil videre.",
     "The settings have a mistake": "Innstillingene inneholder en feil",
     "The hotkey hasn't changed": "Hurtigtasten er ikke endret",
@@ -419,5 +418,13 @@
     "windows": "Som i Windows",
     "un": "FN-språk",
     "all": "Alle språk"
+  },
+  "installer": {
+    "installTitle": "Installer ainitShot {version}",
+    "installedTitle": "ainitShot er installert",
+    "autostart": "Start med Windows",
+    "run": "Start ainitShot",
+    "done": "Ferdig",
+    "removeData": "Vil du også fjerne innstillingene for ainitShot og påloggingen til Google?"
   }
 }

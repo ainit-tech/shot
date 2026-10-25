@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "당분간 기본 설정이 적용됩니다.",
     "A click on the icon takes a screenshot.": "아이콘을 클릭하면 스크린샷을 찍을 수 있습니다.",
     "The hotkey doesn't work": "단축키가 작동하지 않습니다",
-    "Starting with Windows isn't set up": "자동 실행이 설정되지 않았습니다",
     "The settings from before are in force meanwhile.": "당분간 이전 설정이 적용됩니다.",
     "The settings have a mistake": "설정에 오류가 있습니다",
     "The hotkey hasn't changed": "단축키가 바뀌지 않았습니다",
@@ -419,5 +418,13 @@
     "windows": "Windows와 같게",
     "un": "UN 공용어",
     "all": "모든 언어"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} 설치",
+    "installedTitle": "ainitShot이 설치되었습니다",
+    "autostart": "Windows와 함께 시작",
+    "run": "ainitShot 실행",
+    "done": "완료",
+    "removeData": "ainitShot 설정과 Google 로그인 정보도 삭제할까요?"
   }
 }

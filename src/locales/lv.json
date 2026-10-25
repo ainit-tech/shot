@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Pagaidām ir spēkā noklusējuma iestatījumi.",
     "A click on the icon takes a screenshot.": "Ekrānuzņēmumu var uzņemt, noklikšķinot uz ikonas.",
     "The hotkey doesn't work": "Īsinājumtaustiņš nedarbojas",
-    "Starting with Windows isn't set up": "Palaišana kopā ar Windows nav iestatīta",
     "The settings from before are in force meanwhile.": "Pagaidām ir spēkā iepriekšējie iestatījumi.",
     "The settings have a mistake": "Iestatījumos ir kļūda",
     "The hotkey hasn't changed": "Īsinājumtaustiņš nav mainīts",
@@ -419,5 +418,13 @@
     "windows": "Kā sistēmā Windows",
     "un": "ANO valodas",
     "all": "Visas valodas"
+  },
+  "installer": {
+    "installTitle": "Instalēt ainitShot {version}",
+    "installedTitle": "ainitShot ir instalēta",
+    "autostart": "Palaist kopā ar Windows",
+    "run": "Palaist ainitShot",
+    "done": "Gatavs",
+    "removeData": "Vai noņemt arī ainitShot iestatījumus un pieteikšanos Google?"
   }
 }

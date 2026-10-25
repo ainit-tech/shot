@@ -301,14 +301,16 @@ pub fn heard(report: isize) {
 }
 
 /// Runs the installer silently and closes the program as "Exit" does; the installer waits for
-/// it to close, replaces it and starts the new version.
+/// it to close, replaces it and starts the new version. Every installer from 0.2.1 on takes
+/// these arguments (decision 13): they never change.
 fn install() {
     let Some((window, installer)) = UPDATES.with(|cell| cell.borrow().as_ref().and_then(|u| Some((u.window, u.installer.clone()?))))
     else {
         return;
     };
     let file = wide(&installer.to_string_lossy());
-    let started = unsafe { ShellExecuteW(null_mut(), w!("open"), file.as_ptr(), w!("/S /UPDATE"), null(), SW_HIDE) } as isize > 32;
+    let arguments = w!("/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE");
+    let started = unsafe { ShellExecuteW(null_mut(), w!("open"), file.as_ptr(), arguments, null(), SW_HIDE) } as isize > 32;
     if started {
         log(&format!("installing from {}", installer.display()));
         unsafe { PostMessageW(window, WM_CLOSE, 0, 0) };

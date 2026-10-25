@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Kwa sasa, mipangilio chaguomsingi inatumika.",
     "A click on the icon takes a screenshot.": "Bofya aikoni ili upige picha ya skrini.",
     "The hotkey doesn't work": "Mkato wa kibodi haufanyi kazi",
-    "Starting with Windows isn't set up": "Kuanza pamoja na Windows hakujawekwa",
     "The settings from before are in force meanwhile.": "Kwa sasa, mipangilio ya awali inatumika.",
     "The settings have a mistake": "Mipangilio ina kosa",
     "The hotkey hasn't changed": "Mkato wa kibodi haujabadilika",
@@ -419,5 +418,13 @@
     "windows": "Kama ilivyo kwenye Windows",
     "un": "Lugha za Umoja wa Mataifa",
     "all": "Lugha zote"
+  },
+  "installer": {
+    "installTitle": "Sakinisha ainitShot {version}",
+    "installedTitle": "ainitShot imesakinishwa",
+    "autostart": "Anza pamoja na Windows",
+    "run": "Fungua ainitShot",
+    "done": "Imekamilika",
+    "removeData": "Uondoe pia mipangilio ya ainitShot na kuingia kwake kwenye Google?"
   }
 }

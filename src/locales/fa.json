@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "فعلاً تنظیمات پیش‌فرض اعمال می‌شود.",
     "A click on the icon takes a screenshot.": "با کلیک روی نماد، اسکرین‌شات گرفته می‌شود.",
     "The hotkey doesn't work": "کلید میان‌بر کار نمی‌کند",
-    "Starting with Windows isn't set up": "اجرا همراه با Windows تنظیم نشد",
     "The settings from before are in force meanwhile.": "فعلاً تنظیمات قبلی اعمال می‌شود.",
     "The settings have a mistake": "تنظیمات اشتباه دارد",
     "The hotkey hasn't changed": "کلید میان‌بر تغییر نکرد",
@@ -419,5 +418,13 @@
     "windows": "مانند Windows",
     "un": "زبان‌های سازمان ملل",
     "all": "همهٔ زبان‌ها"
+  },
+  "installer": {
+    "installTitle": "نصب ainitShot {version}",
+    "installedTitle": "ainitShot نصب شد",
+    "autostart": "اجرا همراه با Windows",
+    "run": "اجرای ainitShot",
+    "done": "تمام",
+    "removeData": "تنظیمات ainitShot و ورود به Google هم حذف شود؟"
   }
 }

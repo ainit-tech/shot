@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "ამასობაში მოქმედებს ნაგულისხმევი პარამეტრები.",
     "A click on the icon takes a screenshot.": "ხატულაზე დაწკაპუნება ეკრანის ანაბეჭდს იღებს.",
     "The hotkey doesn't work": "ცხელი კლავიში არ მუშაობს",
-    "Starting with Windows isn't set up": "Windows-თან ერთად გაშვება არ არის დაყენებული",
     "The settings from before are in force meanwhile.": "ამასობაში მოქმედებს წინა პარამეტრები.",
     "The settings have a mistake": "პარამეტრებში შეცდომაა",
     "The hotkey hasn't changed": "ცხელი კლავიში არ შეიცვალა",
@@ -419,5 +418,13 @@
     "windows": "როგორც Windows-ში",
     "un": "გაეროს ენები",
     "all": "ყველა ენა"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version}-ის ინსტალაცია",
+    "installedTitle": "ainitShot დაინსტალირდა",
+    "autostart": "Windows-თან ერთად გაშვება",
+    "run": "ainitShot-ის გაშვება",
+    "done": "მზადაა",
+    "removeData": "წაიშალოს ainitShot-ის პარამეტრები და Google-ში შესვლაც?"
   }
 }

@@ -71,7 +71,12 @@ struct Preferences {
 
 /// Opens the settings window, or brings it to the front if it is open.
 pub fn open() {
+    // Starting with Windows shows as Windows has it now.
+    let changed = app::follow_autostart();
     if let Some(window) = window() {
+        if changed {
+            refresh();
+        }
         bring_up(window);
         return;
     }

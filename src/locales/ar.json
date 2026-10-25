@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "تُستخدم الإعدادات الافتراضية في الوقت الحالي.",
     "A click on the icon takes a screenshot.": "النقر على الرمز يلتقط لقطة شاشة.",
     "The hotkey doesn't work": "مفتاح الاختصار لا يعمل",
-    "Starting with Windows isn't set up": "لم يتم إعداد التشغيل مع Windows",
     "The settings from before are in force meanwhile.": "تُستخدم الإعدادات السابقة في الوقت الحالي.",
     "The settings have a mistake": "في الإعدادات خطأ",
     "The hotkey hasn't changed": "لم يتغيّر مفتاح الاختصار",
@@ -419,5 +418,13 @@
     "windows": "مثل Windows",
     "un": "لغات الأمم المتحدة",
     "all": "كل اللغات"
+  },
+  "installer": {
+    "installTitle": "تثبيت ainitShot {version}",
+    "installedTitle": "تم تثبيت ainitShot",
+    "autostart": "التشغيل مع Windows",
+    "run": "تشغيل ainitShot",
+    "done": "تم",
+    "removeData": "هل تريد أيضًا حذف إعدادات ainitShot وتسجيل الدخول إلى Google؟"
   }
 }

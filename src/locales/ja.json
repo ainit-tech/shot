@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "当面は既定の設定を使います。",
     "A click on the icon takes a screenshot.": "アイコンをクリックするとスクリーンショットを撮れます。",
     "The hotkey doesn't work": "ホットキーが機能しません",
-    "Starting with Windows isn't set up": "自動起動が設定されていません",
     "The settings from before are in force meanwhile.": "当面は以前の設定を使います。",
     "The settings have a mistake": "設定に誤りがあります",
     "The hotkey hasn't changed": "ホットキーは変更されませんでした",
@@ -419,5 +418,13 @@
     "windows": "Windows と同じ",
     "un": "国連公用語",
     "all": "すべての言語"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} のインストール",
+    "installedTitle": "ainitShot をインストールしました",
+    "autostart": "Windows と一緒に起動",
+    "run": "ainitShot を起動する",
+    "done": "完了",
+    "removeData": "ainitShot の設定と Google へのログインも削除しますか？"
   }
 }

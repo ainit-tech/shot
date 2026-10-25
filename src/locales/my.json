@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "ယခုအတွင်း မူလဆက်တင်များကို အသုံးပြုထားသည်။",
     "A click on the icon takes a screenshot.": "အိုင်ကွန်ကို နှိပ်လျှင် ဖန်သားပြင်ဓာတ်ပုံ ရိုက်သည်။",
     "The hotkey doesn't work": "ဖြတ်လမ်းကီး အလုပ်မလုပ်ပါ",
-    "Starting with Windows isn't set up": "Windows နှင့်အတူ စတင်ခြင်း သတ်မှတ်မထားပါ",
     "The settings from before are in force meanwhile.": "ယခုအတွင်း ယခင်ဆက်တင်များကို အသုံးပြုထားသည်။",
     "The settings have a mistake": "ဆက်တင်များတွင် အမှားရှိသည်",
     "The hotkey hasn't changed": "ဖြတ်လမ်းကီး မပြောင်းလဲခဲ့ပါ",
@@ -419,5 +418,13 @@
     "windows": "Windows အတိုင်း",
     "un": "ကုလသမဂ္ဂ ဘာသာစကားများ",
     "all": "ဘာသာစကား အားလုံး"
+  },
+  "installer": {
+    "installTitle": "ainitShot {version} ကို တပ်ဆင်ရန်",
+    "installedTitle": "ainitShot ကို တပ်ဆင်ပြီးပါပြီ",
+    "autostart": "Windows နှင့်အတူ စတင်ရန်",
+    "run": "ainitShot ကို ဖွင့်ရန်",
+    "done": "ပြီးပြီ",
+    "removeData": "ainitShot ၏ ဆက်တင်များနှင့် Google ဝင်ရောက်မှုကိုပါ ဖယ်ရှားမလား။"
   }
 }

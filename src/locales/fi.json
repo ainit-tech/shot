@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Toistaiseksi käytössä ovat oletusasetukset.",
     "A click on the icon takes a screenshot.": "Kuvakkeen napsautus ottaa kuvakaappauksen.",
     "The hotkey doesn't work": "Pikanäppäin ei toimi",
-    "Starting with Windows isn't set up": "Käynnistystä Windowsin mukana ei ole määritetty",
     "The settings from before are in force meanwhile.": "Toistaiseksi käytössä ovat aiemmat asetukset.",
     "The settings have a mistake": "Asetuksissa on virhe",
     "The hotkey hasn't changed": "Pikanäppäin ei muuttunut",
@@ -419,5 +418,13 @@
     "windows": "Kuten Windowsissa",
     "un": "YK:n kielet",
     "all": "Kaikki kielet"
+  },
+  "installer": {
+    "installTitle": "Asenna ainitShot {version}",
+    "installedTitle": "ainitShot on asennettu",
+    "autostart": "Käynnistä Windowsin mukana",
+    "run": "Käynnistä ainitShot",
+    "done": "Valmis",
+    "removeData": "Poistetaanko myös ainitShotin asetukset ja Google-kirjautuminen?"
   }
 }

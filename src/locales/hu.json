@@ -41,7 +41,6 @@
     "The default settings are in force meanwhile.": "Addig az alapértelmezett beállítások vannak érvényben.",
     "A click on the icon takes a screenshot.": "Az ikonra kattintva képernyőkép készül.",
     "The hotkey doesn't work": "A gyorsbillentyű nem működik",
-    "Starting with Windows isn't set up": "A Windows rendszerrel való indítás nincs beállítva",
     "The settings from before are in force meanwhile.": "Addig a korábbi beállítások vannak érvényben.",
     "The settings have a mistake": "Hiba van a beállításokban",
     "The hotkey hasn't changed": "A gyorsbillentyű nem változott",
@@ -419,5 +418,13 @@
     "windows": "Mint a Windowsban",
     "un": "Az ENSZ nyelvei",
     "all": "Minden nyelv"
+  },
+  "installer": {
+    "installTitle": "Az ainitShot {version} telepítése",
+    "installedTitle": "Az ainitShot telepítve",
+    "autostart": "Indítás a Windows rendszerrel",
+    "run": "Az ainitShot indítása",
+    "done": "Kész",
+    "removeData": "Az ainitShot beállításai és a Google-bejelentkezés is törlődjön?"
   }
 }
