@@ -1,0 +1,18 @@
+[package]
+name = "docs-engine"
+version = "0.1.0"
+edition.workspace = true
+publish = false
+description = "Checks the screenshot documentation and builds data for the docs site and for AI agents."
+
+[[bin]]
+name = "docs"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+pulldown-cmark = { version = "0.13.4", default-features = false, features = ["html"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tar = { version = "0.4.46", default-features = false }
+toml = "1.1.6"

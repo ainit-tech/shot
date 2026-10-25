@@ -1,0 +1,16 @@
+{
+  "name": "screenshot-docs-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "data": "cargo run --quiet -p docs-engine -- build",
+    "dev": "npm run data && vite",
+    "build": "npm run data && tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

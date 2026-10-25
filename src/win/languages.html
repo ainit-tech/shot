@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>ainitShot</title>
+<style>
+:root {
+  --bg: #1c1c1c;
+  --tile: #262626;
+  --tile-hover: #2f2f2f;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #ededed;
+  --muted: #a8a8a8;
+  --accent: #2f6feb;
+  --accent-soft: rgba(47, 111, 235, 0.16);
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  font: 14px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+html { height: 100%; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #4b4b4b transparent; }
+body { margin: 0; user-select: none; cursor: default; }
+body.loading > * { visibility: hidden; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: default; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
+
+main { padding: 26px 34px 30px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 600; }
+.brand svg { width: 22px; height: 22px; }
+h1 { margin: 18px 0 4px; font: 600 26px/1.25 var(--display); }
+.later { margin: 0; color: var(--muted); }
+h2 { margin: 28px 0 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+#own { margin-top: 24px; }
+
+/* Every language is a tile with its flag, three in a row. */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tile {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  min-height: 62px; padding: 10px 14px; text-align: start;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--tile);
+  transition: background 0.12s, border-color 0.12s, transform 0.12s;
+}
+.tile:hover { background: var(--tile-hover); border-color: var(--line-strong); }
+.tile:active { transform: scale(0.98); }
+.tile.windows { border-color: rgba(47, 111, 235, 0.7); background: var(--accent-soft); }
+.flag {
+  flex: none; display: block; width: 42px; height: 28px; border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.names { display: flex; flex-direction: column; min-width: 0; }
+.native { font-weight: 600; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+.here { color: var(--muted); font-size: 12.5px; line-height: 1.3; overflow-wrap: anywhere; }
+.badge {
+  position: absolute; top: -9px; inset-inline-end: 12px;
+  padding: 1px 8px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 11.5px;
+}
+</style>
+</head>
+<body class="loading">
+<main>
+  <div class="brand">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    ainitShot
+  </div>
+  <h1 data-t="title"></h1>
+  <p class="later" data-t="later"></p>
+  <div class="tiles" id="own" role="listbox" hidden></div>
+  <h2 id="un-title" data-t="un"></h2>
+  <div class="tiles" id="un" role="listbox" aria-labelledby="un-title"></div>
+  <h2 id="all-title" data-t="all"></h2>
+  <div class="tiles" id="all" role="listbox" aria-labelledby="all-title"></div>
+</main>
+<script>
+"use strict";
+const webview = window.chrome && window.chrome.webview;
+const send = message => webview && webview.postMessage(JSON.stringify(message));
+const $ = (selector, root = document) => root.querySelector(selector);
+
+// The page's texts in English; the program gives their translations into the language in force.
+const TEXT = {
+  title: "Choose a language",
+  later: "You can change it later in the settings.",
+  windows: "As in Windows",
+  un: "UN languages",
+  all: "All languages",
+};
+const state = { language: "en", windows: "en", texts: {}, languages: [], un: ["en", "zh", "es", "ar", "fr", "ru"] };
+const say = key => state.texts[key] || TEXT[key] || key;
+
+function h(tag, attributes, ...children) {
+  const element = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes || {})) {
+    if (value == null || value === false) continue;
+    if (name.startsWith("on")) element.addEventListener(name.slice(2), value);
+    else element.setAttribute(name, value === true ? "" : value);
+  }
+  element.append(...children.flat().filter(child => child != null && child !== false));
+  return element;
+}
+
+// Flags, drawn on a field of 30 by 20; a language has the flag of the country where most speak it.
+const SVG = "http://www.w3.org/2000/svg";
+let ids = 0;
+const field = color => `<rect width="30" height="20" fill="${color}"/>`;
+const stripes = (colors, upright = false, parts = colors.map(() => 1)) => {
+  const total = parts.reduce((sum, part) => sum + part, 0);
+  let at = 0;
+  return colors.map((color, i) => {
+    const size = (upright ? 30 : 20) * parts[i] / total;
+    const shape = upright
+      ? `<rect x="${at}" y="0" width="${size}" height="20" fill="${color}"/>`
+      : `<rect x="0" y="${at}" width="30" height="${size}" fill="${color}"/>`;
+    at += size;
+    return shape;
+  }).join("");
+};
+/** A star of `points` points at a point, its first point turned by `turn` degrees from the top. */
+const star = (cx, cy, r, turn = 0, fill = "#ffde00", points = 5, inner = points === 5 ? 0.382 : 0.5) => {
+  const corners = [];
+  for (let i = 0; i < 2 * points; i++) {
+    const angle = ((turn + (i * 180) / points) * Math.PI) / 180;
+    const radius = i % 2 ? r * inner : r;
+    corners.push(`${(cx + radius * Math.sin(angle)).toFixed(3)},${(cy - radius * Math.cos(angle)).toFixed(3)}`);
+  }
+  return `<polygon points="${corners.join(" ")}" fill="${fill}"/>`;
+};
+/** A crescent: a disc with another disc of the field's colour moved off its middle. */
+const crescent = (cx, cy, r, dx, dy, inner, color, ground) =>
+  `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}"/><circle cx="${cx + dx}" cy="${cy + dy}" r="${inner}" fill="${ground}"/>`;
+/** A Nordic cross, its upright nearer the staff, with a narrower cross inside it or without. */
+const nordic = (ground, cross, width, inner, innerWidth) =>
+  `${field(ground)}<path d="M11,0 V20 M0,10 H30" stroke="${cross}" stroke-width="${width}"/>` +
+  (inner ? `<path d="M11,0 V20 M0,10 H30" stroke="${inner}" stroke-width="${innerWidth}"/>` : "");
+const FLAGS = {
+  en: () => {
+    const id = `f${ids++}`;
+    // The Union flag on its own field of 60 by 30, cut to the shape of the others.
+    return `<svg x="0" y="0" width="30" height="20" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice">
+      <clipPath id="${id}"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath>
+      <rect width="60" height="30" fill="#012169"/>
+      <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+      <path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#${id})" stroke="#c8102e" stroke-width="4"/>
+      <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/>
+      <path d="M30,0 v30 M0,15 h60" stroke="#c8102e" stroke-width="6"/>
+    </svg>`;
+  },
+  zh: () => {
+    // The small stars turn to the big one.
+    const small = [[10, 2], [12, 4], [12, 7], [10, 9]]
+      .map(([x, y]) => star(x, y, 1, (Math.atan2(5 - y, 5 - x) * 180) / Math.PI + 90));
+    return `${field("#ee1c25")}${star(5, 5, 3)}${small.join("")}`;
+  },
+  es: () => stripes(["#aa151b", "#f1bf00", "#aa151b"], false, [1, 2, 1]),
+  ar: () => `${stripes(["#00732f", "#ffffff", "#000000"])}<rect width="7.5" height="20" fill="#ff0000"/>`,
+  fr: () => stripes(["#0055a4", "#ffffff", "#ef4135"], true),
+  ru: () => stripes(["#ffffff", "#0039a6", "#d52b1e"]),
+  hi: () => {
+    const spokes = Array.from({ length: 24 }, (_, i) => {
+      const angle = (i * 15 * Math.PI) / 180;
+      return `<line x1="15" y1="10" x2="${(15 + 2.4 * Math.sin(angle)).toFixed(3)}" y2="${(10 - 2.4 * Math.cos(angle)).toFixed(3)}"/>`;
+    }).join("");
+    return `${stripes(["#ff9933", "#ffffff", "#138808"])}<g stroke="#000080" stroke-width="0.22" fill="none"><circle cx="15" cy="10" r="2.6" stroke-width="0.4"/>${spokes}</g><circle cx="15" cy="10" r="0.55" fill="#000080"/>`;
+  },
+  pt: () => `${field("#009c3b")}<path d="M15,2.4 L27.4,10 L15,17.6 L2.6,10 Z" fill="#ffdf00"/><circle cx="15" cy="10" r="4.6" fill="#002776"/><path d="M10.6,9.3 Q15,7.6 19.4,10.9" fill="none" stroke="#fff" stroke-width="0.8"/>`,
+  bn: () => `${field("#006a4e")}<circle cx="13.5" cy="10" r="6.2" fill="#f42a41"/>`,
+  ja: () => `${field("#ffffff")}<circle cx="15" cy="10" r="6" fill="#bc002d"/>`,
+  de: () => stripes(["#000000", "#dd0000", "#ffce00"]),
+  id: () => stripes(["#ce1126", "#ffffff"]),
+  ur: () => `${field("#01411c")}<rect width="7.5" height="20" fill="#ffffff"/>${crescent(18.6, 10.4, 5.2, 1.5, -1.4, 4.5, "#ffffff", "#01411c")}${star(21.9, 7.3, 1.9, 45, "#ffffff")}`,
+  tr: () => `${field("#e30a17")}${crescent(10, 10, 5, 1.25, 0, 4, "#ffffff", "#e30a17")}${star(14.6, 10, 2.5, -90, "#ffffff")}`,
+  vi: () => `${field("#da251d")}${star(15, 10.6, 6, 0, "#ffff00")}`,
+  ko: () => {
+    // The trigrams across the diagonals, a broken bar as two halves.
+    const bars = (broken, x, y, turn) => `<g transform="translate(${x} ${y}) rotate(${turn})" fill="#000000">${
+      broken.map((gap, i) => {
+        const top = (i - 1) * 1.25 - 0.415;
+        return gap
+          ? `<rect x="-2.5" y="${top}" width="2.29" height="0.83"/><rect x="0.21" y="${top}" width="2.29" height="0.83"/>`
+          : `<rect x="-2.5" y="${top}" width="5" height="0.83"/>`;
+      }).join("")}</g>`;
+    return `${field("#ffffff")}
+      <g transform="rotate(33.69 15 10)"><circle cx="15" cy="10" r="5" fill="#cd2e3a"/><path d="M10,10 A5,5 0 0 0 20,10 A2.5,2.5 0 0 0 15,10 A2.5,2.5 0 0 1 10,10 Z" fill="#0047a0"/></g>
+      ${bars([0, 0, 0], 7.35, 4.89, -56.31)}${bars([1, 1, 1], 22.65, 15.11, -56.31)}
+      ${bars([1, 0, 1], 22.65, 4.89, 56.31)}${bars([0, 1, 0], 7.35, 15.11, 56.31)}`;
+  },
+  it: () => stripes(["#009246", "#ffffff", "#ce2b37"], true),
+  fa: () => `${stripes(["#239f40", "#ffffff", "#da0000"])}
+    <path d="M0,6.25 H30 M0,13.75 H30" stroke="#ffffff" stroke-width="0.35" stroke-dasharray="0.8 0.55"/>
+    <path d="M13.5,8.1 Q12.5,10.2 13.7,11.9 M16.5,8.1 Q17.5,10.2 16.3,11.9 M14.3,8.5 Q13.7,10.2 14.5,11.4 M15.7,8.5 Q16.3,10.2 15.5,11.4 M15,7.8 V12.1" fill="none" stroke="#da0000" stroke-width="0.5" stroke-linecap="round"/>`,
+  th: () => stripes(["#a51931", "#f4f5f8", "#2d2a4a", "#f4f5f8", "#a51931"], false, [1, 1, 2, 1, 1]),
+  pl: () => stripes(["#ffffff", "#dc143c"]),
+  uk: () => stripes(["#0057b7", "#ffd700"]),
+  ms: () => {
+    const stripe = 20 / 14;
+    const red = Array.from({ length: 7 }, (_, i) => `<rect y="${2 * i * stripe}" width="30" height="${stripe}" fill="#cc0001"/>`).join("");
+    return `${field("#ffffff")}${red}<rect width="15" height="${8 * stripe}" fill="#010066"/>
+      ${crescent(5.6, 5.72, 3.5, 0.9, 0, 2.9, "#ffcc00", "#010066")}${star(10.6, 5.72, 2.6, 0, "#ffcc00", 14, 0.45)}`;
+  },
+  fil: () => {
+    const rays = Array.from({ length: 8 }, (_, i) => {
+      const angle = (i * 45 * Math.PI) / 180;
+      const at = r => `${(6 + r * Math.cos(angle)).toFixed(2)},${(10 + r * Math.sin(angle)).toFixed(2)}`;
+      return `M${at(1.9)} L${at(3.3)}`;
+    }).join(" ");
+    return `${stripes(["#0038a8", "#ce1126"])}<path d="M0,0 L17.3,10 L0,20 Z" fill="#ffffff"/>
+      <circle cx="6" cy="10" r="1.6" fill="#fcd116"/><path d="${rays}" stroke="#fcd116" stroke-width="0.7" stroke-linecap="round"/>
+      ${star(1.9, 2.6, 0.95, 0, "#fcd116")}${star(1.9, 17.4, 0.95, 0, "#fcd116")}${star(14.1, 10, 0.95, 0, "#fcd116")}`;
+  },
+  sw: () => `${field("#00a3dd")}<path d="M0,0 H30 L0,20 Z" fill="#1eb53a"/><path d="M-3,22 L33,-2" stroke="#fcd116" stroke-width="7.4"/><path d="M-3,22 L33,-2" stroke="#000000" stroke-width="5"/>`,
+  am: () => {
+    // A pentagram: every second corner of a pentagon.
+    const corners = Array.from({ length: 5 }, (_, i) => {
+      const angle = ((i * 144 - 90) * Math.PI) / 180;
+      return `${(15 + 3 * Math.cos(angle)).toFixed(2)},${(10 + 3 * Math.sin(angle)).toFixed(2)}`;
+    });
+    return `${stripes(["#078930", "#fcdd09", "#da121a"])}<circle cx="15" cy="10" r="4.6" fill="#0f47af"/>
+      <path d="M${corners.join(" L")} Z" fill="none" stroke="#fcdd09" stroke-width="0.55" stroke-linejoin="round"/>`;
+  },
+  my: () => `${stripes(["#fecb00", "#34b233", "#ea2839"])}${star(15, 10.7, 7.4, 0, "#ffffff")}`,
+  uz: () => {
+    const stars = [[3, 1.45], [4, 3.2], [5, 4.95]]
+      .flatMap(([count, y]) => Array.from({ length: count }, (_, i) => `<circle cx="${(13.4 - i * 1.5).toFixed(1)}" cy="${y}" r="0.42"/>`))
+      .join("");
+    return `${stripes(["#0099b5", "#ffffff", "#1eb53a"])}<path d="M0,6.67 H30 M0,13.33 H30" stroke="#ce1126" stroke-width="0.6"/>
+      ${crescent(4.3, 3.2, 2.3, 0.85, 0, 1.95, "#ffffff", "#0099b5")}<g fill="#ffffff">${stars}</g>`;
+  },
+  nl: () => stripes(["#ae1c28", "#ffffff", "#21468b"]),
+  ro: () => stripes(["#002b7f", "#fcd116", "#ce1126"], true),
+  kk: () => `${field("#00abc2")}<circle cx="16" cy="8" r="2.5" fill="#fec50c"/>
+    <circle cx="16" cy="8" r="3.7" fill="none" stroke="#fec50c" stroke-width="1" stroke-dasharray="0.5 0.42"/>
+    <path d="M10,12.6 Q13,11.6 16,13.5 Q19,11.6 22,12.6 Q19.2,14.2 16,14.9 Q12.8,14.2 10,12.6 Z" fill="#fec50c"/>
+    <path d="M2.4,1.2 V18.8" stroke="#fec50c" stroke-width="1.3" stroke-dasharray="1.1 0.7"/>`,
+  az: () => `${stripes(["#00b5e2", "#ef3340", "#509e2f"])}${crescent(14.2, 10, 2.7, 0.65, 0, 2.2, "#ffffff", "#ef3340")}${star(16.9, 10, 1.2, 0, "#ffffff", 8, 0.45)}`,
+  el: () => {
+    const stripe = 20 / 9;
+    const white = Array.from({ length: 4 }, (_, i) => `<rect y="${(2 * i + 1) * stripe}" width="30" height="${stripe}" fill="#ffffff"/>`).join("");
+    return `${field("#0d5eaf")}${white}<rect width="${5 * stripe}" height="${5 * stripe}" fill="#0d5eaf"/>
+      <path d="M${2.5 * stripe},0 V${5 * stripe} M0,${2.5 * stripe} H${5 * stripe}" stroke="#ffffff" stroke-width="${stripe}"/>`;
+  },
+  hu: () => stripes(["#ce2939", "#ffffff", "#477050"]),
+  cs: () => `${stripes(["#ffffff", "#d7141a"])}<path d="M0,0 L15,10 L0,20 Z" fill="#11457e"/>`,
+  sv: () => nordic("#006aa7", "#fecc00", 4),
+  sr: () => stripes(["#c6363c", "#0c4076", "#ffffff"]),
+  he: () => `${field("#ffffff")}<rect y="2" width="30" height="3" fill="#0038b8"/><rect y="15" width="30" height="3" fill="#0038b8"/>
+    <path d="M15,6.6 L17.94,11.7 H12.06 Z M15,13.4 L12.06,8.3 H17.94 Z" fill="none" stroke="#0038b8" stroke-width="0.7"/>`,
+  bg: () => stripes(["#ffffff", "#00966e", "#d62612"]),
+  da: () => nordic("#c8102e", "#ffffff", 3),
+  fi: () => nordic("#ffffff", "#002f6c", 5),
+  sk: () => `${stripes(["#ffffff", "#0b4ea2", "#ee1c25"])}
+    <path d="M6.6,4.4 H14.4 V10.4 C14.4,13.4 12.3,14.9 10.5,15.8 C8.7,14.9 6.6,13.4 6.6,10.4 Z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.6"/>
+    <path d="M10.5,6 V13 M8.6,7.9 H12.4 M8.1,10.1 H12.9" stroke="#ffffff" stroke-width="0.9"/>
+    <path d="M7.4,12.9 Q8.4,11.7 9.4,12.5 Q10.5,11.2 11.6,12.5 Q12.6,11.7 13.6,12.9 Q12.3,14.6 10.5,15.3 Q8.7,14.6 7.4,12.9 Z" fill="#0b4ea2"/>`,
+  nb: () => nordic("#ba0c2f", "#ffffff", 5, "#00205b", 2.6),
+  ka: () => {
+    const small = [[6.5, 4], [23.5, 4], [6.5, 16], [23.5, 16]].map(([x, y]) => `M${x},${y - 1.9} V${y + 1.9} M${x - 1.9},${y} H${x + 1.9}`).join(" ");
+    return `${field("#ffffff")}<path d="M15,0 V20 M0,10 H30" stroke="#e8112d" stroke-width="4"/><path d="${small}" stroke="#e8112d" stroke-width="1.2"/>`;
+  },
+  hr: () => {
+    // The chequered shield under its crown.
+    const id = `f${ids++}`;
+    const size = 1.25, top = 5.8, left = 15 - 2.5 * size, right = 15 + 2.5 * size;
+    let squares = "";
+    for (let row = 0; row < 6; row++) {
+      for (let column = 0; column < 5; column++) {
+        if ((row + column) % 2 === 0) squares += `<rect x="${left + column * size}" y="${top + row * size}" width="${size}" height="${size}" fill="#ff0000"/>`;
+      }
+    }
+    const shield = `M${left},${top} H${right} V${top + 3 * size} C${right},${top + 4.6 * size} 16.6,${top + 5.4 * size} 15,${top + 5.6 * size} C13.4,${top + 5.4 * size} ${left},${top + 4.6 * size} ${left},${top + 3 * size} Z`;
+    return `${stripes(["#ff0000", "#ffffff", "#171796"])}<clipPath id="${id}"><path d="${shield}"/></clipPath>
+      <path d="${shield}" fill="#ffffff"/><g clip-path="url(#${id})">${squares}</g><path d="${shield}" fill="none" stroke="#ff0000" stroke-width="0.3"/>
+      <path d="M${left},${top} V${top - 1.5} L13.35,${top - 0.9} L14.45,${top - 1.9} L15,${top - 1.3} L15.55,${top - 1.9} L16.65,${top - 0.9} L${right},${top - 1.5} V${top} Z" fill="#171796"/>`;
+  },
+  hy: () => stripes(["#d90012", "#0033a0", "#f2a800"]),
+  sq: () => {
+    // The eagle: its left half, and the same turned over for the right.
+    const half = "M15,7.4 C14.5,6.8 14.3,6 14.2,5.3 L13.2,4.5 L12.1,4.7 L13,5.1 L13.5,5.8 C13.6,6.5 13.9,7.1 14.3,7.6 L9.1,4.3 L9.7,6.2 L8.9,6.3 L10,7.6 L9.2,7.8 L10.7,9 L10,9.3 L11.9,10.2 L11.5,10.6 L13.7,10.8 L13.5,12.6 L12.4,15.6 L14.1,14.4 L15,15.8 Z";
+    return `${field("#e41e20")}<g fill="#000000"><path d="${half}"/><path d="${half}" transform="matrix(-1 0 0 1 30 0)"/></g>`;
+  },
+  lt: () => stripes(["#fdb913", "#006a44", "#c1272d"]),
+  sl: () => `${stripes(["#ffffff", "#005da4", "#ed1c24"])}
+    <path d="M5.6,3.4 H10.6 V7.4 C10.6,9.4 9.1,10.3 8.1,10.7 C7.1,10.3 5.6,9.4 5.6,7.4 Z" fill="#005da4" stroke="#ed1c24" stroke-width="0.45"/>
+    <path d="M6,8.6 L7.1,6.6 L7.7,7.5 L8.1,6.1 L8.5,7.5 L9.1,6.6 L10.2,8.6 Z" fill="#ffffff"/>
+    <g fill="#ffdd00"><circle cx="7" cy="4.5" r="0.35"/><circle cx="9.2" cy="4.5" r="0.35"/><circle cx="8.1" cy="5.3" r="0.35"/></g>`,
+  lv: () => stripes(["#9e3039", "#ffffff", "#9e3039"], false, [2, 1, 2]),
+  et: () => stripes(["#0072ce", "#000000", "#ffffff"]),
+};
+function flag(code) {
+  const holder = document.createElementNS(SVG, "svg");
+  holder.setAttribute("viewBox", "0 0 30 20");
+  holder.setAttribute("class", "flag");
+  holder.setAttribute("aria-hidden", "true");
+  holder.innerHTML = (FLAGS[code] || (() => field("#3a3a3a")))();
+  return holder;
+}
+
+/** A language's name in the language the page speaks. */
+function here(code) {
+  try {
+    return new Intl.DisplayNames([state.language], { type: "language" }).of(code);
+  } catch {
+    return code;
+  }
+}
+
+function choose(code) {
+  send({ type: "choose", language: code });
+}
+
+/** A language's tile: its flag, its name in itself and in the page's language unless that's the
+ *  same, and the mark of the language of Windows. */
+function tile(language, windows) {
+  const name = here(language.code);
+  const same = name.toLocaleLowerCase() === language.native.toLocaleLowerCase();
+  return h("button", {
+    class: "tile" + (windows ? " windows" : ""), role: "option", "data-code": language.code,
+    "data-native": language.native, "data-here": name, onclick: () => choose(language.code),
+  },
+  flag(language.code),
+  h("span", { class: "names" },
+    h("span", { class: "native", lang: language.code }, language.native),
+    same ? null : h("span", { class: "here", lang: state.language }, name)),
+  windows ? h("span", { class: "badge", lang: state.language }, say("windows")) : null);
+}
+
+function render() {
+  for (const element of document.querySelectorAll("[data-t]")) element.textContent = say(element.dataset.t);
+  const known = new Map(state.languages.map(language => [language.code, language]));
+  const un = state.un.filter(code => known.has(code));
+  const windows = known.has(state.windows) ? state.windows : null;
+  // The language of Windows, marked, comes first: among the UN's when it's one of them, above them
+  // otherwise.
+  const own = windows && !un.includes(windows) ? [tile(known.get(windows), true)] : [];
+  $("#own").replaceChildren(...own);
+  $("#own").hidden = !own.length;
+  $("#un").replaceChildren(...un.map(code => tile(known.get(code), code === windows)));
+  // Every language, in the order of the alphabets of their own names.
+  const collator = new Intl.Collator("en");
+  const all = [...state.languages].sort((a, b) => collator.compare(a.native, b.native));
+  $("#all").replaceChildren(...all.map(language => tile(language, false)));
+}
+
+/** The tile an arrow goes to: the next or the previous one across, the nearest one in the row
+ *  below or above. */
+function neighbour(tiles, at, key) {
+  if (key === "Home") return tiles[0];
+  if (key === "End") return tiles[tiles.length - 1];
+  if (at < 0) return tiles[0];
+  const across = { ArrowRight: 1, ArrowLeft: -1 }[key];
+  if (across) return tiles[at + across * (document.documentElement.dir === "rtl" ? -1 : 1)];
+  const from = tiles[at].getBoundingClientRect();
+  const middle = from.left + from.width / 2;
+  const down = key === "ArrowDown";
+  const rows = tiles.map((tile, i) => ({ i, rect: tile.getBoundingClientRect() }))
+    .filter(({ rect }) => (down ? rect.top > from.top + 1 : rect.top < from.top - 1));
+  if (!rows.length) return null;
+  const row = (down ? Math.min : Math.max)(...rows.map(({ rect }) => rect.top));
+  const nearest = rows.filter(({ rect }) => Math.abs(rect.top - row) < 1)
+    .sort((a, b) => Math.abs(a.rect.left + a.rect.width / 2 - middle) - Math.abs(b.rect.left + b.rect.width / 2 - middle));
+  return tiles[nearest[0].i];
+}
+
+/** Typing finds a language among all of them: by its name in itself or in the page's language,
+ *  or by its code. */
+let typed = "", typedAt = 0;
+const plain = text => text.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase();
+function find(key) {
+  const now = Date.now();
+  typed = (now - typedAt > 1000 ? "" : typed) + key;
+  typedAt = now;
+  const wanted = plain(typed);
+  const found = [...document.querySelectorAll("#all .tile")]
+    .find(tile => [tile.dataset.native, tile.dataset.here, tile.dataset.code].some(name => plain(name || "").startsWith(wanted)));
+  if (found) {
+    found.focus({ preventScroll: true });
+    found.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+}
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") return send({ type: "close" });
+  if (event.ctrlKey || event.altKey || event.metaKey) return;
+  const tiles = [...document.querySelectorAll(".tile")];
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
+    event.preventDefault();
+    const next = neighbour(tiles, tiles.indexOf(document.activeElement), event.key);
+    if (next) next.focus();
+  } else if (event.key.length === 1 && (event.key !== " " || Date.now() - typedAt < 1000)) {
+    // A space chooses the tile in focus, unless it's in the middle of a name being typed.
+    event.preventDefault();
+    find(event.key);
+  }
+});
+document.addEventListener("contextmenu", event => event.preventDefault());
+
+function heard(message) {
+  if (message.type !== "init") return;
+  state.language = message.language || "en";
+  state.windows = message.windows || state.language;
+  state.texts = message.texts || {};
+  state.languages = message.languages || [];
+  state.un = message.un || state.un;
+  document.documentElement.lang = state.language;
+  document.documentElement.dir = message.rightToLeft ? "rtl" : "ltr";
+  render();
+  document.body.classList.remove("loading");
+  const windows = $(".tile.windows") || $(".tile");
+  if (windows) windows.focus({ preventScroll: true });
+}
+
+if (webview) webview.addEventListener("message", event => heard(event.data));
+send({ type: "ready" });
+</script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+# The term base of the documentation.
+#
+# The glossary page (docs/<lang>/glossary.md) takes its term cards and its term base table
+# from here: the page only holds the markers `<!-- glossary: term base -->` and
+# `<!-- glossary: terms -->` where they go. The same data gives the hints over terms
+# in the texts of every page.
+#
+# Every term is written in every language of the site:
+# - `name`, `kind`, `text` (the definition) and `notes` (bullet points) make its card;
+# - `forms` are the word forms that mark the term in page texts, letter case aside;
+# - `avoid` lists phrases in which a form means something else, such as "taskbar";
+# - `status` inside a language overrides the term's status for that language.
+
+[labels.en]
+code = "Code"
+kind = "Kind"
+status = "Status"
+and = "and"
+
+[labels.ru]
+code = "В коде"
+kind = "Вид"
+status = "Статус"
+and = "и"
+
+[labels.hi]
+code = "कोड"
+kind = "श्रेणी"
+status = "स्टेटस"
+and = "और"
+
+[statuses]
+accepted = { en = "accepted", ru = "принят", hi = "स्वीकृत" }
+proposed = { en = "proposed", ru = "предложен", hi = "प्रस्तावित" }
+open = { en = "open", ru = "под вопросом", hi = "विचाराधीन" }
+
+[[sections]]
+id = "capture"
+title = { en = "1. Capture", ru = "1. Захват экрана", hi = "1. स्क्रीन कैप्चर" }
+
+[[sections]]
+id = "drawing"
+title = { en = "2. Drawing", ru = "2. Рисование", hi = "2. ड्रॉइंग" }
+
+[[sections]]
+id = "actions"
+title = { en = "3. Actions", ru = "3. Действия", hi = "3. क्रियाएँ" }
+
+# 1. Capture
+
+[[terms]]
+id = "selection"
+section = "capture"
+code = ["Selection"]
+status = "accepted"
+
+[terms.en]
+name = "Selection"
+kind = "entity"
+text = "The part of the screen picked with the mouse after the hotkey. Annotations are drawn inside it, and actions take it together with them."
+notes = ["Don't confuse with: the screenshot, which is the selection together with its annotations."]
+forms = ["selection", "selections"]
+
+[terms.ru]
+name = "Выделение"
+kind = "сущность"
+text = "Часть экрана, которую выбирают мышью после горячей клавиши. Пометки рисуют внутри неё, а действия берут её вместе с ними."
+notes = ["Не путать: со скриншотом — это выделение вместе с пометками."]
+forms = [
+  "выделение",
+  "выделения",
+  "выделению",
+  "выделением",
+  "выделении",
+  "выделений",
+  "выделениям",
+  "выделениями",
+  "выделениях",
+]
+
+[terms.hi]
+name = "चयनित क्षेत्र"
+kind = "इकाई"
+text = "स्क्रीन का वह हिस्सा, जिसे हॉटकी दबाने के बाद माउस से चुना जाता है। निशान इसी के अंदर बनाए जाते हैं, और क्रियाएँ इसे इन निशानों के साथ लेती हैं।"
+notes = ["भ्रम न करें: स्क्रीनशॉट से, जो चयनित क्षेत्र और उसके निशान मिलकर है।"]
+forms = ["चयनित क्षेत्र", "चयनित क्षेत्रों"]
+
+[[terms]]
+id = "screenshot"
+section = "capture"
+code = ["Screenshot"]
+status = "accepted"
+
+[terms.en]
+name = "Screenshot"
+kind = "picture"
+text = "The picture that actions work with: the selection together with all its annotations."
+forms = ["screenshot", "screenshots"]
+
+[terms.ru]
+name = "Скриншот"
+kind = "изображение"
+text = "Картинка, с которой работают действия: выделение вместе со всеми пометками на нём."
+forms = [
+  "скриншот",
+  "скриншота",
+  "скриншоту",
+  "скриншотом",
+  "скриншоте",
+  "скриншоты",
+  "скриншотов",
+  "скриншотам",
+  "скриншотами",
+  "скриншотах",
+]
+
+[terms.hi]
+name = "स्क्रीनशॉट"
+kind = "चित्र"
+text = "वह चित्र, जिस पर क्रियाएँ काम करती हैं: चयनित क्षेत्र और उस पर बने सभी निशान।"
+forms = ["स्क्रीनशॉट", "स्क्रीनशॉटों"]
+
+[[terms]]
+id = "toolbar"
+section = "capture"
+code = ["Toolbar"]
+status = "accepted"
+
+[terms.en]
+name = "Toolbar"
+kind = "part of the interface"
+text = "The two strips next to the selection: one with the tools and the action buttons, by default a row under it at its right end, and one with the query buttons, by default a column to the right of it at its bottom. The settings put either on any side of the selection, pressed to either end of it. They appear as soon as the selection is made."
+forms = ["toolbar", "toolbars"]
+
+[terms.ru]
+name = "Панель"
+kind = "часть интерфейса"
+text = "Две полосы рядом с выделением: одна с инструментами и кнопками действий, по умолчанию строкой под ним у правого края, другая с кнопками запросов, по умолчанию столбцом справа от него у нижнего края. Настройки ставят любую из них на любую сторону выделения, прижатой к любому концу этой стороны. Появляются, как только выделение сделано."
+forms = ["панель", "панели", "панелью", "панелей", "панелям", "панелями", "панелях"]
+avoid = ["панель задач", "панели задач", "панелью задач", "панель управления", "панели управления"]
+
+[terms.hi]
+name = "टूलबार"
+kind = "इंटरफ़ेस का भाग"
+text = "चयनित क्षेत्र के पास की दो पट्टियाँ: एक टूल और क्रियाओं के बटनों वाली, डिफ़ॉल्ट रूप से उसके नीचे दाएँ सिरे पर पंक्ति, और दूसरी क्वेरी के बटनों वाली, डिफ़ॉल्ट रूप से उसके दाईं ओर निचले सिरे पर स्तंभ। सेटिंग्स किसी को भी चयनित क्षेत्र की किसी भी ओर, उस ओर के किसी भी सिरे से सटाकर रख सकती हैं। क्षेत्र चुनते ही दिखाई देती हैं।"
+forms = ["टूलबार", "टूलबारों"]
+
+# 2. Drawing
+
+[[terms]]
+id = "tool"
+section = "drawing"
+code = ["Tool"]
+status = "accepted"
+
+[terms.en]
+name = "Tool"
+kind = "part of the interface"
+text = "What annotations are drawn with: pencil, brush, line, arrow, rectangle, filled rectangle, text and magic pencil. One tool is chosen at a time."
+forms = ["tool", "tools"]
+
+[terms.ru]
+name = "Инструмент"
+kind = "часть интерфейса"
+text = "То, чем рисуют пометки: карандаш, кисть, линия, стрелка, прямоугольник, закрашенный прямоугольник, надпись и волшебный карандаш. Выбран всегда один инструмент."
+forms = [
+  "инструмент",
+  "инструмента",
+  "инструменту",
+  "инструментом",
+  "инструменте",
+  "инструменты",
+  "инструментов",
+  "инструментам",
+  "инструментами",
+  "инструментах",
+]
+
+[terms.hi]
+name = "टूल"
+kind = "इंटरफ़ेस का भाग"
+text = "जिससे निशान बनाए जाते हैं: पेंसिल, ब्रश, रेखा, तीर, आयत, भरा हुआ आयत, लेबल और जादुई पेंसिल। एक समय में एक ही टूल चुना रहता है।"
+forms = ["टूल", "टूलों"]
+
+[[terms]]
+id = "annotation"
+section = "drawing"
+code = ["Annotation"]
+status = "accepted"
+
+[terms.en]
+name = "Annotation"
+kind = "entity"
+text = "One thing drawn on the selection: a stroke, a line, an arrow, a frame, a filled rectangle or a label. Once drawn, it can be picked to move it, reshape it by its handles, rewrite it if it is a label, or remove it. Changes are undone one at a time, the last one first."
+forms = ["annotation", "annotations"]
+
+[terms.ru]
+name = "Пометка"
+kind = "сущность"
+text = "Что-то одно, нарисованное на выделении: штрих, линия, стрелка, рамка, закрашенный прямоугольник или надпись. Нарисованную пометку можно выбрать, чтобы сдвинуть её, изменить за ручки, переписать, если это надпись, или удалить. Изменения отменяют по одному, начиная с последнего."
+forms = [
+  "пометка",
+  "пометки",
+  "пометке",
+  "пометку",
+  "пометкой",
+  "пометок",
+  "пометкам",
+  "пометками",
+  "пометках",
+]
+
+[terms.hi]
+name = "निशान"
+kind = "इकाई"
+text = "चयनित क्षेत्र पर बनाई गई एक चीज़: लकीर, रेखा, तीर, फ़्रेम, भरा हुआ आयत या लेबल। बनने के बाद उसे चुनकर खिसकाया जा सकता है, हैंडलों से उसका आकार बदला जा सकता है, लेबल हो तो फिर से लिखा जा सकता है, या हटाया जा सकता है। बदलाव एक-एक करके पूर्ववत किए जाते हैं, सबसे आख़िरी पहले।"
+forms = ["निशान", "निशानों"]
+
+[[terms]]
+id = "pencil"
+section = "drawing"
+code = ["Pencil"]
+status = "accepted"
+
+[terms.en]
+name = "Pencil"
+kind = "tool"
+text = "Draws a thin line exactly along the mouse."
+forms = ["pencil", "pencils"]
+
+[terms.ru]
+name = "Карандаш"
+kind = "инструмент"
+text = "Рисует тонкую линию точно по движению мыши."
+forms = [
+  "карандаш",
+  "карандаша",
+  "карандашу",
+  "карандашом",
+  "карандаше",
+  "карандаши",
+  "карандашей",
+  "карандашам",
+  "карандашами",
+  "карандашах",
+]
+
+[terms.hi]
+name = "पेंसिल"
+kind = "टूल"
+text = "माउस की चाल के ठीक साथ पतली रेखा खींचती है।"
+forms = ["पेंसिल", "पेंसिलें", "पेंसिलों"]
+
+[[terms]]
+id = "brush"
+section = "drawing"
+code = ["Brush"]
+status = "accepted"
+
+[terms.en]
+name = "Brush"
+kind = "tool"
+text = "Draws a wide translucent line by hand, like a highlighter over text."
+forms = ["brush", "brushes"]
+
+[terms.ru]
+name = "Кисть"
+kind = "инструмент"
+text = "Рисует от руки широкую полупрозрачную линию, как маркер поверх текста."
+forms = ["кисть", "кисти", "кистью", "кистей", "кистям", "кистями", "кистях"]
+
+[terms.hi]
+name = "ब्रश"
+kind = "टूल"
+text = "हाथ से चौड़ी अर्ध-पारदर्शी रेखा खींचता है, जैसे टेक्स्ट पर हाइलाइटर।"
+forms = ["ब्रश", "ब्रशों"]
+
+[[terms]]
+id = "label"
+section = "drawing"
+code = ["Label"]
+status = "accepted"
+
+[terms.en]
+name = "Label"
+kind = "annotation"
+text = "Text written on the selection with the text tool, where the selection is clicked. A soft shadow under its letters, dark or, under dark letters, light, keeps it readable on any background. A double click rewrites it."
+forms = ["label", "labels"]
+
+[terms.ru]
+name = "Надпись"
+kind = "пометка"
+text = "Текст, написанный на выделении инструментом «Надпись» там, где по выделению щёлкнули. Мягкая тень под буквами — тёмная, а под тёмными буквами светлая — делает его читаемым на любом фоне. Двойной щелчок открывает надпись для правки."
+forms = ["надпись", "надписи", "надписью", "надписей", "надписям", "надписями", "надписях"]
+
+[terms.hi]
+name = "लेबल"
+kind = "निशान"
+text = "लेबल टूल से चयनित क्षेत्र पर, जहाँ क्लिक किया गया, वहाँ लिखा गया टेक्स्ट। अक्षरों के नीचे की हल्की छाया, गहरी, और गहरे अक्षरों के नीचे हल्की, उसे हर पृष्ठभूमि पर पढ़ने लायक़ बनाती है। डबल क्लिक उसे फिर से लिखने के लिए खोलता है।"
+forms = ["लेबल", "लेबलों"]
+
+[[terms]]
+id = "magic-pencil"
+section = "drawing"
+code = ["MagicPencil"]
+status = "accepted"
+
+[terms.en]
+name = "Magic pencil"
+kind = "tool"
+text = "A loop drawn roughly around something turns into a neat outline when the mouse button is released."
+notes = ["It draws a neat ellipse or rectangle; an outline along the edge of the object inside the loop is an open question."]
+forms = ["magic pencil", "magic pencils"]
+
+[terms.ru]
+name = "Волшебный карандаш"
+kind = "инструмент"
+text = "Петля, нарисованная от руки вокруг чего-то, превращается в аккуратный контур, как только отпускают кнопку мыши."
+notes = ["Рисует аккуратный эллипс или прямоугольник; контур по краю предмета внутри петли — открытый вопрос."]
+forms = [
+  "волшебный карандаш",
+  "волшебного карандаша",
+  "волшебному карандашу",
+  "волшебным карандашом",
+  "волшебном карандаше",
+  "волшебные карандаши",
+  "волшебных карандашей",
+  "волшебным карандашам",
+  "волшебными карандашами",
+  "волшебных карандашах",
+]
+
+[terms.hi]
+name = "जादुई पेंसिल"
+kind = "टूल"
+text = "किसी चीज़ के चारों ओर हाथ से मोटे तौर पर बनाया गया घेरा माउस का बटन छोड़ते ही साफ़ रूपरेखा में बदल जाता है।"
+notes = ["यह साफ़ अंडाकार या आयत बनाती है; घेरे के अंदर की चीज़ के किनारे के साथ चलती रूपरेखा एक खुला प्रश्न है।"]
+forms = ["जादुई पेंसिल", "जादुई पेंसिलें", "जादुई पेंसिलों"]
+
+# 3. Actions
+
+[[terms]]
+id = "action"
+section = "actions"
+code = ["Action"]
+status = "accepted"
+
+[terms.en]
+name = "Action"
+kind = "operation"
+text = "What is done with the finished screenshot: copy it or its text, save it, or send it as a query to a search engine."
+forms = ["action", "actions"]
+
+[terms.ru]
+name = "Действие"
+kind = "операция"
+text = "Что делают с готовым скриншотом: копируют его или его текст, сохраняют или отправляют запросом в поисковик."
+forms = [
+  "действие",
+  "действия",
+  "действию",
+  "действием",
+  "действии",
+  "действий",
+  "действиям",
+  "действиями",
+  "действиях",
+]
+
+[terms.hi]
+name = "क्रिया"
+kind = "ऑपरेशन"
+text = "तैयार स्क्रीनशॉट के साथ क्या किया जाता है: उसे या उसका टेक्स्ट कॉपी करना, सेव करना या क्वेरी के रूप में सर्च इंजन को भेजना।"
+forms = ["क्रिया", "क्रियाएँ", "क्रियाओं"]
+
+[[terms]]
+id = "query"
+section = "actions"
+code = ["Query"]
+status = "accepted"
+
+[terms.en]
+name = "Query"
+kind = "action"
+text = "Sends the screenshot with a mini prompt to Google's AI mode and opens the answer in the browser or in the program's own window. The buttons \"Ask Google\" and \"Translate\" are queries. A query can go to the image search instead."
+forms = ["query", "queries"]
+
+[terms.ru]
+name = "Запрос"
+kind = "действие"
+text = "Отправляет скриншот с мини-промптом в режим ИИ Google и открывает ответ в браузере или в собственном окне программы. Кнопки «Спросить Google» и «Перевести» — это запросы. Запрос можно отправить и в поиск по картинке."
+forms = [
+  "запрос",
+  "запроса",
+  "запросу",
+  "запросом",
+  "запросе",
+  "запросы",
+  "запросов",
+  "запросам",
+  "запросами",
+  "запросах",
+]
+
+[terms.hi]
+name = "क्वेरी"
+kind = "क्रिया"
+text = "स्क्रीनशॉट को मिनी-प्रॉम्प्ट के साथ Google के AI मोड को भेजती है और जवाब ब्राउज़र में या प्रोग्राम की अपनी विंडो में खोलती है। \"Google से पूछें\" और \"अनुवाद करें\" बटन क्वेरी हैं। क्वेरी तस्वीर से खोज को भी भेजी जा सकती है।"
+forms = ["क्वेरी", "क्वेरियाँ", "क्वेरियों"]
+
+[[terms]]
+id = "programs-window"
+section = "actions"
+code = ["Browser"]
+status = "accepted"
+
+[terms.en]
+name = "The program's window"
+kind = "part of the interface"
+text = "The window, made with WebView2, in which the program shows Google's pages and puts the screenshot into them itself: AI Mode for a conversation, the results of the image search. The user signs in to Google in it once."
+forms = ["program's window", "program's own window"]
+
+[terms.ru]
+name = "Окно программы"
+kind = "часть интерфейса"
+text = "Окно на WebView2, в котором программа показывает страницы Google и сама кладёт в них скриншот: AI Mode для разговора, результаты поиска по картинке. В Google в нём входят один раз."
+forms = [
+  "окно программы",
+  "окна программы",
+  "окну программы",
+  "окном программы",
+  "окне программы",
+  "собственное окно программы",
+  "собственного окна программы",
+  "собственном окне программы",
+  "собственным окном программы",
+]
+
+[terms.hi]
+name = "प्रोग्राम की अपनी विंडो"
+kind = "इंटरफ़ेस का भाग"
+text = "WebView2 से बनी विंडो, जिसमें प्रोग्राम Google के पेज दिखाता है और ख़ुद स्क्रीनशॉट उनमें रखता है: बातचीत के लिए AI Mode, तस्वीर से खोज के नतीजे। उपयोगकर्ता उसमें एक बार Google में साइन इन करता है।"
+forms = ["प्रोग्राम की अपनी विंडो", "प्रोग्राम की विंडो"]
+
+[[terms]]
+id = "search-engine"
+section = "actions"
+code = ["SearchEngine"]
+status = "accepted"
+
+[terms.en]
+name = "Search engine"
+kind = "external service"
+text = "Google: where a query sends the screenshot. It has an AI mode, the main target of queries, and an image search."
+forms = ["search engine", "search engines"]
+
+[terms.ru]
+name = "Поисковик"
+kind = "внешний сервис"
+text = "Google — куда запрос отправляет скриншот. У него есть режим ИИ, главная цель запросов, и поиск по картинке."
+forms = [
+  "поисковик",
+  "поисковика",
+  "поисковику",
+  "поисковиком",
+  "поисковике",
+  "поисковики",
+  "поисковиков",
+  "поисковикам",
+  "поисковиками",
+  "поисковиках",
+]
+
+[terms.hi]
+name = "सर्च इंजन"
+kind = "बाहरी सेवा"
+text = "Google: वह सेवा, जिसे क्वेरी स्क्रीनशॉट भेजती है। इसमें AI मोड है, जो क्वेरी का मुख्य लक्ष्य है, और तस्वीर से खोज भी।"
+forms = ["सर्च इंजन", "सर्च इंजनों"]
+
+[[terms]]
+id = "ai-mode"
+section = "actions"
+code = ["AiMode"]
+status = "accepted"
+
+[terms.en]
+name = "AI mode"
+kind = "part of a search engine"
+text = "The part of a search engine where its AI answers a question about a picture in words. Google answers on top of its results for the picture and the question (AI Overview), and AI Mode is the next tab there. It takes one picture together with the question."
+notes = ["Queries that ask about the picture go here; the image search has buttons of its own."]
+forms = ["AI mode", "AI modes"]
+
+[terms.ru]
+name = "Режим ИИ"
+kind = "часть поисковика"
+text = "Часть поисковика, где его ИИ отвечает на вопрос о картинке словами. Google отвечает сверху над своими результатами по картинке и вопросу («Обзор от ИИ»), а AI Mode — соседняя вкладка там же. Принимает одну картинку вместе с вопросом."
+notes = ["Сюда уходят запросы, которые спрашивают о картинке; у поиска по картинке свои кнопки."]
+forms = [
+  "режим ИИ",
+  "режима ИИ",
+  "режиму ИИ",
+  "режимом ИИ",
+  "режиме ИИ",
+  "режимы ИИ",
+  "режимов ИИ",
+  "режимам ИИ",
+  "режимами ИИ",
+  "режимах ИИ",
+]
+
+[terms.hi]
+name = "AI मोड"
+kind = "सर्च इंजन का भाग"
+text = "सर्च इंजन का वह भाग, जहाँ उसका AI तस्वीर के बारे में सवाल का जवाब शब्दों में देता है। Google तस्वीर और सवाल के अपने नतीजों के ऊपर जवाब देता है (AI Overview), और AI Mode वहीं पास वाला टैब है। यह सवाल के साथ एक तस्वीर लेता है।"
+notes = ["तस्वीर के बारे में पूछने वाली क्वेरी यहाँ जाती हैं; तस्वीर से खोज के अपने बटन हैं।"]
+forms = ["AI मोड", "AI मोडों"]
+
+[[terms]]
+id = "image-search"
+section = "actions"
+code = ["ImageSearch"]
+status = "accepted"
+
+[terms.en]
+name = "Image search"
+kind = "part of a search engine"
+text = "The part of a search engine that finds where a picture comes from and where else it is: Google Lens, which is also behind Google Images. It takes the picture alone, without a question; queries to it have buttons of their own."
+forms = ["image search", "image searches"]
+
+[terms.ru]
+name = "Поиск по картинке"
+kind = "часть поисковика"
+text = "Часть поисковика, которая находит, откуда картинка и где ещё она встречается: Google Lens, на котором работают и Google Картинки. Принимает картинку без вопроса; у запросов в неё свои кнопки."
+forms = [
+  "поиск по картинке",
+  "поиска по картинке",
+  "поиску по картинке",
+  "поиском по картинке",
+  "поиске по картинке",
+]
+
+[terms.hi]
+name = "तस्वीर से खोज"
+kind = "सर्च इंजन का भाग"
+text = "सर्च इंजन का वह भाग, जो पता करता है कि तस्वीर कहाँ से है और कहाँ-कहाँ मिलती है: Google Lens, जिस पर Google Images भी चलता है। यह बिना सवाल के केवल तस्वीर लेता है; इसकी क्वेरी के अपने बटन हैं।"
+forms = ["तस्वीर से खोज"]
+
+[[terms]]
+id = "mini-prompt"
+section = "actions"
+code = ["MiniPrompt"]
+status = "accepted"
+
+[terms.en]
+name = "Mini prompt"
+kind = "setting"
+text = "The question sent along with the screenshot to the AI mode of a search engine: what to find, explain or translate."
+forms = ["mini prompt", "mini prompts"]
+
+[terms.ru]
+name = "Мини-промпт"
+kind = "настройка"
+text = "Вопрос, который уходит вместе со скриншотом в режим ИИ поисковика: что найти, объяснить или перевести."
+forms = [
+  "мини-промпт",
+  "мини-промпта",
+  "мини-промпту",
+  "мини-промптом",
+  "мини-промпте",
+  "мини-промпты",
+  "мини-промптов",
+  "мини-промптам",
+  "мини-промптами",
+  "мини-промптах",
+]
+
+[terms.hi]
+name = "मिनी-प्रॉम्प्ट"
+kind = "सेटिंग"
+text = "वह सवाल, जो स्क्रीनशॉट के साथ सर्च इंजन के AI मोड को जाता है: क्या खोजना, समझाना या अनुवाद करना है।"
+forms = ["मिनी-प्रॉम्प्ट", "मिनी-प्रॉम्प्टों"]

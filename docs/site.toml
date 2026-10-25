@@ -1,0 +1,57 @@
+# Documentation site settings: languages and the menu.
+#
+# A page is identified by its path inside a language folder without ".md":
+# "open-questions" is en/open-questions.md. A folder's README.md is identified
+# by the folder path ("decisions"), and the language's own README.md is "index".
+#
+# A menu section is a folder. Its README.md is the section's own page: set it as
+# `index`, and the section takes its title from that page and links to it. `title`
+# (per language) is only for a section without such a page.
+
+name = "ainitShot"
+summary = "A small program for one person that replaces Lightshot: by a hotkey it takes a part of the screen, lets you draw on it, and then copies it, saves it, asks Google's AI mode about it, for example to explain or to translate it, or finds where it comes from."
+default_language = "en"
+
+[[languages]]
+code = "en"
+name = "English"
+
+[[languages]]
+code = "ru"
+name = "Русский"
+
+[[languages]]
+code = "hi"
+name = "हिन्दी"
+
+[[nav]]
+pages = ["index", "requirements"]
+
+[[nav]]
+pages = ["glossary"]
+
+[[nav]]
+index = "decisions"
+
+[[nav]]
+pages = ["open-questions"]
+
+# Topics of decision records, in the order the decisions page shows them. Every record names
+# its topic in its front matter, for example `topic: queries`. A new topic gets a title in
+# every language.
+
+[[decision_topics]]
+id = "product"
+title = { en = "Product", ru = "Продукт", hi = "उत्पाद" }
+
+[[decision_topics]]
+id = "drawing"
+title = { en = "Drawing", ru = "Рисование", hi = "ड्रॉइंग" }
+
+[[decision_topics]]
+id = "queries"
+title = { en = "Queries to Google", ru = "Запросы в Google", hi = "Google को क्वेरी" }
+
+[[decision_topics]]
+id = "platform"
+title = { en = "Platform and code", ru = "Платформа и код", hi = "प्लेटफ़ॉर्म और कोड" }

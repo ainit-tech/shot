@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>screenshot</title>
+    <!-- The theme chosen on the site (localStorage "theme": light | dark) is applied before the
+         first paint, so the page does not flash in the other theme; main.ts keeps it in sync. -->
+    <script>
+      try {
+        var theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    </script>
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Documentation for AI agents" />
+  </head>
+  <body>
+    <header id="topbar" class="topbar">
+      <button id="menu-toggle" class="icon-button menu-toggle" type="button" aria-controls="sidebar"></button>
+      <a class="brand" href="/">screenshot.ainit.localhost</a>
+      <div class="search">
+        <input id="search" type="search" autocomplete="off" />
+        <ul id="search-results" hidden></ul>
+      </div>
+      <select id="version" class="version"></select>
+      <nav id="languages" class="languages"></nav>
+      <button id="theme" class="icon-button" type="button"></button>
+    </header>
+    <div class="layout">
+      <aside id="sidebar" class="sidebar"></aside>
+      <main id="content" class="content"></main>
+      <aside id="toc" class="toc"></aside>
+    </div>
+    <noscript>This site needs JavaScript. The Markdown sources of every page are listed in /llms.txt, and the JSON API starts at /api/versions.json.</noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

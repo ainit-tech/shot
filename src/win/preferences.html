@@ -1,0 +1,2108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>ainitShot</title>
+<style>
+:root {
+  --bg: #202020;
+  --side: #1b1b1b;
+  --card: #2b2b2b;
+  --field: #1d1d1d;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #ededed;
+  --muted: #a8a8a8;
+  --faint: #7a7a7a;
+  --accent: #2f6feb;
+  --accent-hover: #4380f3;
+  --accent-text: #8db3ff;
+  --accent-soft: rgba(47, 111, 235, 0.16);
+  --danger: #ff8078;
+  --danger-soft: rgba(255, 128, 120, 0.1);
+  --ok: #6fdc8c;
+  --shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  font: 14px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  display: grid;
+  grid-template-columns: clamp(204px, 27vw, 256px) 1fr;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+body.loading > * { visibility: hidden; }
+body.sorting, body.sorting * { cursor: grabbing !important; }
+button { font: inherit; color: inherit; cursor: default; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
+svg.glyph { width: 20px; height: 20px; flex: none; }
+.hidden { display: none !important; }
+
+/* The side: the search, the sections, what is going on. */
+.side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 14px 10px 12px;
+  background: var(--side);
+  border-right: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 2px 8px 14px; }
+.brand svg { width: 22px; height: 22px; }
+.brand b { font: 600 15px var(--display); }
+.search { position: relative; margin: 0 2px 12px; }
+.search input {
+  width: 100%;
+  height: 34px;
+  padding-block: 0;
+  padding-inline: 34px 32px;
+  border: 1px solid var(--line-strong);
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+  user-select: text;
+}
+.search input::placeholder { color: var(--faint); }
+.search input:focus { border-bottom: 2px solid var(--accent); outline: none; }
+.search input::-webkit-search-cancel-button { display: none; }
+.search .glass { position: absolute; inset-inline-start: 9px; top: 8px; width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+.search .clear {
+  position: absolute; inset-inline-end: 3px; top: 3px;
+  width: 28px; height: 28px;
+  display: none; place-items: center;
+  border: 0; border-radius: 5px; background: none; color: var(--muted);
+}
+.search .clear:hover { background: rgba(255, 255, 255, 0.07); color: var(--text); }
+.search.filled .clear { display: grid; }
+nav { display: flex; flex-direction: column; gap: 2px; }
+nav button {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  height: 38px; padding: 0 10px;
+  border: 0; border-radius: 6px; background: none;
+  text-align: start;
+}
+nav button:hover { background: rgba(255, 255, 255, 0.05); }
+nav button[aria-current="page"] { background: rgba(255, 255, 255, 0.08); }
+nav button[aria-current="page"]::before {
+  content: ""; position: absolute; inset-inline-start: 0; top: 11px; bottom: 11px;
+  width: 3px; border-radius: 2px; background: var(--accent);
+}
+nav .count {
+  display: none; margin-inline-start: auto;
+  min-width: 20px; height: 18px; padding: 0 6px; border-radius: 9px;
+  background: var(--accent-soft); color: var(--accent-text);
+  font-size: 12px; line-height: 18px; text-align: center;
+}
+body.searching nav button[aria-current="page"] { background: none; }
+body.searching nav button[aria-current="page"]::before { display: none; }
+body.searching nav .count { display: block; }
+body.searching nav button.none { opacity: 0.4; }
+nav .alert { margin-inline-start: auto; width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--accent); }
+body.searching nav .alert { display: none; }
+body.searching nav button.none .count { display: none; }
+.side-foot { margin-top: auto; padding: 12px 10px 0; display: grid; gap: 3px; font-size: 12px; color: var(--faint); }
+#status { display: flex; align-items: center; gap: 6px; min-height: 18px; color: var(--muted); transition: color 0.2s; }
+#status svg { width: 14px; height: 14px; display: none; }
+#status.saved { color: var(--ok); }
+#status.saved svg { display: block; }
+#status.error { color: var(--danger); }
+
+/* The page of a section, or of what was found. */
+main { min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #4b4b4b transparent; }
+.page { max-width: 760px; margin: 0 auto; padding: 26px 36px 72px; }
+section { display: none; }
+section.current { display: block; }
+body.searching section { display: block; }
+body.searching section.empty { display: none; }
+h1 { margin: 0 0 6px; font: 600 26px/1.25 var(--display); }
+body.searching h1 {
+  margin: 22px 0 8px; font: 600 13px/1.3 var(--display); color: var(--muted);
+  letter-spacing: 0.02em;
+}
+body.searching section:not(.empty) ~ section h1 { margin-top: 26px; }
+body.searching h1:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.intro { margin: 0 0 18px; color: var(--muted); max-width: 620px; }
+.callout {
+  display: flex; align-items: center; gap: 14px; margin: 10px 0 18px; padding: 12px 14px 12px 16px;
+  border: 1px solid rgba(47, 111, 235, 0.45); border-radius: 8px; background: var(--accent-soft);
+}
+.callout > svg { width: 22px; height: 22px; color: var(--accent-text); }
+.callout .text { flex: 1; }
+.callout .text b { display: block; font-weight: 600; }
+.callout .text span { color: var(--muted); font-size: 12.5px; }
+body.searching .callout { display: none; }
+.state-dot { display: inline-block; width: 8px; height: 8px; margin-inline-end: 8px; border-radius: 50%; vertical-align: 1px; }
+.state-dot.on { background: var(--ok); }
+.state-dot.off { background: var(--accent); }
+body.searching .intro { display: none; }
+.rows { display: flex; flex-direction: column; gap: 4px; }
+.row {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 20px;
+  min-height: 66px; padding: 13px 16px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+}
+.row.wide { grid-template-columns: 1fr auto; align-items: start; }
+.row.wide > .body { grid-column: 1 / -1; margin-top: 8px; }
+.row .label { color: var(--text); }
+.row .desc { margin-top: 1px; color: var(--muted); font-size: 12.5px; }
+.row .control { display: flex; align-items: center; gap: 8px; }
+.row .error { grid-column: 1 / -1; }
+body.searching .item.unmatched { display: none; }
+.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { 0%, 45% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: 0 0 0 2px transparent; } }
+::highlight(found) { background-color: rgba(255, 210, 80, 0.32); color: #fff; }
+#nothing { display: none; padding: 72px 0; text-align: center; color: var(--muted); }
+#nothing b { display: block; margin-bottom: 6px; color: var(--text); font: 600 18px var(--display); }
+body.searching.nothing #nothing { display: block; }
+.path { color: var(--muted); font-size: 12.5px; word-break: break-all; user-select: text; cursor: text; }
+.error { display: none; margin-top: 6px; color: var(--danger); font-size: 12.5px; }
+.error.shown { display: block; }
+.note { margin-top: 5px; color: var(--faint); font-size: 12px; }
+/* Controls. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 32px; padding: 0 14px; white-space: nowrap;
+  border: 1px solid var(--line-strong); border-radius: 6px; background: #383838;
+}
+.btn:hover { background: #404040; }
+.btn:active { background: #333; color: var(--muted); }
+.btn:disabled { opacity: 0.45; pointer-events: none; }
+.btn svg { width: 16px; height: 16px; }
+.btn.accent { border-color: transparent; background: var(--accent); color: #fff; }
+.btn.accent:hover { background: var(--accent-hover); }
+.btn.quiet { border-color: transparent; background: none; color: var(--accent-text); padding: 0 10px; }
+.btn.quiet:hover { background: rgba(255, 255, 255, 0.06); }
+.btn.dashed { border: 1px dashed rgba(255, 255, 255, 0.25); background: none; color: var(--text); }
+.btn.dashed:hover { border-color: rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.03); }
+.icon-btn {
+  display: inline-grid; place-items: center; flex: none;
+  width: 32px; height: 32px; padding: 0;
+  border: 0; border-radius: 6px; background: none; color: var(--muted);
+}
+.icon-btn:hover { background: rgba(255, 255, 255, 0.07); color: var(--text); }
+.icon-btn svg { width: 16px; height: 16px; }
+.reset { color: var(--faint); }
+.switch { display: inline-flex; align-items: center; gap: 12px; padding: 0; border: 0; background: none; }
+.switch .state { min-width: 36px; text-align: right; color: var(--muted); }
+.switch .track {
+  position: relative; width: 40px; height: 20px; flex: none;
+  border: 1px solid #a0a0a0; border-radius: 10px; transition: background 0.15s, border-color 0.15s;
+}
+.switch .track::after {
+  content: ""; position: absolute; inset-inline-start: 3px; top: 3px; width: 12px; height: 12px;
+  border-radius: 50%; background: #d0d0d0; transition: transform 0.15s ease;
+}
+.switch:hover .track::after { transform: scale(1.15); }
+.switch[aria-checked="true"] .track { border-color: var(--accent); background: var(--accent); }
+.switch[aria-checked="true"] .track::after { background: #fff; transform: translateX(20px); }
+.switch[aria-checked="true"]:hover .track::after { transform: translateX(20px) scale(1.15); }
+kbd {
+  display: inline-grid; place-items: center;
+  min-width: 26px; height: 24px; padding: 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.13); border-bottom-width: 2px; border-radius: 5px;
+  background: #3a3a3a; color: var(--text); font: 600 12.5px/1 "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+/* A combination reads from left to right in every language, as Windows writes it. */
+.keys {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-width: 168px; height: 38px; padding: 0 12px; direction: ltr;
+  border: 1px solid var(--line-strong); border-radius: 6px; background: var(--field);
+}
+.keys:hover { border-color: rgba(255, 255, 255, 0.28); }
+.keys .plus { color: var(--faint); font-size: 12px; }
+.keys .wait { color: var(--accent-text); }
+.keys.recording { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.keys.recording .wait { animation: breathe 1.4s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: 0.45; } }
+.field {
+  width: 100%; height: 32px; padding: 0 10px;
+  border: 1px solid var(--line-strong); border-bottom-color: rgba(255, 255, 255, 0.3); border-radius: 6px;
+  background: var(--field); color: var(--text); font: inherit; user-select: text;
+}
+.field:focus { border-bottom: 2px solid var(--accent); outline: none; }
+.field.invalid, .field.invalid:focus { border-color: var(--danger); }
+select.field { width: auto; min-width: 190px; padding-inline-end: 8px; }
+textarea.field { height: auto; min-height: 56px; padding: 6px 10px; line-height: 1.4; resize: vertical; }
+.field::placeholder { color: var(--faint); }
+
+/* Colours and width. */
+.swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 4px 2px; }
+.swatch {
+  position: relative; width: 34px; height: 34px; flex: none;
+  border-radius: 50%; background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transition: transform 0.12s;
+  touch-action: none;
+}
+.swatch:hover { transform: scale(1.07); }
+.swatch.first::before {
+  content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--accent);
+}
+.swatch .remove {
+  position: absolute; inset-inline-end: -7px; top: -7px; width: 20px; height: 20px; padding: 0;
+  display: none; place-items: center;
+  border: 2px solid var(--card); border-radius: 50%; background: #555; color: #fff;
+}
+.swatch .remove svg { width: 10px; height: 10px; }
+.swatch .remove:hover { background: #c4443c; }
+.swatch:hover .remove, .swatch:focus-visible .remove { display: grid; }
+.swatches.single .remove, body.sorting .remove { display: none !important; }
+.swatch.dragging { z-index: 2; transform: scale(1.15); box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.2); }
+.add-color {
+  width: 34px; height: 34px; padding: 0; display: grid; place-items: center;
+  border: 1.5px dashed rgba(255, 255, 255, 0.3); border-radius: 50%; background: none; color: var(--muted);
+}
+.add-color:hover { border-color: rgba(255, 255, 255, 0.55); color: var(--text); }
+.add-color svg { width: 16px; height: 16px; }
+#picker { position: fixed; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.width { display: flex; align-items: center; gap: 16px; }
+input[type="range"] { flex: 1; min-width: 120px; max-width: 320px; height: 24px; margin: 0; appearance: none; background: none; }
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 0%), #5c5c5c var(--fill, 0%));
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%;
+  background: radial-gradient(circle, var(--accent) 0 5px, #454545 5.5px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: background 0.1s;
+}
+input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(circle, var(--accent-hover) 0 6px, #454545 6.5px); }
+#width-value { min-width: 44px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stroke { width: 150px; height: 60px; flex: none; border-radius: 6px; background: #f1f1f1; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); }
+.stroke.dark { background: #3a3a3a; }
+
+/* Panels: a picture of the selection with the panels, and the eight places of each panel. */
+.panels { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 26px; align-items: start; }
+.panels-preview { display: block; width: 100%; max-width: 360px; aspect-ratio: 260 / 180; border-radius: 8px; background: #141414; box-shadow: inset 0 0 0 1px var(--line); }
+.panels-preview .selection { fill: #343434; stroke: rgba(255, 255, 255, 0.85); stroke-width: 0.8; }
+.panels-preview .handle { fill: #fff; }
+.panels-preview .body { fill: #262626; stroke: rgba(255, 255, 255, 0.18); stroke-width: 0.6; }
+.panels-preview .tools .key { fill: #d4d4d4; }
+.panels-preview .queries .key { fill: var(--accent-text); }
+.panel-pick { display: flex; align-items: center; gap: 14px; }
+.panel-pick + .panel-pick { margin-top: 12px; }
+.panel-pick .caption { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.panel-pick .caption i { width: 9px; height: 9px; border-radius: 2px; }
+.panel-pick .caption i.tools { background: #d4d4d4; }
+.panel-pick .caption i.queries { background: var(--accent-text); }
+.panel-pick .where { margin: 2px 0 0 17px; color: var(--muted); font-size: 12.5px; }
+.spots { position: relative; width: 92px; height: 70px; flex: none; }
+.spots .shown { position: absolute; left: 22px; top: 17px; width: 52px; height: 36px; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 2px; background: #333; }
+.spot { position: absolute; padding: 4px; border: 0; border-radius: 5px; background: none; }
+.spot::before { content: ""; display: block; border-radius: 2px; background: #555; transition: background 0.12s; }
+.spot:hover::before { background: #8c8c8c; }
+.spot[aria-checked="true"]::before { background: var(--accent); }
+.spot.top-left, .spot.top-right { top: 3px; }
+.spot.bottom-left, .spot.bottom-right { top: 53px; }
+.spot.top-left, .spot.bottom-left { left: 18px; }
+.spot.top-right, .spot.bottom-right { left: 48px; }
+.spot.top-left::before, .spot.top-right::before, .spot.bottom-left::before, .spot.bottom-right::before { width: 22px; height: 6px; }
+.spot.left-top, .spot.left-bottom { left: 8px; }
+.spot.right-top, .spot.right-bottom { left: 74px; }
+.spot.left-top, .spot.right-top { top: 13px; }
+.spot.left-bottom, .spot.right-bottom { top: 33px; }
+.spot.left-top::before, .spot.left-bottom::before, .spot.right-top::before, .spot.right-bottom::before { width: 6px; height: 16px; }
+.segmented { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--field); }
+.segmented button { height: 28px; padding: 0 11px; border: 0; border-radius: 5px; background: none; color: var(--muted); white-space: nowrap; }
+.segmented button:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+.segmented button[aria-checked="true"] { background: var(--accent); color: #fff; }
+#panels-order { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+#panels-order .note { margin: 0 0 8px; color: var(--muted); font-size: 12.5px; }
+
+/* Saving. */
+.folder { display: flex; align-items: center; gap: 12px; }
+.folder .where {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+  min-height: 36px; padding: 7px 12px; border-radius: 6px; background: var(--field); border: 1px solid var(--line);
+}
+.folder .where svg { width: 18px; height: 18px; color: var(--muted); align-self: flex-start; margin-top: 1px; }
+.folder .where #folder-path { min-width: 0; overflow-wrap: anywhere; user-select: text; cursor: text; }
+.tag { flex: none; align-self: flex-start; padding: 1px 8px; border-radius: 9px; background: rgba(255, 255, 255, 0.07); color: var(--muted); font-size: 12px; }
+.name { display: flex; gap: 8px; align-items: center; }
+.name .btn { height: 32px; padding: 0 10px; color: var(--muted); }
+.example { margin-top: 8px; color: var(--muted); font-size: 12.5px; }
+.example b { color: var(--text); font-weight: 400; user-select: text; }
+/* Query buttons. */
+.cards { display: flex; flex-direction: column; gap: 4px; }
+.card { border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+.card.dragging { position: relative; z-index: 2; box-shadow: var(--shadow); border-color: var(--line-strong); }
+.card-head { display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 10px 10px 10px 4px; }
+.card-head:hover { background: rgba(255, 255, 255, 0.02); }
+.grip {
+  display: grid; place-items: center; width: 22px; height: 40px; flex: none;
+  border-radius: 5px; color: var(--faint); cursor: grab; touch-action: none;
+}
+.grip:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+.grip svg { width: 14px; height: 14px; }
+.tile {
+  display: grid; place-items: center; width: 38px; height: 38px; flex: none;
+  border-radius: 9px; background: #1f1f1f; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+  color: #ececec; font: 700 17px/1 "Segoe UI", sans-serif;
+}
+.tile.small-letters { font-size: 13px; }
+.card-text { flex: 1; min-width: 0; }
+.card-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-sum { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12.5px; }
+.card .chev { width: 16px; height: 16px; margin: 0 6px 0 2px; color: var(--muted); transition: transform 0.15s; }
+.card.open .chev { transform: rotate(180deg); }
+.card .bad { color: var(--danger); }
+.editor { display: none; padding: 4px 16px 18px 50px; border-top: 1px solid var(--line); }
+.card.open .editor { display: grid; gap: 14px; }
+.editor .caption { display: block; margin: 12px 0 6px; font-weight: 600; font-size: 13px; }
+.editor .pair { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 20px; }
+.modes { display: grid; gap: 6px; }
+.mode {
+  display: grid; grid-template-columns: 20px 1fr; gap: 1px 10px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 7px; background: var(--field); text-align: start;
+}
+.mode:hover { border-color: var(--line-strong); }
+.mode .dot { grid-row: span 2; width: 18px; height: 18px; margin-top: 1px; border: 1px solid #a0a0a0; border-radius: 50%; }
+.mode .title { color: var(--text); }
+.mode .what { color: var(--muted); font-size: 12.5px; }
+.mode[aria-checked="true"] { border-color: rgba(47, 111, 235, 0.7); background: var(--accent-soft); }
+.mode[aria-checked="true"] .dot { border: 5px solid var(--accent); background: #fff; }
+.tiles { display: flex; gap: 8px; flex-wrap: wrap; }
+.tiles button { padding: 0; border: 0; background: none; }
+.tiles button[aria-checked="true"] .tile { background: var(--accent); box-shadow: none; color: #fff; }
+.tiles button:hover .tile { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3); }
+.key-field { width: 64px; text-align: center; font-weight: 600; caret-color: transparent; cursor: default; }
+.buttons-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+
+/* Messages. */
+#banner {
+  display: none; gap: 12px; align-items: flex-start; margin-bottom: 18px; padding: 12px 14px;
+  border: 1px solid rgba(255, 128, 120, 0.35); border-radius: 8px; background: var(--danger-soft);
+}
+#banner.shown { display: flex; }
+#banner > svg { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--danger); }
+#banner .text { flex: 1; }
+#banner .text b { display: block; margin-bottom: 2px; }
+#banner .problem { color: var(--text); font-family: "Cascadia Mono", Consolas, monospace; font-size: 12.5px; user-select: text; }
+#banner .then { margin-top: 4px; color: var(--muted); font-size: 12.5px; }
+#toast {
+  position: fixed; left: calc(clamp(204px, 27vw, 256px) + (100vw - clamp(204px, 27vw, 256px)) / 2); bottom: 22px;
+  display: flex; align-items: center; gap: 14px; max-width: min(560px, 70vw); padding: 8px 8px 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; background: #383838; box-shadow: var(--shadow);
+  opacity: 0; transform: translate(-50%, 14px); pointer-events: none; transition: opacity 0.18s, transform 0.18s;
+}
+#toast.shown { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+#toast.error { border-color: rgba(255, 128, 120, 0.45); }
+#toast .btn { height: 30px; }
+#toast:not(:has(.btn)) { padding-inline-end: 16px; }
+/* From right to left the side of the window is on the right, and switches go the other way. */
+[dir="rtl"] #toast { left: calc((100vw - clamp(204px, 27vw, 256px)) / 2); }
+[dir="rtl"] .switch[aria-checked="true"] .track::after { transform: translateX(-20px); }
+[dir="rtl"] .switch[aria-checked="true"]:hover .track::after { transform: translateX(-20px) scale(1.15); }
+</style>
+</head>
+<body class="loading">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-search" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5"/><path d="M 12.3 12.3 L 16.5 16.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M 5.5 5.5 L 14.5 14.5 M 14.5 5.5 L 5.5 14.5"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 3.5 10 A 6.5 6.5 0 1 0 5.4 5.4 L 3.5 7.3 M 3.5 3.8 V 7.3 H 7"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M 10 4.5 V 15.5 M 4.5 10 H 15.5"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 6 H 16 M 8 6 V 4.5 H 12 V 6 M 5.5 6 L 6.3 15.6 C 6.4 16.1 6.8 16.5 7.3 16.5 H 12.7 C 13.2 16.5 13.6 16.1 13.7 15.6 L 14.5 6 M 8.5 9 V 13.5 M 11.5 9 V 13.5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 5.5 8 L 10 12.5 L 14.5 8"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 20 20" fill="currentColor"><circle cx="7" cy="4.5" r="1.5"/><circle cx="13" cy="4.5" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/><circle cx="7" cy="15.5" r="1.5"/><circle cx="13" cy="15.5" r="1.5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M 3 6 C 3 5.2 3.6 4.5 4.5 4.5 H 8 L 9.6 6.2 H 15.5 C 16.3 6.2 17 6.9 17 7.7 V 14 C 17 14.8 16.3 15.5 15.5 15.5 H 4.5 C 3.7 15.5 3 14.8 3 14 Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M 4.5 10.5 L 8.2 14 L 15.5 6.5"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 3.5 L 17.5 16.5 H 2.5 Z M 10 8 V 11.5"/><circle cx="10" cy="14" r="0.6" fill="currentColor"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M 3.5 6.5 H 6.5 M 10.5 6.5 H 16.5 M 3.5 13.5 H 9.5 M 13.5 13.5 H 16.5"/><circle cx="8.5" cy="6.5" r="2"/><circle cx="11.5" cy="13.5" r="2"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M 10 3 C 10.5 7 13 9.5 17 10 C 13 10.5 10.5 13 10 17 C 9.5 13 7 10.5 3 10 C 7 9.5 9.5 7 10 3 Z"/></symbol>
+    <symbol id="i-person" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="7" r="3"/><path d="M 4.5 16.5 C 5.2 13.9 7.4 12.3 10 12.3 C 12.6 12.3 14.8 13.9 15.5 16.5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 11.5 2.5 H 6 C 5.2 2.5 4.5 3.2 4.5 4 V 16 C 4.5 16.8 5.2 17.5 6 17.5 H 14 C 14.8 17.5 15.5 16.8 15.5 16 V 6.5 Z M 11.5 2.5 V 6.5 H 15.5 M 7.5 10.5 H 12.5 M 7.5 13.5 H 12.5"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 7 H 15.5 M 12.5 4 L 15.5 7 L 12.5 10 M 16 13 H 4.5 M 7.5 10 L 4.5 13 L 7.5 16"/></symbol>
+    <symbol id="i-panels" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="10.5" height="8.5" rx="1.5" stroke-width="1.5"/><path d="M 6.5 15.5 H 13.5 M 16.5 5.5 V 11.5" stroke-width="2.6"/></symbol>
+    <symbol id="i-open" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 11 3.5 H 16.5 V 9 M 16.5 3.5 L 9.5 10.5 M 14.5 12 V 15 C 14.5 15.8 13.8 16.5 13 16.5 H 5 C 4.2 16.5 3.5 15.8 3.5 15 V 7 C 3.5 6.2 4.2 5.5 5 5.5 H 8"/></symbol>
+  </defs>
+</svg>
+
+<aside class="side">
+  <div class="brand">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <b data-t="settings"></b>
+  </div>
+  <div class="search" id="search-box">
+    <svg class="glass"><use href="#i-search"/></svg>
+    <input id="search" type="search" data-t-placeholder="find" data-t-aria="find" autocomplete="off" spellcheck="false">
+    <button class="clear" id="search-clear" data-t-title="clearTitle" data-t-aria="clearSearch"><svg class="glyph" style="width: 14px; height: 14px"><use href="#i-close"/></svg></button>
+  </div>
+  <nav id="nav">
+    <button data-section="general"><svg class="glyph"><use href="#i-sliders"/></svg><span data-t="general"></span><span class="count"></span></button>
+    <button data-section="drawing"><span class="nav-icon" data-icon="pencil"></span><span data-t="drawing"></span><span class="count"></span></button>
+    <button data-section="panels"><svg class="glyph"><use href="#i-panels"/></svg><span data-t="panels"></span><span class="count"></span></button>
+    <button data-section="saving"><span class="nav-icon" data-icon="save"></span><span data-t="saving"></span><span class="count"></span></button>
+    <button data-section="buttons"><svg class="glyph"><use href="#i-sparkle"/></svg><span data-t="queryButtons"></span><span class="count"></span></button>
+    <button data-section="account"><svg class="glyph"><use href="#i-person"/></svg><span data-t="googleAccount"></span><span class="alert hidden" id="account-alert" data-t-title="notSignedIn"></span><span class="count"></span></button>
+  </nav>
+  <div class="side-foot">
+    <div id="status"><svg><use href="#i-check"/></svg><span id="status-text"></span></div>
+    <div id="version"></div>
+  </div>
+</aside>
+
+<main id="main">
+<div class="page">
+  <div id="banner" role="alert">
+    <svg><use href="#i-warning"/></svg>
+    <div class="text">
+      <b data-t="fileMistake"></b>
+      <div class="problem" id="banner-problem"></div>
+      <div class="then" data-t="fileMistakeThen"></div>
+    </div>
+    <button class="btn" id="banner-open" data-t="openFile"></button>
+  </div>
+
+  <section id="general">
+    <h1 data-t="general"></h1>
+    <div class="callout hidden" id="sign-in-callout">
+      <svg class="glyph"><use href="#i-person"/></svg>
+      <div class="text"><b data-t="signInTitle"></b><span data-t="signInWhy"></span></div>
+      <button class="btn accent" data-sign-in data-t="signIn"></button>
+    </div>
+    <div class="rows">
+      <div class="row item" data-k="kHotkey">
+        <div><div class="label find" data-t="hotkey"></div><div class="desc find" data-t="hotkeyDesc"></div></div>
+        <div class="control">
+          <button class="icon-btn reset" id="hotkey-reset"><svg class="glyph"><use href="#i-reset"/></svg></button>
+          <button class="keys" id="hotkey" data-t-aria="hotkey"></button>
+        </div>
+        <div class="error" id="hotkey-error"></div>
+      </div>
+      <div class="row item" data-k="kLanguage">
+        <div><div class="label find" data-t="language"></div><div class="desc find" data-t="languageDesc"></div></div>
+        <div class="control" id="language"></div>
+      </div>
+      <div class="row item" data-k="kAutostart">
+        <div><div class="label find" data-t="autostart"></div><div class="desc find" data-t="autostartDesc"></div></div>
+        <div class="control"><button class="switch" id="autostart" role="switch" data-t-aria="autostart"><span class="state"></span><span class="track"></span></button></div>
+      </div>
+      <div class="row item" data-k="kFile">
+        <div>
+          <div class="label find" data-t="file"></div>
+          <div class="desc find" data-t="fileDesc"></div>
+          <div class="path" id="file-path"></div>
+        </div>
+        <div class="control"><button class="btn" id="file-open"><svg class="glyph"><use href="#i-file"/></svg><span data-t="open"></span></button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="drawing">
+    <h1 data-t="drawing"></h1>
+    <p class="intro" data-t="drawingIntro"></p>
+    <div class="rows">
+      <div class="row wide item" data-k="kColors">
+        <div><div class="label find" data-t="colors"></div><div class="desc find" data-t="colorsDesc"></div></div>
+        <div class="control"><button class="icon-btn reset" id="colors-reset" data-t-title="colorsReset"><svg class="glyph"><use href="#i-reset"/></svg></button></div>
+        <div class="body"><div class="swatches" id="swatches"></div></div>
+      </div>
+      <div class="row wide item" data-k="kWidth">
+        <div><div class="label find" data-t="width"></div><div class="desc find" data-t="widthDesc"></div></div>
+        <div class="control"><button class="icon-btn reset" id="width-reset"><svg class="glyph"><use href="#i-reset"/></svg></button></div>
+        <div class="body width">
+          <input type="range" id="width" min="1" max="50" step="1" data-t-aria="width">
+          <span id="width-value"></span>
+          <svg class="stroke" id="stroke" viewBox="0 0 150 60" aria-hidden="true"><path d="M 24 40 C 44 8 62 12 75 30 S 106 52 126 20" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panels">
+    <h1 data-t="panels"></h1>
+    <p class="intro" data-t="panelsIntro"></p>
+    <div class="rows">
+      <div class="row wide item" data-k="kPanels">
+        <div><div class="label find" data-t="panelsPlace"></div><div class="desc find" data-t="panelsDesc"></div></div>
+        <div class="control"><button class="icon-btn reset" id="panels-reset" data-t-title="panelsReset"><svg class="glyph"><use href="#i-reset"/></svg></button></div>
+        <div class="body panels">
+          <svg class="panels-preview" id="panels-preview" viewBox="0 0 260 180" aria-hidden="true"></svg>
+          <div>
+            <div class="panel-pick" data-panel="tools">
+              <div class="spots" role="radiogroup" data-t-aria="whereTools"></div>
+              <div><div class="caption"><i class="tools"></i><span data-t="tools"></span></div><div class="where"></div></div>
+            </div>
+            <div class="panel-pick" data-panel="queries">
+              <div class="spots" role="radiogroup" data-t-aria="whereQueries"></div>
+              <div><div class="caption"><i class="queries"></i><span data-t="queryButtons"></span></div><div class="where"></div></div>
+            </div>
+            <div class="hidden" id="panels-order">
+              <div class="note" data-t="oneRow"></div>
+              <button class="btn" id="panels-swap"><svg class="glyph"><use href="#i-swap"/></svg><span data-t="swap"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="saving">
+    <h1 data-t="saving"></h1>
+    <p class="intro" data-t="savingIntro"></p>
+    <div class="rows">
+      <div class="row item" data-k="kAsk">
+        <div><div class="label find" data-t="ask"></div><div class="desc find" data-t="askDesc"></div></div>
+        <div class="control"><button class="switch" id="ask" role="switch" data-t-aria="ask"><span class="state"></span><span class="track"></span></button></div>
+      </div>
+      <div class="row wide item" data-k="kFolder">
+        <div><div class="label find" data-t="folder"></div><div class="desc find" data-t="folderDesc"></div></div>
+        <div class="control"><button class="btn quiet" id="folder-reset" data-t="byDefault"></button></div>
+        <div class="body folder">
+          <div class="where"><svg class="glyph"><use href="#i-folder"/></svg><span id="folder-path"></span><span class="tag" id="folder-default" data-t="defaultTag"></span></div>
+          <button class="btn" id="folder-pick" data-t="pick"></button>
+          <button class="btn" id="folder-open" data-t-title="openFolderTitle"><svg class="glyph"><use href="#i-open"/></svg><span data-t="open"></span></button>
+        </div>
+      </div>
+      <div class="row wide item" data-k="kName">
+        <div><div class="label find" data-t="name"></div><div class="desc find" data-t="nameDesc"></div></div>
+        <div class="control"><button class="icon-btn reset" id="name-reset" data-t-title="nameReset"><svg class="glyph"><use href="#i-reset"/></svg></button></div>
+        <div class="body">
+          <div class="name">
+            <input class="field" id="name" spellcheck="false" data-t-aria="name">
+            <button class="btn" id="name-date" data-t-title="insertDate" data-t="plusDate"></button>
+            <button class="btn" id="name-time" data-t-title="insertTime" data-t="plusTime"></button>
+          </div>
+          <div class="error" id="name-error"></div>
+          <div class="example"><span data-t="example"></span> <b id="name-example"></b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="buttons">
+    <h1 data-t="queryButtons"></h1>
+    <p class="intro" data-t="buttonsIntro"></p>
+    <div class="cards" id="cards"></div>
+    <div class="buttons-foot item" data-k="kButtons">
+      <button class="btn dashed" id="add-button"><svg class="glyph"><use href="#i-plus"/></svg><span class="find" data-t="addButton"></span></button>
+      <button class="btn quiet" id="reset-buttons"><span class="find" data-t="resetButtons"></span></button>
+    </div>
+  </section>
+
+  <section id="account">
+    <h1 data-t="googleAccount"></h1>
+    <p class="intro" data-t="accountIntro"></p>
+    <div class="rows">
+      <div class="row item" data-k="kAccount">
+        <div><div class="label find" id="account-title"></div><div class="desc find" id="account-desc"></div></div>
+        <div class="control"><button class="btn" id="account-open"></button></div>
+      </div>
+    </div>
+  </section>
+
+  <div id="nothing"><b data-t="nothing"></b><span data-t="nothingTry"></span></div>
+</div>
+</main>
+<input type="color" id="picker" tabindex="-1" aria-hidden="true">
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+
+// The window talks to the program in JSON: it asks with `send`, and hears in `heard` below.
+const webview = window.chrome && window.chrome.webview;
+const send = message => webview && webview.postMessage(JSON.stringify(message));
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+/** An element with its attributes, handlers (`on…`) and children. */
+function h(tag, attributes, ...children) {
+  const element = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes || {})) {
+    if (value == null || value === false) continue;
+    if (name.startsWith("on")) element.addEventListener(name.slice(2), value);
+    else element.setAttribute(name, value === true ? "" : value);
+  }
+  element.append(...children.flat().filter(child => child != null && child !== false));
+  return element;
+}
+
+// The page's texts in English; the program gives their translations into the language in force.
+const TEXT = {
+  settings: "Settings",
+  find: "Find a setting",
+  clearTitle: "Clear · Esc",
+  clearSearch: "Clear the search",
+  general: "General",
+  drawing: "Drawing",
+  panels: "Panels",
+  saving: "Saving",
+  queryButtons: "Query buttons",
+  googleAccount: "Google account",
+  notSignedIn: "Not signed in to Google",
+  savedAtOnce: "Changes are saved at once",
+  saved: "Saved",
+  notSaved: "Not saved: fix the mistake",
+  fileMistake: "The settings file has a mistake",
+  fileMistakeThen: "The settings from before are in force meanwhile. If you change anything here, the file will be written anew.",
+  openFile: "Open the file",
+  signInTitle: "Sign in to Google",
+  signInWhy: "Google then asks less often to confirm you're not a robot, and AI Mode keeps the history of your conversations.",
+  signIn: "Sign in",
+  open: "Open",
+  hotkey: "Hotkey",
+  hotkeyDesc: "Freezes the screen to select an area. Click the field and press a new combination.",
+  language: "Language",
+  languageDesc: "Of the program's windows, hints and messages. The standard query buttons switch to it too.",
+  languageAuto: "As in Windows",
+  autostart: "Start with Windows",
+  autostartDesc: "The program will wait for the hotkey right after you sign in to Windows.",
+  file: "Settings file",
+  fileDesc: "All settings are kept in a text file with comments. You can edit it by hand too: the program picks the changes up at once.",
+  drawingIntro: "Colours and the width of the line for the pencil, the brush, arrows and frames.",
+  colors: "Colours",
+  colorsDesc: "The first one is chosen at once. Click a colour to change it, or drag it to change the order.",
+  colorsReset: "Bring back the default colours",
+  width: "Line width",
+  widthDesc: "In pixels at the scale of 100%. While drawing, the mouse wheel changes it.",
+  panelsIntro: "Where the panels stand next to the selection. Above and below it a panel is a row, beside it a column. Without room on its side, a panel goes to the opposite one by itself.",
+  panelsPlace: "Where the panels stand",
+  panelsDesc: "The side of the selection and the end of that side the panel is pressed to.",
+  panelsReset: "Bring back the default",
+  whereTools: "Where the tools stand",
+  whereQueries: "Where the query buttons stand",
+  tools: "Tools",
+  oneRow: "Both panels stand in one row.",
+  swap: "Swap them",
+  placeTopLeft: "Top, left",
+  placeTopRight: "Top, right",
+  placeRightTop: "Right, top",
+  placeRightBottom: "Right, bottom",
+  placeBottomRight: "Bottom, right",
+  placeBottomLeft: "Bottom, left",
+  placeLeftBottom: "Left, bottom",
+  placeLeftTop: "Left, top",
+  savingIntro: "What the Save button and Ctrl+S do while the screen is frozen.",
+  ask: "Ask where to save",
+  askDesc: "If off, the screenshot is saved into the folder below at once.",
+  folder: "Folder for screenshots",
+  folderDesc: "Screenshots are saved here, and the Save As window opens here too.",
+  byDefault: "Default",
+  defaultTag: "default",
+  pick: "Choose…",
+  openFolderTitle: "Open the folder in Explorer",
+  name: "File name",
+  nameDesc: "{date} is the date, {time} the time; the .png extension is added by itself.",
+  nameReset: "Bring back the default name",
+  insertDate: "Insert the date",
+  insertTime: "Insert the time",
+  plusDate: "+ date",
+  plusTime: "+ time",
+  example: "For example:",
+  nameEmpty: "The name can't be empty.",
+  buttonsIntro: "The buttons send the screenshot to Google; their panel stands next to the selection where the Panels section says. Click a button to change it; to change the order, drag it by the dots on the left.",
+  addButton: "Add a button",
+  resetButtons: "Bring back the standard buttons",
+  accountIntro: "The program's window is a browser of its own with its own sign-in to Google: AI Mode and the image search work in it under this account.",
+  accountUnknownTitle: "Signing in to Google",
+  accountUnknownDesc: "Sign in, switch the account or sign out: the account's page opens in the program's window.",
+  accountOutTitle: "Not signed in",
+  accountOutDesc: "Google then asks less often to confirm you're not a robot, and AI Mode keeps the history of your conversations. Sign in once, in the program's window.",
+  accountInTitle: "Signed in",
+  accountInDesc: "Switch the account or sign out on the account's page, in the program's window.",
+  nothing: "Nothing found",
+  nothingTry: "Try another word, such as “colour”, “folder” or “key”.",
+  undo: "Undo",
+  pressKeys: "Press a combination",
+  keyUnknown: "The program can't take this key. Letters, digits, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp and PageDown will do.",
+  keyAlone: "{keys} would get in the way of typing: add Ctrl, Alt or Win.",
+  on: "On",
+  off: "Off",
+  chosenAtOnce: "{color} is chosen at once",
+  removeColor: "Remove the colour",
+  addColor: "Add a colour",
+  colorRemoved: "The colour {color} is removed.",
+  colorsDefault: "The colours are the default ones now.",
+  modeChat: "Conversation with Google's AI",
+  modeChatShort: "Conversation with the AI",
+  modeChatWhat: "AI Mode's window next to the selection: the screenshot and the question go at once, and the conversation can go on. Held, the button asks the question aloud.",
+  modeAnswer: "Answer in a card",
+  modeAnswerWhat: "Google's AI answers in a small card next to the selection, with no window in sight. Handy for translations.",
+  modeAi: "AI's answer in the browser",
+  modeAiWhat: "Your browser opens the image search with the question, and the AI answers above the results.",
+  modeImages: "Search by image",
+  modeImagesWhat: "No question: the pages with this very picture at once. Their titles often say who or what is in it.",
+  iconGoogle: "Google",
+  iconTranslate: "Translation",
+  iconImages: "Picture",
+  iconQuestion: "Question",
+  iconByItself: " — by itself, by what the button does",
+  exactMatches: "{mode} · exact matches",
+  withPrompt: "{mode} · “{prompt}”",
+  ownerTool: "the tool “{name}”",
+  ownerButton: "the button “{name}”",
+  keyTakenButton: "The key {key} belongs to {owner} already: take it away there first.",
+  keyTakenTool: "The key {key} belongs to {owner} already.",
+  maxButtons: "No more than {n} buttons",
+  untitled: "Untitled",
+  gripTitle: "Drag to change the order (or ↑ and ↓)",
+  gripAria: "Move the button",
+  keyTitle: "The key while the screen is frozen",
+  deleteButton: "Delete the button",
+  buttonName: "Name",
+  nameNote: "Pops up as the button's hint.",
+  needName: "A name is needed: it pops up as the button's hint.",
+  prompt: "Question to the AI",
+  promptNote: "Goes to Google with the screenshot.",
+  needPrompt: "Write a question: without it the AI doesn't know what to do with the picture.",
+  whatItDoes: "What it does",
+  whatButtonDoes: "What the button does",
+  key: "Key",
+  buttonKey: "The button's key",
+  keyNote: "Press a letter or a digit; Backspace for no key. It works while the screen is frozen.",
+  needLetter: "A Latin letter or a digit is needed.",
+  icon: "Icon",
+  buttonRemoved: "The button “{name}” is deleted.",
+  newButton: "New button",
+  newPrompt: "What is in the picture? Explain.",
+  buttonsStandard: "The buttons are the standard ones now.",
+  bringBack: "Bring back {value}",
+  kHotkey: "hotkey shortcut key combination freeze screen screenshot capture printscreen prtsc",
+  kLanguage: "language interface english arabic chinese french hindi russian spanish translation",
+  kAutostart: "autostart startup start launch windows sign in boot",
+  kFile: "settings file toml text by hand editor notepad comments",
+  kColors: "colours colors colour color palette paint marker drawing",
+  kWidth: "line width thickness size brush pencil pixels mouse wheel",
+  kPanels: "panels toolbar tools query buttons position place side bottom top left right end align order row column",
+  kAsk: "ask where to save dialog save as at once",
+  kFolder: "folder path directory place saving pictures screenshots",
+  kName: "file name pattern date time format png",
+  kButtons: "add new button query standard default bring back",
+  kAccount: "google account sign in sign out switch profile user login",
+};
+
+/** A text of the page in the language in force, with `{name}` filled in from `values`. */
+function t(key, values = {}) {
+  const text = state.texts[key] || TEXT[key] || key;
+  return text.replace(/\{(\w+)\}/g, (all, name) => (name in values ? String(values[name]) : all));
+}
+
+/** Puts the texts of the language in force into the page's own elements. */
+function translatePage() {
+  document.documentElement.lang = state.language;
+  document.documentElement.dir = state.rightToLeft ? "rtl" : "ltr";
+  for (const element of $$("[data-t]")) element.textContent = t(element.dataset.t);
+  for (const element of $$("[data-t-title]")) element.title = t(element.dataset.tTitle);
+  for (const element of $$("[data-t-placeholder]")) element.placeholder = t(element.dataset.tPlaceholder);
+  for (const element of $$("[data-t-aria]")) element.setAttribute("aria-label", t(element.dataset.tAria));
+  for (const element of $$("[data-k]")) element.dataset.keywords = t(element.dataset.k);
+  if (!status.kind) status();
+}
+
+const SVG = "http://www.w3.org/2000/svg";
+function svg(tag, attributes) {
+  const element = document.createElementNS(SVG, tag);
+  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
+  return element;
+}
+
+/** An icon of the sprite above. */
+function symbol(name) {
+  const icon = svg("svg", { class: "glyph", "aria-hidden": "true" });
+  icon.append(svg("use", { href: `#i-${name}` }));
+  return icon;
+}
+
+/** An icon of the toolbar, as the program draws it: lines, fills and dots on a grid of 20. */
+function glyph(parts) {
+  const icon = svg("svg", { class: "glyph", viewBox: "0 0 20 20", "aria-hidden": "true" });
+  for (const part of parts || []) {
+    if (part.line) {
+      icon.append(svg("path", { d: part.line, fill: "none", stroke: "currentColor", "stroke-width": 1.5, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    } else if (part.fill) {
+      icon.append(svg("path", { d: part.fill, fill: "currentColor" }));
+    } else if (part.dot) {
+      icon.append(svg("circle", { cx: part.dot[0], cy: part.dot[1], r: part.dot[2], fill: "currentColor" }));
+    }
+  }
+  return icon;
+}
+
+const clone = value => JSON.parse(JSON.stringify(value));
+/** Values compared whatever the order of their fields: the program sends them sorted by name. */
+const canonical = value =>
+  JSON.stringify(value, (_, v) =>
+    v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) : v);
+const same = (a, b) => canonical(a) === canonical(b);
+
+const state = {
+  /** The language of the page as the program says: its code, the page's texts in it, whether it
+   * is written from right to left, and the languages there are. */
+  language: "en",
+  texts: {},
+  rightToLeft: false,
+  languages: [],
+  /** The settings in force, as the program has them. */
+  inForce: null,
+  /** The settings as the window shows them, with an id for every button. */
+  draft: null,
+  defaults: null,
+  tools: [],
+  icons: {},
+  defaultFolder: "",
+  /** The settings sent to be saved and not answered yet, oldest first. */
+  sent: [],
+  /** The last settings sent, to send nothing twice. */
+  last: null,
+  /** The buttons whose editor is open, by id. */
+  open: new Set(),
+  section: "general",
+  /** Whether someone is signed in to Google in the program's window, once the program knows. */
+  signedIn: null,
+};
+let nextId = 1;
+
+/** The draft with an id for every button, which the page keeps to itself. */
+function withIds(settings) {
+  const draft = clone(settings);
+  for (const button of draft.buttons) button.id = nextId++;
+  return draft;
+}
+
+/** The settings as the program takes them: nothing of the page's own, and no question for the image search. */
+function toSettings(draft) {
+  return {
+    hotkey: draft.hotkey,
+    language: draft.language,
+    autostart: draft.autostart,
+    colors: [...draft.colors],
+    width: draft.width,
+    save: { ask: draft.save.ask, folder: draft.save.folder, name: draft.save.name },
+    panels: clone(draft.panels),
+    buttons: draft.buttons.map(button => ({
+      name: button.name.trim(),
+      mode: button.mode,
+      prompt: button.mode === "images" ? "" : button.prompt.trim(),
+      key: button.key,
+      icon: button.icon,
+    })),
+  };
+}
+
+// Saving: every change is put in force at once, typing a moment after the last key.
+let saveTimer = 0;
+let statusTimer = 0;
+
+/** What keeps the draft from being saved, by the field it is about. */
+function problems(draft) {
+  const found = {};
+  if (!fileName(draft.save.name)) found.name = t("nameEmpty");
+  for (const button of draft.buttons) {
+    if (!button.name.trim()) found[`${button.id}.name`] = t("needName");
+    if (button.mode !== "images" && !button.prompt.trim()) {
+      found[`${button.id}.prompt`] = t("needPrompt");
+    }
+  }
+  return found;
+}
+
+/** The draft has changed: it is checked and saved, `delay` milliseconds after the last change. */
+function changed(delay = 0) {
+  clearTimeout(saveTimer);
+  const found = problems(state.draft);
+  showProblems(found);
+  updateResets();
+  if (Object.keys(found).length) {
+    status("error", t("notSaved"));
+    return;
+  }
+  if (status.kind === "error") status();
+  if (delay) saveTimer = setTimeout(save, delay);
+  else save();
+}
+
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = 0;
+  if (Object.keys(problems(state.draft)).length) return;
+  const settings = toSettings(state.draft);
+  if (same(settings, state.last || state.inForce)) return;
+  state.sent.push(settings);
+  state.last = settings;
+  send({ type: "save", settings });
+}
+
+/** Saves at once what is still waiting for the typing to stop. */
+function flush() {
+  if (saveTimer) save();
+}
+
+function saved() {
+  state.inForce = state.sent.shift() || state.inForce;
+  banner(null);
+  if (!state.sent.length && !saveTimer) status("saved", t("saved"));
+}
+
+/** The program couldn't put the settings in force: a hotkey taken by another program goes back. */
+function refused(text) {
+  const failed = state.sent.shift();
+  state.last = null;
+  if (failed && failed.hotkey !== state.inForce.hotkey) {
+    state.draft.hotkey = state.inForce.hotkey;
+    renderHotkey();
+    fieldError("hotkey-error", text);
+    updateResets();
+  } else {
+    toast(text, { error: true });
+  }
+  status();
+}
+
+/** What the side says of saving: nothing special, saved, or an error. */
+function status(kind = "", text = t("savedAtOnce")) {
+  status.kind = kind;
+  const line = $("#status");
+  line.className = kind;
+  $("#status-text").textContent = text;
+  clearTimeout(statusTimer);
+  if (kind === "saved") statusTimer = setTimeout(() => status(), 1800);
+}
+
+function fieldError(id, text) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = text || "";
+  element.classList.toggle("shown", !!text);
+}
+
+/** Shows the problems of the draft under their fields, and clears the rest. */
+function showProblems(found) {
+  fieldError("name-error", found.name);
+  $("#name").classList.toggle("invalid", !!found.name);
+  for (const card of $$(".card")) {
+    const id = card.dataset.id;
+    for (const field of ["name", "prompt"]) {
+      const text = found[`${id}.${field}`];
+      const error = $(`.error[data-for="${field}"]`, card);
+      if (error) {
+        error.textContent = text || "";
+        error.classList.toggle("shown", !!text);
+      }
+      const input = $(`[data-field="${field}"]`, card);
+      if (input) input.classList.toggle("invalid", !!text);
+    }
+    $(".card-name", card).classList.toggle("bad", !!(found[`${id}.name`] || found[`${id}.prompt`]));
+  }
+}
+
+// A note at the bottom of the page, with a way back for what was removed.
+let toastTimer = 0;
+function toast(text, { undo, error } = {}) {
+  const box = $("#toast");
+  box.replaceChildren(h("span", {}, text));
+  if (undo) {
+    box.append(h("button", { class: "btn quiet", onclick: () => { hideToast(); undo(); } }, t("undo")));
+  }
+  box.classList.toggle("error", !!error);
+  box.classList.add("shown");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, error ? 9000 : 6000);
+}
+function hideToast() {
+  clearTimeout(toastTimer);
+  $("#toast").classList.remove("shown");
+}
+
+/** The mistake in the file the user edited by hand, or none. */
+function banner(text) {
+  $("#banner").classList.toggle("shown", !!text);
+  $("#banner-problem").textContent = text || "";
+}
+
+
+// Sections, and the search over all of them.
+function showSection(id) {
+  state.section = id;
+  for (const button of $$("nav button")) {
+    if (button.dataset.section === id) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  }
+  for (const section of $$("section")) section.classList.toggle("current", section.id === id);
+  $("#main").scrollTop = 0;
+}
+
+const highlight = typeof Highlight === "function" && CSS.highlights ? new Highlight() : null;
+if (highlight) CSS.highlights.set("found", highlight);
+
+/** Text as the search compares it: in small letters, with ё as е. Its length stays. */
+const plain = text => text.toLowerCase().replace(/ё/g, "е");
+
+function searchWords() {
+  return plain($("#search").value).split(/\s+/).filter(Boolean);
+}
+const searching = () => searchWords().length > 0;
+
+/** Shows the settings that have every word typed, from all sections, with the words marked. */
+function applySearch() {
+  const words = searchWords();
+  const on = words.length > 0;
+  document.body.classList.toggle("searching", on);
+  $("#search-box").classList.toggle("filled", $("#search").value.length > 0);
+  if (highlight) highlight.clear();
+  let total = 0;
+  for (const section of $$("section")) {
+    let count = 0;
+    for (const item of $$(".item", section)) {
+      const texts = $$(".find", item);
+      const haystack = plain([...texts.map(t => t.textContent), item.dataset.keywords || ""].join(" "));
+      const match = on && words.every(word => haystack.includes(word));
+      item.classList.toggle("unmatched", on && !match);
+      if (match) {
+        count++;
+        if (highlight) for (const text of texts) mark(text, words);
+      }
+    }
+    total += count;
+    section.classList.toggle("empty", on && count === 0);
+    const tab = $(`nav button[data-section="${section.id}"]`);
+    tab.classList.toggle("none", on && count === 0);
+    $(".count", tab).textContent = count ? String(count) : "";
+  }
+  document.body.classList.toggle("nothing", on && total === 0);
+  if (on) $("#main").scrollTop = 0;
+}
+
+function mark(element, words) {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = plain(node.data);
+    for (const word of words) {
+      for (let at = text.indexOf(word); at >= 0; at = text.indexOf(word, at + word.length)) {
+        const range = new Range();
+        range.setStart(node, at);
+        range.setEnd(node, at + word.length);
+        highlight.add(range);
+      }
+    }
+  }
+}
+
+function clearSearch() {
+  $("#search").value = "";
+  applySearch();
+}
+
+/** Leaves the search for a setting it found: its section opens with the setting lit up. */
+function goTo(item) {
+  const section = item.closest("section");
+  clearSearch();
+  showSection(section.id);
+  item.scrollIntoView({ block: "center" });
+  item.classList.remove("flash");
+  void item.offsetWidth;
+  item.classList.add("flash");
+  const control = $("button:not(.reset):not(.icon-btn), input, textarea", item);
+  if (control) control.focus({ preventScroll: true });
+}
+
+$("#search").addEventListener("input", applySearch);
+$("#search").addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    if ($("#search").value) clearSearch();
+    else $("#search").blur();
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    const first = $$("section .item").find(item => !item.classList.contains("unmatched") && !item.closest(".empty"));
+    if (searching() && first) goTo(first);
+  } else if (event.key === "ArrowDown") {
+    // From the search to the first setting it found.
+    const first = $$("section:not(.empty) .item:not(.unmatched)")[0];
+    const control = first && $("button, input, textarea", first);
+    if (searching() && control) {
+      event.preventDefault();
+      control.focus();
+    }
+  }
+});
+$("#search-clear").addEventListener("click", () => {
+  clearSearch();
+  $("#search").focus();
+});
+for (const button of $$("nav button")) {
+  button.addEventListener("click", () => {
+    if (searching()) clearSearch();
+    showSection(button.dataset.section);
+  });
+}
+// A section's title among what was found opens the section.
+for (const title of $$("section h1")) {
+  title.addEventListener("click", () => {
+    if (!searching()) return;
+    clearSearch();
+    showSection(title.closest("section").id);
+  });
+}
+
+
+// The hotkey: the field listens for a new one while the program holds the old one back.
+const MODIFIERS = ["Win", "Ctrl", "Alt", "Shift"];
+const NAMED = ["Space", "Pause", "Insert", "Delete", "Home", "End", "PageUp", "PageDown", "PrintScreen"];
+let recording = false;
+
+function keycaps(parts) {
+  return parts.flatMap((part, i) => [i ? h("span", { class: "plus" }, "+") : null, h("kbd", {}, part)]).filter(Boolean);
+}
+
+function renderHotkey() {
+  const field = $("#hotkey");
+  field.classList.toggle("recording", recording);
+  if (!recording) field.replaceChildren(...keycaps(state.draft.hotkey.split("+").map(part => part.trim())));
+}
+
+function pressed(event) {
+  return MODIFIERS.filter(name => ({ Win: event.metaKey, Ctrl: event.ctrlKey, Alt: event.altKey, Shift: event.shiftKey })[name]);
+}
+
+/** The key's name as the program reads it, or nothing for a key it can't take. */
+function keyName(code) {
+  let found;
+  if ((found = /^Key([A-Z])$/.exec(code))) return found[1];
+  if ((found = /^Digit([0-9])$/.exec(code))) return found[1];
+  if ((found = /^F([0-9]{1,2})$/.exec(code)) && +found[1] >= 1 && +found[1] <= 24) return code;
+  if (code === "Backquote") return "~";
+  return NAMED.includes(code) ? code : null;
+}
+
+function startRecording() {
+  if (recording) return;
+  recording = true;
+  send({ type: "record", on: true });
+  fieldError("hotkey-error", "");
+  waiting([]);
+}
+
+function waiting(held) {
+  const field = $("#hotkey");
+  field.classList.add("recording");
+  field.replaceChildren(...(held.length ? [...keycaps(held), h("span", { class: "plus" }, "+")] : []), h("span", { class: "wait" }, held.length ? "…" : t("pressKeys")));
+}
+
+function stopRecording(hotkey) {
+  if (!recording) return;
+  recording = false;
+  send({ type: "record", on: false });
+  if (hotkey && hotkey !== state.draft.hotkey) {
+    state.draft.hotkey = hotkey;
+    changed();
+  }
+  renderHotkey();
+}
+
+/** A new hotkey pressed while the field listens, or why it doesn't do. */
+function recordKey(event) {
+  const held = pressed(event);
+  const name = keyName(event.code);
+  if (!name) {
+    fieldError("hotkey-error", t("keyUnknown"));
+    return;
+  }
+  const alone = !held.some(modifier => modifier !== "Shift");
+  if (alone && !/^(F[0-9]+|PrintScreen|Pause)$/.test(name)) {
+    fieldError("hotkey-error", t("keyAlone", { keys: [...held, name].join("+") }));
+    return;
+  }
+  fieldError("hotkey-error", "");
+  stopRecording([...held, name].join("+"));
+}
+
+document.addEventListener("keydown", event => {
+  if (!recording) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (event.repeat) return;
+  if (event.key === "Escape" && !pressed(event).length) {
+    fieldError("hotkey-error", "");
+    stopRecording();
+  } else if (["Control", "Alt", "Shift", "Meta", "OS"].includes(event.key)) {
+    waiting(pressed(event));
+  } else {
+    recordKey(event);
+  }
+}, true);
+document.addEventListener("keyup", event => {
+  if (!recording) return;
+  event.preventDefault();
+  event.stopPropagation();
+  // Windows lets a page hear only the release of PrintScreen.
+  if (event.code === "PrintScreen") recordKey(event);
+  else if (recording) waiting(pressed(event));
+}, true);
+$("#hotkey").addEventListener("click", startRecording);
+$("#hotkey").addEventListener("blur", () => stopRecording());
+window.addEventListener("blur", () => stopRecording());
+$("#hotkey-reset").addEventListener("click", () => {
+  fieldError("hotkey-error", "");
+  state.draft.hotkey = state.defaults.hotkey;
+  renderHotkey();
+  changed();
+});
+
+// The language: that of Windows or one of the program's own, each by its name in itself, in the
+// order of the alphabet of the language in force.
+function renderLanguage() {
+  const chosen = state.draft.language || "auto";
+  // In the order of the alphabets of their own names, as the choice of a language has them.
+  const collator = new Intl.Collator("en");
+  const languages = [...state.languages].sort((a, b) => collator.compare(a.native, b.native));
+  const select = h("select", {
+      class: "field select", "aria-label": t("language"),
+      onchange: () => {
+        state.draft.language = select.value;
+        changed();
+      },
+    },
+    h("option", { value: "auto", selected: chosen === "auto" }, t("languageAuto")),
+    ...languages.map(language => h("option", { value: language.code, selected: chosen === language.code }, language.native)));
+  $("#language").replaceChildren(select);
+}
+
+// Switches.
+function renderSwitch(id, on) {
+  const button = document.getElementById(id);
+  button.setAttribute("aria-checked", String(on));
+  $(".state", button).textContent = on ? t("on") : t("off");
+}
+$("#autostart").addEventListener("click", () => {
+  state.draft.autostart = !state.draft.autostart;
+  renderSwitch("autostart", state.draft.autostart);
+  changed();
+});
+$("#ask").addEventListener("click", () => {
+  state.draft.save.ask = !state.draft.save.ask;
+  renderSwitch("ask", state.draft.save.ask);
+  changed();
+});
+$("#file-open").addEventListener("click", () => send({ type: "openFile" }));
+$("#banner-open").addEventListener("click", () => send({ type: "openFile" }));
+for (const button of $$("#account-open, [data-sign-in]")) button.addEventListener("click", () => send({ type: "account" }));
+
+/** Whether someone is signed in to Google in the program's window; while nobody is, the window
+ * invites to sign in on its first page and marks the account's section. */
+function renderAccount() {
+  const known = typeof state.signedIn === "boolean";
+  const out = state.signedIn === false;
+  $("#sign-in-callout").classList.toggle("hidden", !out);
+  $("#account-alert").classList.toggle("hidden", !out);
+  const [title, desc] = !known
+    ? [t("accountUnknownTitle"), t("accountUnknownDesc")]
+    : out
+      ? [t("accountOutTitle"), t("accountOutDesc")]
+      : [t("accountInTitle"), t("accountInDesc")];
+  $("#account-title").replaceChildren(...(known ? [h("span", { class: `state-dot ${out ? "off" : "on"}` })] : []), title);
+  $("#account-desc").textContent = desc;
+  const button = $("#account-open");
+  button.classList.toggle("accent", out);
+  button.replaceChildren(...(out ? [] : [symbol("open")]), out ? t("signIn") : t("open"));
+  if (searching()) applySearch();
+}
+
+
+// Colours: a click changes one, a drag moves it, the cross removes it.
+const MAX_COLORS = 16;
+/** Colours for a new swatch, the first one not in the palette yet. */
+const MORE_COLORS = ["#00ACC1", "#EC407A", "#7CB342", "#6D4C41", "#3949AB", "#9E9E9E", "#FF7043", "#26A69A"];
+let picking = -1;
+let dragged = false;
+
+function renderColors() {
+  const colors = state.draft.colors;
+  const box = $("#swatches");
+  box.classList.toggle("single", colors.length === 1);
+  box.replaceChildren(
+    ...colors.map((color, index) =>
+      h("div", {
+        class: "swatch" + (index === 0 ? " first" : ""),
+        style: `--c: ${color}`,
+        role: "button",
+        tabindex: "0",
+        title: index === 0 ? t("chosenAtOnce", { color }) : color,
+        "data-index": index,
+        onclick: event => {
+          if (dragged || event.target.closest(".remove")) return;
+          pickColor(index, event.currentTarget);
+        },
+        onkeydown: event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            pickColor(index, event.currentTarget);
+          } else if (event.key === "Delete") {
+            removeColor(index);
+          } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            moveColor(index, index + (event.key === "ArrowLeft" ? -1 : 1));
+          }
+        },
+      }, h("button", { class: "remove", title: t("removeColor"), tabindex: "-1", onclick: () => removeColor(index) }, symbol("close")))
+    ),
+    colors.length < MAX_COLORS
+      ? h("button", { class: "add-color", title: t("addColor"), onclick: addColor }, symbol("plus"))
+      : null
+  );
+  renderStroke();
+}
+
+function pickColor(index, swatch) {
+  const picker = $("#picker");
+  const rect = swatch.getBoundingClientRect();
+  picker.style.left = `${rect.left}px`;
+  picker.style.top = `${rect.bottom - 1}px`;
+  picker.value = state.draft.colors[index].toLowerCase();
+  picking = index;
+  try {
+    picker.showPicker();
+  } catch {
+    picker.click();
+  }
+}
+$("#picker").addEventListener("input", () => {
+  if (picking < 0) return;
+  state.draft.colors[picking] = $("#picker").value.toUpperCase();
+  const swatch = $(`.swatch[data-index="${picking}"]`);
+  if (swatch) {
+    swatch.style.setProperty("--c", state.draft.colors[picking]);
+    swatch.title = state.draft.colors[picking];
+  }
+  renderStroke();
+  changed(300);
+});
+$("#picker").addEventListener("change", () => {
+  if (picking < 0) return;
+  picking = -1;
+  renderColors();
+  changed();
+});
+
+function addColor() {
+  const colors = state.draft.colors;
+  const color = MORE_COLORS.find(c => !colors.includes(c)) || "#FFFFFF";
+  colors.push(color);
+  renderColors();
+  changed();
+  const swatch = $(`.swatch[data-index="${colors.length - 1}"]`);
+  if (swatch) pickColor(colors.length - 1, swatch);
+}
+
+function removeColor(index) {
+  const colors = state.draft.colors;
+  if (colors.length < 2) return;
+  const [color] = colors.splice(index, 1);
+  renderColors();
+  changed();
+  toast(t("colorRemoved", { color }), {
+    undo: () => {
+      state.draft.colors.splice(Math.min(index, state.draft.colors.length), 0, color);
+      renderColors();
+      changed();
+    },
+  });
+}
+
+function moveColor(from, to) {
+  const colors = state.draft.colors;
+  if (to < 0 || to >= colors.length) return;
+  colors.splice(to, 0, colors.splice(from, 1)[0]);
+  renderColors();
+  changed();
+  const swatch = $(`.swatch[data-index="${to}"]`);
+  if (swatch) swatch.focus();
+}
+
+$("#colors-reset").addEventListener("click", () => {
+  const before = [...state.draft.colors];
+  state.draft.colors = [...state.defaults.colors];
+  renderColors();
+  changed();
+  toast(t("colorsDefault"), { undo: () => { state.draft.colors = before; renderColors(); changed(); } });
+});
+
+// The width, with a stroke of it in the first colour.
+function renderWidth() {
+  const range = $("#width");
+  range.value = String(Math.round(state.draft.width));
+  range.style.setProperty("--fill", `${((range.value - range.min) / (range.max - range.min)) * 100}%`);
+  $("#width-value").textContent = `${formatWidth(state.draft.width)} px`;
+  renderStroke();
+}
+const formatWidth = width => (Number.isInteger(width) ? String(width) : width.toFixed(1).replace(".", state.language === "ru" ? "," : "."));
+
+function renderStroke() {
+  const color = state.draft.colors[0] || "#E53935";
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16) / 255);
+  const light = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.72;
+  const stroke = $("#stroke");
+  stroke.classList.toggle("dark", light);
+  const path = $("path", stroke);
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", String(state.draft.width));
+}
+
+$("#width").addEventListener("input", () => {
+  state.draft.width = Number($("#width").value);
+  renderWidth();
+  changed(250);
+});
+$("#width").addEventListener("change", () => changed());
+$("#width-reset").addEventListener("click", () => {
+  state.draft.width = state.defaults.width;
+  renderWidth();
+  changed();
+});
+
+// Panels: on which side of the selection each one stands and to which end of it it is pressed,
+// with a picture of the selection and the panels as the program lays them out.
+/** The eight places of a panel, around the selection clockwise: a side and an end of it. */
+const PLACES = [
+  ["top", "left", "placeTopLeft"], ["top", "right", "placeTopRight"],
+  ["right", "top", "placeRightTop"], ["right", "bottom", "placeRightBottom"],
+  ["bottom", "right", "placeBottomRight"], ["bottom", "left", "placeBottomLeft"],
+  ["left", "bottom", "placeLeftBottom"], ["left", "top", "placeLeftTop"],
+];
+const upright = side => side === "left" || side === "right";
+const atEnd = align => align === "right" || align === "bottom";
+
+function renderPanels() {
+  const panels = state.draft.panels;
+  for (const which of ["tools", "queries"]) {
+    const place = panels[which];
+    const block = $(`.panel-pick[data-panel="${which}"]`);
+    const spots = $(".spots", block);
+    const focused = spots.contains(document.activeElement);
+    const at = PLACES.findIndex(([side, align]) => side === place.side && align === place.align);
+    spots.replaceChildren(h("span", { class: "shown" }), ...PLACES.map(([side, align, name], i) => h("button", {
+      class: `spot ${side}-${align}`, role: "radio", title: t(name), "aria-label": t(name),
+      "aria-checked": String(i === at), tabindex: i === at ? "0" : "-1",
+      onclick: () => setPanel(which, { side, align }),
+      // The arrows go round the selection.
+      onkeydown: event => {
+        const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+        if (!step) return;
+        event.preventDefault();
+        const [nextSide, nextAlign] = PLACES[(i + step + PLACES.length) % PLACES.length];
+        setPanel(which, { side: nextSide, align: nextAlign });
+      },
+    })));
+    if (focused) $('[aria-checked="true"]', spots).focus();
+    $(".where", block).textContent = at >= 0 ? t(PLACES[at][2]) : "";
+  }
+  const together = panels.tools.side === panels.queries.side && panels.tools.align === panels.queries.align;
+  $("#panels-order").classList.toggle("hidden", !together);
+  drawPanels();
+}
+
+function setPanel(which, place) {
+  state.draft.panels[which] = place;
+  renderPanels();
+  changed();
+}
+
+$("#panels-swap").addEventListener("click", () => {
+  state.draft.panels.first = state.draft.panels.first === "queries" ? "tools" : "queries";
+  renderPanels();
+  changed();
+});
+
+/** The picture: the selection with the panels where they stand, their buttons in their groups. */
+function drawPanels() {
+  const panels = state.draft.panels;
+  const S = { left: 60, top: 48, right: 200, bottom: 132 };
+  const [U, PAD, SEP, M] = [6, 1.2, 2.4, 4];
+  const T = U + 2 * PAD;
+  const ai = state.draft.buttons.filter(button => button.mode !== "images").length;
+  const queryGroups = [ai, state.draft.buttons.length - ai].filter(Boolean);
+  const lay = (place, groups) => {
+    const length = 2 * PAD + groups.reduce((sum, n) => sum + n, 0) * U + (groups.length - 1) * SEP;
+    const [start, end] = upright(place.side) ? [S.top, S.bottom] : [S.left, S.right];
+    const across = { bottom: S.bottom + M, top: S.top - M - T, right: S.right + M, left: S.left - M - T }[place.side];
+    return { place, groups, length, across, along: atEnd(place.align) ? end - length : start };
+  };
+  const tools = lay(panels.tools, [8, 2, 3, 1]);
+  const queries = queryGroups.length ? lay(panels.queries, queryGroups) : null;
+  // Two panels on one side that would overlap stand in a row, the first one first.
+  if (queries && tools.place.side === queries.place.side) {
+    const [first, second] = panels.first === "queries" ? [queries, tools] : [tools, queries];
+    const apart = first.along + first.length + M <= second.along || second.along + second.length + M <= first.along;
+    if (!apart) {
+      const [start, end] = upright(first.place.side) ? [S.top, S.bottom] : [S.left, S.right];
+      first.along = atEnd(first.place.align) ? end - (first.length + M + second.length) : start;
+      second.along = first.along + first.length + M;
+    }
+  }
+  const shapes = [svg("rect", { x: S.left, y: S.top, width: S.right - S.left, height: S.bottom - S.top, class: "selection" })];
+  for (const [x, y] of [[S.left, S.top], [S.right, S.top], [S.right, S.bottom], [S.left, S.bottom]]) {
+    shapes.push(svg("circle", { cx: x, cy: y, r: 2, class: "handle" }));
+  }
+  for (const [panel, kind] of [[tools, "tools"], [queries, "queries"]]) {
+    if (!panel) continue;
+    const up = upright(panel.place.side);
+    const [x, y] = up ? [panel.across, panel.along] : [panel.along, panel.across];
+    const bar = svg("g", { class: kind });
+    bar.append(svg("rect", { x, y, width: up ? T : panel.length, height: up ? panel.length : T, rx: 2.4, class: "body" }));
+    let at = PAD;
+    panel.groups.forEach((count, i) => {
+      if (i) at += SEP;
+      for (let n = 0; n < count; n++, at += U) {
+        const [kx, ky] = up ? [x + PAD + 1, y + at + 1] : [x + at + 1, y + PAD + 1];
+        bar.append(svg("rect", { x: kx, y: ky, width: U - 2, height: U - 2, rx: 1, class: "key" }));
+      }
+    });
+    shapes.push(bar);
+  }
+  $("#panels-preview").replaceChildren(...shapes);
+}
+
+$("#panels-reset").addEventListener("click", () => {
+  state.draft.panels = clone(state.defaults.panels);
+  renderPanels();
+  changed();
+});
+
+// Saving: the folder comes from Windows' dialog; the name shows what it becomes.
+function renderSave() {
+  renderSwitch("ask", state.draft.save.ask);
+  const folder = state.draft.save.folder.trim();
+  const shown = folder || state.defaultFolder;
+  // A long path wraps after a backslash rather than inside a name.
+  const parts = shown.split("\\");
+  $("#folder-path").replaceChildren(...parts.flatMap((part, i) => (i < parts.length - 1 ? [part + "\\", h("wbr")] : [part])));
+  $("#folder-path").title = shown;
+  $("#folder-default").classList.toggle("hidden", !!folder);
+  const name = $("#name");
+  if (name.value !== state.draft.save.name) name.value = state.draft.save.name;
+  renderExample();
+}
+
+/** The name of a screenshot taken now, as the program makes it. */
+function fileName(pattern) {
+  const now = new Date();
+  const two = n => String(n).padStart(2, "0");
+  const date = `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
+  const time = `${two(now.getHours())}-${two(now.getMinutes())}-${two(now.getSeconds())}`;
+  return pattern.replaceAll("{date}", date).replaceAll("{time}", time).replace(/[\\/:*?"<>|]/g, "-").trim();
+}
+
+function renderExample() {
+  const name = fileName(state.draft.save.name);
+  $("#name-example").textContent = name ? `${name}.png` : "—";
+}
+
+$("#name").addEventListener("input", () => {
+  state.draft.save.name = $("#name").value;
+  renderExample();
+  changed(400);
+});
+$("#name").addEventListener("blur", flush);
+for (const [id, word] of [["#name-date", "{date}"], ["#name-time", "{time}"]]) {
+  $(id).addEventListener("click", () => {
+    const input = $("#name");
+    const [start, end] = [input.selectionStart ?? input.value.length, input.selectionEnd ?? input.value.length];
+    const before = input.value.slice(0, start);
+    const gap = before && !/\s$/.test(before) ? " " : "";
+    input.setRangeText(gap + word, start, end, "end");
+    input.focus();
+    state.draft.save.name = input.value;
+    renderExample();
+    changed();
+  });
+}
+$("#name-reset").addEventListener("click", () => {
+  state.draft.save.name = state.defaults.save.name;
+  renderSave();
+  changed();
+});
+$("#folder-pick").addEventListener("click", () => send({ type: "pickFolder", folder: state.draft.save.folder }));
+$("#folder-open").addEventListener("click", () => send({ type: "openFolder", folder: state.draft.save.folder }));
+$("#folder-reset").addEventListener("click", () => {
+  state.draft.save.folder = "";
+  renderSave();
+  changed();
+});
+
+/** The folder chosen in Windows' dialog; the default one is kept as none. */
+function folderChosen(path) {
+  const plainPath = p => p.replace(/[\\/]+$/, "").toLowerCase();
+  state.draft.save.folder = plainPath(path) === plainPath(state.defaultFolder) ? "" : path;
+  renderSave();
+  changed();
+}
+
+
+// Query buttons: a card each, opened to change it.
+const MAX_BUTTONS = 10;
+const MODES = [
+  { mode: "chat", title: "modeChat", short: "modeChatShort", what: "modeChatWhat" },
+  { mode: "answer", title: "modeAnswer", short: "modeAnswer", what: "modeAnswerWhat" },
+  { mode: "ai", title: "modeAi", short: "modeAi", what: "modeAiWhat" },
+  { mode: "images", title: "modeImages", short: "modeImages", what: "modeImagesWhat" },
+];
+const ICONS = [
+  { icon: "google", title: "iconGoogle", letters: "G" },
+  { icon: "translate", title: "iconTranslate", letters: "AЯ" },
+  { icon: "images", title: "iconImages" },
+  { icon: "question", title: "iconQuestion" },
+];
+
+/** The icon on the button: its own, or the one that follows from where it sends the screenshot. */
+const iconOf = button => button.icon || (button.mode === "images" ? "images" : "google");
+
+function tile(icon) {
+  const look = ICONS.find(i => i.icon === icon) || ICONS[0];
+  if (look.letters) return h("span", { class: "tile" + (look.letters.length > 1 ? " small-letters" : "") }, look.letters);
+  return h("span", { class: "tile" }, glyph(state.icons[icon]));
+}
+
+function summary(button) {
+  const mode = MODES.find(m => m.mode === button.mode) || MODES[0];
+  return button.mode === "images" ? t("exactMatches", { mode: t(mode.short) }) : t("withPrompt", { mode: t(mode.short), prompt: button.prompt.trim() });
+}
+
+/** Who has the key already: a tool or another button, and how to say so. */
+function keyOwner(key, button) {
+  const tool = state.tools.find(tool => tool.key === key);
+  if (tool) return { button: false, text: t("ownerTool", { name: toolName(tool) }) };
+  const other = state.draft.buttons.find(b => b !== button && (b.key || "").toUpperCase() === key);
+  return other ? { button: true, text: t("ownerButton", { name: other.name }) } : null;
+}
+
+/** A tool's name in the language of the page. */
+const toolName = tool => tool.name;
+
+function renderButtons() {
+  const buttons = state.draft.buttons;
+  $("#cards").replaceChildren(...buttons.map(card));
+  $("#add-button").disabled = buttons.length >= MAX_BUTTONS;
+  $("#add-button").title = buttons.length >= MAX_BUTTONS ? t("maxButtons", { n: MAX_BUTTONS }) : "";
+  $("#reset-buttons").classList.toggle("hidden", same(toSettings(state.draft).buttons, state.defaults.buttons));
+  showProblems(problems(state.draft));
+  drawPanels();
+  if (searching()) applySearch();
+}
+
+/** The head of a card again, after its button has changed. */
+function refreshCard(button) {
+  const element = $(`.card[data-id="${button.id}"]`);
+  if (!element) return;
+  $(".card-name", element).textContent = button.name.trim() || t("untitled");
+  $(".card-sum", element).textContent = summary(button);
+  $(".card-head .tile", element).replaceWith(tile(iconOf(button)));
+  const key = $(".card-head kbd", element);
+  key.textContent = button.key || "";
+  key.classList.toggle("hidden", !button.key);
+  $("#reset-buttons").classList.toggle("hidden", same(toSettings(state.draft).buttons, state.defaults.buttons));
+  // A button that changes between asking the AI and searching by image changes its group.
+  drawPanels();
+}
+
+function card(button) {
+  const open = state.open.has(button.id);
+  const element = h("div", { class: "card item" + (open ? " open" : ""), "data-id": button.id });
+  const toggle = () => {
+    const now = !state.open.has(button.id);
+    if (now) state.open.add(button.id);
+    else state.open.delete(button.id);
+    element.classList.toggle("open", now);
+    head.setAttribute("aria-expanded", String(now));
+  };
+  const head = h("div", {
+      class: "card-head", role: "button", tabindex: "0", "aria-expanded": String(open),
+      onclick: event => {
+        if (!dragged && !event.target.closest(".grip, .delete")) toggle();
+      },
+      onkeydown: event => {
+        if ((event.key === "Enter" || event.key === " ") && event.target === head) {
+          event.preventDefault();
+          toggle();
+        }
+      },
+    },
+    h("span", { class: "grip", title: t("gripTitle"), tabindex: "0", "aria-label": t("gripAria"),
+      onkeydown: event => {
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+          event.preventDefault();
+          moveButton(button, event.key === "ArrowUp" ? -1 : 1);
+        }
+      } }, symbol("grip")),
+    tile(iconOf(button)),
+    h("div", { class: "card-text" },
+      h("div", { class: "card-name find" }, button.name.trim() || t("untitled")),
+      h("div", { class: "card-sum find" }, summary(button))),
+    h("kbd", { class: button.key ? "" : "hidden", title: t("keyTitle") }, button.key || ""),
+    h("button", { class: "icon-btn delete", title: t("deleteButton"), onclick: () => removeButton(button) }, symbol("trash")),
+  );
+  const chevron = symbol("chevron");
+  chevron.classList.add("chev");
+  head.append(chevron);
+  element.append(head, editor(button));
+  return element;
+}
+
+
+/** The editor in a card: the name, where the screenshot goes, the question, the key and the icon. */
+function editor(button) {
+  const name = h("input", { class: "field", "data-field": "name", spellcheck: "false", maxlength: "60", "aria-label": t("buttonName") });
+  name.value = button.name;
+  name.addEventListener("input", () => {
+    button.name = name.value;
+    refreshCard(button);
+    changed(400);
+  });
+  name.addEventListener("blur", flush);
+
+  const prompt = h("textarea", { class: "field", "data-field": "prompt", rows: "2", spellcheck: "true", "aria-label": t("prompt") });
+  prompt.value = button.prompt;
+  prompt.addEventListener("input", () => {
+    button.prompt = prompt.value;
+    refreshCard(button);
+    changed(400);
+  });
+  prompt.addEventListener("blur", flush);
+  const question = h("div", { class: button.mode === "images" ? "hidden" : "" },
+    h("span", { class: "caption" }, t("prompt")),
+    prompt,
+    h("div", { class: "error", "data-for": "prompt" }),
+    h("div", { class: "note" }, t("promptNote")));
+
+  const modes = h("div", { class: "modes", role: "radiogroup", "aria-label": t("whatButtonDoes") },
+    ...MODES.map(mode => h("button", {
+      class: "mode", role: "radio", "aria-checked": String(button.mode === mode.mode),
+      onclick: event => {
+        button.mode = mode.mode;
+        for (const other of $$(".mode", modes)) other.setAttribute("aria-checked", String(other === event.currentTarget));
+        question.classList.toggle("hidden", button.mode === "images");
+        renderTiles();
+        refreshCard(button);
+        changed();
+      },
+    }, h("span", { class: "dot" }), h("span", { class: "title" }, t(mode.title)), h("span", { class: "what" }, t(mode.what)))));
+
+  const key = h("input", { class: "field key-field", readonly: true, placeholder: "—", "aria-label": t("buttonKey") });
+  key.value = button.key || "";
+  const keyError = h("div", { class: "error" });
+  key.addEventListener("keydown", event => {
+    if (event.key === "Tab") return;
+    event.preventDefault();
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (event.key === "Escape") return key.blur();
+    let chosen;
+    if (event.key === "Backspace" || event.key === "Delete") chosen = null;
+    else {
+      const found = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(event.code);
+      if (!found) {
+        keyError.textContent = t("needLetter");
+        keyError.classList.add("shown");
+        return;
+      }
+      chosen = found[1] || found[2];
+      const owner = keyOwner(chosen, button);
+      if (owner) {
+        keyError.textContent = t(owner.button ? "keyTakenButton" : "keyTakenTool", { key: chosen, owner: owner.text });
+        keyError.classList.add("shown");
+        return;
+      }
+    }
+    keyError.classList.remove("shown");
+    button.key = chosen;
+    key.value = chosen || "";
+    refreshCard(button);
+    changed();
+  });
+  key.addEventListener("blur", () => keyError.classList.remove("shown"));
+
+  const tiles = h("div", { class: "tiles", role: "radiogroup", "aria-label": t("icon") });
+  function renderTiles() {
+    const shown = iconOf(button);
+    tiles.replaceChildren(...ICONS.map(look => h("button", {
+      role: "radio", title: t(look.title) + (!button.icon && look.icon === shown ? t("iconByItself") : ""),
+      "aria-checked": String(look.icon === shown),
+      onclick: () => {
+        button.icon = look.icon;
+        renderTiles();
+        refreshCard(button);
+        changed();
+      },
+    }, tile(look.icon))));
+  }
+  renderTiles();
+
+  return h("div", { class: "editor" },
+    h("div", {},
+      h("span", { class: "caption" }, t("buttonName")),
+      name,
+      h("div", { class: "error", "data-for": "name" }),
+      h("div", { class: "note" }, t("nameNote"))),
+    h("div", {}, h("span", { class: "caption" }, t("whatItDoes")), modes),
+    question,
+    h("div", { class: "pair" },
+      h("div", {},
+        h("span", { class: "caption" }, t("key")),
+        key,
+        keyError,
+        h("div", { class: "note" }, t("keyNote"))),
+      h("div", {}, h("span", { class: "caption" }, t("icon")), tiles)));
+}
+
+function moveButton(button, step) {
+  const buttons = state.draft.buttons;
+  const from = buttons.indexOf(button);
+  const to = from + step;
+  if (to < 0 || to >= buttons.length) return;
+  buttons.splice(to, 0, buttons.splice(from, 1)[0]);
+  renderButtons();
+  changed();
+  const grip = $(`.card[data-id="${button.id}"] .grip`);
+  if (grip) grip.focus();
+}
+
+function removeButton(button) {
+  const buttons = state.draft.buttons;
+  const index = buttons.indexOf(button);
+  buttons.splice(index, 1);
+  renderButtons();
+  changed();
+  toast(t("buttonRemoved", { name: button.name.trim() || t("untitled") }), {
+    undo: () => {
+      state.draft.buttons.splice(Math.min(index, state.draft.buttons.length), 0, button);
+      renderButtons();
+      changed();
+    },
+  });
+}
+
+$("#add-button").addEventListener("click", () => {
+  const button = { name: t("newButton"), mode: "chat", prompt: t("newPrompt"), key: null, icon: "question", id: nextId++ };
+  state.draft.buttons.push(button);
+  state.open.add(button.id);
+  renderButtons();
+  changed();
+  const element = $(`.card[data-id="${button.id}"]`);
+  element.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  const name = $('[data-field="name"]', element);
+  name.focus();
+  name.select();
+});
+
+$("#reset-buttons").addEventListener("click", () => {
+  const before = state.draft.buttons;
+  state.draft.buttons = withIds({ buttons: state.defaults.buttons }).buttons;
+  renderButtons();
+  changed();
+  toast(t("buttonsStandard"), { undo: () => { state.draft.buttons = before; renderButtons(); changed(); } });
+});
+
+
+/**
+ * Lets the items of a list be put in another order by dragging them by `handle`; the others
+ * make way smoothly. `done` gets the new order of the items' indices as they were.
+ */
+function sortable(list, { item, handle, axis, done }) {
+  list.addEventListener("pointerdown", event => {
+    if (event.button !== 0 || event.target.closest(".remove, .delete")) return;
+    const grabbed = event.target.closest(handle);
+    const moving = grabbed && grabbed.closest(item);
+    if (!moving || moving.parentElement !== list) return;
+    const items = () => [...list.children].filter(child => child.matches(item));
+    const before = items();
+    const start = { x: event.clientX, y: event.clientY };
+    let dragging = false;
+
+    const move = moved => {
+      if (!dragging) {
+        if (Math.hypot(moved.clientX - start.x, moved.clientY - start.y) < 5) return;
+        dragging = true;
+        moving.classList.add("dragging");
+        document.body.classList.add("sorting");
+      }
+      const now = items();
+      const from = now.indexOf(moving);
+      for (const [to, other] of now.entries()) {
+        if (other === moving) continue;
+        const rect = other.getBoundingClientRect();
+        const along = axis === "y" ? moved.clientY : moved.clientX;
+        const across = axis === "y" ? moved.clientX : moved.clientY;
+        const [low, high] = axis === "y" ? [rect.top, rect.bottom] : [rect.left, rect.right];
+        const [side, otherSide] = axis === "y" ? [rect.left, rect.right] : [rect.top - 6, rect.bottom + 6];
+        if (along < low || along > high || across < side || across > otherSide) continue;
+        const middle = (low + high) / 2;
+        if (from < to && along > middle) slide(now, () => other.after(moving));
+        else if (from > to && along < middle) slide(now, () => other.before(moving));
+        break;
+      }
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      if (!dragging) return;
+      moving.classList.remove("dragging");
+      document.body.classList.remove("sorting");
+      // The click that ends a drag is no click.
+      dragged = true;
+      setTimeout(() => (dragged = false), 0);
+      const order = items().map(element => before.indexOf(element));
+      if (order.some((was, now) => was !== now)) done(order);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  });
+}
+
+/** Changes the order of elements, and lets the ones that moved glide to their places. */
+function slide(elements, change) {
+  const was = new Map(elements.map(element => [element, element.getBoundingClientRect()]));
+  change();
+  for (const element of elements) {
+    if (element.classList.contains("dragging")) continue;
+    const from = was.get(element);
+    const to = element.getBoundingClientRect();
+    const [dx, dy] = [from.left - to.left, from.top - to.top];
+    if (dx || dy) {
+      element.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 160, easing: "ease-out" });
+    }
+  }
+}
+
+sortable($("#swatches"), {
+  item: ".swatch", handle: ".swatch", axis: "x",
+  done: order => {
+    state.draft.colors = order.map(i => state.draft.colors[i]);
+    renderColors();
+    changed();
+  },
+});
+sortable($("#cards"), {
+  item: ".card", handle: ".grip", axis: "y",
+  done: order => {
+    state.draft.buttons = order.map(i => state.draft.buttons[i]);
+    renderButtons();
+    changed();
+  },
+});
+
+// What the program tells the page.
+function renderAll() {
+  renderHotkey();
+  renderLanguage();
+  renderSwitch("autostart", state.draft.autostart);
+  renderColors();
+  renderWidth();
+  renderPanels();
+  renderSave();
+  renderButtons();
+  updateResets();
+  showProblems(problems(state.draft));
+  if (searching()) applySearch();
+}
+
+/** The reset buttons show only for what differs from the default. */
+function updateResets() {
+  if (!state.defaults) return;
+  const draft = state.draft, defaults = state.defaults;
+  $("#hotkey-reset").classList.toggle("hidden", draft.hotkey === defaults.hotkey);
+  $("#hotkey-reset").title = t("bringBack", { value: defaults.hotkey });
+  $("#colors-reset").classList.toggle("hidden", same(draft.colors.map(c => c.toUpperCase()), defaults.colors.map(c => c.toUpperCase())));
+  $("#width-reset").classList.toggle("hidden", draft.width === defaults.width);
+  $("#width-reset").title = t("bringBack", { value: `${formatWidth(defaults.width)} px` });
+  $("#panels-reset").classList.toggle("hidden", same(draft.panels, defaults.panels));
+  $("#folder-reset").classList.toggle("hidden", !draft.save.folder.trim());
+  $("#name-reset").classList.toggle("hidden", draft.save.name === defaults.save.name);
+}
+
+/** New settings in force, from the file: the page shows them, keeping the cards that were open. */
+function adopt(settings) {
+  const openAt = state.draft ? state.draft.buttons.map((b, i) => (state.open.has(b.id) ? i : -1)).filter(i => i >= 0) : [];
+  clearTimeout(saveTimer);
+  saveTimer = 0;
+  state.inForce = clone(settings);
+  state.draft = withIds(settings);
+  state.sent = [];
+  state.last = null;
+  state.open = new Set(openAt.filter(i => i < state.draft.buttons.length).map(i => state.draft.buttons[i].id));
+  renderAll();
+}
+
+/** The language in force, from the program: its code, the page's texts in it, and the languages there are. */
+function speak(message) {
+  state.language = message.language || "en";
+  state.texts = message.texts || {};
+  state.rightToLeft = !!message.rightToLeft;
+  if (message.languages) state.languages = message.languages;
+  if (message.tools) state.tools = message.tools;
+  translatePage();
+}
+
+function init(message) {
+  speak(message);
+  state.defaults = message.defaults;
+  state.tools = message.tools;
+  state.icons = message.icons;
+  state.defaultFolder = message.defaultFolder;
+  $("#file-path").textContent = message.file;
+  $("#version").textContent = `ainitShot ${message.version}`;
+  for (const holder of $$(".nav-icon")) holder.replaceWith(glyph(state.icons[holder.dataset.icon]));
+  state.signedIn = message.signedIn;
+  renderAccount();
+  adopt(message.settings);
+  showSection("general");
+  document.body.classList.remove("loading");
+}
+
+function heard(message) {
+  switch (message.type) {
+    case "init": return init(message);
+    case "settings":
+      banner(null);
+      // The page speaks the language in force, whose defaults are its own.
+      if (message.language) {
+        speak(message);
+        renderAccount();
+      }
+      if (message.defaults) state.defaults = message.defaults;
+      return adopt(message.settings);
+    case "saved": return saved();
+    case "problem": return refused(message.text);
+    case "fileProblem": return banner(message.text);
+    case "folder": return folderChosen(message.path);
+    case "account":
+      state.signedIn = message.signedIn;
+      return renderAccount();
+    case "close":
+      // The window is closing: what is still being typed is saved first.
+      flush();
+      return send({ type: "closed" });
+  }
+}
+
+if (webview) webview.addEventListener("message", event => heard(event.data));
+
+// Keys of the whole window.
+document.addEventListener("keydown", event => {
+  if ((event.ctrlKey && event.code === "KeyF") || event.key === "F3") {
+    event.preventDefault();
+    $("#search").focus();
+    $("#search").select();
+  } else if (event.key === "Escape" && $("#toast").classList.contains("shown")) {
+    hideToast();
+  }
+});
+// A dropped file doesn't take the window's place, and only text fields have a menu.
+for (const type of ["dragover", "drop"]) document.addEventListener(type, event => event.preventDefault());
+document.addEventListener("contextmenu", event => {
+  if (!event.target.closest("input:not([readonly]):not([type=range]):not([type=color]), textarea")) event.preventDefault();
+});
+
+send({ type: "ready" });
+</script>
+</body>
+</html>

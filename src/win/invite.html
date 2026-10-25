@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>ainitShot</title>
+<style>
+:root {
+  --bg: #202020;
+  --text: #ededed;
+  --muted: #a8a8a8;
+  --accent: #2f6feb;
+  --accent-hover: #4380f3;
+  font: 14px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow: hidden; user-select: none; cursor: default; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
+.card {
+  width: 380px;
+  padding: 16px 16px 14px;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 2px 14px;
+  animation: in 0.22s ease-out;
+}
+@keyframes in { from { opacity: 0; transform: translateY(8px); } }
+.logo { grid-row: span 2; width: 36px; height: 36px; margin-top: 2px; }
+b { font: 600 15px/1.3 "Segoe UI Variable Display", "Segoe UI", sans-serif; }
+p { margin: 0; color: var(--muted); font-size: 13px; }
+.actions { grid-column: 2; display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+button {
+  height: 32px; padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px;
+  background: #383838; color: var(--text); font: inherit; cursor: default;
+}
+button:hover { background: #404040; }
+button.accent { border-color: transparent; background: var(--accent); color: #fff; }
+button.accent:hover { background: var(--accent-hover); }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <svg class="logo" viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <b data-t="title"></b>
+  <p data-t="why"></p>
+  <div class="actions">
+    <button id="later" data-t="later"></button>
+    <button class="accent" id="sign-in" data-t="signIn"></button>
+  </div>
+</div>
+<script>
+"use strict";
+// The card speaks the program's language: its texts in English, and the program gives their
+// translations into the language in force, its code and its direction.
+const SPEECH = {{speech}};
+const TEXT = {
+  title: "Sign in to Google",
+  why: "Google then asks less often to confirm you're not a robot, and AI Mode keeps the history of your conversations. It's needed once.",
+  later: "Later",
+  signIn: "Sign in",
+};
+const say = key => SPEECH.texts[key] || TEXT[key];
+document.documentElement.lang = SPEECH.language;
+document.documentElement.dir = SPEECH.rightToLeft ? "rtl" : "ltr";
+for (const element of document.querySelectorAll("[data-t]")) element.textContent = say(element.dataset.t);
+document.title = say("title");
+// The card tells the program its size, and what the user chose; it goes by itself after half a
+// minute unless the mouse is on it.
+const send = message => window.chrome && window.chrome.webview && window.chrome.webview.postMessage(JSON.stringify(message));
+const card = document.getElementById("card");
+let timer = 0;
+const wait = () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => send({ type: "later" }), 30000);
+};
+card.addEventListener("mouseenter", () => clearTimeout(timer));
+card.addEventListener("mouseleave", wait);
+document.getElementById("sign-in").addEventListener("click", () => send({ type: "signIn" }));
+document.getElementById("later").addEventListener("click", () => send({ type: "later" }));
+document.addEventListener("contextmenu", event => event.preventDefault());
+const size = card.getBoundingClientRect();
+send({ type: "size", width: Math.ceil(size.width), height: Math.ceil(size.height) });
+wait();
+</script>
+</body>
+</html>

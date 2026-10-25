@@ -1,0 +1,44 @@
+# The documentation site, running on its own, apart from any terminal session:
+#
+#   docker compose up -d          start it at http://screenshot.ainit.localhost
+#   docker compose logs -f docs   watch it rebuild the docs after every change
+#   docker compose down           stop it
+#
+# The site is reached through the machine's shared local gateway (Traefik on 127.0.0.1:80,
+# Docker network elpa-local; it lives outside this repository and must be running). The
+# gateway routes the name above to this container by the labels below, and no port is
+# opened on the host. Personal projects use names under *.ainit.localhost, apart from the
+# company's *.elpa.localhost, so the browser keeps their cookies separate.
+#
+# Details are in tools/docs/README.md.
+services:
+  docs:
+    build: tools/docs
+    image: screenshot-docs
+    networks: [default, gateway]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ainit-screenshot.rule=Host(`screenshot.ainit.localhost`)
+      - traefik.http.routers.ainit-screenshot.entrypoints=web
+      - traefik.http.services.ainit-screenshot.loadbalancer.server.port=5176
+    volumes:
+      - .:/repo
+      # The container's own packages, build output and generated site data. Writing them
+      # into the host's folders would be slow and would mix Linux and Windows files.
+      - docs-node-modules:/repo/tools/docs/ui/node_modules
+      - docs-public:/repo/tools/docs/ui/public
+      - docs-target:/repo/target
+      - docs-cargo-registry:/usr/local/cargo/registry
+    # Starts again whenever Docker starts, until it is removed with `docker compose down`.
+    restart: always
+
+networks:
+  gateway:
+    external: true
+    name: elpa-local
+
+volumes:
+  docs-node-modules:
+  docs-public:
+  docs-target:
+  docs-cargo-registry:

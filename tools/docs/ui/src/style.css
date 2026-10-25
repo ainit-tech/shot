@@ -1,0 +1,1548 @@
+/* The look comes from the ELPA handbook: quiet colours, plenty of air, a text column of about
+   80 characters, a calm hierarchy of headings, a 4/8 px spacing grid. Inter for text and JetBrains
+   Mono for code, bundled with the site (fonts/fonts.css); neither has Devanagari, so Hindi falls
+   back to Nirmala UI or Noto Sans Devanagari. The structure of the page — top bar, menu, text,
+   table of contents — is this site's own. */
+@import './fonts/fonts.css';
+
+:root {
+  color-scheme: light;
+  --font-text: "Inter", "Nirmala UI", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-text);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bg: #ffffff;
+  --bg-subtle: #f7f8fa;
+  --bg-hover: #f1f3f6;
+  --text: #0e1525;
+  --text-2: #4a5263;
+  --text-3: #7c8496;
+  --border: #e7e9ee;
+  --border-strong: #d6dae2;
+  --accent: #2563eb;
+  --accent-soft: #eef3fe;
+  --accent-text: #1d4fd8;
+  --code-bg: #f6f7f9;
+  --mark: #fff1a8;
+  --scroll-thumb: rgb(14 21 37 / 0.14);
+  --scroll-thumb-hover: rgb(14 21 37 / 0.28);
+  --shadow-pop: 0 1px 2px rgb(14 21 37 / 0.04), 0 12px 40px rgb(14 21 37 / 0.14);
+  /* Statuses of pages, decisions and terms */
+  --draft: #d97706;
+  --draft-soft: #fef3c7;
+  --draft-text: #b45309;
+  --on-draft: #ffffff;
+  --accepted: #15803d;
+  --partial: #0d9488;
+  --living: #2563eb;
+  --superseded: #9aa2b1;
+  /* Changes since the previous version: a colour of their own, and the colours of any diff */
+  --change: #7c3aed;
+  --removed: #dc2626;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b0d12;
+    --bg-subtle: #11141b;
+    --bg-hover: #171b24;
+    --text: #e8eaf0;
+    --text-2: #a9b0bf;
+    --text-3: #7d8597;
+    --border: #1f2430;
+    --border-strong: #2b3140;
+    --accent: #7aa2ff;
+    --accent-soft: rgb(122 162 255 / 0.12);
+    --accent-text: #9bb8ff;
+    --code-bg: #11141b;
+    --mark: rgb(250 204 21 / 0.3);
+    --scroll-thumb: rgb(232 234 240 / 0.14);
+    --scroll-thumb-hover: rgb(232 234 240 / 0.28);
+    --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 48px rgb(0 0 0 / 0.5);
+    --draft: #fbbf24;
+    --draft-soft: rgb(251 191 36 / 0.16);
+    --draft-text: #fbbf24;
+    --on-draft: #0b0d12;
+    --accepted: #4ade80;
+    --partial: #2dd4bf;
+    --living: #7aa2ff;
+    --superseded: #6b7280;
+    --change: #a78bfa;
+    --removed: #f87171;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --bg-subtle: #11141b;
+  --bg-hover: #171b24;
+  --text: #e8eaf0;
+  --text-2: #a9b0bf;
+  --text-3: #7d8597;
+  --border: #1f2430;
+  --border-strong: #2b3140;
+  --accent: #7aa2ff;
+  --accent-soft: rgb(122 162 255 / 0.12);
+  --accent-text: #9bb8ff;
+  --code-bg: #11141b;
+  --mark: rgb(250 204 21 / 0.3);
+  --scroll-thumb: rgb(232 234 240 / 0.14);
+  --scroll-thumb-hover: rgb(232 234 240 / 0.28);
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 48px rgb(0 0 0 / 0.5);
+  --draft: #fbbf24;
+  --draft-soft: rgb(251 191 36 / 0.16);
+  --draft-text: #fbbf24;
+  --on-draft: #0b0d12;
+  --accepted: #4ade80;
+  --partial: #2dd4bf;
+  --living: #7aa2ff;
+  --superseded: #6b7280;
+  --change: #a78bfa;
+  --removed: #f87171;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-text);
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--topbar-height, 56px) + 24px);
+  /* Thin scrollbars in the colours of the interface, everywhere */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-optical-sizing: auto;
+  /* Inter's single-storey a, and round quotes and commas */
+  font-feature-settings: "cv11", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--scroll-thumb);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scroll-thumb-hover);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+mark {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--mark);
+  color: inherit;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+}
+
+.icon-button:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Top bar: stays on screen; the page shows through it */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 56px;
+  /* The bar's content lines up with the page columns below it. */
+  padding: 10px max(var(--page-padding), calc((100% - var(--layout-width)) / 2));
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+.brand {
+  flex: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+.search {
+  position: relative;
+  flex: 1;
+  max-width: 240px;
+}
+
+.search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease;
+}
+
+.search input::placeholder {
+  color: var(--text-3);
+}
+
+.search input:hover {
+  border-color: var(--border-strong);
+}
+
+.search input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* The results may be wider than the field, up to what the screen allows. */
+.search ul {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(480px, calc(100vw - 32px));
+  max-height: 60vh;
+  overflow: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-pop);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.search li a {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.search li a:hover,
+.search li a:focus-visible {
+  outline: none;
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.result-title {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.result-heading {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+.search .empty {
+  padding: 6px 10px;
+  color: var(--text-3);
+}
+
+/* The version menu is as wide as the version shown, not as the longest one in the list, where
+   browsers allow it. */
+.version {
+  field-sizing: content;
+  margin-left: auto;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  cursor: pointer;
+}
+
+.version:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.languages {
+  display: flex;
+  gap: 4px;
+}
+
+.languages a {
+  padding: 4px 12px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  text-decoration: none;
+}
+
+.languages a:hover,
+.languages a[aria-current] {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+/* Page layout: menu, text, table of contents. The columns are fixed; what is left of the screen
+   stays at the sides. */
+
+:root {
+  --sidebar-width: 17rem;
+  --content-width: 45rem;
+  --toc-width: 13.5rem;
+  --column-gap: 48px;
+  --page-padding: 24px;
+  --layout-width: calc(var(--sidebar-width) + var(--content-width) + var(--toc-width) + 2 * var(--column-gap));
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, var(--content-width)) var(--toc-width);
+  justify-content: center;
+  gap: var(--column-gap);
+  padding: 0 var(--page-padding);
+}
+
+.sidebar,
+.toc {
+  position: sticky;
+  top: var(--topbar-height, 56px);
+  align-self: start;
+  max-height: calc(100vh - var(--topbar-height, 56px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+/* The menu's line runs the full height of the screen, however short the menu is. */
+.sidebar {
+  height: calc(100vh - var(--topbar-height, 56px));
+  padding: 24px 16px 48px 0;
+  border-right: 1px solid var(--border);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.sidebar ul,
+.toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-section {
+  margin-bottom: 16px;
+}
+
+.nav-title,
+.toc-title {
+  margin: 0 0 4px;
+  padding: 0 8px;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5rem;
+  text-transform: uppercase;
+}
+
+.sidebar a,
+.nav-heading {
+  display: block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  line-height: 1.25rem;
+  text-decoration: none;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.nav-heading {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sidebar .nav-child {
+  padding-left: 20px;
+  color: var(--text-2);
+  font-size: 0.8125rem;
+}
+
+.sidebar a:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.sidebar a[aria-current] {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-weight: 500;
+}
+
+.nav-section.machine {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-section.machine .nav-title {
+  color: var(--text-3);
+}
+
+.nav-section.machine a {
+  padding-left: 8px;
+  color: var(--text-3);
+  font-size: 0.8125rem;
+}
+
+.toc {
+  padding: 40px 0 48px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+.toc ul {
+  border-left: 1px solid var(--border);
+}
+
+.toc a {
+  display: block;
+  margin-left: -1px;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid transparent;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.12s ease;
+}
+
+.toc a:hover {
+  color: var(--text);
+}
+
+.toc .toc-level-3 a {
+  padding-left: 24px;
+}
+
+/* Page text */
+
+.content {
+  min-width: 0;
+  padding: 40px 0 96px;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content h1 {
+  margin: 0 0 16px;
+  font-size: 2.125rem;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -0.022em;
+}
+
+.content h2 {
+  margin: 48px 0 12px;
+  font-size: 1.4375rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.content h3 {
+  margin: 32px 0 8px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.content h4 {
+  margin: 24px 0 8px;
+  font-size: 1rem;
+}
+
+.content h2,
+.content h3 {
+  scroll-margin-top: calc(var(--topbar-height, 56px) + 24px);
+}
+
+/* The first paragraph after the title says what the page is about: larger and quieter. */
+.content .page-meta + p,
+.content .decision-banner + p {
+  color: var(--text-2);
+  font-size: 1.1875rem;
+  line-height: 1.65;
+}
+
+.content p,
+.content ul,
+.content ol {
+  margin: 16px 0;
+}
+
+.content ul,
+.content ol {
+  padding-left: 24px;
+}
+
+.content li {
+  margin: 4px 0;
+  padding-left: 4px;
+}
+
+.content li::marker {
+  color: var(--text-3);
+}
+
+.content li > p {
+  margin: 4px 0;
+}
+
+.content li > ul,
+.content li > ol {
+  margin: 4px 0;
+}
+
+.content a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.12s ease;
+}
+
+.content a:hover {
+  text-decoration-color: currentColor;
+}
+
+.content strong {
+  font-weight: 600;
+}
+
+/* Tables are light: only horizontal lines; a wide one scrolls inside, the page does not */
+.content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.content th,
+.content td {
+  padding: 8px 16px 8px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.content th {
+  color: var(--text-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.content tr:last-child td {
+  border-bottom: none;
+}
+
+.content code {
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-variant-ligatures: none;
+}
+
+.content pre {
+  margin: 24px 0;
+  padding: 16px 20px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--code-bg);
+  line-height: 1.65;
+}
+
+.content pre code {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+}
+
+.content blockquote {
+  margin: 24px 0;
+  padding: 4px 0 4px 16px;
+  border-left: 2px solid var(--border-strong);
+  color: var(--text-2);
+}
+
+.content blockquote > :first-child {
+  margin-top: 0;
+}
+
+.content blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px 0;
+}
+
+/* Diagrams are drawn 680px wide; they scale to the text column so that their labels
+   stay in proportion with the text around them. */
+.content img[src$=".svg"] {
+  width: 100%;
+}
+
+.content hr {
+  margin: 40px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* Status, translation and source lines under the title */
+
+.page-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 32px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--text-3);
+}
+
+.content .page-meta p {
+  margin: 0;
+}
+
+.content .page-meta a {
+  color: inherit;
+  text-decoration-color: var(--border-strong);
+}
+
+.content .page-meta a:hover {
+  color: var(--text);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: 12px;
+  color: var(--text);
+}
+
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+
+.status-draft::before {
+  background: var(--draft);
+}
+
+.status-accepted::before {
+  background: var(--accepted);
+}
+
+.status-partial::before {
+  background: var(--partial);
+}
+
+.status-living::before {
+  background: var(--living);
+}
+
+.status-superseded::before {
+  background: var(--superseded);
+}
+
+/* Statuses of glossary terms: accepted as above, proposed, open */
+
+.status-proposed::before {
+  background: var(--living);
+}
+
+.status-open::before {
+  background: var(--draft);
+}
+
+/* Glossary terms in page texts: the first mention in a section is underlined with dots;
+   every mention shows a hint on hover, focus or tap (hints.ts). */
+
+.content .term {
+  cursor: help;
+}
+
+.content .term-first {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--text-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.content .term:hover,
+.content .term[aria-describedby] {
+  text-decoration: underline dotted;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.content .term:focus-visible {
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+.term-tip {
+  position: absolute;
+  z-index: 30;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-pop);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.term-tip[hidden] {
+  display: none;
+}
+
+.term-tip-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+}
+
+.term-tip-head strong {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.term-tip .status {
+  margin-right: 0;
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.term-tip-meta {
+  margin: 2px 0 8px;
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.term-tip code {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.term-tip-text p {
+  margin: 0 0 8px;
+}
+
+.term-tip-more {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+.term-tip-more:hover {
+  color: var(--text);
+}
+
+/* Term cards on the glossary page, built from docs/glossary.toml */
+
+.term-card {
+  margin-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.content .term-card h3 {
+  margin-top: 20px;
+}
+
+.content .term-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 20px;
+  margin: -2px 0 12px;
+  font-size: 0.8125rem;
+  color: var(--text-3);
+}
+
+.term-meta .status {
+  margin-right: 0;
+  color: var(--text-3);
+}
+
+.uncommitted {
+  color: var(--change);
+}
+
+.version-banner {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  font-size: 0.9375rem;
+}
+
+.content .version-banner a {
+  font-weight: 500;
+}
+
+.page-history {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--text-3);
+}
+
+.content .page-history h2 {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.content .page-history ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.content .page-history li {
+  margin: 4px 0;
+  padding: 0;
+}
+
+.content .page-history code {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.75rem;
+}
+
+.history-date {
+  font-variant-numeric: tabular-nums;
+}
+
+.history-version {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Decision records (decisions/NNN-….md): the line above the title, the line under it,
+   the notice on a replaced decision, and the references and neighbours under the text */
+
+.content .decision-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--text-3);
+}
+
+.content .decision-eyebrow a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.content .decision-eyebrow a:hover {
+  color: var(--text);
+}
+
+.decision-eyebrow .separator {
+  color: var(--border-strong);
+}
+
+.page-meta .decision-date,
+.page-meta .decision-relation {
+  margin-right: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.decision-banner {
+  margin: -8px 0 32px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--superseded);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  font-size: 0.9375rem;
+}
+
+.decision-references {
+  margin-top: 64px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.content .decision-references h2 {
+  margin-top: 24px;
+}
+
+.decision-empty {
+  color: var(--text-3);
+}
+
+/* Previous and next decision: two cards */
+
+.decision-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.content .decision-nav a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--accent-text);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.375rem;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.content .decision-nav a:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+
+.content .decision-nav .decision-next {
+  grid-column: 2;
+  text-align: right;
+}
+
+.decision-nav-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  color: var(--text-3);
+}
+
+/* The list on the decisions page: status filters, then the decisions by topic, one row each */
+
+.decision-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 24px 0 8px;
+}
+
+.decision-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.decision-filter:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.decision-filter[aria-pressed="true"] {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.decision-filter-count {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.content .decision-topic {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 32px 0 4px;
+  font-size: 1.0625rem;
+}
+
+.decision-topic-count {
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.content .decision-rows {
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.content .decision-rows li {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.content a.decision-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  gap: 2px 16px;
+  margin: 0 -12px;
+  padding: 14px 12px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+}
+
+.content a.decision-row:hover {
+  background: var(--bg-subtle);
+}
+
+.decision-number {
+  padding-top: 1px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.375rem;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.decision-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.decision-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+}
+
+.decision-summary {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+.decision-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--text-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.decision-side .status {
+  margin-right: 0;
+}
+
+.is-superseded .decision-title {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+/* Links to decisions in page texts: the decision's number after the link's last word, in one
+   piece with it; hovering shows what the decision says (hints.ts). An inline-block number
+   stays clear of the link's underline. A draft's number is amber, as its status is. */
+
+.content .decision-tail {
+  white-space: nowrap;
+}
+
+.content .decision-badge {
+  display: inline-block;
+  margin-left: 0.3em;
+  padding: 0 0.45em;
+  border-radius: 999px;
+  background: var(--bg-hover);
+  color: var(--text-2);
+  font-size: 0.72em;
+  font-weight: 500;
+  line-height: 1.6;
+  vertical-align: 0.12em;
+  font-variant-numeric: tabular-nums;
+}
+
+.content .decision-badge.is-draft {
+  background: var(--draft-soft);
+  color: var(--draft-text);
+}
+
+.content a.decision-link:hover .decision-badge {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.term-tip-title {
+  margin: 4px 0 6px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.term-tip-date {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Menu: the count of drafts next to Decisions, and the decisions inside that section */
+
+.nav-count {
+  display: inline-block;
+  min-width: 1.5em;
+  margin-left: 8px;
+  padding: 0 0.5em;
+  border-radius: 999px;
+  background: var(--draft);
+  color: var(--on-draft);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.125rem;
+  text-align: center;
+  vertical-align: 0.1em;
+}
+
+/* Inside the decisions section the decisions stand under the titles of their topics. */
+.sidebar .nav-topic {
+  margin: 10px 0 2px;
+  padding: 0 8px 0 20px;
+  color: var(--text-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.sidebar .nav-topic:first-child {
+  margin-top: 4px;
+}
+
+.sidebar .nav-decision {
+  display: grid;
+  grid-template-columns: 1.6em minmax(0, 1fr);
+  gap: 6px;
+}
+
+.nav-number {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.sidebar .nav-decision.is-superseded > span:last-child {
+  text-decoration: line-through;
+}
+
+/* A draft waits for a decision: the dot of the draft status opens its title, as on the page */
+.sidebar .nav-decision.is-draft > span:last-child::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--draft);
+  vertical-align: 0.1em;
+}
+
+.result-number {
+  margin-right: 8px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Changes since the previous version: dots in the menu and the table of contents, a mark after
+   changed headings, and on demand the changes themselves (changes.ts). The marks have a colour
+   of their own, so that they are never taken for a status: amber is a draft, green is accepted.
+   Only in the changes themselves added text is green and removed text red, as in any diff. */
+
+.change-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 7px;
+  border-radius: 50%;
+  background: var(--change);
+  vertical-align: 0.15em;
+}
+
+.changes-summary {
+  margin: 0 0 16px;
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  color: var(--text-3);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+.content .change-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 0 0.55em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--change) 14%, transparent);
+  color: var(--change);
+  font-family: var(--font-text);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.6;
+  vertical-align: 0.3em;
+}
+
+.change-text::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--change);
+}
+
+.link-button {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+.link-button:hover {
+  color: var(--text);
+}
+
+.content ins {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accepted) 22%, transparent);
+  text-decoration: none;
+}
+
+.content del {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--removed) 16%, transparent);
+  color: var(--text-3);
+}
+
+/* What was removed and what replaced it stand side by side: a little space keeps them apart. */
+.content del + ins {
+  margin-left: 0.2em;
+}
+
+.content .diff-added,
+.content .diff-changed,
+.content .diff-removed {
+  padding-left: 10px;
+  border-radius: 0 6px 6px 0;
+}
+
+.content .diff-added {
+  background: color-mix(in srgb, var(--accepted) 10%, transparent);
+  box-shadow: inset 3px 0 0 var(--accepted);
+}
+
+.content .diff-changed {
+  box-shadow: inset 3px 0 0 var(--change);
+}
+
+.content .diff-removed {
+  background: color-mix(in srgb, var(--removed) 8%, transparent);
+  box-shadow: inset 3px 0 0 var(--removed);
+  color: var(--text-3);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--removed) 60%, transparent);
+}
+
+/* Table rows take the colour in their cells: a row has no padding or inner shadow of its own. */
+.content tr.diff-added,
+.content tr.diff-changed,
+.content tr.diff-removed {
+  box-shadow: none;
+}
+
+.content tr.diff-added > * {
+  background: color-mix(in srgb, var(--accepted) 10%, transparent);
+}
+
+.content tr.diff-removed > * {
+  background: color-mix(in srgb, var(--removed) 8%, transparent);
+}
+
+/* Devanagari joins the letters of a word with a line along their tops, and any change to the
+   spacing between letters breaks it: Hindi keeps the font's own spacing. */
+:lang(hi) :is(h1, h2, h3, h4, .brand, .nav-title, .toc-title) {
+  letter-spacing: normal;
+}
+
+/* Devanagari has no capitals, and at the size of the small capital titles it reads too small. */
+:lang(hi) :is(.nav-title, .toc-title, .page-history h2) {
+  font-size: 0.8125rem;
+}
+
+/* Up to 1280 px: no table of contents */
+
+@media (max-width: 1279px) {
+  :root {
+    --layout-width: calc(var(--sidebar-width) + var(--content-width) + var(--column-gap));
+  }
+
+  .layout {
+    grid-template-columns: var(--sidebar-width) minmax(0, var(--content-width));
+  }
+
+  .toc {
+    display: none;
+  }
+}
+
+/* Up to 900 px: the menu becomes a panel over the page */
+
+@media (max-width: 899px) {
+  :root {
+    --page-padding: 16px;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 10px var(--page-padding);
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .search {
+    order: 10;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 0 var(--page-padding);
+  }
+
+  .content {
+    padding-top: 24px;
+    font-size: 1rem;
+  }
+
+  .content h1 {
+    font-size: 1.75rem;
+  }
+
+  .content h2 {
+    font-size: 1.25rem;
+  }
+
+  .content a.decision-row {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .decision-side {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .decision-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .content .decision-nav .decision-next {
+    grid-column: 1;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  body.menu-open .sidebar {
+    display: block;
+    position: fixed;
+    top: var(--topbar-height, 56px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    height: auto;
+    max-height: none;
+    padding: 24px var(--page-padding);
+    border-right: none;
+    background: var(--bg);
+  }
+}
+
+/* A phone: three languages and the version still fit in the bar beside the site's name. */
+@media (max-width: 640px) {
+  .version {
+    max-width: 10rem;
+    font-size: 0.8125rem;
+  }
+
+  .languages {
+    gap: 2px;
+  }
+
+  .languages a {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}

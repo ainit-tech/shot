@@ -1,0 +1,2 @@
+# The image takes nothing from this folder: the repository is mounted when the container runs.
+*
