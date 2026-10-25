@@ -1,9 +1,9 @@
-//! The panels next to the selection. The main one has the tools, the colour, masking, undo,
-//! copying the picture or its text, saving and closing; the other one has the query buttons from the
-//! settings. The settings say on which side of the selection each panel stands and to which end
-//! of that side it is pressed: above and below the selection a panel is a row, beside it a
-//! column. Here is where their buttons go and which one is under the mouse; how they look is in
-//! `draw`.
+//! The panels next to the selection. The main one has the tools, the colour, undo and closing;
+//! the other one has what is done with the screenshot: the query buttons from the settings,
+//! masking, copying the picture or its text, and saving. The settings say on which side of the
+//! selection each panel stands and to which end of that side it is pressed: above and below the
+//! selection a panel is a row, beside it a column. Here is where their buttons go and which one is
+//! under the mouse; how they look is in `draw`.
 
 use crate::annotation::Tool;
 use crate::geometry::{Point, Rect};
@@ -47,37 +47,39 @@ pub struct Toolbar {
 }
 
 impl Toolbar {
-    /// The main toolbar and, if there are query buttons, theirs, where the settings put them
-    /// around the selection. `monitor_at` gives the monitor and its scale at a point: a panel is
-    /// laid out for the monitor at the corner of the selection it is pressed to. The query
-    /// buttons come in groups by their numbers in the settings: those that ask the AI, then
-    /// those that search by image.
+    /// The main toolbar and that of the actions, where the settings put them around the
+    /// selection. `monitor_at` gives the monitor and its scale at a point: a panel is laid out for
+    /// the monitor at the corner of the selection it is pressed to. The query buttons come in
+    /// groups by their numbers in the settings: those that ask the AI, then those that search by
+    /// image.
     pub fn panels(
         selection: Rect,
         settings: &Panels,
         queries: &[Vec<usize>],
         monitor_at: impl Fn(Point) -> (Rect, f32),
-    ) -> (Toolbar, Option<Toolbar>) {
+    ) -> (Toolbar, Toolbar) {
         let tools = vec![
             Tool::ALL.iter().map(|&tool| Button::Tool(tool)).collect(),
-            vec![Button::Color, Button::Mask, Button::Undo],
-            vec![Button::Copy, Button::CopyText, Button::Save],
+            vec![Button::Color, Button::Undo],
             vec![Button::Close],
         ];
-        let queries: Vec<Vec<Button>> = queries
+        // The query buttons come first. Copying and saving come last, at the end that meets the
+        // main panel in the corner by default, and masking just before them: it hides what is
+        // private in the picture that then goes into the clipboard, a file or to Google.
+        let mut actions: Vec<Vec<Button>> = queries
             .iter()
             .filter(|group| !group.is_empty())
             .map(|group| group.iter().map(|&i| Button::Query(i)).collect())
             .collect();
+        actions.push(vec![Button::Mask]);
+        actions.push(vec![Button::Copy, Button::CopyText, Button::Save]);
         let mut main = Layout::new(tools, settings.tools, selection, &monitor_at);
-        let mut search = (!queries.is_empty()).then(|| Layout::new(queries, settings.queries, selection, &monitor_at));
-        if let Some(search) = &mut search {
-            match settings.first {
-                Panel::Tools => line_up(&mut main, search, selection),
-                Panel::Queries => line_up(search, &mut main, selection),
-            }
+        let mut actions = Layout::new(actions, settings.queries, selection, &monitor_at);
+        match settings.first {
+            Panel::Tools => line_up(&mut main, &mut actions, selection),
+            Panel::Queries => line_up(&mut actions, &mut main, selection),
         }
-        (main.toolbar(), search.map(Layout::toolbar))
+        (main.toolbar(), actions.toolbar())
     }
 
     /// Lays the groups of buttons out in a row or a column inside `rect`, with separators
@@ -323,8 +325,7 @@ mod tests {
     }
 
     fn panels(selection: Rect, settings: &Panels) -> (Toolbar, Toolbar) {
-        let (main, search) = Toolbar::panels(selection, settings, &queries(), |_| (MONITOR, 1.0));
-        (main, search.unwrap())
+        Toolbar::panels(selection, settings, &queries(), |_| (MONITOR, 1.0))
     }
 
     fn place(side: Side, align: Align) -> Place {
@@ -338,7 +339,17 @@ mod tests {
         assert_eq!(toolbar.rect.top, 708);
         assert!(!toolbar.column);
         assert_eq!(toolbar.hit(Point::new(1400 - 20, 708 + 20)), Some(Button::Close));
-        assert_eq!(toolbar.buttons.len(), 8 + 3 + 3 + 1);
+        assert_eq!(toolbar.buttons.len(), 8 + 2 + 1);
+    }
+
+    #[test]
+    fn the_column_asks_first_then_masks_copies_and_saves() {
+        let (_, toolbar) = panels(SELECTION, &Panels::default());
+        let order: Vec<Button> = toolbar.buttons.iter().map(|&(button, _)| button).collect();
+        let actions = [Button::Mask, Button::Copy, Button::CopyText, Button::Save];
+        let expected: Vec<Button> = (0..5).map(Button::Query).chain(actions).collect();
+        assert_eq!(order, expected);
+        assert_eq!(toolbar.separators.len(), 3);
     }
 
     #[test]
@@ -383,9 +394,11 @@ mod tests {
     }
 
     #[test]
-    fn no_query_buttons_no_column() {
-        let (_, search) = Toolbar::panels(SELECTION, &Panels::default(), &[vec![], vec![]], |_| (MONITOR, 1.0));
-        assert!(search.is_none());
+    fn without_query_buttons_the_column_has_the_actions_alone() {
+        let (_, toolbar) = Toolbar::panels(SELECTION, &Panels::default(), &[vec![], vec![]], |_| (MONITOR, 1.0));
+        let order: Vec<Button> = toolbar.buttons.iter().map(|&(button, _)| button).collect();
+        assert_eq!(order, [Button::Mask, Button::Copy, Button::CopyText, Button::Save]);
+        assert_eq!(toolbar.separators.len(), 1);
     }
 
     #[test]

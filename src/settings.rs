@@ -42,9 +42,9 @@ pub struct Settings {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Panels {
-    /// The main panel: the tools, the colour, undo, copying, saving and closing.
+    /// The main panel: the tools, the colour, undo and closing.
     pub tools: Place,
-    /// The panel of the query buttons.
+    /// The panel of the actions: the query buttons, masking, copying and saving.
     pub queries: Place,
     pub first: Panel,
 }
@@ -156,8 +156,8 @@ impl Save {
     }
 }
 
-/// As in Lightshot: the tools under the selection at its right end, the query buttons to the
-/// right of it at its bottom, the two meeting at the corner.
+/// As in Lightshot: the tools under the selection at its right end, the actions to the right of
+/// it at its bottom, the two meeting at the corner.
 impl Default for Panels {
     fn default() -> Self {
         Panels {
@@ -514,8 +514,8 @@ const NOTES: Notes = Notes {
 #     above, \"top\" or \"bottom\" beside.
 # Without room on its side, a panel goes to the opposite one, and without room there either,
 # inside the selection at the same edge.",
-    tools: "# The tools: drawing, the colour, undo, copying, saving and closing.",
-    queries: "# The query buttons.",
+    tools: "# The tools: drawing, the colour, undo and closing.",
+    queries: "# The actions: the query buttons, masking, copying and saving.",
     first: "# If both panels are pressed to the same end of one side, they stand in a row; first is
 # the one on the left or on top: \"tools\" or \"queries\".",
     buttons: "# The query buttons on their panel. Each sends the screenshot to Google:

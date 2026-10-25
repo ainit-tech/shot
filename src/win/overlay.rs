@@ -239,7 +239,8 @@ struct Scene {
     picked: Option<(usize, Rect)>,
     label: Option<(Rect, Text)>,
     toolbar: Option<Toolbar>,
-    search: Option<Toolbar>,
+    /// The panel of the actions: masking, the query buttons, copying and saving.
+    actions: Option<Toolbar>,
     palette: Option<Palette>,
     hint: Option<(Rect, Text)>,
     ring: Option<(Point, f32)>,
@@ -1335,9 +1336,8 @@ impl Session {
         (!self.selection.is_dragging()).then_some(selection)
     }
 
-    /// The main toolbar and that of the query buttons, if there are any, where the settings put
-    /// them around the selection.
-    fn panels(&self) -> Option<(Toolbar, Option<Toolbar>)> {
+    /// The main toolbar and that of the actions, where the settings put them around the selection.
+    fn panels(&self) -> Option<(Toolbar, Toolbar)> {
         let selection = self.settled()?;
         let monitor_at = |p: Point| {
             let monitor = self.screen.monitor_at(p);
@@ -1353,8 +1353,8 @@ impl Session {
 
     /// The button of either toolbar under the point.
     fn button_at(&self, p: Point) -> Option<Button> {
-        let (main, search) = self.panels()?;
-        main.hit(p).or_else(|| search.and_then(|bar| bar.hit(p)))
+        let (main, actions) = self.panels()?;
+        main.hit(p).or_else(|| actions.hit(p))
     }
 
     /// The query buttons by their numbers in the settings, in two groups: those that ask the AI,
@@ -1378,9 +1378,8 @@ impl Session {
             return IDC_APPSTARTING;
         }
         let p = self.cursor();
-        let on_panel = self.panels().is_some_and(|(main, search)| {
-            main.rect.contains(p) || search.is_some_and(|search| search.rect.contains(p))
-        }) || self.palette_layout().is_some_and(|palette| palette.rect.contains(p));
+        let on_panel = self.panels().is_some_and(|(main, actions)| main.rect.contains(p) || actions.rect.contains(p))
+            || self.palette_layout().is_some_and(|palette| palette.rect.contains(p));
         if on_panel {
             return IDC_ARROW;
         }
@@ -1738,11 +1737,11 @@ impl Session {
         });
         let selection = self.selection.rect().filter(|r| !r.is_empty() && clicking.is_none());
         let scale = selection.map_or(1.0, |s| self.screen.monitor_at(s.top_left()).scale);
-        let (toolbar, search) = self.panels().map_or((None, None), |(main, search)| (Some(main), search));
-        let panels: Vec<Rect> = toolbar.iter().chain(&search).map(|bar| bar.rect).collect();
+        let (toolbar, actions) = self.panels().map_or((None, None), |(main, actions)| (Some(main), Some(actions)));
+        let panels: Vec<Rect> = toolbar.iter().chain(&actions).map(|bar| bar.rect).collect();
         let label = selection.and_then(|s| self.label(s, scale, &panels));
         let palette = self.palette_layout();
-        let hint = self.hint(toolbar.as_ref(), search.as_ref());
+        let hint = self.hint(toolbar.as_ref(), actions.as_ref());
         let ring = self.ring.map(|at| {
             (at, annotation::drawn_width(self.tool, self.width) * self.screen.monitor_at(at).scale)
         });
@@ -1753,7 +1752,7 @@ impl Session {
             let item = self.history.items().get(index)?;
             Some((index, draw::picked_bounds(item, scale)))
         });
-        Scene { selection, scale, snap, picked, label, toolbar, search, palette, hint, ring }
+        Scene { selection, scale, snap, picked, label, toolbar, actions, palette, hint, ring }
     }
 
     /// The selection's size next to it, clear of the panels.
@@ -1768,7 +1767,7 @@ impl Session {
 
     /// The hint of the button under the mouse, what is being sent, what is heard of a question
     /// asked aloud, or what happened to it, next to its toolbar.
-    fn hint(&mut self, main: Option<&Toolbar>, search: Option<&Toolbar>) -> Option<(Rect, Text)> {
+    fn hint(&mut self, main: Option<&Toolbar>, actions: Option<&Toolbar>) -> Option<(Rect, Text)> {
         let (button, text) = match (&self.sending, &self.listening, &self.note) {
             _ if self.reading == Some(Button::Mask) => (Button::Mask, tr("Looking for private data…").to_string()),
             _ if self.reading.is_some() => (Button::CopyText, tr("Reading the text…").to_string()),
@@ -1783,8 +1782,7 @@ impl Session {
             }
             _ => return None,
         };
-        let toolbar = if matches!(button, Button::Query(_)) { search? } else { main? };
-        let anchor = toolbar.button(button)?;
+        let (toolbar, anchor) = [main, actions].into_iter().flatten().find_map(|bar| Some((bar, bar.button(button)?)))?;
         let size = draw::label_font(toolbar.scale);
         let measured = self.measure(&text, size)?;
         let rect = toolbar.popup(anchor, draw::pill_size(measured, toolbar.scale));
@@ -1847,8 +1845,8 @@ impl Session {
             queries: &queries,
             coming: models::coming(),
         };
-        if let Some(search) = &scene.search {
-            texts.extend(draw::toolbar(&mut frame, search, &look));
+        if let Some(actions) = &scene.actions {
+            texts.extend(draw::toolbar(&mut frame, actions, &look));
         }
         if let Some(toolbar) = &scene.toolbar {
             texts.extend(draw::toolbar(&mut frame, toolbar, &look));
@@ -1986,8 +1984,8 @@ impl Scene {
                 all = all.union(palette.rect.inflate(shadow));
             }
         }
-        if let Some(search) = &self.search {
-            all = all.union(search.rect.inflate(draw::shadow_reach(search.scale)));
+        if let Some(actions) = &self.actions {
+            all = all.union(actions.rect.inflate(draw::shadow_reach(actions.scale)));
         }
         if let Some((rect, _)) = &self.hint {
             all = all.union(*rect);
@@ -2100,6 +2098,101 @@ mod tests {
     use windows_sys::Win32::UI::WindowsAndMessaging::DestroyWindow;
 
     use super::*;
+
+    /// Draws the overlay over a made-up screen into the PNG file named by `SCREENSHOT_PREVIEW`,
+    /// to look at the panels and the annotations without running the program, with the hint of
+    /// the masking button in the language of the tests:
+    /// `SCREENSHOT_PREVIEW=preview.png cargo test -p ainitshot preview -- --ignored`, with
+    /// `SCREENSHOT_PANELS='tools = { side = "left", align = "top" }'` for the panels elsewhere
+    /// and `SCREENSHOT_PALETTE=1` for the colours open in place of the hint.
+    #[test]
+    #[ignore]
+    fn preview() {
+        let (width, height) = (1100, 420);
+        let mut pixels = Vec::with_capacity(width * height * 4);
+        for y in 0..height {
+            for x in 0..width {
+                let shade = 200 + ((x / 40 + y / 40) % 2 * 30) as u8;
+                pixels.extend_from_slice(&[shade, shade - 20, shade - 60, 255]);
+            }
+        }
+        let screen = Image { width: width as u32, height: height as u32, pixels };
+        // The letters are drawn with GDI, as the overlay draws them, into the same pixels.
+        let mut buffer = Buffer::new(width as u32, height as u32).unwrap();
+        let mut frame = buffer.frame();
+        let selection = Rect::new(120, 60, 780, 330);
+        draw::background(&mut frame, &screen, Some(selection), screen.bounds());
+
+        let red = [229, 57, 53, 255];
+        let mut layer = Pixmap::new(selection.width() as u32, selection.height() as u32).unwrap();
+        let mut drawn = Vec::new();
+        for (tool, points) in [
+            (Tool::Arrow, vec![(160.0, 290.0), (330.0, 150.0)]),
+            (Tool::Rectangle, vec![(380.0, 100.0), (520.0, 190.0)]),
+            (Tool::FilledRectangle, vec![(560.0, 230.0), (740.0, 290.0)]),
+            (Tool::Brush, vec![(380.0, 260.0), (430.0, 262.0), (520.0, 258.0)]),
+            (Tool::Pencil, vec![(560.0, 120.0), (600.0, 90.0), (650.0, 140.0), (700.0, 100.0)]),
+        ] {
+            let mut draft = Draft::start(tool, PointF::new(points[0].0, points[0].1), red, 4.0).unwrap();
+            for &(x, y) in &points[1..] {
+                draft.extend(PointF::new(x, y), false);
+            }
+            drawn.extend(draft.finish(false));
+        }
+        draw::annotations(&mut layer, &drawn, selection.top_left());
+        draw::blend(frame.pixels, frame.width, &layer, selection.top_left(), selection);
+        // The arrow picked shows its handles; the pencil's line, which only moves, its frame.
+        draw::picked(&mut frame, &drawn[0], 1.0);
+        draw::picked(&mut frame, &drawn[4], 1.0);
+        draw::selection_frame(&mut frame, selection, 1.0);
+
+        // The panels stand where `SCREENSHOT_PANELS` puts them, as the [panels] of the settings
+        // file do, or where they stand by default.
+        let panels: crate::settings::Panels = std::env::var("SCREENSHOT_PANELS")
+            .map(|text| toml::from_str(&text).expect("SCREENSHOT_PANELS reads as [panels]"))
+            .unwrap_or_default();
+        let (bar, column) = Toolbar::panels(selection, &panels, &[vec![0, 1], vec![2]], |_| (screen.bounds(), 1.0));
+        let queries = [Icon::Google, Icon::Translate, Icon::Images];
+        let open = std::env::var_os("SCREENSHOT_PALETTE").is_some();
+        let look = ToolbarLook {
+            tool: Some(Tool::Arrow),
+            hovered: (!open).then_some(Button::Mask),
+            color: red,
+            width: 4.0,
+            can_undo: true,
+            busy: None,
+            queries: &queries,
+            coming: None,
+        };
+        let mut texts = draw::toolbar(&mut frame, &bar, &look);
+        texts.extend(draw::toolbar(&mut frame, &column, &look));
+        let colors = Palette::layout(&bar, 8).filter(|_| open);
+        if let Some(colors) = &colors {
+            draw::palette(&mut frame, colors, &[red, [251, 140, 0, 255], [253, 216, 53, 255], [67, 160, 71, 255], [30, 136, 229, 255], [142, 36, 170, 255], [33, 33, 33, 255], [255, 255, 255, 255]], 0, 1.0);
+        }
+
+        // The hint of the button under the mouse, next to its panel, as the overlay puts it.
+        let font = |size: i32, bold: bool| Font::new(size, bold).unwrap();
+        let wide = |text: &str| text.encode_utf16().collect::<Vec<u16>>();
+        if colors.is_none() {
+            let text = tr("Mask private data · Ctrl+M").to_string();
+            let size = draw::label_font(1.0);
+            let measured = gdi::text_size(buffer.dc(), &font(size, false), &wide(&text));
+            let rect = column.popup(column.button(Button::Mask).unwrap(), draw::pill_size(measured, 1.0));
+            draw::pill(&mut buffer.frame(), rect);
+            texts.push(Text { text, rect, size, bold: false, color: draw::TEXT });
+        }
+        for text in &texts {
+            let (font, letters) = (font(text.size, text.bold), wide(&text.text));
+            let (w, h) = gdi::text_size(buffer.dc(), &font, &letters);
+            let (x, y) = (text.rect.left + (text.rect.width() - w) / 2, text.rect.top + (text.rect.height() - h) / 2);
+            gdi::draw_text(buffer.dc(), &font, &letters, x, y, text.color);
+        }
+
+        let path = std::env::var("SCREENSHOT_PREVIEW").expect("SCREENSHOT_PREVIEW names the file to write");
+        let picture = Image { width: width as u32, height: height as u32, pixels: buffer.frame().pixels.to_vec() };
+        std::fs::write(path, picture.to_png().unwrap()).unwrap();
+    }
 
     /// A window, hidden, gives up its input method and takes it back.
     #[test]

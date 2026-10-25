@@ -33,7 +33,7 @@ The recognition with the rectangles of words is already in the program, and a fi
 
 ## How it works
 
-- **The button "Mask"** stands on the toolbar between the colour and "Undo"; its key is Ctrl+M.
+- **The button "Mask"** stands on the toolbar of the actions, after the query buttons and before copying and saving; its key is Ctrl+M.
 - **Reading.** The selection with its annotations is read by the recognition of the user's language, and by the English one too when that language isn't written in Latin letters. Each misreads what the other reads right, so both readings are looked at.
 - **Finding.** In each reading, the rules and the model mark parts of the text. The words of each part are covered: words next to each other on a line by one rectangle, a little bigger than they are. Covers of the two readings that overlap become one.
 - **The rules** find IP addresses of versions 4 and 6 as the recognition reads them: with O, Ø or I for some digits, and a space by a dot or a colon.

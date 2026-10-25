@@ -362,13 +362,13 @@ function sizePill() {
   return g;
 }
 
-/** The width of the main panel: its 15 buttons, 18 wide, its padding and its 3 separators. */
-const BAR_WIDTH = 6 + 15 * 18 + 3 * 6;
+/** The width of the main panel: its 11 buttons, 18 wide, its padding and its 2 separators. */
+const BAR_WIDTH = 6 + 11 * 18 + 2 * 6;
 
 /** The main panel as the program draws it, the tool `active` lit up; buttons 18 wide. */
 function toolbar(x, y, active) {
   const order = ["Pencil", "Brush", "Line", "Arrow", "Rectangle", "FilledRectangle", "Text", "MagicPencil"];
-  const groups = [order, ["color", "mask", "undo"], ["copy", "copyText", "save"], ["close"]];
+  const groups = [order, ["color", "undo"], ["close"]];
   const g = S("g", { transform: `translate(${x} ${y})` });
   const width = BAR_WIDTH;
   g.append(S("rect", { x: 0, y: 0, width, height: 24, rx: 7, fill: "rgba(32,32,32,0.97)", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.6, filter: "url(#shade)" }));
@@ -399,12 +399,13 @@ function toolbar(x, y, active) {
   return g;
 }
 
-/** The panel of the query buttons, as a column: the first buttons of the settings. */
+/** The panel of the actions, as a column: the first query buttons of the settings, masking, then
+ * copying and saving. */
 function queryColumn(x, y) {
   const buttons = (state.settings.buttons || []).slice(0, 4);
   const ai = buttons.filter(b => b.mode !== "images"), images = buttons.filter(b => b.mode === "images");
-  const groups = [ai, images].filter(group => group.length);
-  const count = buttons.length;
+  const groups = [ai, images, ["mask"], ["copy", "copyText", "save"]].filter(group => group.length);
+  const count = groups.reduce((sum, group) => sum + group.length, 0);
   const height = 6 + count * 18 + (groups.length - 1) * 6;
   const g = S("g", { transform: `translate(${x} ${y - height})` });
   g.append(S("rect", { x: 0, y: 0, width: 24, height, rx: 7, fill: "rgba(32,32,32,0.97)", stroke: "rgba(255,255,255,0.1)", "stroke-width": 0.6, filter: "url(#shade)" }));
@@ -415,7 +416,8 @@ function queryColumn(x, y) {
       at += 6;
     }
     for (const button of group) {
-      const look = button.icon || (button.mode === "images" ? "images" : "google");
+      // An action by the name of its icon, or a query button from the settings.
+      const look = typeof button === "string" ? button : button.icon || (button.mode === "images" ? "images" : "google");
       if (look === "google" || look === "translate") {
         g.append(S("text", { x: 12, y: at + 12.5, fill: "#ececec", "font-size": look === "google" ? 10 : 7.5, "font-weight": 700, class: "ink", "text-anchor": "middle" }, look === "google" ? "G" : "A\u042f"));
       } else {

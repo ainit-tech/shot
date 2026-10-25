@@ -39,7 +39,7 @@ The buttons differ only in where the picture goes and what is asked about it. Th
 | Translate | AI mode: AI Mode in the program's hidden window, the answer in a card next to the selection | Translate the text in the picture into the program's language, such as English. Answer with the translation only. |
 | Search by image in Google | Image search: the exact matches in the program's window next to the selection | None |
 
-- The query buttons stand on a toolbar of their own, by default a column to the right of the selection at its bottom, which the settings move to any side (see the [requirements](../requirements.md)): those that ask the AI mode come first, and the image search buttons after them as a group of their own.
+- The query buttons stand first on the toolbar of the actions, by default a column to the right of the selection at its bottom, which the settings move to any side (see the [requirements](../requirements.md)): those that ask the AI mode come first, the image search buttons after them as a group of their own, and then masking, copying and saving.
 - A button for a conversation (`mode = "chat"`), held, asks the user's own question aloud in place of its mini prompt ([decision](008-google-in-the-programs-own-window.md)).
 - A query sends the screenshot with its annotations. Then a loop drawn with the magic pencil shows the AI mode what to look at, and the mini prompt can ask about "what is circled".
 

@@ -563,7 +563,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
             </div>
             <div class="panel-pick" data-panel="queries">
               <div class="spots" role="radiogroup" data-t-aria="whereQueries"></div>
-              <div><div class="caption"><i class="queries"></i><span data-t="queryButtons"></span></div><div class="where"></div></div>
+              <div><div class="caption"><i class="queries"></i><span data-t="actionsPanel"></span></div><div class="where"></div></div>
             </div>
             <div class="hidden" id="panels-order">
               <div class="note" data-t="oneRow"></div>
@@ -765,8 +765,9 @@ const TEXT = {
   panelsDesc: "The side of the selection and the end of that side the panel is pressed to.",
   panelsReset: "Bring back the default",
   whereTools: "Where the tools stand",
-  whereQueries: "Where the query buttons stand",
+  whereQueries: "Where the actions stand",
   tools: "Tools",
+  actionsPanel: "Actions",
   oneRow: "Both panels stand in one row.",
   swap: "Swap them",
   placeTopLeft: "Top, left",
@@ -1800,18 +1801,19 @@ function drawPanels() {
   const S = { left: 60, top: 48, right: 200, bottom: 132 };
   const [U, PAD, SEP, M] = [6, 1.2, 2.4, 4];
   const T = U + 2 * PAD;
+  // The actions: the query buttons by their kind, masking, then copying and saving.
   const ai = state.draft.buttons.filter(button => button.mode !== "images").length;
-  const queryGroups = [ai, state.draft.buttons.length - ai].filter(Boolean);
+  const actionGroups = [ai, state.draft.buttons.length - ai, 1, 3].filter(Boolean);
   const lay = (place, groups) => {
     const length = 2 * PAD + groups.reduce((sum, n) => sum + n, 0) * U + (groups.length - 1) * SEP;
     const [start, end] = upright(place.side) ? [S.top, S.bottom] : [S.left, S.right];
     const across = { bottom: S.bottom + M, top: S.top - M - T, right: S.right + M, left: S.left - M - T }[place.side];
     return { place, groups, length, across, along: atEnd(place.align) ? end - length : start };
   };
-  const tools = lay(panels.tools, [8, 2, 3, 1]);
-  const queries = queryGroups.length ? lay(panels.queries, queryGroups) : null;
+  const tools = lay(panels.tools, [8, 2, 1]);
+  const queries = lay(panels.queries, actionGroups);
   // Two panels on one side that would overlap stand in a row, the first one first.
-  if (queries && tools.place.side === queries.place.side) {
+  if (tools.place.side === queries.place.side) {
     const [first, second] = panels.first === "queries" ? [queries, tools] : [tools, queries];
     const apart = first.along + first.length + M <= second.along || second.along + second.length + M <= first.along;
     if (!apart) {
@@ -1825,7 +1827,6 @@ function drawPanels() {
     shapes.push(svg("circle", { cx: x, cy: y, r: 2, class: "handle" }));
   }
   for (const [panel, kind] of [[tools, "tools"], [queries, "queries"]]) {
-    if (!panel) continue;
     const up = upright(panel.place.side);
     const [x, y] = up ? [panel.across, panel.along] : [panel.along, panel.across];
     const bar = svg("g", { class: kind });
