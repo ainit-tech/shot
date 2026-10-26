@@ -358,9 +358,7 @@
     "signInOffer": "Melde dich einmal bei Google an: Das Captcha kommt seltener, und Unterhaltungen bleiben gespeichert.",
     "signIn": "Anmelden",
     "aiMode": "KI-Modus von Google",
-    "question": "Wo wurde das aufgenommen?",
-    "speak": "sprich, solange du hältst",
-    "letGo": "loslassen: Die Frage wird gesendet"
+    "question": "Wo wurde das aufgenommen?"
   },
   "invite": {
     "title": "Bei Google anmelden",

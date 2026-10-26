@@ -358,9 +358,7 @@
     "signInOffer": "Inicia sesión en Google una vez: el captcha aparecerá menos y las conversaciones se guardarán.",
     "signIn": "Iniciar sesión",
     "aiMode": "Modo IA de Google",
-    "question": "¿Dónde se tomó esto?",
-    "speak": "habla mientras mantienes",
-    "letGo": "suelta: la pregunta se envía"
+    "question": "¿Dónde se tomó esto?"
   },
   "invite": {
     "title": "Inicia sesión en Google",

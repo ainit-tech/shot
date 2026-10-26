@@ -358,9 +358,7 @@
     "signInOffer": "Conectați-vă la Google o singură dată: captcha apare mai rar, iar conversațiile se păstrează.",
     "signIn": "Conectați-vă",
     "aiMode": "Modul AI de la Google",
-    "question": "Unde a fost făcută?",
-    "speak": "vorbiți cât țineți apăsat",
-    "letGo": "eliberat: întrebarea e trimisă"
+    "question": "Unde a fost făcută?"
   },
   "invite": {
     "title": "Conectați-vă la Google",

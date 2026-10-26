@@ -358,9 +358,7 @@
     "signInOffer": "Connectez-vous à Google une fois : le captcha viendra moins souvent et les conversations seront gardées.",
     "signIn": "Se connecter",
     "aiMode": "Mode IA de Google",
-    "question": "Où est-ce que ça a été pris ?",
-    "speak": "parlez tant que vous maintenez",
-    "letGo": "relâché : la question est partie"
+    "question": "Où est-ce que ça a été pris ?"
   },
   "invite": {
     "title": "Connectez-vous à Google",

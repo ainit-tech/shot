@@ -358,9 +358,7 @@
     "signInOffer": "Google'da bir kez oturum açın: captcha daha seyrek çıkar ve sohbetler saklanır.",
     "signIn": "Oturum aç",
     "aiMode": "Google Yapay Zeka Modu",
-    "question": "Bu nerede çekildi?",
-    "speak": "basılı tutarken konuşun",
-    "letGo": "bırakın: soru gönderilir"
+    "question": "Bu nerede çekildi?"
   },
   "invite": {
     "title": "Google'da oturum açın",

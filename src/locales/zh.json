@@ -358,9 +358,7 @@
     "signInOffer": "登录一次 Google：验证码会更少，对话也会被保存。",
     "signIn": "登录",
     "aiMode": "Google AI 模式",
-    "question": "这是在哪里拍的？",
-    "speak": "按住时说话",
-    "letGo": "松开：问题已发送"
+    "question": "这是在哪里拍的？"
   },
   "invite": {
     "title": "登录 Google",

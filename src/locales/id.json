@@ -358,9 +358,7 @@
     "signInOffer": "Login ke Google sekali saja: captcha lebih jarang muncul, dan percakapan disimpan.",
     "signIn": "Login",
     "aiMode": "Mode AI Google",
-    "question": "Di mana foto ini diambil?",
-    "speak": "bicara selama menahan",
-    "letGo": "lepaskan: pertanyaan terkirim"
+    "question": "Di mana foto ini diambil?"
   },
   "invite": {
     "title": "Login ke Google",

@@ -358,9 +358,7 @@
     "signInOffer": "አንድ ጊዜ ወደ Google ይግቡ: ካፕቻ ያነሰ ይመጣል፣ ውይይቶችም ይቀመጣሉ።",
     "signIn": "ግባ",
     "aiMode": "የGoogle AI ሁነታ",
-    "question": "ይህ የት ነው የተነሳው?",
-    "speak": "ይዘው ይናገሩ",
-    "letGo": "ይልቀቁ: ጥያቄው ይላካል"
+    "question": "ይህ የት ነው የተነሳው?"
   },
   "invite": {
     "title": "ወደ Google ይግቡ",

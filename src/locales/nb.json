@@ -358,9 +358,7 @@
     "signInOffer": "Logg på Google én gang: captcha dukker opp sjeldnere, og samtaler blir lagret.",
     "signIn": "Logg på",
     "aiMode": "Googles AI-modus",
-    "question": "Hvor er dette tatt?",
-    "speak": "snakk mens du holder",
-    "letGo": "slipp: spørsmålet sendes"
+    "question": "Hvor er dette tatt?"
   },
   "invite": {
     "title": "Logg på Google",

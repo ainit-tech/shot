@@ -358,9 +358,7 @@
     "signInOffer": "Google に一度ログインしておくと、CAPTCHA が減り、会話が保存されます。",
     "signIn": "ログイン",
     "aiMode": "Google の AI モード",
-    "question": "これはどこで撮影されたものですか？",
-    "speak": "押している間に話す",
-    "letGo": "離すと質問を送信"
+    "question": "これはどこで撮影されたものですか？"
   },
   "invite": {
     "title": "Google にログイン",

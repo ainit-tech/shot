@@ -358,9 +358,7 @@
     "signInOffer": "Jelentkezz be egyszer a Google-ba: ritkábban lesz captcha, és a beszélgetések megmaradnak.",
     "signIn": "Bejelentkezés",
     "aiMode": "Google MI mód",
-    "question": "Hol készült ez?",
-    "speak": "beszélj, amíg nyomva tartod",
-    "letGo": "engedd fel: a kérdés elmegy"
+    "question": "Hol készült ez?"
   },
   "invite": {
     "title": "Jelentkezz be a Google-ba",

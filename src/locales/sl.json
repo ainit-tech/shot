@@ -358,9 +358,7 @@
     "signInOffer": "Enkrat se prijavite v Google: captcha bo redkejša, pogovori pa se bodo shranjevali.",
     "signIn": "Prijava",
     "aiMode": "Google AI Mode",
-    "question": "Kje je bilo to posneto?",
-    "speak": "govorite, dokler držite",
-    "letGo": "spustite: vprašanje je poslano"
+    "question": "Kje je bilo to posneto?"
   },
   "invite": {
     "title": "Prijavite se v Google",

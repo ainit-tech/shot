@@ -358,9 +358,7 @@
     "signInOffer": "Đăng nhập Google một lần: ít gặp captcha hơn, và các cuộc trò chuyện được lưu lại.",
     "signIn": "Đăng nhập",
     "aiMode": "Chế độ AI của Google",
-    "question": "Ảnh này chụp ở đâu?",
-    "speak": "nói trong lúc giữ",
-    "letGo": "thả ra: câu hỏi được gửi đi"
+    "question": "Ảnh này chụp ở đâu?"
   },
   "invite": {
     "title": "Đăng nhập Google",

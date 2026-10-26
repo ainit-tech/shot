@@ -358,9 +358,7 @@
     "signInOffer": "Pierakstieties Google kontā vienreiz: CAPTCHA būs retāk, un sarunas tiks saglabātas.",
     "signIn": "Pierakstīties",
     "aiMode": "Google MI režīms",
-    "question": "Kur tas ir uzņemts?",
-    "speak": "runājiet, kamēr turat",
-    "letGo": "atlaidāt: jautājums nosūtīts"
+    "question": "Kur tas ir uzņemts?"
   },
   "invite": {
     "title": "Pierakstieties Google kontā",

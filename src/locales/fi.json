@@ -358,9 +358,7 @@
     "signInOffer": "Kirjaudu Googleen kerran: captcha tulee harvemmin, ja keskustelut säilyvät.",
     "signIn": "Kirjaudu sisään",
     "aiMode": "Googlen tekoälytila",
-    "question": "Missä tämä on otettu?",
-    "speak": "puhu pitäessäsi pohjassa",
-    "letGo": "vapautit: kysymys lähti"
+    "question": "Missä tämä on otettu?"
   },
   "invite": {
     "title": "Kirjaudu Googleen",

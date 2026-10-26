@@ -358,9 +358,7 @@
     "signInOffer": "Logige Google'isse üks kord sisse: captcha tuleb ette harvemini ja vestlused säilivad.",
     "signIn": "Logi sisse",
     "aiMode": "Google'i AI Mode",
-    "question": "Kus see on pildistatud?",
-    "speak": "rääkige, kuni hoiate",
-    "letGo": "lahti lastud: küsimus saadeti"
+    "question": "Kus see on pildistatud?"
   },
   "invite": {
     "title": "Logige Google'isse sisse",

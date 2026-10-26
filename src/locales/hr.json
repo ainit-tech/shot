@@ -358,9 +358,7 @@
     "signInOffer": "Prijavite se na Google jednom: captcha će se pojavljivati rjeđe, a razgovori će se čuvati.",
     "signIn": "Prijava",
     "aiMode": "Googleov AI Mode",
-    "question": "Gdje je ovo snimljeno?",
-    "speak": "govorite dok držite",
-    "letGo": "pustite: pitanje je poslano"
+    "question": "Gdje je ovo snimljeno?"
   },
   "invite": {
     "title": "Prijavite se na Google",

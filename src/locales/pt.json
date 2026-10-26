@@ -358,9 +358,7 @@
     "signInOffer": "Faça login no Google uma vez: o captcha aparece menos, e as conversas ficam guardadas.",
     "signIn": "Fazer login",
     "aiMode": "Modo IA do Google",
-    "question": "Onde foi tirada esta foto?",
-    "speak": "fale enquanto segura",
-    "letGo": "soltou: a pergunta foi enviada"
+    "question": "Onde foi tirada esta foto?"
   },
   "invite": {
     "title": "Faça login no Google",

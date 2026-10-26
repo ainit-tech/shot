@@ -358,9 +358,7 @@
     "signInOffer": "Logga in på Google en gång: captcha kommer mer sällan, och konversationer sparas.",
     "signIn": "Logga in",
     "aiMode": "Googles AI-läge",
-    "question": "Var är det här taget?",
-    "speak": "tala medan du håller",
-    "letGo": "släpp: frågan skickas"
+    "question": "Var är det här taget?"
   },
   "invite": {
     "title": "Logga in på Google",

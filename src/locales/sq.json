@@ -358,9 +358,7 @@
     "signInOffer": "Identifikohu në Google një herë: captcha del më rrallë, dhe bisedat ruhen.",
     "signIn": "Identifikohu",
     "aiMode": "Modaliteti AI i Google",
-    "question": "Ku është bërë kjo?",
-    "speak": "fol sa e mban",
-    "letGo": "lëshoje: pyetja dërgohet"
+    "question": "Ku është bërë kjo?"
   },
   "invite": {
     "title": "Identifikohu në Google",

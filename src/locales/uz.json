@@ -358,9 +358,7 @@
     "signInOffer": "Google hisobiga bir marta kiring: kapcha kamroq chiqadi, suhbatlar esa saqlanadi.",
     "signIn": "Kirish",
     "aiMode": "Google AI Mode",
-    "question": "Bu qayerda suratga olingan?",
-    "speak": "bosib turib gapiring",
-    "letGo": "qoʻyib yuboring — savol ketadi"
+    "question": "Bu qayerda suratga olingan?"
   },
   "invite": {
     "title": "Google hisobiga kiring",

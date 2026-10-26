@@ -358,9 +358,7 @@
     "signInOffer": "Zaloguj się raz do Google: captcha pojawia się rzadziej, a rozmowy są zachowywane.",
     "signIn": "Zaloguj się",
     "aiMode": "Tryb AI w Google",
-    "question": "Gdzie zrobiono to zdjęcie?",
-    "speak": "mów, trzymając",
-    "letGo": "puść: pytanie zostaje wysłane"
+    "question": "Gdzie zrobiono to zdjęcie?"
   },
   "invite": {
     "title": "Zaloguj się do Google",

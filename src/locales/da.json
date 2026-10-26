@@ -358,9 +358,7 @@
     "signInOffer": "Log ind på Google én gang: captchaen kommer sjældnere, og samtaler bliver gemt.",
     "signIn": "Log ind",
     "aiMode": "Googles AI-tilstand",
-    "question": "Hvor er det her taget?",
-    "speak": "tal, mens du holder",
-    "letGo": "slip: spørgsmålet sendes"
+    "question": "Hvor er det her taget?"
   },
   "invite": {
     "title": "Log ind på Google",

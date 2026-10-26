@@ -358,9 +358,7 @@
     "signInOffer": "Google에 한 번 로그인하면 캡차가 줄고 대화가 저장됩니다.",
     "signIn": "로그인",
     "aiMode": "Google AI 모드",
-    "question": "이 사진은 어디서 찍은 건가요?",
-    "speak": "누르고 있는 동안 말하기",
-    "letGo": "놓으면 질문이 전송됨"
+    "question": "이 사진은 어디서 찍은 건가요?"
   },
   "invite": {
     "title": "Google에 로그인",

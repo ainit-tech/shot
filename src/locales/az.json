@@ -358,9 +358,7 @@
     "signInOffer": "Google-a bir dəfə daxil olun: captcha daha az çıxacaq, söhbətlər isə saxlanılacaq.",
     "signIn": "Daxil ol",
     "aiMode": "Google AI rejimi",
-    "question": "Bu harada çəkilib?",
-    "speak": "basılı saxlayarkən danışın",
-    "letGo": "buraxın: sual göndərilir"
+    "question": "Bu harada çəkilib?"
   },
   "invite": {
     "title": "Google-a daxil olun",

@@ -358,9 +358,7 @@
     "signInOffer": "Přihlaste se k účtu Google jednou: captcha bude méně často a konverzace se uchovají.",
     "signIn": "Přihlásit se",
     "aiMode": "Režim AI Google",
-    "question": "Kde to bylo vyfoceno?",
-    "speak": "mluvte, dokud držíte",
-    "letGo": "pusťte: otázka se odešle"
+    "question": "Kde to bylo vyfoceno?"
   },
   "invite": {
     "title": "Přihlaste se k účtu Google",
