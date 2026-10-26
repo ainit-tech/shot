@@ -1489,6 +1489,11 @@ impl Session {
     /// for undo to bring back.
     fn start_over(&mut self, window: HWND) {
         self.put_down_text(window);
+        // An annotation being dragged stays where it has got to; if it hasn't moved, there is
+        // nothing to undo.
+        if self.grabbed.take().is_some() {
+            self.history.forget_if_unchanged();
+        }
         if let Some(selection) = self.selection.rect().filter(|r| !r.is_empty()) {
             let history = std::mem::take(&mut self.history);
             self.earlier.push(Earlier { selection, history, tool: self.tool });
@@ -1496,7 +1501,6 @@ impl Session {
         self.selection.clear();
         self.history.clear();
         self.picked = None;
-        self.grabbed = None;
         self.draft = None;
         self.layers = None;
         self.tool = None;
