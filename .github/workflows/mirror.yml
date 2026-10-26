@@ -1,0 +1,36 @@
+# The repository lives on SourceCraft (sourcecraft.dev/ainit-tech/shot); GitHub keeps a mirror of
+# its branch main and its tags, for the people who look for programs there. This workflow runs only
+# on GitHub: every quarter of an hour it takes main and the tags from SourceCraft and gives them to
+# github.com/ainit-tech/shot. Nothing is pushed to the mirror by hand, with one exception: GitHub
+# lets the workflow's own token push no change to the files in .github/workflows, so a commit that
+# changes this file goes to GitHub once by hand, over SSH, and the mirror goes on from there.
+name: mirror
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Take main and the tags from SourceCraft
+        run: |
+          git init --quiet --bare mirror.git
+          git -C mirror.git fetch --quiet --no-tags https://git.sourcecraft.dev/ainit-tech/shot.git \
+            "+refs/heads/main:refs/heads/main" "+refs/tags/*:refs/tags/*"
+      - name: Give them to GitHub
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          git -C mirror.git -c http.extraheader="AUTHORIZATION: basic $auth" push --quiet \
+            "https://github.com/$GITHUB_REPOSITORY.git" "refs/heads/main:refs/heads/main" "refs/tags/*:refs/tags/*"
