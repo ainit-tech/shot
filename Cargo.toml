@@ -1,6 +1,6 @@
 [package]
 name = "ainitshot"
-version = "0.2.3"
+version = "0.2.4"
 description = "A screenshot program for Windows that replaces Lightshot"
 license = "GPL-3.0-or-later"
 edition.workspace = true
