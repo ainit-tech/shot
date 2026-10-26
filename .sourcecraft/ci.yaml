@@ -35,4 +35,6 @@ workflows:
               PUBLISH_SSH_KEY: ${{ secrets.PUBLISH_SSH_KEY }}
             script:
               - apt-get update -qq && apt-get install -y -qq minisign openssh-client
-              - bash ci/publish.sh "${SOURCECRAFT_COMMIT_REF_NAME#refs/tags/}"
+              # A run started by hand on a tag gets no name of a ref at all: the version is then
+              # that of the tag's Cargo.toml, which the build has just built.
+              - tag="${SOURCECRAFT_COMMIT_REF_NAME#refs/tags/}"; bash ci/publish.sh "${tag:-v$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n 1)}"
