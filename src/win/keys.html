@@ -84,7 +84,6 @@ kbd {
 /* The tip: a quiet line, not a choice of the same weight. */
 .tip { margin-top: 22px; color: var(--muted); max-width: 600px; }
 .tip b { color: var(--text); font-weight: 600; white-space: nowrap; }
-.tip .link { margin-inline-start: 6px; }
 
 footer {
   display: flex; align-items: center; justify-content: flex-end; gap: 12px;
@@ -238,7 +237,9 @@ function render() {
   tip.hidden = !state.tip || state.hotkey === "Alt+~";
   if (!tip.hidden) {
     const [before, after] = say("tip").split("{keys}");
-    tip.replaceChildren(before, h("b", {}, written("Alt+~")), after || "",
+    // A space before the link, not a margin: where the link goes down to the next line, it starts
+    // the line as the text does.
+    tip.replaceChildren(before, h("b", {}, written("Alt+~")), after || "", " ",
       h("button", { class: "link", onclick: () => choose("Alt+~") }, say("use")));
   }
 }
