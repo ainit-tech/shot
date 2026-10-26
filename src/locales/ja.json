@@ -96,6 +96,7 @@
     "The folder didn't open": "フォルダーを開けませんでした",
     "The settings file didn't open": "設定ファイルを開けませんでした",
     "The site didn't open": "サイトを開けませんでした",
+    "Windows Settings didn't open": "Windows の設定が開きませんでした",
     "Windows couldn't open {}.": "Windows で {} を開けませんでした。",
     "Folder for screenshots": "スクリーンショットのフォルダー",
     "Couldn't add the icon to the notification area.": "通知領域にアイコンを追加できませんでした。",
@@ -374,6 +375,25 @@
     "un": "国連公用語",
     "all": "すべての言語"
   },
+  "keys": {
+    "title": "スクリーンショットのキー",
+    "intro": "どのプログラムでもこのキーを押すと画面が止まり、撮りたい部分を選べます。",
+    "pressOther": "別のキーを押すと、そのキーに変わります。",
+    "pressKeys": "組み合わせを押してください",
+    "backTo": "{keys} に戻す",
+    "free": "このキーは空いています",
+    "taken": "このキーは別のプログラムが使っています。別のキーを押すか、そのプログラムを閉じてください。",
+    "keyUnknown": "このキーは使えません。使えるのは英字、数字、~、F1–F24、PrintScreen、Pause、Space、Insert、Delete、Home、End、PageUp、PageDown です。",
+    "keyAlone": "{keys} だけでは文字入力の妨げになります。Ctrl、Alt、Win のいずれかを加えてください。",
+    "snipping": "Windows では PrtSc キーで Windows 自体の画面キャプチャが開きます。これをオフにすると、このキーで ainitShot のスクリーンショットを撮れます。",
+    "turnOff": "オフにする",
+    "snippingOff": "完了: PrtSc キーは ainitShot で使えるようになりました。",
+    "snippingLater": "Windows がこのキーを手放すのは、次にサインインしてからです。すぐに使うには、開く Windows の設定ページで PrtSc キーのスイッチをオフにしてください。",
+    "openSettings": "Windows の設定を開く",
+    "tip": "ヒント: {keys} を試してみてください。左手だけでスクリーンショットを撮れ、右手はマウスに置いたままにできます。",
+    "use": "使う",
+    "next": "次へ"
+  },
   "installer": {
     "installTitle": "ainitShot {version} のインストール",
     "installedTitle": "ainitShot をインストールしました",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot の設定と Google へのログインも削除しますか？"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "再生",
     "ui.pause": "一時停止",
     "ui.chapters": "チャプター",

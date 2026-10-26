@@ -96,6 +96,7 @@
     "The folder didn't open": "Mapa se ni odprla",
     "The settings file didn't open": "Datoteka z nastavitvami se ni odprla",
     "The site didn't open": "Spletno mesto se ni odprlo",
+    "Windows Settings didn't open": "Nastavitve sistema Windows se niso odprle",
     "Windows couldn't open {}.": "Windows ni mogel odpreti {}.",
     "Folder for screenshots": "Mapa s posnetki zaslona",
     "Couldn't add the icon to the notification area.": "Ikone ni bilo mogoče dodati v območje za obvestila.",
@@ -374,6 +375,25 @@
     "un": "Jeziki OZN",
     "all": "Vsi jeziki"
   },
+  "keys": {
+    "title": "Tipke za posnetek zaslona",
+    "intro": "Pritisnite jih v katerem koli programu: zaslon zamrzne, vi pa izberete, kaj posneti.",
+    "pressOther": "Pritisnite druge tipke, da uporabite te.",
+    "pressKeys": "Pritisnite kombinacijo",
+    "backTo": "Nazaj na {keys}",
+    "free": "Te tipke so proste",
+    "taken": "Te tipke ima drug program: pritisnite druge ali zaprite tisti program.",
+    "keyUnknown": "Te tipke program ne more uporabiti. Primerne so črke, števke, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp in PageDown.",
+    "keyAlone": "Bližnjica {keys} bi motila tipkanje: dodajte Ctrl, Alt ali Win.",
+    "snipping": "V sistemu Windows tipka Print Screen odpre lastno zajemanje zaslona sistema Windows. Izklopite to in tipka bo delala posnetke z ainitShot.",
+    "turnOff": "Izklopi",
+    "snippingOff": "Končano: tipka Print Screen zdaj pripada ainitShot.",
+    "snippingLater": "Windows bo tipko sprostil šele po ponovni prijavi. Če jo želite takoj, izklopite stikalo za Print Screen na strani nastavitev sistema Windows, ki se bo odprla.",
+    "openSettings": "Odpri nastavitve sistema Windows",
+    "tip": "Nasvet: poskusite {keys}: posnetek samo z levo roko, desna pa ostane na miški.",
+    "use": "Uporabi",
+    "next": "Naprej"
+  },
   "installer": {
     "installTitle": "Namestitev programa ainitShot {version}",
     "installedTitle": "ainitShot je nameščen",
@@ -383,6 +403,7 @@
     "removeData": "Ali želite odstraniti tudi nastavitve ainitShot in prijavo v Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Predvajaj",
     "ui.pause": "Premor",
     "ui.chapters": "Poglavja",

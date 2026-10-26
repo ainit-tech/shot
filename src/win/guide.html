@@ -120,7 +120,7 @@ function options() {
     hotkey: state.settings.hotkey,
     buttons: state.settings.buttons || [],
     actions: "column",
-    words: { ...unflatten(state.clip), program: AinitShotClip.programWords(state.terms) },
+    words: { ...unflatten(state.clip), keys: state.names, program: AinitShotClip.programWords(state.terms) },
     icons: state.icons,
   };
 }
@@ -144,6 +144,7 @@ function speak(message) {
   state.texts = message.texts || {};
   state.clip = message.clip || {};
   state.terms = message.terms || {};
+  state.names = message.names || {};
 }
 
 function init(message) {

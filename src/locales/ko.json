@@ -96,6 +96,7 @@
     "The folder didn't open": "폴더가 열리지 않았습니다",
     "The settings file didn't open": "설정 파일이 열리지 않았습니다",
     "The site didn't open": "사이트가 열리지 않았습니다",
+    "Windows Settings didn't open": "Windows 설정이 열리지 않았습니다",
     "Windows couldn't open {}.": "Windows가 {} 항목을 열지 못했습니다.",
     "Folder for screenshots": "스크린샷 폴더",
     "Couldn't add the icon to the notification area.": "알림 영역에 아이콘을 추가하지 못했습니다.",
@@ -374,6 +375,25 @@
     "un": "UN 공용어",
     "all": "모든 언어"
   },
+  "keys": {
+    "title": "스크린샷 키",
+    "intro": "어떤 프로그램에서든 이 키를 누르면 화면이 멈추고, 찍을 부분을 선택할 수 있습니다.",
+    "pressOther": "다른 키를 누르면 그 키로 바뀝니다.",
+    "pressKeys": "조합을 누르세요",
+    "backTo": "{keys}(으)로 되돌리기",
+    "free": "이 키는 사용할 수 있습니다",
+    "taken": "다른 프로그램이 이 키를 사용 중입니다. 다른 키를 누르거나 그 프로그램을 닫으세요.",
+    "keyUnknown": "이 키는 사용할 수 없습니다. 문자, 숫자, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp, PageDown을 사용할 수 있습니다.",
+    "keyAlone": "{keys}만 쓰면 입력에 방해가 됩니다. Ctrl, Alt 또는 Win을 추가하세요.",
+    "snipping": "Windows에서는 Print Screen 키가 Windows 자체 화면 캡처를 엽니다. 이 기능을 끄면 이 키로 ainitShot 스크린샷을 찍을 수 있습니다.",
+    "turnOff": "끄기",
+    "snippingOff": "완료: 이제 Print Screen 키는 ainitShot이 사용합니다.",
+    "snippingLater": "Windows는 다시 로그인한 뒤에야 이 키를 놓아 줍니다. 바로 쓰려면 열리는 Windows 설정 페이지에서 Print Screen 스위치를 끄세요.",
+    "openSettings": "Windows 설정 열기",
+    "tip": "팁: {keys}을(를) 써 보세요. 왼손만으로 스크린샷을 찍고 오른손은 마우스에 그대로 둘 수 있습니다.",
+    "use": "사용",
+    "next": "다음"
+  },
   "installer": {
     "installTitle": "ainitShot {version} 설치",
     "installedTitle": "ainitShot이 설치되었습니다",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot 설정과 Google 로그인 정보도 삭제할까요?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "재생",
     "ui.pause": "일시 정지",
     "ui.chapters": "챕터",

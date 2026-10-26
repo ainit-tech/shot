@@ -96,6 +96,7 @@
     "The folder didn't open": "لم يُفتح المجلد",
     "The settings file didn't open": "لم يُفتح ملف الإعدادات",
     "The site didn't open": "لم يُفتح الموقع",
+    "Windows Settings didn't open": "لم تُفتح إعدادات Windows",
     "Windows couldn't open {}.": "تعذّر على Windows فتح {}.",
     "Folder for screenshots": "مجلد لقطات الشاشة",
     "Couldn't add the icon to the notification area.": "تعذّرت إضافة الرمز إلى منطقة الإعلامات.",
@@ -374,6 +375,25 @@
     "un": "لغات الأمم المتحدة",
     "all": "كل اللغات"
   },
+  "keys": {
+    "title": "مفاتيح لقطة الشاشة",
+    "intro": "اضغطها في أي برنامج: تتجمّد الشاشة، وتحدّد ما تريد التقاطه.",
+    "pressOther": "اضغط مفاتيح أخرى لاستخدامها بدلًا منها.",
+    "pressKeys": "اضغط تركيبة",
+    "backTo": "العودة إلى {keys}",
+    "free": "هذه المفاتيح متاحة",
+    "taken": "يستخدم برنامج آخر هذه المفاتيح: اضغط مفاتيح أخرى أو أغلق ذلك البرنامج.",
+    "keyUnknown": "لا يدعم البرنامج هذا المفتاح. تصلح الحروف والأرقام و~ وF1–F24 وPrintScreen وPause وSpace وInsert وDelete وHome وEnd وPageUp وPageDown.",
+    "keyAlone": "{keys} سيعيق الكتابة: أضف Ctrl أو Alt أو Win.",
+    "snipping": "في Windows، يفتح مفتاح Print Screen أداة التقاط الشاشة المدمجة في النظام. أوقف ذلك، وسيلتقط المفتاح الشاشة باستخدام ainitShot.",
+    "turnOff": "إيقاف",
+    "snippingOff": "تم: أصبح مفتاح Print Screen الآن لـ ainitShot.",
+    "snippingLater": "لن يحرّر Windows المفتاح إلا بعد تسجيل الدخول من جديد. لاستخدامه فورًا، أوقف مفتاح Print Screen في صفحة إعدادات Windows التي ستُفتح.",
+    "openSettings": "فتح إعدادات Windows",
+    "tip": "نصيحة: جرّب {keys}: لقطة شاشة باليد اليسرى وحدها، بينما تبقى اليمنى على الفأرة.",
+    "use": "استخدام",
+    "next": "التالي"
+  },
   "installer": {
     "installTitle": "تثبيت ainitShot {version}",
     "installedTitle": "تم تثبيت ainitShot",
@@ -383,6 +403,7 @@
     "removeData": "هل تريد أيضًا حذف إعدادات ainitShot وتسجيل الدخول إلى Google؟"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "تشغيل",
     "ui.pause": "إيقاف مؤقت",
     "ui.chapters": "الفصول",

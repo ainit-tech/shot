@@ -96,6 +96,7 @@
     "The folder didn't open": "Priečinok sa neotvoril",
     "The settings file didn't open": "Súbor nastavení sa neotvoril",
     "The site didn't open": "Web sa neotvoril",
+    "Windows Settings didn't open": "Nastavenia Windows sa neotvorili",
     "Windows couldn't open {}.": "Systém Windows nedokázal otvoriť {}.",
     "Folder for screenshots": "Priečinok snímok obrazovky",
     "Couldn't add the icon to the notification area.": "Ikonu sa nepodarilo pridať do oblasti oznámení.",
@@ -374,6 +375,25 @@
     "un": "Jazyky OSN",
     "all": "Všetky jazyky"
   },
+  "keys": {
+    "title": "Klávesy na snímku",
+    "intro": "Stlačte ich v ľubovoľnom programe: obrazovka zamrzne a vy vyberiete, čo zachytiť.",
+    "pressOther": "Stlačte iné klávesy, ak chcete použiť tie.",
+    "pressKeys": "Stlačte kombináciu",
+    "backTo": "Späť na {keys}",
+    "free": "Tieto klávesy sú voľné",
+    "taken": "Tieto klávesy má iný program: stlačte iné alebo ten program zatvorte.",
+    "keyUnknown": "Tento kláves program nevie použiť. Hodia sa písmená, číslice, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp a PageDown.",
+    "keyAlone": "Skratka {keys} by prekážala pri písaní: pridajte Ctrl, Alt alebo Win.",
+    "snipping": "Vo Windows otvára kláves Print Screen vlastné zachytávanie obrazovky Windows. Vypnite to a kláves bude robiť snímky v ainitShot.",
+    "turnOff": "Vypnúť",
+    "snippingOff": "Hotovo: kláves Print Screen teraz patrí ainitShot.",
+    "snippingLater": "Windows kláves uvoľní až po novom prihlásení. Ak ho chcete hneď, vypnite prepínač Print Screen na stránke Nastavení Windows, ktorá sa otvorí.",
+    "openSettings": "Otvoriť Nastavenia Windows",
+    "tip": "Tip: skúste {keys}: snímka len ľavou rukou, kým pravá zostáva na myši.",
+    "use": "Použiť",
+    "next": "Ďalej"
+  },
   "installer": {
     "installTitle": "Inštalácia ainitShot {version}",
     "installedTitle": "ainitShot je nainštalovaný",
@@ -383,6 +403,7 @@
     "removeData": "Odstrániť aj nastavenia ainitShot a prihlásenie do účtu Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Prehrať",
     "ui.pause": "Pozastaviť",
     "ui.chapters": "Kapitoly",

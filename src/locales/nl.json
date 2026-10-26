@@ -96,6 +96,7 @@
     "The folder didn't open": "De map ging niet open",
     "The settings file didn't open": "Het instellingenbestand ging niet open",
     "The site didn't open": "De website ging niet open",
+    "Windows Settings didn't open": "Windows-instellingen zijn niet geopend",
     "Windows couldn't open {}.": "Windows kon {} niet openen.",
     "Folder for screenshots": "Map voor schermafbeeldingen",
     "Couldn't add the icon to the notification area.": "Kan het pictogram niet aan het systeemvak toevoegen.",
@@ -374,6 +375,25 @@
     "un": "VN-talen",
     "all": "Alle talen"
   },
+  "keys": {
+    "title": "Toetsen voor een schermafbeelding",
+    "intro": "Druk ze in elk programma in: het scherm bevriest, en je selecteert wat je wilt vastleggen.",
+    "pressOther": "Druk andere toetsen in om die te gebruiken.",
+    "pressKeys": "Druk op een combinatie",
+    "backTo": "Terug naar {keys}",
+    "free": "Deze toetsen zijn vrij",
+    "taken": "Een ander programma heeft deze toetsen: druk andere in of sluit dat programma.",
+    "keyUnknown": "Deze toets kan het programma niet gebruiken. Letters, cijfers, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp en PageDown zijn goed.",
+    "keyAlone": "{keys} zou het typen in de weg zitten: voeg Ctrl, Alt of Win toe.",
+    "snipping": "In Windows opent Print Screen de eigen schermopname van Windows. Zet dat uit, dan maakt de toets schermafbeeldingen met ainitShot.",
+    "turnOff": "Uitzetten",
+    "snippingOff": "Klaar: Print Screen is nu van ainitShot.",
+    "snippingLater": "Windows laat de toets pas los nadat je opnieuw aanmeldt. Wil je hem meteen, zet dan de schakelaar voor Print Screen uit op de pagina van Windows-instellingen die opent.",
+    "openSettings": "Windows-instellingen openen",
+    "tip": "Tip: probeer {keys}: een schermafbeelding met alleen je linkerhand, terwijl je rechterhand op de muis blijft.",
+    "use": "Gebruiken",
+    "next": "Volgende"
+  },
   "installer": {
     "installTitle": "ainitShot {version} installeren",
     "installedTitle": "ainitShot is geïnstalleerd",
@@ -383,6 +403,7 @@
     "removeData": "Ook de instellingen van ainitShot en de aanmelding bij Google verwijderen?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Afspelen",
     "ui.pause": "Pauzeren",
     "ui.chapters": "Hoofdstukken",

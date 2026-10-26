@@ -96,6 +96,7 @@
     "The folder didn't open": "Kaust ei avanenud",
     "The settings file didn't open": "Sättefail ei avanenud",
     "The site didn't open": "Sait ei avanenud",
+    "Windows Settings didn't open": "Windowsi sätted ei avanenud",
     "Windows couldn't open {}.": "Windows ei saanud avada üksust {}.",
     "Folder for screenshots": "Kuvatõmmiste kaust",
     "Couldn't add the icon to the notification area.": "Ikooni ei õnnestunud teavitusalale lisada.",
@@ -374,6 +375,25 @@
     "un": "ÜRO keeled",
     "all": "Kõik keeled"
   },
+  "keys": {
+    "title": "Kuvatõmmise klahvid",
+    "intro": "Vajutage neid mis tahes programmis: ekraan tardub ja te valite, mida jäädvustada.",
+    "pressOther": "Vajutage teisi klahve, et kasutada neid.",
+    "pressKeys": "Vajutage klahvikombinatsiooni",
+    "backTo": "Tagasi: {keys}",
+    "free": "Need klahvid on vabad",
+    "taken": "Need klahvid on teise programmi käes: vajutage teisi või sulgege see programm.",
+    "keyUnknown": "Programm ei oska seda klahvi kasutada. Sobivad tähed, numbrid, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp ja PageDown.",
+    "keyAlone": "{keys} segaks trükkimist: lisage Ctrl, Alt või Win.",
+    "snipping": "Windowsis avab klahv Print Screen Windowsi enda ekraanipildistuse. Lülitage see välja ja klahv teeb kuvatõmmiseid ainitShotiga.",
+    "turnOff": "Lülita välja",
+    "snippingOff": "Valmis: klahv Print Screen kuulub nüüd ainitShotile.",
+    "snippingLater": "Windows vabastab klahvi alles pärast uuesti sisselogimist. Et see kohe saada, lülitage avanevas Windowsi sätete lehel välja Print Screeni lüliti.",
+    "openSettings": "Ava Windowsi sätted",
+    "tip": "Nõuanne: proovige {keys}: kuvatõmmis ainult vasaku käega, samal ajal kui parem jääb hiirele.",
+    "use": "Kasuta",
+    "next": "Edasi"
+  },
   "installer": {
     "installTitle": "ainitShot {version} paigaldamine",
     "installedTitle": "ainitShot on paigaldatud",
@@ -383,6 +403,7 @@
     "removeData": "Kas eemaldada ka ainitShoti sätted ja Google’isse sisselogimine?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Esita",
     "ui.pause": "Paus",
     "ui.chapters": "Peatükid",

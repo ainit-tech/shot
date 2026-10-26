@@ -96,6 +96,7 @@
     "The folder didn't open": "Folder tidak terbuka",
     "The settings file didn't open": "File setelan tidak terbuka",
     "The site didn't open": "Situs tidak terbuka",
+    "Windows Settings didn't open": "Setelan Windows tidak terbuka",
     "Windows couldn't open {}.": "Windows tidak dapat membuka {}.",
     "Folder for screenshots": "Folder screenshot",
     "Couldn't add the icon to the notification area.": "Tidak dapat menambahkan ikon ke area notifikasi.",
@@ -374,6 +375,25 @@
     "un": "Bahasa PBB",
     "all": "Semua bahasa"
   },
+  "keys": {
+    "title": "Tombol untuk tangkapan layar",
+    "intro": "Tekan di program apa pun: layar membeku, lalu Anda memilih bagian yang akan diambil.",
+    "pressOther": "Tekan tombol lain untuk memakainya sebagai gantinya.",
+    "pressKeys": "Tekan kombinasi tombol",
+    "backTo": "Kembali ke {keys}",
+    "free": "Tombol ini bebas",
+    "taken": "Program lain memakai tombol ini: tekan tombol lain atau tutup program itu.",
+    "keyUnknown": "Program tidak dapat memakai tombol ini. Gunakan huruf, angka, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp, atau PageDown.",
+    "keyAlone": "{keys} akan mengganggu saat mengetik: tambahkan Ctrl, Alt, atau Win.",
+    "snipping": "Di Windows, tombol Print Screen membuka tangkapan layar bawaan Windows. Matikan itu, dan tombol ini akan mengambil tangkapan layar dengan ainitShot.",
+    "turnOff": "Matikan",
+    "snippingOff": "Selesai: tombol Print Screen sekarang milik ainitShot.",
+    "snippingLater": "Windows baru melepaskan tombol ini setelah Anda masuk lagi. Agar langsung bisa, matikan sakelar Print Screen di halaman Setelan Windows yang akan terbuka.",
+    "openSettings": "Buka Setelan Windows",
+    "tip": "Tips: coba {keys}: tangkapan layar hanya dengan tangan kiri, sementara tangan kanan tetap di mouse.",
+    "use": "Pakai",
+    "next": "Berikutnya"
+  },
   "installer": {
     "installTitle": "Pasang ainitShot {version}",
     "installedTitle": "ainitShot sudah terpasang",
@@ -383,6 +403,7 @@
     "removeData": "Hapus juga setelan ainitShot dan login Google-nya?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Putar",
     "ui.pause": "Jeda",
     "ui.chapters": "Bab",

@@ -31,7 +31,7 @@ The texts are written in English where they are used, so the code reads as it di
 ## How it works
 
 - **The languages:** English, Chinese, Spanish, Arabic, French, Russian, Hindi, Portuguese, Bengali, Japanese, German, Indonesian, Urdu, Turkish, Vietnamese, Korean, Italian, Persian, Thai, Polish, Ukrainian, Malay, Filipino, Swahili, Amharic, Burmese, Uzbek, Dutch, Romanian, Kazakh, Azerbaijani, Greek, Hungarian, Czech, Swedish, Serbian, Hebrew, Bulgarian, Danish, Finnish, Slovak, Norwegian, Georgian, Croatian, Armenian, Albanian, Lithuanian, Slovenian, Latvian and Estonian.
-- **On the first start,** before the presentation "How to use", a window asks for the language. Every language has a tile with its flag, three in a row, and the whole window scrolls.
+- **On the first start,** before the choice of the keys and the presentation "How to use", a window asks for the language. Every language has a tile with its flag, three in a row, and the whole window scrolls.
   - "UN languages" comes first: English, Chinese, Spanish, Arabic, French and Russian, by how many people speak them.
   - "All languages" follows: every language, the UN's six too, in the alphabetical order of their own names.
   - The language of Windows is marked "As in Windows": among the UN's six, or above them if it isn't one of them.

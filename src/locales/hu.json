@@ -96,6 +96,7 @@
     "The folder didn't open": "A mappa nem nyílt meg",
     "The settings file didn't open": "A beállításfájl nem nyílt meg",
     "The site didn't open": "A webhely nem nyílt meg",
+    "Windows Settings didn't open": "A Windows-beállítások nem nyíltak meg",
     "Windows couldn't open {}.": "A Windows nem tudta megnyitni: {}.",
     "Folder for screenshots": "Képernyőképek mappája",
     "Couldn't add the icon to the notification area.": "Nem sikerült hozzáadni az ikont az értesítési területhez.",
@@ -374,6 +375,25 @@
     "un": "Az ENSZ nyelvei",
     "all": "Minden nyelv"
   },
+  "keys": {
+    "title": "Billentyűk a képernyőképhez",
+    "intro": "Nyomd le őket bármelyik programban: a képernyő megáll, te pedig kijelölöd, mit rögzíts.",
+    "pressOther": "Nyomj le más billentyűket, hogy azokat használd helyettük.",
+    "pressKeys": "Nyomj meg egy billentyűkombinációt",
+    "backTo": "Vissza erre: {keys}",
+    "free": "Ezek a billentyűk szabadok",
+    "taken": "Ezeket a billentyűket egy másik program használja: nyomj le másokat, vagy zárd be azt a programot.",
+    "keyUnknown": "Ezt a billentyűt a program nem tudja használni. Jók a betűk, a számjegyek, a ~, az F1–F24, a PrintScreen, a Pause, a Space, az Insert, a Delete, a Home, az End, a PageUp és a PageDown.",
+    "keyAlone": "{keys} zavarná a gépelést: adj hozzá Ctrl, Alt vagy Win billentyűt.",
+    "snipping": "A Windowsban a Print Screen a Windows saját képernyőkivágását nyitja meg. Kapcsold ki, és a billentyű az ainitShottal készít képernyőképet.",
+    "turnOff": "Kikapcsolás",
+    "snippingOff": "Kész: a Print Screen mostantól az ainitShoté.",
+    "snippingLater": "A Windows csak újbóli bejelentkezés után engedi el a billentyűt. Ha azonnal kell, kapcsold ki a Print Screen kapcsolóját a megnyíló Windows-beállítások oldalon.",
+    "openSettings": "Windows-beállítások megnyitása",
+    "tip": "Tipp: próbáld ki ezt a kombinációt: {keys}. Képernyőkép csak bal kézzel, a jobb kezed közben az egéren marad.",
+    "use": "Használom",
+    "next": "Tovább"
+  },
   "installer": {
     "installTitle": "Az ainitShot {version} telepítése",
     "installedTitle": "Az ainitShot telepítve",
@@ -383,6 +403,7 @@
     "removeData": "Az ainitShot beállításai és a Google-bejelentkezés is törlődjön?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Lejátszás",
     "ui.pause": "Szünet",
     "ui.chapters": "Fejezetek",

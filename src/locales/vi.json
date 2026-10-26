@@ -96,6 +96,7 @@
     "The folder didn't open": "Không mở được thư mục",
     "The settings file didn't open": "Không mở được tệp cài đặt",
     "The site didn't open": "Không mở được trang web",
+    "Windows Settings didn't open": "Cài đặt Windows không mở được",
     "Windows couldn't open {}.": "Windows không mở được {}.",
     "Folder for screenshots": "Thư mục ảnh chụp màn hình",
     "Couldn't add the icon to the notification area.": "Không thêm được biểu tượng vào vùng thông báo.",
@@ -374,6 +375,25 @@
     "un": "Ngôn ngữ của Liên Hợp Quốc",
     "all": "Tất cả ngôn ngữ"
   },
+  "keys": {
+    "title": "Phím để chụp màn hình",
+    "intro": "Nhấn chúng trong bất kỳ chương trình nào: màn hình đứng yên và bạn chọn phần cần chụp.",
+    "pressOther": "Nhấn phím khác để dùng chúng thay thế.",
+    "pressKeys": "Nhấn tổ hợp phím",
+    "backTo": "Quay lại {keys}",
+    "free": "Các phím này đang trống",
+    "taken": "Chương trình khác đang dùng các phím này: hãy nhấn phím khác hoặc đóng chương trình đó.",
+    "keyUnknown": "Chương trình không dùng được phím này. Hãy dùng chữ cái, chữ số, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp hoặc PageDown.",
+    "keyAlone": "{keys} sẽ cản trở việc gõ phím: hãy thêm Ctrl, Alt hoặc Win.",
+    "snipping": "Trong Windows, phím Print Screen mở công cụ chụp màn hình riêng của Windows. Hãy tắt nó, và phím này sẽ chụp màn hình bằng ainitShot.",
+    "turnOff": "Tắt",
+    "snippingOff": "Xong: phím Print Screen giờ thuộc về ainitShot.",
+    "snippingLater": "Windows chỉ trả lại phím này sau khi bạn đăng nhập lại. Để dùng ngay, hãy tắt công tắc Print Screen trên trang Cài đặt Windows sẽ mở ra.",
+    "openSettings": "Mở Cài đặt Windows",
+    "tip": "Mẹo: thử {keys}: chụp màn hình chỉ bằng tay trái, còn tay phải vẫn để trên chuột.",
+    "use": "Dùng",
+    "next": "Tiếp"
+  },
   "installer": {
     "installTitle": "Cài đặt ainitShot {version}",
     "installedTitle": "Đã cài đặt ainitShot",
@@ -383,6 +403,7 @@
     "removeData": "Xóa cả cài đặt của ainitShot và thông tin đăng nhập Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Phát",
     "ui.pause": "Tạm dừng",
     "ui.chapters": "Chương",

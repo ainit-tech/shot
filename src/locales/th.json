@@ -96,6 +96,7 @@
     "The folder didn't open": "โฟลเดอร์ไม่เปิด",
     "The settings file didn't open": "ไฟล์การตั้งค่าไม่เปิด",
     "The site didn't open": "เว็บไซต์ไม่เปิด",
+    "Windows Settings didn't open": "การตั้งค่า Windows ไม่เปิด",
     "Windows couldn't open {}.": "Windows เปิด {} ไม่ได้",
     "Folder for screenshots": "โฟลเดอร์ภาพหน้าจอ",
     "Couldn't add the icon to the notification area.": "เพิ่มไอคอนลงในพื้นที่แจ้งเตือนไม่ได้",
@@ -374,6 +375,25 @@
     "un": "ภาษาของ UN",
     "all": "ภาษาทั้งหมด"
   },
+  "keys": {
+    "title": "ปุ่มสำหรับจับภาพหน้าจอ",
+    "intro": "กดในโปรแกรมใดก็ได้ หน้าจอจะหยุดนิ่ง แล้วคุณเลือกส่วนที่ต้องการจับภาพ",
+    "pressOther": "กดปุ่มอื่นเพื่อใช้ปุ่มนั้นแทน",
+    "pressKeys": "กดชุดคีย์",
+    "backTo": "กลับไปใช้ {keys}",
+    "free": "ปุ่มเหล่านี้ว่างอยู่",
+    "taken": "โปรแกรมอื่นใช้ปุ่มเหล่านี้อยู่ กดปุ่มอื่นหรือปิดโปรแกรมนั้น",
+    "keyUnknown": "โปรแกรมใช้คีย์นี้ไม่ได้ ใช้ได้กับตัวอักษร, ตัวเลข, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp และ PageDown",
+    "keyAlone": "{keys} จะรบกวนการพิมพ์: เพิ่ม Ctrl, Alt หรือ Win",
+    "snipping": "ใน Windows ปุ่ม Print Screen จะเปิดเครื่องมือจับภาพหน้าจอของ Windows เอง ปิดการตั้งค่านี้ แล้วปุ่มนี้จะจับภาพหน้าจอด้วย ainitShot",
+    "turnOff": "ปิด",
+    "snippingOff": "เรียบร้อย: ตอนนี้ปุ่ม Print Screen เป็นของ ainitShot แล้ว",
+    "snippingLater": "Windows จะปล่อยปุ่มนี้หลังจากคุณลงชื่อเข้าใช้ใหม่เท่านั้น หากต้องการใช้ทันที ให้ปิดสวิตช์ Print Screen ในหน้าการตั้งค่า Windows ที่จะเปิดขึ้น",
+    "openSettings": "เปิดการตั้งค่า Windows",
+    "tip": "เคล็ดลับ: ลอง {keys} จับภาพหน้าจอได้ด้วยมือซ้ายข้างเดียว ส่วนมือขวายังอยู่บนเมาส์",
+    "use": "ใช้",
+    "next": "ถัดไป"
+  },
   "installer": {
     "installTitle": "ติดตั้ง ainitShot {version}",
     "installedTitle": "ติดตั้ง ainitShot แล้ว",
@@ -383,6 +403,7 @@
     "removeData": "ลบการตั้งค่าของ ainitShot และการลงชื่อเข้าใช้ Google ด้วยหรือไม่"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "เล่น",
     "ui.pause": "หยุดชั่วคราว",
     "ui.chapters": "บท",

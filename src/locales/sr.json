@@ -96,6 +96,7 @@
     "The folder didn't open": "Фасцикла се није отворила",
     "The settings file didn't open": "Датотека подешавања се није отворила",
     "The site didn't open": "Сајт се није отворио",
+    "Windows Settings didn't open": "Подешавања Windows-а се нису отворила",
     "Windows couldn't open {}.": "Windows није могао да отвори {}.",
     "Folder for screenshots": "Фасцикла за снимке екрана",
     "Couldn't add the icon to the notification area.": "Икона није могла да се дода у област за обавештења.",
@@ -374,6 +375,25 @@
     "un": "Језици УН",
     "all": "Сви језици"
   },
+  "keys": {
+    "title": "Тастери за снимак",
+    "intro": "Притисните их у било ком програму: екран се замрзне, а ви означите шта да снимите.",
+    "pressOther": "Притисните друге тастере да бисте користили њих.",
+    "pressKeys": "Притисните комбинацију",
+    "backTo": "Назад на {keys}",
+    "free": "Ови тастери су слободни",
+    "taken": "Ове тастере има други програм: притисните друге или затворите тај програм.",
+    "keyUnknown": "Програм не може да користи овај тастер. Одговарају слова, цифре, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp и PageDown.",
+    "keyAlone": "{keys} би сметао при куцању: додајте Ctrl, Alt или Win.",
+    "snipping": "У Windows-у тастер Print Screen отвара сопствено снимање екрана система Windows. Искључите то и тастер ће правити снимке у ainitShot-у.",
+    "turnOff": "Искључи",
+    "snippingOff": "Готово: тастер Print Screen сада припада ainitShot-у.",
+    "snippingLater": "Windows ће пустити тастер тек након поновног пријављивања. Да бисте га одмах имали, искључите прекидач за Print Screen на страници подешавања Windows-а која ће се отворити.",
+    "openSettings": "Отвори подешавања Windows-а",
+    "tip": "Савет: пробајте {keys}: снимак само левом руком, док десна остаје на мишу.",
+    "use": "Користи",
+    "next": "Даље"
+  },
   "installer": {
     "installTitle": "Инсталација програма ainitShot {version}",
     "installedTitle": "ainitShot је инсталиран",
@@ -383,6 +403,7 @@
     "removeData": "Да ли да се уклоне и подешавања ainitShot-а и пријава на Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Пусти",
     "ui.pause": "Пауза",
     "ui.chapters": "Поглавља",

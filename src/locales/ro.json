@@ -96,6 +96,7 @@
     "The folder didn't open": "Folderul nu s-a deschis",
     "The settings file didn't open": "Fișierul de setări nu s-a deschis",
     "The site didn't open": "Site-ul nu s-a deschis",
+    "Windows Settings didn't open": "Setările Windows nu s-au deschis",
     "Windows couldn't open {}.": "Windows nu a putut deschide {}.",
     "Folder for screenshots": "Folderul pentru capturi de ecran",
     "Couldn't add the icon to the notification area.": "Nu s-a putut adăuga pictograma în zona de notificare.",
@@ -374,6 +375,25 @@
     "un": "Limbile ONU",
     "all": "Toate limbile"
   },
+  "keys": {
+    "title": "Taste pentru o captură",
+    "intro": "Apăsați-le în orice program: ecranul îngheață, iar dvs. selectați ce să capturați.",
+    "pressOther": "Apăsați alte taste pentru a le folosi pe acelea.",
+    "pressKeys": "Apăsați o combinație",
+    "backTo": "Înapoi la {keys}",
+    "free": "Aceste taste sunt libere",
+    "taken": "Alt program folosește aceste taste: apăsați altele sau închideți acel program.",
+    "keyUnknown": "Programul nu acceptă această tastă. Merg literele, cifrele, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp și PageDown.",
+    "keyAlone": "{keys} ar încurca tastarea: adăugați Ctrl, Alt sau Win.",
+    "snipping": "În Windows, tasta Print Screen deschide captura de ecran proprie a Windows. Dezactivați asta, iar tasta va face capturi cu ainitShot.",
+    "turnOff": "Dezactivați",
+    "snippingOff": "Gata: tasta Print Screen este acum a lui ainitShot.",
+    "snippingLater": "Windows va elibera tasta abia după ce vă conectați din nou. Ca s-o aveți imediat, dezactivați comutatorul pentru Print Screen în pagina Setări Windows care se va deschide.",
+    "openSettings": "Deschideți Setări Windows",
+    "tip": "Sfat: încercați {keys}: o captură doar cu mâna stângă, în timp ce dreapta rămâne pe mouse.",
+    "use": "Folosiți",
+    "next": "Înainte"
+  },
   "installer": {
     "installTitle": "Instalarea ainitShot {version}",
     "installedTitle": "ainitShot a fost instalat",
@@ -383,6 +403,7 @@
     "removeData": "Ștergeți și setările ainitShot și conectarea la Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Redare",
     "ui.pause": "Pauză",
     "ui.chapters": "Capitole",

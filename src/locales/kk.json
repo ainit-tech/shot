@@ -96,6 +96,7 @@
     "The folder didn't open": "Қалта ашылмады",
     "The settings file didn't open": "Параметрлер файлы ашылмады",
     "The site didn't open": "Сайт ашылмады",
+    "Windows Settings didn't open": "Windows параметрлері ашылмады",
     "Windows couldn't open {}.": "Windows {} аша алмады.",
     "Folder for screenshots": "Скриншоттар қалтасы",
     "Couldn't add the icon to the notification area.": "Белгішені хабарландыру аймағына қосу мүмкін болмады.",
@@ -374,6 +375,25 @@
     "un": "БҰҰ тілдері",
     "all": "Барлық тілдер"
   },
+  "keys": {
+    "title": "Скриншот пернелері",
+    "intro": "Оларды кез келген бағдарламада басыңыз: экран қатып қалады, ал сіз нені түсіретініңізді таңдайсыз.",
+    "pressOther": "Олардың орнына басқа пернелерді алу үшін соларды басыңыз.",
+    "pressKeys": "Тіркесімді басыңыз",
+    "backTo": "Қайтару: {keys}",
+    "free": "Бұл пернелер бос",
+    "taken": "Бұл пернелерді басқа бағдарлама алып қойған: басқаларын басыңыз немесе сол бағдарламаны жабыңыз.",
+    "keyUnknown": "Бағдарлама бұл пернені қабылдай алмайды. Әріптер, цифрлар, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp және PageDown жарайды.",
+    "keyAlone": "{keys} теруге кедергі келтіреді: Ctrl, Alt немесе Win қосыңыз.",
+    "snipping": "Windows жүйесінде Print Screen пернесі Windows-тың өз экранды түсіру құралын ашады. Мұны өшіріңіз, сонда перне ainitShot арқылы скриншот түсіреді.",
+    "turnOff": "Өшіру",
+    "snippingOff": "Дайын: Print Screen пернесі енді ainitShot-та.",
+    "snippingLater": "Windows пернені тек қайта кіргеннен кейін ғана босатады. Оны бірден алу үшін ашылатын Windows параметрлері бетінде Print Screen ауыстырғышын өшіріңіз.",
+    "openSettings": "Windows параметрлерін ашу",
+    "tip": "Кеңес: {keys} тіркесімін байқап көріңіз: скриншотты тек сол қолмен түсіресіз, ал оң қол тышқанда қалады.",
+    "use": "Пайдалану",
+    "next": "Келесі"
+  },
   "installer": {
     "installTitle": "ainitShot {version} орнату",
     "installedTitle": "ainitShot орнатылды",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot баптаулары мен Google-ға кіру де жойылсын ба?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Ойнату",
     "ui.pause": "Кідірту",
     "ui.chapters": "Тараулар",

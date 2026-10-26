@@ -96,6 +96,7 @@
     "The folder didn't open": "文件夹没有打开",
     "The settings file didn't open": "设置文件没有打开",
     "The site didn't open": "网站没有打开",
+    "Windows Settings didn't open": "Windows 设置没有打开",
     "Windows couldn't open {}.": "Windows 无法打开 {}。",
     "Folder for screenshots": "截图文件夹",
     "Couldn't add the icon to the notification area.": "无法将图标添加到通知区域。",
@@ -374,6 +375,25 @@
     "un": "联合国语言",
     "all": "所有语言"
   },
+  "keys": {
+    "title": "截图快捷键",
+    "intro": "在任何程序中按下它们：屏幕会定格，你可以框选要截取的部分。",
+    "pressOther": "按下其他按键即可改用它们。",
+    "pressKeys": "按下组合键",
+    "backTo": "改回 {keys}",
+    "free": "这些按键可用",
+    "taken": "这些按键已被其他程序占用：请按其他按键，或关闭那个程序。",
+    "keyUnknown": "程序不支持这个按键。可以使用字母、数字、~、F1–F24、PrintScreen、Pause、Space、Insert、Delete、Home、End、PageUp 和 PageDown。",
+    "keyAlone": "{keys} 会妨碍打字：请加上 Ctrl、Alt 或 Win。",
+    "snipping": "Windows 会用 PrtSc 键打开自带的屏幕截图。关闭这一设置后，这个键就会用 ainitShot 截图。",
+    "turnOff": "关闭",
+    "snippingOff": "完成：PrtSc 键现在归 ainitShot 使用。",
+    "snippingLater": "Windows 要等你重新登录后才会放开这个键。若想立即生效，请在打开的 Windows 设置页面中关闭 PrtSc 键的开关。",
+    "openSettings": "打开 Windows 设置",
+    "tip": "提示：试试 {keys}——只用左手就能截图，右手可以一直放在鼠标上。",
+    "use": "使用",
+    "next": "下一步"
+  },
   "installer": {
     "installTitle": "安装 ainitShot {version}",
     "installedTitle": "ainitShot 已安装",
@@ -383,6 +403,7 @@
     "removeData": "同时删除 ainitShot 的设置和 Google 登录信息吗？"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "播放",
     "ui.pause": "暂停",
     "ui.chapters": "章节",

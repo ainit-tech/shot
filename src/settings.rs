@@ -186,7 +186,9 @@ impl Settings {
             tr_in(language, "Translate the text in the picture into English. Answer with the translation only.");
         let images = tr_in(language, "Search by image in Google");
         Settings {
-            hotkey: "Alt+~".into(),
+            // A new installation's keys; the choice of the keys on the first start offers others,
+            // and a settings file keeps the keys it has.
+            hotkey: "PrintScreen".into(),
             language: Choice::Auto,
             autostart: false,
             autoupdate: true,

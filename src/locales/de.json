@@ -96,6 +96,7 @@
     "The folder didn't open": "Der Ordner hat sich nicht geöffnet",
     "The settings file didn't open": "Die Einstellungsdatei hat sich nicht geöffnet",
     "The site didn't open": "Die Website hat sich nicht geöffnet",
+    "Windows Settings didn't open": "Die Windows-Einstellungen haben sich nicht geöffnet",
     "Windows couldn't open {}.": "Windows konnte {} nicht öffnen.",
     "Folder for screenshots": "Screenshot-Ordner",
     "Couldn't add the icon to the notification area.": "Das Symbol konnte nicht zum Infobereich hinzugefügt werden.",
@@ -374,6 +375,25 @@
     "un": "UN-Sprachen",
     "all": "Alle Sprachen"
   },
+  "keys": {
+    "title": "Tasten für einen Screenshot",
+    "intro": "Drück sie in jedem Programm: Der Bildschirm friert ein, und du wählst aus, was du aufnehmen willst.",
+    "pressOther": "Drück andere Tasten, um stattdessen sie zu nehmen.",
+    "pressKeys": "Drücke eine Kombination",
+    "backTo": "Zurück zu {keys}",
+    "free": "Diese Tasten sind frei",
+    "taken": "Ein anderes Programm hat diese Tasten: Drück andere oder schließ dieses Programm.",
+    "keyUnknown": "Diese Taste kann das Programm nicht verwenden. Geeignet sind Buchstaben, Ziffern, ~, F1–F24, Druck, Pause, Leertaste, Einfg, Entf, Pos1, Ende, Bild↑ und Bild↓.",
+    "keyAlone": "{keys} würde beim Tippen stören: Nimm Strg, Alt oder Win dazu.",
+    "snipping": "Unter Windows öffnet die Druck-Taste die eigene Bildschirmaufnahme von Windows. Schalte das aus, dann macht die Taste Screenshots mit ainitShot.",
+    "turnOff": "Ausschalten",
+    "snippingOff": "Erledigt: Die Druck-Taste gehört jetzt ainitShot.",
+    "snippingLater": "Windows gibt die Taste erst nach der nächsten Anmeldung frei. Damit es sofort klappt, schalte auf der Seite der Windows-Einstellungen, die sich öffnet, den Schalter für die Druck-Taste aus.",
+    "openSettings": "Windows-Einstellungen öffnen",
+    "tip": "Tipp: Probier {keys}: ein Screenshot nur mit der linken Hand, während die rechte auf der Maus bleibt.",
+    "use": "Übernehmen",
+    "next": "Weiter"
+  },
   "installer": {
     "installTitle": "ainitShot {version} installieren",
     "installedTitle": "ainitShot ist installiert",
@@ -383,6 +403,7 @@
     "removeData": "Auch die Einstellungen von ainitShot und die Anmeldung bei Google entfernen?"
   },
   "clip": {
+    "keys.PrintScreen": "Druck",
     "ui.play": "Abspielen",
     "ui.pause": "Pause",
     "ui.chapters": "Kapitel",

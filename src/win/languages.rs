@@ -3,8 +3,8 @@
 //! first and then every language in alphabetical order, the one of Windows marked. The window
 //! speaks the language in force, which is in focus: that of Windows, or that of the installation
 //! when it was another (decision 11). The language chosen goes into the settings; on the first
-//! start the presentation of how to use the program then opens in it. A page in WebView2, like the
-//! program's other windows.
+//! start the choice of the keys for a screenshot then opens in it, and the presentation of how to
+//! use the program after that. A page in WebView2, like the program's other windows.
 
 use std::cell::{Cell, RefCell};
 use std::ptr::{null, null_mut};
@@ -26,13 +26,14 @@ use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW,
-    LoadCursorW, RegisterClassExW, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow, SetWindowPos, ShowWindow,
-    WA_INACTIVE, WM_ACTIVATE, WM_CLOSE, WM_DPICHANGED, WM_SIZE, WNDCLASSEXW, WS_CAPTION, WS_OVERLAPPED, WS_SYSMENU,
+    LoadCursorW, RegisterClassExW, SW_SHOW, SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow,
+    SetWindowPos, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_CLOSE, WM_DPICHANGED, WM_SIZE, WNDCLASSEXW, WS_CAPTION,
+    WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_OVERLAPPED, WS_SYSMENU,
 };
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, browser, guide, last_error, shell, tray, wide};
+use super::{QUIET, app, browser, guide, keys, last_error, out_of_sight, shell, tray, wide};
 use crate::settings::Settings;
 use crate::text::{self, Choice, Language};
 
@@ -53,25 +54,30 @@ struct Picker {
     window: HWND,
     controller: Option<ICoreWebView2Controller>,
     icons: Vec<HICON>,
-    /// Whether the presentation follows, as on the first start.
-    then_guide: bool,
+    /// Whether the choice of the keys and the presentation follow, as on the first start.
+    first: bool,
 }
 
-/// Asks which language the program speaks, and then shows how to use it with `then_guide`.
-/// Without WebView2 nothing is asked, and the language of Windows stays.
-pub fn open(then_guide: bool) {
+/// Asks which language the program speaks; on the first start, `first`, the choice of the keys
+/// and the presentation of how to use the program follow. Without WebView2 nothing is asked, and
+/// the language of Windows stays.
+pub fn open(first: bool) {
     let window = match create_window() {
         Ok(window) => window,
         Err(error) => {
             eprintln!("The choice of a language didn't open: {error}");
-            return after(then_guide);
+            return after(first);
         }
     };
     let icons = tray::give_icon(window);
-    WINDOW.with(|cell| *cell.borrow_mut() = Some(Picker { window, controller: None, icons, then_guide }));
+    WINDOW.with(|cell| *cell.borrow_mut() = Some(Picker { window, controller: None, icons, first }));
     unsafe {
-        ShowWindow(window, SW_SHOW);
-        SetForegroundWindow(window);
+        if QUIET {
+            ShowWindow(window, SW_SHOWNOACTIVATE);
+        } else {
+            ShowWindow(window, SW_SHOW);
+            SetForegroundWindow(window);
+        }
     }
     browser::with_environment(Box::new(move |environment| match environment {
         Some(environment) => create_controller(environment, window),
@@ -84,17 +90,17 @@ pub fn is_open() -> bool {
     window().is_some()
 }
 
-/// The window has done its work, chosen or closed: the presentation follows on the first start,
-/// and an invitation to sign in that waited for the window comes.
+/// The window has done its work, chosen or closed: the choice of the keys follows on the first
+/// start, and an invitation to sign in that waited for the window comes otherwise.
 fn finish() {
-    let then_guide = WINDOW.with(|cell| cell.borrow().as_ref().is_some_and(|picker| picker.then_guide));
+    let first = WINDOW.with(|cell| cell.borrow().as_ref().is_some_and(|picker| picker.first));
     close();
-    after(then_guide);
+    after(first);
 }
 
-fn after(then_guide: bool) {
-    if then_guide {
-        guide::open();
+fn after(first: bool) {
+    if first {
+        keys::open();
     } else {
         guide::invite_if_waiting();
     }
@@ -253,9 +259,12 @@ fn create_window() -> std::io::Result<HWND> {
             }
             REGISTERED.set(true);
         }
-        let place = place();
+        let (place, quiet) = match QUIET {
+            true => (out_of_sight(place()), WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE),
+            false => (place(), 0),
+        };
         let window = CreateWindowExW(
-            0,
+            quiet,
             CLASS,
             w!("ainitShot"),
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
@@ -351,8 +360,8 @@ mod tests {
     fn the_choice_of_a_language_shows_the_flags_and_the_rest() {
         unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
         let window = create_window().unwrap();
-        WINDOW.with(|cell| *cell.borrow_mut() = Some(Picker { window, controller: None, icons: Vec::new(), then_guide: false }));
-        unsafe { ShowWindow(window, SW_SHOW) };
+        WINDOW.with(|cell| *cell.borrow_mut() = Some(Picker { window, controller: None, icons: Vec::new(), first: false }));
+        unsafe { ShowWindow(window, SW_SHOWNOACTIVATE) };
         browser::with_environment(Box::new(move |environment| {
             if let Some(environment) = environment {
                 create_controller(environment, window);

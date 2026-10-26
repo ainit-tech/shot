@@ -38,7 +38,7 @@ webview2-com = "0.39.1"
 # The text recognition of Windows, for copying the text of a screenshot, is a WinRT API.
 windows = { version = "0.62", features = ["Win32_Foundation", "Win32_System_Com", "Win32_UI_Shell", "Win32_UI_Shell_Common", "Media_Ocr", "Graphics_Imaging", "Security_Cryptography", "Storage_Streams", "Foundation_Collections", "Globalization", "System_UserProfile"] }
 windows-core = "0.62"
-windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Input_Ime", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_System_LibraryLoader", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_System_Ole", "Win32_System_Threading", "Win32_Security", "Win32_UI_Controls_Dialogs", "Win32_System_Registry", "Win32_System_Com", "Win32_System_SystemInformation", "Win32_System_Console", "Win32_Networking_WinHttp"] }
+windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Input_Ime", "Win32_UI_HiDpi", "Win32_UI_Shell", "Win32_System_LibraryLoader", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_System_Ole", "Win32_System_Threading", "Win32_Security", "Win32_UI_Controls_Dialogs", "Win32_System_Registry", "Win32_System_Com", "Win32_System_SystemInformation", "Win32_System_Console", "Win32_Networking_WinHttp", "Win32_Globalization"] }
 
 # The program redraws whole screens of pixels, which unoptimized code does too slowly to use
 # even while it is being developed.

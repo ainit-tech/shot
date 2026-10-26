@@ -96,6 +96,7 @@
     "The folder didn't open": "فولڈر نہیں کھلا",
     "The settings file didn't open": "ترتیبات کی فائل نہیں کھلی",
     "The site didn't open": "سائٹ نہیں کھلی",
+    "Windows Settings didn't open": "Windows ترتیبات نہیں کھلیں",
     "Windows couldn't open {}.": "Windows {} کو نہیں کھول سکا۔",
     "Folder for screenshots": "اسکرین شاٹس کا فولڈر",
     "Couldn't add the icon to the notification area.": "آئیکن کو اطلاعاتی علاقے میں شامل نہیں کیا جا سکا۔",
@@ -374,6 +375,25 @@
     "un": "اقوام متحدہ کی زبانیں",
     "all": "تمام زبانیں"
   },
+  "keys": {
+    "title": "اسکرین شاٹ کی کلیدیں",
+    "intro": "انہیں کسی بھی پروگرام میں دبائیں: اسکرین رک جاتی ہے، اور آپ چنتے ہیں کہ کیا لینا ہے۔",
+    "pressOther": "ان کی جگہ دوسری کلیدیں لینے کے لیے انہیں دبائیں۔",
+    "pressKeys": "امتزاج دبائیں",
+    "backTo": "{keys} پر واپس جائیں",
+    "free": "یہ کلیدیں خالی ہیں",
+    "taken": "یہ کلیدیں کسی دوسرے پروگرام کے پاس ہیں: دوسری کلیدیں دبائیں یا وہ پروگرام بند کریں۔",
+    "keyUnknown": "پروگرام یہ کلید نہیں لے سکتا۔ حروف، ہندسے، ~، F1–F24، PrintScreen، Pause، Space، Insert، Delete، Home، End، PageUp اور PageDown چلیں گے۔",
+    "keyAlone": "{keys} ٹائپنگ میں رکاوٹ بنے گی: Ctrl، Alt یا Win شامل کریں۔",
+    "snipping": "Windows میں Print Screen کلید Windows کا اپنا اسکرین کیپچر کھولتی ہے۔ اسے بند کریں، تو یہ کلید ainitShot سے اسکرین شاٹ لے گی۔",
+    "turnOff": "بند کریں",
+    "snippingOff": "ہو گیا: Print Screen کلید اب ainitShot کی ہے۔",
+    "snippingLater": "Windows یہ کلید دوبارہ سائن ان کرنے کے بعد ہی چھوڑے گا۔ اسے فوراً پانے کے لیے، کھلنے والے Windows ترتیبات کے صفحے پر Print Screen کا سوئچ بند کریں۔",
+    "openSettings": "Windows ترتیبات کھولیں",
+    "tip": "مشورہ: {keys} آزمائیں: صرف بائیں ہاتھ سے اسکرین شاٹ، جبکہ دایاں ہاتھ ماؤس پر رہتا ہے۔",
+    "use": "استعمال کریں",
+    "next": "آگے"
+  },
   "installer": {
     "installTitle": "ainitShot {version} انسٹال کریں",
     "installedTitle": "ainitShot انسٹال ہو گیا",
@@ -383,6 +403,7 @@
     "removeData": "کیا ainitShot کی ترتیبات اور Google میں سائن ان بھی ہٹا دیں؟"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "چلائیں",
     "ui.pause": "روکیں",
     "ui.chapters": "ابواب",

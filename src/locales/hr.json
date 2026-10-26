@@ -96,6 +96,7 @@
     "The folder didn't open": "Mapa se nije otvorila",
     "The settings file didn't open": "Datoteka postavki nije se otvorila",
     "The site didn't open": "Web-stranica se nije otvorila",
+    "Windows Settings didn't open": "Postavke sustava Windows nisu se otvorile",
     "Windows couldn't open {}.": "Windows nije mogao otvoriti {}.",
     "Folder for screenshots": "Mapa za snimke zaslona",
     "Couldn't add the icon to the notification area.": "Ikona nije dodana u područje obavijesti.",
@@ -374,6 +375,25 @@
     "un": "Jezici UN-a",
     "all": "Svi jezici"
   },
+  "keys": {
+    "title": "Tipke za snimku",
+    "intro": "Pritisnite ih u bilo kojem programu: zaslon se zamrzne, a vi odaberete što snimiti.",
+    "pressOther": "Pritisnite druge tipke da biste koristili njih.",
+    "pressKeys": "Pritisnite kombinaciju",
+    "backTo": "Natrag na {keys}",
+    "free": "Ove su tipke slobodne",
+    "taken": "Ove tipke ima drugi program: pritisnite druge ili zatvorite taj program.",
+    "keyUnknown": "Program ne može koristiti ovu tipku. Odgovaraju slova, znamenke, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp i PageDown.",
+    "keyAlone": "Prečac {keys} smetao bi pri tipkanju: dodajte Ctrl, Alt ili Win.",
+    "snipping": "U Windowsima tipka Print Screen otvara Windowsovo vlastito snimanje zaslona. Isključite to i tipka će snimati zaslon u ainitShotu.",
+    "turnOff": "Isključi",
+    "snippingOff": "Gotovo: tipka Print Screen sada pripada ainitShotu.",
+    "snippingLater": "Windows će otpustiti tipku tek nakon ponovne prijave. Da biste je imali odmah, isključite prekidač za Print Screen na stranici postavki sustava Windows koja će se otvoriti.",
+    "openSettings": "Otvori postavke sustava Windows",
+    "tip": "Savjet: isprobajte {keys}: snimka samo lijevom rukom, dok desna ostaje na mišu.",
+    "use": "Koristi",
+    "next": "Dalje"
+  },
   "installer": {
     "installTitle": "Instalacija programa ainitShot {version}",
     "installedTitle": "ainitShot je instaliran",
@@ -383,6 +403,7 @@
     "removeData": "Ukloniti i postavke ainitShota i prijavu na Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Reproduciraj",
     "ui.pause": "Pauza",
     "ui.chapters": "Poglavlja",

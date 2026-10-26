@@ -96,6 +96,7 @@
     "The folder didn't open": "La cartella non si è aperta",
     "The settings file didn't open": "Il file delle impostazioni non si è aperto",
     "The site didn't open": "Il sito non si è aperto",
+    "Windows Settings didn't open": "Le Impostazioni di Windows non si sono aperte",
     "Windows couldn't open {}.": "Windows non è riuscito ad aprire {}.",
     "Folder for screenshots": "Cartella degli screenshot",
     "Couldn't add the icon to the notification area.": "Impossibile aggiungere l'icona all'area di notifica.",
@@ -374,6 +375,25 @@
     "un": "Lingue dell'ONU",
     "all": "Tutte le lingue"
   },
+  "keys": {
+    "title": "Tasti per uno screenshot",
+    "intro": "Premili in qualsiasi programma: lo schermo si ferma e selezioni cosa catturare.",
+    "pressOther": "Premi altri tasti per usare quelli al loro posto.",
+    "pressKeys": "Premi una combinazione",
+    "backTo": "Torna a {keys}",
+    "free": "Questi tasti sono liberi",
+    "taken": "Un altro programma usa questi tasti: premine altri o chiudi quel programma.",
+    "keyUnknown": "Il programma non accetta questo tasto. Vanno bene lettere, cifre, ~, F1–F24, Stamp, Pausa, Spazio, Ins, Canc, Home, Fine, PagSu e PagGiù.",
+    "keyAlone": "{keys} intralcerebbe la digitazione: aggiungi Ctrl, Alt o Win.",
+    "snipping": "In Windows il tasto Stamp apre la cattura dello schermo di Windows. Disattivala, e il tasto farà gli screenshot con ainitShot.",
+    "turnOff": "Disattiva",
+    "snippingOff": "Fatto: ora il tasto Stamp è di ainitShot.",
+    "snippingLater": "Windows lascerà il tasto solo dopo un nuovo accesso. Per averlo subito, disattiva l'interruttore del tasto Stamp nella pagina delle Impostazioni di Windows che si aprirà.",
+    "openSettings": "Apri le Impostazioni di Windows",
+    "tip": "Suggerimento: prova {keys}: uno screenshot con la sola mano sinistra, mentre la destra resta sul mouse.",
+    "use": "Usa",
+    "next": "Avanti"
+  },
   "installer": {
     "installTitle": "Installa ainitShot {version}",
     "installedTitle": "ainitShot è installato",
@@ -383,6 +403,7 @@
     "removeData": "Rimuovere anche le impostazioni di ainitShot e l’accesso a Google?"
   },
   "clip": {
+    "keys.PrintScreen": "Stamp",
     "ui.play": "Riproduci",
     "ui.pause": "Pausa",
     "ui.chapters": "Capitoli",

@@ -96,6 +96,7 @@
     "The folder didn't open": "Folder tidak terbuka",
     "The settings file didn't open": "Fail tetapan tidak terbuka",
     "The site didn't open": "Laman web tidak terbuka",
+    "Windows Settings didn't open": "Tetapan Windows tidak dibuka",
     "Windows couldn't open {}.": "Windows tidak dapat membuka {}.",
     "Folder for screenshots": "Folder tangkapan skrin",
     "Couldn't add the icon to the notification area.": "Tidak dapat menambah ikon pada kawasan pemberitahuan.",
@@ -374,6 +375,25 @@
     "un": "Bahasa PBB",
     "all": "Semua bahasa"
   },
+  "keys": {
+    "title": "Kekunci untuk tangkapan skrin",
+    "intro": "Tekan dalam mana-mana program: skrin membeku, dan anda memilih bahagian yang hendak diambil.",
+    "pressOther": "Tekan kekunci lain untuk menggunakannya sebagai ganti.",
+    "pressKeys": "Tekan gabungan kekunci",
+    "backTo": "Kembali kepada {keys}",
+    "free": "Kekunci ini bebas",
+    "taken": "Program lain menggunakan kekunci ini: tekan kekunci lain atau tutup program itu.",
+    "keyUnknown": "Program tidak boleh menggunakan kekunci ini. Gunakan huruf, digit, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp atau PageDown.",
+    "keyAlone": "{keys} akan mengganggu semasa menaip: tambah Ctrl, Alt atau Win.",
+    "snipping": "Dalam Windows, kekunci Print Screen membuka tangkapan skrin Windows sendiri. Matikan itu, dan kekunci ini akan mengambil tangkapan skrin dengan ainitShot.",
+    "turnOff": "Matikan",
+    "snippingOff": "Selesai: kekunci Print Screen kini milik ainitShot.",
+    "snippingLater": "Windows hanya akan melepaskan kekunci ini selepas anda log masuk semula. Untuk mendapatkannya serta-merta, matikan suis Print Screen pada halaman Tetapan Windows yang akan dibuka.",
+    "openSettings": "Buka Tetapan Windows",
+    "tip": "Petua: cuba {keys}: tangkapan skrin dengan tangan kiri sahaja, sementara tangan kanan kekal pada tetikus.",
+    "use": "Guna",
+    "next": "Seterusnya"
+  },
   "installer": {
     "installTitle": "Pasang ainitShot {version}",
     "installedTitle": "ainitShot telah dipasang",
@@ -383,6 +403,7 @@
     "removeData": "Buang juga tetapan ainitShot dan log masuk Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Main",
     "ui.pause": "Jeda",
     "ui.chapters": "Bab",

@@ -96,6 +96,7 @@
     "The folder didn't open": "Թղթապանակը չբացվեց",
     "The settings file didn't open": "Կարգավորումների ֆայլը չբացվեց",
     "The site didn't open": "Կայքը չբացվեց",
+    "Windows Settings didn't open": "Windows-ի կարգավորումները չբացվեցին",
     "Windows couldn't open {}.": "Windows-ը չկարողացավ բացել {}։",
     "Folder for screenshots": "Սքրինշոթների թղթապանակ",
     "Couldn't add the icon to the notification area.": "Չհաջողվեց պատկերակն ավելացնել ծանուցումների տարածք։",
@@ -374,6 +375,25 @@
     "un": "ՄԱԿ-ի լեզուներ",
     "all": "Բոլոր լեզուները"
   },
+  "keys": {
+    "title": "Սքրինշոթի ստեղներ",
+    "intro": "Սեղմեք դրանք ցանկացած ծրագրում. էկրանը կանգ է առնում, և դուք ընտրում եք, թե ինչ նկարել։",
+    "pressOther": "Սեղմեք այլ ստեղներ՝ դրանք ընտրելու համար։",
+    "pressKeys": "Սեղմեք համակցությունը",
+    "backTo": "Վերադարձնել՝ {keys}",
+    "free": "Այս ստեղներն ազատ են",
+    "taken": "Այս ստեղներն զբաղեցրել է մեկ այլ ծրագիր. սեղմեք ուրիշները կամ փակեք այդ ծրագիրը։",
+    "keyUnknown": "Ծրագիրը չի կարող ընդունել այս ստեղնը։ Կհամապատասխանեն տառերը, թվանշանները, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp և PageDown։",
+    "keyAlone": "{keys}-ը կխանգարեր տեքստ մուտքագրելուն. ավելացրեք Ctrl, Alt կամ Win։",
+    "snipping": "Windows-ում Print Screen ստեղնը բացում է Windows-ի սեփական էկրանի նկարահանումը։ Անջատեք դա, և ստեղնը սքրինշոթներ կանի ainitShot-ով։",
+    "turnOff": "Անջատել",
+    "snippingOff": "Պատրաստ է. Print Screen-ն այժմ ainitShot-ինն է։",
+    "snippingLater": "Windows-ը ստեղնը կազատի միայն նորից մուտք գործելուց հետո։ Այն անմիջապես ունենալու համար անջատեք Print Screen-ի փոխանջատիչը Windows-ի կարգավորումների էջում, որը կբացվի։",
+    "openSettings": "Բացել Windows-ի կարգավորումները",
+    "tip": "Խորհուրդ. փորձեք {keys}՝ սքրինշոթ միայն ձախ ձեռքով, իսկ աջը մնում է մկնիկի վրա։",
+    "use": "Օգտագործել",
+    "next": "Հաջորդը"
+  },
   "installer": {
     "installTitle": "ainitShot {version}-ի տեղադրում",
     "installedTitle": "ainitShot-ը տեղադրված է",
@@ -383,6 +403,7 @@
     "removeData": "Հեռացնե՞լ նաև ainitShot-ի կարգավորումները և Google-ի մուտքը։"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Նվագարկել",
     "ui.pause": "Դադար",
     "ui.chapters": "Գլուխներ",

@@ -96,6 +96,7 @@
     "The folder didn't open": "Folda haikufunguka",
     "The settings file didn't open": "Faili ya mipangilio haikufunguka",
     "The site didn't open": "Tovuti haikufunguka",
+    "Windows Settings didn't open": "Mipangilio ya Windows haikufunguka",
     "Windows couldn't open {}.": "Windows imeshindwa kufungua {}.",
     "Folder for screenshots": "Folda ya picha za skrini",
     "Couldn't add the icon to the notification area.": "Imeshindwa kuongeza aikoni kwenye eneo la arifa.",
@@ -374,6 +375,25 @@
     "un": "Lugha za Umoja wa Mataifa",
     "all": "Lugha zote"
   },
+  "keys": {
+    "title": "Vitufe vya picha ya skrini",
+    "intro": "Vibonyeze katika programu yoyote: skrini inasimama, nawe unachagua cha kupiga.",
+    "pressOther": "Bonyeza vitufe vingine ili uvitumie badala yake.",
+    "pressKeys": "Bonyeza mchanganyiko",
+    "backTo": "Rudi kwa {keys}",
+    "free": "Vitufe hivi viko huru",
+    "taken": "Programu nyingine inatumia vitufe hivi: bonyeza vingine au funga programu hiyo.",
+    "keyUnknown": "Programu haiwezi kutumia kitufe hiki. Herufi, tarakimu, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp na PageDown zitafaa.",
+    "keyAlone": "{keys} kingezuia kuandika: ongeza Ctrl, Alt au Win.",
+    "snipping": "Katika Windows, kitufe cha Print Screen hufungua kinasa skrini cha Windows chenyewe. Kizime, na kitufe hiki kitapiga picha za skrini kwa ainitShot.",
+    "turnOff": "Zima",
+    "snippingOff": "Tayari: kitufe cha Print Screen sasa ni cha ainitShot.",
+    "snippingLater": "Windows itaachilia kitufe hiki baada ya kuingia tena tu. Ili ukitumie mara moja, zima swichi ya Print Screen kwenye ukurasa wa Mipangilio ya Windows utakaofunguka.",
+    "openSettings": "Fungua Mipangilio ya Windows",
+    "tip": "Kidokezo: jaribu {keys}: picha ya skrini kwa mkono wa kushoto pekee, huku wa kulia ukibaki kwenye kipanya.",
+    "use": "Tumia",
+    "next": "Endelea"
+  },
   "installer": {
     "installTitle": "Sakinisha ainitShot {version}",
     "installedTitle": "ainitShot imesakinishwa",
@@ -383,6 +403,7 @@
     "removeData": "Uondoe pia mipangilio ya ainitShot na kuingia kwake kwenye Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Cheza",
     "ui.pause": "Sitisha",
     "ui.chapters": "Sura",

@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>ainitShot</title>
+<style>
+:root {
+  --bg: #1c1c1c;
+  --card: #262626;
+  --field: #161616;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #ededed;
+  --muted: #a8a8a8;
+  --faint: #7a7a7a;
+  --accent: #2f6feb;
+  --accent-hover: #4380f3;
+  --accent-text: #8db3ff;
+  --accent-soft: rgba(47, 111, 235, 0.16);
+  --ok: #6fdc8c;
+  --warn: #ffc457;
+  --warn-soft: rgba(255, 196, 87, 0.08);
+  --danger: #ff8078;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  font: 14px/1.45 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { display: flex; flex-direction: column; user-select: none; cursor: default; }
+body.loading > * { visibility: hidden; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: default; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
+
+main { flex: 1; padding: 26px 34px 0; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--muted); font-weight: 600; }
+.brand svg { width: 22px; height: 22px; }
+h1 { margin: 18px 0 4px; font: 600 26px/1.25 var(--display); }
+.intro { margin: 0 0 22px; color: var(--muted); max-width: 560px; }
+
+/* The keys chosen, in a field that listens for others. */
+.field {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 104px; padding: 0 20px; direction: ltr;
+  border: 1px solid var(--line-strong); border-radius: 12px; background: var(--field);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field.listening { border-color: rgba(47, 111, 235, 0.65); box-shadow: 0 0 0 3px rgba(47, 111, 235, 0.14); }
+kbd {
+  display: inline-grid; place-items: center;
+  min-width: 52px; height: 52px; padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16); border-bottom-width: 3px; border-radius: 9px;
+  background: linear-gradient(#3b3b3b, #333); color: #f4f4f4;
+  font: 600 20px/1 "Segoe UI Variable Text", "Segoe UI", sans-serif; white-space: nowrap;
+}
+.plus { color: var(--faint); font-size: 18px; }
+.wait { color: var(--accent-text); font-size: 15px; animation: breathe 1.4s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: 0.45; } }
+.under { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; min-height: 22px; margin-top: 10px; font-size: 13px; }
+.hint { color: var(--faint); }
+.status { display: inline-flex; align-items: center; gap: 6px; text-align: end; }
+.status svg { width: 15px; height: 15px; flex: none; }
+.status.free { color: var(--ok); }
+.status.taken { color: var(--danger); }
+.links { display: flex; gap: 18px; }
+.link { padding: 0; border: 0; background: none; color: var(--accent-text); }
+.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Windows opens its own screen capture with Print Screen. */
+.note {
+  display: flex; align-items: flex-start; gap: 14px; margin-top: 18px; padding: 13px 14px 13px 16px;
+  border: 1px solid rgba(255, 196, 87, 0.3); border-radius: 10px; background: var(--warn-soft);
+}
+.note > svg { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--warn); }
+.note .text { flex: 1; }
+.note .actions { flex: none; align-self: center; }
+.note.done { border-color: rgba(111, 220, 140, 0.35); background: rgba(111, 220, 140, 0.07); }
+.note.done > svg { color: var(--ok); }
+
+/* The tip: a quiet line, not a choice of the same weight. */
+.tip { margin-top: 22px; color: var(--muted); max-width: 600px; }
+.tip b { color: var(--text); font-weight: 600; white-space: nowrap; }
+.tip .link { margin-inline-start: 6px; }
+
+footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  padding: 16px 34px 22px;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 34px; padding: 0 18px; white-space: nowrap;
+  border: 1px solid var(--line-strong); border-radius: 6px; background: #383838;
+}
+.btn:hover { background: #404040; }
+.btn.accent { min-width: 120px; border-color: transparent; background: var(--accent); color: #fff; }
+.btn.accent:hover { background: var(--accent-hover); }
+.problem { margin-inline-end: auto; color: var(--danger); font-size: 13px; }
+</style>
+</head>
+<body class="loading">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M 4.5 10.5 L 8.2 14 L 15.5 6.5"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 3.5 L 17.5 16.5 H 2.5 Z M 10 8 V 11.5"/><circle cx="10" cy="14" r="0.6" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+<main>
+  <div class="brand">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    ainitShot
+  </div>
+  <h1 data-t="title"></h1>
+  <p class="intro" data-t="intro"></p>
+  <div class="field listening" id="field" role="status" aria-live="polite"></div>
+  <div class="under">
+    <div class="links">
+      <span class="hint" id="hint" data-t="pressOther"></span>
+      <button class="link" id="back" hidden></button>
+    </div>
+    <span class="status" id="status"></span>
+  </div>
+  <div class="note" id="note" hidden>
+    <svg id="note-sign"><use href="#i-warning"/></svg>
+    <div class="text" id="note-text"></div>
+    <div class="actions"><button class="btn" id="note-button"></button></div>
+  </div>
+  <p class="tip" id="tip" hidden></p>
+</main>
+<footer>
+  <span class="problem" id="problem"></span>
+  <button class="btn accent" id="next" data-t="next"></button>
+</footer>
+<script>
+"use strict";
+const webview = window.chrome && window.chrome.webview;
+const send = message => webview && webview.postMessage(JSON.stringify(message));
+const $ = (selector, root = document) => root.querySelector(selector);
+
+// The page's texts in English; the program gives their translations into the language in force.
+const TEXT = {
+  title: "Keys for a screenshot",
+  intro: "Press them in any program: the screen freezes, and you select what to take.",
+  pressOther: "Press other keys to take them instead.",
+  pressKeys: "Press a combination",
+  backTo: "Back to {keys}",
+  free: "These keys are free",
+  taken: "Another program has these keys: press others, or close that program.",
+  keyUnknown: "The program can't take this key. Letters, digits, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp and PageDown will do.",
+  keyAlone: "{keys} would get in the way of typing: add Ctrl, Alt or Win.",
+  snipping: "Windows opens its own screen capture with Print Screen. Turn that off, and the key will take screenshots with ainitShot.",
+  turnOff: "Turn it off",
+  snippingOff: "Done: Print Screen is ainitShot's now.",
+  snippingLater: "Windows will let the key go only after you sign in again. To have it at once, turn off the switch for Print Screen on the page of Windows Settings that opens.",
+  openSettings: "Open Windows Settings",
+  tip: "Tip: try {keys}: a screenshot with your left hand alone, while the right one stays on the mouse.",
+  use: "Use",
+  next: "Next",
+};
+const state = {
+  language: "en", texts: {}, rightToLeft: false,
+  /** The keys chosen, as the settings write them, and the default ones. */
+  hotkey: "PrintScreen", standard: "PrintScreen",
+  /** The keys' names as the user's keyboard has them: PrtSc, Ё for "~". */
+  names: {},
+  /** The label of the key left of 1 for the tip, or nothing where there is no tip. */
+  tip: null,
+  /** What the program said of the keys chosen: free, and whether Windows snips with them. */
+  tried: null,
+  /** The keys held while a combination is pressed. */
+  held: null,
+  /** Turning off the Snipping Tool: "asked", "done" or "later". */
+  snipping: null,
+};
+const say = (key, values = {}) => (state.texts[key] || TEXT[key] || key).replace(/\{(\w+)\}/g, (all, name) => (name in values ? values[name] : all));
+
+function h(tag, attributes, ...children) {
+  const element = document.createElement(tag);
+  for (const [name, value] of Object.entries(attributes || {})) {
+    if (value == null || value === false) continue;
+    if (name.startsWith("on")) element.addEventListener(name.slice(2), value);
+    else element.setAttribute(name, value === true ? "" : value);
+  }
+  element.append(...children.flat().filter(child => child != null && child !== false));
+  return element;
+}
+
+const SVG = "http://www.w3.org/2000/svg";
+function symbol(name) {
+  const icon = document.createElementNS(SVG, "svg");
+  const use = document.createElementNS(SVG, "use");
+  use.setAttribute("href", `#i-${name}`);
+  icon.append(use);
+  return icon;
+}
+
+/** The keys of a combination as the user's keyboard names them. */
+const parts = hotkey => hotkey.split("+").map(part => part.trim()).filter(Boolean);
+const named = part => state.names[part] || part;
+/** A combination written for a sentence, from left to right in every language: "Alt + Ё". */
+const written = hotkey => `⁦${parts(hotkey).map(named).join(" + ")}⁩`;
+
+function keycaps(keys) {
+  return keys.flatMap((key, i) => [i ? h("span", { class: "plus" }, "+") : null, h("kbd", {}, named(key))]).filter(Boolean);
+}
+
+function translate() {
+  document.documentElement.lang = state.language;
+  document.documentElement.dir = state.rightToLeft ? "rtl" : "ltr";
+  for (const element of document.querySelectorAll("[data-t]")) element.textContent = say(element.dataset.t);
+}
+
+/** The field, what is said under it, Windows' Snipping Tool, and the tip. */
+function render() {
+  const field = $("#field");
+  if (state.held) {
+    const held = state.held.length ? [...keycaps(state.held), h("span", { class: "plus" }, "+")] : [];
+    field.replaceChildren(...held, h("span", { class: "wait" }, state.held.length ? "…" : say("pressKeys")));
+  } else {
+    field.replaceChildren(...keycaps(parts(state.hotkey)));
+  }
+  const back = $("#back");
+  back.hidden = state.hotkey === state.standard;
+  back.textContent = say("backTo", { keys: written(state.standard) });
+  $("#hint").hidden = !back.hidden;
+  const status = $("#status");
+  const tried = state.tried && state.tried.hotkey === state.hotkey ? state.tried : null;
+  const free = tried && tried.free && !tried.snipping;
+  // While Windows is letting Print Screen go, the note says why it is still taken.
+  const taken = tried && !tried.free && !tried.snipping && !(state.hotkey === "PrintScreen" && state.snipping);
+  status.className = `status ${free ? "free" : taken ? "taken" : ""}`;
+  status.replaceChildren(...(free ? [symbol("check"), say("free")] : taken ? [symbol("warning"), say("taken")] : []));
+  renderSnipping(tried);
+  const tip = $("#tip");
+  tip.hidden = !state.tip || state.hotkey === "Alt+~";
+  if (!tip.hidden) {
+    const [before, after] = say("tip").split("{keys}");
+    tip.replaceChildren(before, h("b", {}, written("Alt+~")), after || "",
+      h("button", { class: "link", onclick: () => choose("Alt+~") }, say("use")));
+  }
+}
+
+/** Print Screen alone, while Windows opens its Snipping Tool with it: the window says so, turns
+ * that off on a click, and says what to do if Windows lets the key go only later. */
+function renderSnipping(tried) {
+  const shown = state.hotkey === "PrintScreen" && (!!state.snipping || !!(tried && tried.snipping));
+  const note = $("#note");
+  note.hidden = !shown;
+  if (!shown) return;
+  const done = state.snipping === "done";
+  note.classList.toggle("done", done);
+  $("#note-sign").replaceChildren(...symbol(done ? "check" : "warning").childNodes);
+  $("#note-text").textContent = say(done ? "snippingOff" : state.snipping === "later" ? "snippingLater" : "snipping");
+  const button = $("#note-button");
+  button.hidden = done;
+  button.textContent = say(state.snipping === "later" ? "openSettings" : "turnOff");
+}
+
+/** New keys chosen: the program says at once whether they are free. */
+function choose(hotkey) {
+  state.hotkey = hotkey;
+  state.held = null;
+  $("#problem").textContent = "";
+  render();
+  send({ type: "try", hotkey });
+}
+
+// The keys pressed. Enter goes on, Tab goes between the buttons; any other key, with Ctrl, Alt,
+// Shift or Win, makes a combination. Windows lets a page hear only the release of Print Screen.
+const MODIFIERS = ["Win", "Ctrl", "Alt", "Shift"];
+const NAMED = ["Space", "Pause", "Insert", "Delete", "Home", "End", "PageUp", "PageDown", "PrintScreen"];
+const pressed = event => MODIFIERS.filter(name => ({ Win: event.metaKey, Ctrl: event.ctrlKey, Alt: event.altKey, Shift: event.shiftKey })[name]);
+
+/** The key's name as the program reads it, or nothing for a key it can't take; the key left of 1
+ * is "~" by its place, whatever the layout. */
+function keyName(event) {
+  let found;
+  if (event.code === "Backquote") return "~";
+  const code = event.keyCode;
+  if ((code >= 65 && code <= 90) || (code >= 48 && code <= 57)) return String.fromCharCode(code);
+  if ((found = /^F([0-9]{1,2})$/.exec(event.code)) && +found[1] >= 1 && +found[1] <= 24) return event.code;
+  return NAMED.includes(event.code) ? event.code : null;
+}
+
+function combination(event) {
+  const held = pressed(event);
+  const name = keyName(event);
+  if (!name) {
+    $("#problem").textContent = say("keyUnknown");
+    return;
+  }
+  const alone = !held.some(modifier => modifier !== "Shift");
+  if (alone && !/^(F[0-9]+|PrintScreen|Pause)$/.test(name)) {
+    $("#problem").textContent = say("keyAlone", { keys: written([...held, name].join("+")) });
+    state.held = null;
+    return render();
+  }
+  choose([...held, name].join("+"));
+}
+
+document.addEventListener("keydown", event => {
+  if (event.repeat) return event.preventDefault();
+  const held = pressed(event);
+  // Enter and Space press the button in focus, and Enter goes on from anywhere else.
+  const onButton = document.activeElement && document.activeElement.tagName === "BUTTON";
+  if (!held.length && (["Tab", "Escape"].includes(event.key) || (onButton && ["Enter", " "].includes(event.key)))) return;
+  if (!held.length && event.key === "Enter") {
+    event.preventDefault();
+    return next();
+  }
+  event.preventDefault();
+  if (["Control", "Alt", "Shift", "Meta", "OS"].includes(event.key)) {
+    state.held = held;
+    return render();
+  }
+  combination(event);
+}, true);
+document.addEventListener("keyup", event => {
+  event.preventDefault();
+  if (event.code === "PrintScreen") return combination(event);
+  if (state.held) {
+    const held = pressed(event);
+    state.held = held.length ? held : null;
+    render();
+  }
+}, true);
+
+function next() {
+  send({ type: "next", hotkey: state.hotkey });
+}
+
+$("#next").addEventListener("click", next);
+$("#back").addEventListener("click", () => choose(state.standard));
+$("#note-button").addEventListener("click", () => {
+  if (state.snipping === "later") return send({ type: "windowsSettings" });
+  state.snipping = "asked";
+  send({ type: "snipping" });
+});
+// Back from Windows Settings, the program looks again.
+window.addEventListener("focus", () => send({ type: "try", hotkey: state.hotkey }));
+document.addEventListener("contextmenu", event => event.preventDefault());
+
+function heard(message) {
+  switch (message.type) {
+    case "init":
+      state.language = message.language || "en";
+      state.texts = message.texts || {};
+      state.rightToLeft = !!message.rightToLeft;
+      state.names = message.names || {};
+      state.tip = message.tip || null;
+      state.standard = message.hotkey;
+      translate();
+      choose(message.hotkey);
+      document.body.classList.remove("loading");
+      return;
+    case "tried":
+      // Print Screen still taken right after turning off the Snipping Tool: Windows lets it go
+      // only later, or once its own switch is turned off.
+      if (message.hotkey === "PrintScreen" && state.snipping && state.snipping !== "done") {
+        if (message.free) state.snipping = "done";
+        else if (state.snipping === "asked") state.snipping = "later";
+      }
+      state.tried = message;
+      return render();
+    case "snipped":
+      if (!message.done) state.snipping = "later";
+      send({ type: "try", hotkey: "PrintScreen" });
+      return render();
+    case "problem":
+      $("#problem").textContent = message.text;
+      return;
+  }
+}
+
+if (webview) webview.addEventListener("message", event => heard(event.data));
+send({ type: "ready" });
+</script>
+</body>
+</html>

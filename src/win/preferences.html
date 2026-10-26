@@ -1350,8 +1350,13 @@ const MODIFIERS = ["Win", "Ctrl", "Alt", "Shift"];
 const NAMED = ["Space", "Pause", "Insert", "Delete", "Home", "End", "PageUp", "PageDown", "PrintScreen"];
 let recording = false;
 
+/** A key as the user's keyboard names it: PrtSc, Ё for "~" on a Russian keyboard. */
+const named = key => (state.names && state.names[key]) || key;
+/** A combination for a sentence, from left to right in every language: "Alt + Ё". */
+const written = hotkey => `\u2066${hotkey.split("+").map(part => named(part.trim())).join(" + ")}\u2069`;
+
 function keycaps(parts) {
-  return parts.flatMap((part, i) => [i ? h("span", { class: "plus" }, "+") : null, h("kbd", {}, part)]).filter(Boolean);
+  return parts.flatMap((part, i) => [i ? h("span", { class: "plus" }, "+") : null, h("kbd", {}, named(part))]).filter(Boolean);
 }
 
 function renderHotkey() {
@@ -1417,7 +1422,7 @@ function recordKey(event) {
   }
   const alone = !held.some(modifier => modifier !== "Shift");
   if (alone && !/^(F[0-9]+|PrintScreen|Pause)$/.test(name)) {
-    fieldError("hotkey-error", t("keyAlone", { keys: [...held, name].join("+") }));
+    fieldError("hotkey-error", t("keyAlone", { keys: written([...held, name].join("+")) }));
     return;
   }
   fieldError("hotkey-error", "");
@@ -2389,7 +2394,7 @@ function updateResets() {
   if (!state.defaults) return;
   const draft = state.draft, defaults = state.defaults;
   $("#hotkey-reset").classList.toggle("hidden", draft.hotkey === defaults.hotkey);
-  $("#hotkey-reset").title = t("bringBack", { value: defaults.hotkey });
+  $("#hotkey-reset").title = t("bringBack", { value: written(defaults.hotkey) });
   $("#colors-reset").classList.toggle("hidden", same(draft.colors.map(c => c.toUpperCase()), defaults.colors.map(c => c.toUpperCase())));
   $("#width-reset").classList.toggle("hidden", draft.width === defaults.width);
   $("#width-reset").title = t("bringBack", { value: `${formatWidth(defaults.width)} px` });
@@ -2418,6 +2423,7 @@ function speak(message) {
   state.rightToLeft = !!message.rightToLeft;
   if (message.languages) state.languages = message.languages;
   if (message.tools) state.tools = message.tools;
+  if (message.names) state.names = message.names;
   translatePage();
 }
 

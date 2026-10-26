@@ -96,6 +96,7 @@
     "The folder didn't open": "ফোল্ডার খোলেনি",
     "The settings file didn't open": "সেটিংস ফাইল খোলেনি",
     "The site didn't open": "সাইট খোলেনি",
+    "Windows Settings didn't open": "Windows সেটিংস খোলেনি",
     "Windows couldn't open {}.": "Windows {} খুলতে পারেনি।",
     "Folder for screenshots": "স্ক্রিনশটের ফোল্ডার",
     "Couldn't add the icon to the notification area.": "বিজ্ঞপ্তি এলাকায় আইকন যোগ করা যায়নি।",
@@ -374,6 +375,25 @@
     "un": "জাতিসংঘের ভাষা",
     "all": "সব ভাষা"
   },
+  "keys": {
+    "title": "স্ক্রিনশটের কী",
+    "intro": "যেকোনো প্রোগ্রামে এগুলো চাপুন: স্ক্রিন থেমে যায়, আর আপনি বেছে নেন কী নেবেন।",
+    "pressOther": "এগুলোর বদলে অন্য কী নিতে সেগুলো চাপুন।",
+    "pressKeys": "কী-সমন্বয় টিপুন",
+    "backTo": "{keys}-এ ফিরে যান",
+    "free": "এই কীগুলো খালি আছে",
+    "taken": "এই কীগুলো অন্য একটি প্রোগ্রাম নিয়ে রেখেছে: অন্য কী চাপুন বা সেই প্রোগ্রাম বন্ধ করুন।",
+    "keyUnknown": "প্রোগ্রাম এই কী নিতে পারে না। অক্ষর, অঙ্ক, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp আর PageDown চলবে।",
+    "keyAlone": "{keys} টাইপ করায় বাধা দেবে: Ctrl, Alt বা Win যোগ করুন।",
+    "snipping": "Windows-এ Print Screen কী Windows-এর নিজস্ব স্ক্রিন ক্যাপচার খোলে। এটি বন্ধ করুন, তাহলে কীটি ainitShot দিয়ে স্ক্রিনশট নেবে।",
+    "turnOff": "বন্ধ করুন",
+    "snippingOff": "হয়ে গেছে: Print Screen কী এখন ainitShot-এর।",
+    "snippingLater": "আবার সাইন ইন করার পরেই Windows কীটি ছাড়বে। এখনই পেতে, যে Windows সেটিংস পেজ খুলবে সেখানে Print Screen-এর সুইচটি বন্ধ করুন।",
+    "openSettings": "Windows সেটিংস খুলুন",
+    "tip": "পরামর্শ: {keys} চেষ্টা করুন: শুধু বাঁ হাতে স্ক্রিনশট, আর ডান হাত থাকে মাউসে।",
+    "use": "ব্যবহার করুন",
+    "next": "পরবর্তী"
+  },
   "installer": {
     "installTitle": "ainitShot {version} ইনস্টল",
     "installedTitle": "ainitShot ইনস্টল হয়েছে",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot-এর সেটিংস এবং Google-এ সাইন ইনও মুছে ফেলবেন?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "চালান",
     "ui.pause": "থামান",
     "ui.chapters": "অধ্যায়",

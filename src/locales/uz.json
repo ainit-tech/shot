@@ -96,6 +96,7 @@
     "The folder didn't open": "Jild ochilmadi",
     "The settings file didn't open": "Sozlamalar fayli ochilmadi",
     "The site didn't open": "Sayt ochilmadi",
+    "Windows Settings didn't open": "Windows sozlamalari ochilmadi",
     "Windows couldn't open {}.": "Windows ocha olmadi: {}.",
     "Folder for screenshots": "Skrinshotlar jildi",
     "Couldn't add the icon to the notification area.": "Belgini bildirishnomalar sohasiga qoʻshib boʻlmadi.",
@@ -374,6 +375,25 @@
     "un": "BMT tillari",
     "all": "Barcha tillar"
   },
+  "keys": {
+    "title": "Skrinshot tugmalari",
+    "intro": "Ularni istalgan dasturda bosing: ekran qotadi va siz nimani olishni tanlaysiz.",
+    "pressOther": "Ularning oʻrniga boshqa tugmalarni olish uchun ularni bosing.",
+    "pressKeys": "Birikmani bosing",
+    "backTo": "Qaytarish: {keys}",
+    "free": "Bu tugmalar boʻsh",
+    "taken": "Bu tugmalar boshqa dasturda band: boshqalarini bosing yoki oʻsha dasturni yoping.",
+    "keyUnknown": "Dastur bu klavishni qabul qila olmaydi. Harflar, raqamlar, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp va PageDown mos keladi.",
+    "keyAlone": "{keys} matn yozishga xalaqit beradi: Ctrl, Alt yoki Win qoʻshing.",
+    "snipping": "Windows tizimida Print Screen tugmasi tizimning oʻz ekran suratga olish vositasini ochadi. Buni oʻchiring, shunda tugma ainitShot bilan skrinshot oladi.",
+    "turnOff": "Oʻchirish",
+    "snippingOff": "Tayyor: Print Screen tugmasi endi ainitShot dasturiniki.",
+    "snippingLater": "Windows tugmani faqat qayta kirganingizdan keyin boʻshatadi. Uni darhol olish uchun ochiladigan Windows sozlamalari sahifasida Print Screen kalitini oʻchiring.",
+    "openSettings": "Windows sozlamalarini ochish",
+    "tip": "Maslahat: {keys} birikmasini sinab koʻring: skrinshot faqat chap qoʻl bilan, oʻng qoʻl esa sichqonchada qoladi.",
+    "use": "Ishlatish",
+    "next": "Keyingi"
+  },
   "installer": {
     "installTitle": "ainitShot {version} oʻrnatish",
     "installedTitle": "ainitShot oʻrnatildi",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot sozlamalari va Google’ga kirish ham oʻchirilsinmi?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Ijro etish",
     "ui.pause": "Pauza",
     "ui.chapters": "Boblar",

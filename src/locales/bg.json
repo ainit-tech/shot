@@ -96,6 +96,7 @@
     "The folder didn't open": "Папката не се отвори",
     "The settings file didn't open": "Файлът с настройки не се отвори",
     "The site didn't open": "Сайтът не се отвори",
+    "Windows Settings didn't open": "Настройките на Windows не се отвориха",
     "Windows couldn't open {}.": "Windows не можа да отвори {}.",
     "Folder for screenshots": "Папка за екранни снимки",
     "Couldn't add the icon to the notification area.": "Иконата не можа да се добави в областта за уведомяване.",
@@ -374,6 +375,25 @@
     "un": "Езици на ООН",
     "all": "Всички езици"
   },
+  "keys": {
+    "title": "Клавиши за екранна снимка",
+    "intro": "Натиснете ги във всяка програма: екранът замръзва и вие избирате какво да снимате.",
+    "pressOther": "Натиснете други клавиши, за да изберете тях.",
+    "pressKeys": "Натиснете комбинация",
+    "backTo": "Обратно към {keys}",
+    "free": "Тези клавиши са свободни",
+    "taken": "Друга програма използва тези клавиши: натиснете други или затворете онази програма.",
+    "keyUnknown": "Програмата не може да използва този клавиш. Подходящи са букви, цифри, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp и PageDown.",
+    "keyAlone": "{keys} би пречил при писане: добавете Ctrl, Alt или Win.",
+    "snipping": "В Windows клавишът Print Screen отваря собственото заснемане на екрана на Windows. Изключете това и клавишът ще прави снимки с ainitShot.",
+    "turnOff": "Изключване",
+    "snippingOff": "Готово: клавишът Print Screen вече е на ainitShot.",
+    "snippingLater": "Windows ще пусне клавиша едва след повторно влизане. За да го имате веднага, изключете превключвателя за Print Screen на страницата с настройки на Windows, която ще се отвори.",
+    "openSettings": "Отваряне на настройките на Windows",
+    "tip": "Съвет: опитайте {keys}: снимка само с лявата ръка, докато дясната остава на мишката.",
+    "use": "Използване",
+    "next": "Напред"
+  },
   "installer": {
     "installTitle": "Инсталиране на ainitShot {version}",
     "installedTitle": "ainitShot е инсталиран",
@@ -383,6 +403,7 @@
     "removeData": "Да се премахнат ли и настройките на ainitShot и входът в Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Пускане",
     "ui.pause": "Пауза",
     "ui.chapters": "Глави",

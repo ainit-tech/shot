@@ -33,7 +33,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{QUIET, app, browser, last_error, models, out_of_sight, shell, tray, update, wide};
+use super::{QUIET, app, browser, keys, last_error, models, out_of_sight, shell, tray, update, wide};
 use crate::annotation::Tool;
 use crate::icons::{self, Part};
 use crate::settings::Settings;
@@ -138,8 +138,8 @@ pub fn models(state: &Value) {
 }
 
 /// A message to the page with what it needs to speak the language in force: its code, the
-/// page's texts in it, whether it is written from right to left, the languages there are, and
-/// the tools with their keys and their names in it.
+/// page's texts in it, whether it is written from right to left, the languages there are, the
+/// tools with their keys and their names in it, and the names of keys on the user's keyboard.
 fn speaking(mut message: Value) -> Value {
     let language = text::current();
     let languages: Vec<Value> = Language::all().map(|l| json!({ "code": l.code(), "native": l.native() })).collect();
@@ -150,6 +150,7 @@ fn speaking(mut message: Value) -> Value {
         fields.insert("rightToLeft".into(), language.right_to_left().into());
         fields.insert("languages".into(), languages.into());
         fields.insert("tools".into(), tools.into());
+        fields.insert("names".into(), keys::names());
     }
     message
 }
@@ -712,7 +713,7 @@ mod tests {
             app::check_account();
             pump_until(15, || evaluate("state.signedIn") != "null");
             seen.push(evaluate("state.signedIn + ' ' + document.querySelector('#sign-in-callout').checkVisibility()"));
-            seen.push(evaluate("[...document.querySelectorAll('#hotkey kbd')].map(k => k.textContent).join('+')"));
+            seen.push(evaluate("state.draft.hotkey + ' ' + [...document.querySelectorAll('#hotkey kbd')].map(k => k.textContent).join('+')"));
             look("general");
             for section in ["drawing", "panels", "saving", "buttons", "account"] {
                 evaluate(&format!("document.querySelector('nav [data-section={section}]').click()"));
@@ -842,7 +843,7 @@ mod tests {
             seen,
             [
                 "\"false true\"",
-                "\"Alt+~\"",
+                "\"PrintScreen PrtSc\"",
                 "3",
                 "false",
                 "\"2\"",
@@ -862,7 +863,8 @@ mod tests {
                 "\"39% · 380 из 951 МБ · 12,3 МБ/с | 40%\"",
                 r#""[\"pauseModels:true\"]""#,
                 r#""[\"record:true\",\"record:false\",\"save:Ctrl+Shift+S\"]""#,
-                "\"Q мешала бы печатать: добавь Ctrl, Alt или Win.\"",
+                // The keys read from left to right in every language.
+                "\"\u{2066}Q\u{2069} мешала бы печатать: добавь Ctrl, Alt или Win.\"",
                 r#""[\"record:true\",\"record:false\"]""#,
                 r#""[\"Alt+~\",\"Ctrl+Alt+Z\"]""#,
                 "\"Клавиша P уже у инструмента «Карандаш». 0\"",

@@ -96,6 +96,7 @@
     "The folder didn't open": "Mappen öppnades inte",
     "The settings file didn't open": "Inställningsfilen öppnades inte",
     "The site didn't open": "Webbplatsen öppnades inte",
+    "Windows Settings didn't open": "Windows-inställningar öppnades inte",
     "Windows couldn't open {}.": "Windows kunde inte öppna {}.",
     "Folder for screenshots": "Mapp för skärmbilder",
     "Couldn't add the icon to the notification area.": "Det gick inte att lägga till ikonen i meddelandefältet.",
@@ -374,6 +375,25 @@
     "un": "FN-språk",
     "all": "Alla språk"
   },
+  "keys": {
+    "title": "Tangenter för en skärmbild",
+    "intro": "Tryck på dem i vilket program som helst: skärmen fryser, och du markerar vad som ska tas.",
+    "pressOther": "Tryck på andra tangenter för att använda dem i stället.",
+    "pressKeys": "Tryck på en kombination",
+    "backTo": "Tillbaka till {keys}",
+    "free": "Tangenterna är lediga",
+    "taken": "Ett annat program har de här tangenterna: tryck på andra eller stäng det programmet.",
+    "keyUnknown": "Programmet kan inte använda den här tangenten. Bokstäver, siffror, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp och PageDown fungerar.",
+    "keyAlone": "{keys} skulle vara i vägen när du skriver: lägg till Ctrl, Alt eller Win.",
+    "snipping": "I Windows öppnar Print Screen Windows egna skärmklippning. Stäng av det, så tar tangenten skärmbilder med ainitShot.",
+    "turnOff": "Stäng av",
+    "snippingOff": "Klart: Print Screen tillhör nu ainitShot.",
+    "snippingLater": "Windows släpper tangenten först när du loggar in igen. För att få den direkt stänger du av reglaget för Print Screen på sidan i Windows-inställningar som öppnas.",
+    "openSettings": "Öppna Windows-inställningar",
+    "tip": "Tips: prova {keys}: en skärmbild med bara vänster hand, medan den högra stannar på musen.",
+    "use": "Använd",
+    "next": "Nästa"
+  },
   "installer": {
     "installTitle": "Installera ainitShot {version}",
     "installedTitle": "ainitShot är installerat",
@@ -383,6 +403,7 @@
     "removeData": "Ta även bort inställningarna för ainitShot och inloggningen på Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Spela upp",
     "ui.pause": "Pausa",
     "ui.chapters": "Kapitel",

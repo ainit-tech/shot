@@ -96,6 +96,7 @@
     "The folder didn't open": "התיקייה לא נפתחה",
     "The settings file didn't open": "קובץ ההגדרות לא נפתח",
     "The site didn't open": "האתר לא נפתח",
+    "Windows Settings didn't open": "ההגדרות של Windows לא נפתחו",
     "Windows couldn't open {}.": "Windows לא הצליח לפתוח את {}.",
     "Folder for screenshots": "תיקיית צילומי המסך",
     "Couldn't add the icon to the notification area.": "לא ניתן להוסיף את הסמל לאזור ההודעות.",
@@ -374,6 +375,25 @@
     "un": "שפות האו\"ם",
     "all": "כל השפות"
   },
+  "keys": {
+    "title": "מקשים לצילום מסך",
+    "intro": "לוחצים עליהם בכל תוכנה: המסך קופא, ואתם בוחרים מה לצלם.",
+    "pressOther": "לחצו על מקשים אחרים כדי לבחור בהם במקום.",
+    "pressKeys": "הקישו צירוף",
+    "backTo": "חזרה ל-{keys}",
+    "free": "המקשים האלה פנויים",
+    "taken": "תוכנה אחרת תופסת את המקשים האלה: לחצו על אחרים או סגרו את התוכנה ההיא.",
+    "keyUnknown": "התוכנה לא יכולה להשתמש במקש הזה. אפשר להשתמש באותיות, בספרות, ב-~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp ו-PageDown.",
+    "keyAlone": "{keys} יפריע להקלדה: הוסיפו Ctrl, Alt או Win.",
+    "snipping": "ב-Windows, המקש Print Screen פותח את לכידת המסך של Windows עצמה. כבו את זה, והמקש יצלם מסך ב-ainitShot.",
+    "turnOff": "כיבוי",
+    "snippingOff": "בוצע: המקש Print Screen שייך עכשיו ל-ainitShot.",
+    "snippingLater": "Windows ישחרר את המקש רק אחרי כניסה מחדש. כדי לקבל אותו מיד, כבו את המתג של Print Screen בדף ההגדרות של Windows שייפתח.",
+    "openSettings": "פתיחת ההגדרות של Windows",
+    "tip": "טיפ: נסו את {keys}: צילום מסך ביד שמאל בלבד, בזמן שיד ימין נשארת על העכבר.",
+    "use": "שימוש",
+    "next": "הבא"
+  },
   "installer": {
     "installTitle": "התקנת ainitShot {version}",
     "installedTitle": "ainitShot הותקן",
@@ -383,6 +403,7 @@
     "removeData": "להסיר גם את ההגדרות של ainitShot ואת ההתחברות ל-Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "הפעלה",
     "ui.pause": "השהיה",
     "ui.chapters": "פרקים",

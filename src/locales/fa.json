@@ -96,6 +96,7 @@
     "The folder didn't open": "پوشه باز نشد",
     "The settings file didn't open": "فایل تنظیمات باز نشد",
     "The site didn't open": "سایت باز نشد",
+    "Windows Settings didn't open": "تنظیمات Windows باز نشد",
     "Windows couldn't open {}.": "Windows نتوانست {} را باز کند.",
     "Folder for screenshots": "پوشهٔ اسکرین‌شات‌ها",
     "Couldn't add the icon to the notification area.": "افزودن نماد به ناحیهٔ اعلان ممکن نشد.",
@@ -374,6 +375,25 @@
     "un": "زبان‌های سازمان ملل",
     "all": "همهٔ زبان‌ها"
   },
+  "keys": {
+    "title": "کلیدهای اسکرین‌شات",
+    "intro": "آن‌ها را در هر برنامه‌ای فشار دهید: صفحه ثابت می‌ماند و شما انتخاب می‌کنید چه چیزی گرفته شود.",
+    "pressOther": "برای استفاده از کلیدهای دیگر، آن‌ها را فشار دهید.",
+    "pressKeys": "ترکیبی را فشار دهید",
+    "backTo": "بازگشت به {keys}",
+    "free": "این کلیدها آزادند",
+    "taken": "برنامهٔ دیگری این کلیدها را گرفته است: کلیدهای دیگری فشار دهید یا آن برنامه را ببندید.",
+    "keyUnknown": "برنامه نمی‌تواند از این کلید استفاده کند. حروف، ارقام، ~، F1–F24، PrintScreen، Pause، Space، Insert، Delete، Home، End، PageUp و PageDown مناسب‌اند.",
+    "keyAlone": "{keys} مزاحم تایپ می‌شود: Ctrl، Alt یا Win را اضافه کنید.",
+    "snipping": "در Windows، کلید Print Screen ابزار گرفتن صفحهٔ خود Windows را باز می‌کند. آن را خاموش کنید تا این کلید با ainitShot اسکرین‌شات بگیرد.",
+    "turnOff": "خاموش کردن",
+    "snippingOff": "انجام شد: کلید Print Screen اکنون مال ainitShot است.",
+    "snippingLater": "Windows این کلید را فقط پس از ورود دوباره رها می‌کند. برای اینکه همین حالا کار کند، کلید Print Screen را در صفحهٔ تنظیمات Windows که باز می‌شود خاموش کنید.",
+    "openSettings": "باز کردن تنظیمات Windows",
+    "tip": "پیشنهاد: {keys} را امتحان کنید: اسکرین‌شات فقط با دست چپ، در حالی که دست راست روی ماوس می‌ماند.",
+    "use": "استفاده",
+    "next": "بعدی"
+  },
   "installer": {
     "installTitle": "نصب ainitShot {version}",
     "installedTitle": "ainitShot نصب شد",
@@ -383,6 +403,7 @@
     "removeData": "تنظیمات ainitShot و ورود به Google هم حذف شود؟"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "پخش",
     "ui.pause": "مکث",
     "ui.chapters": "بخش‌ها",

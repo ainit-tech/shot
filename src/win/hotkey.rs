@@ -1,11 +1,12 @@
 //! Keys by their names in the settings: the hotkey such as "Ctrl+~" or "PrintScreen", and the
-//! letters of the query buttons; and the hotkey taken in Windows, on the same key whatever the
-//! keyboard layout.
+//! letters of the query buttons; the hotkey taken in Windows, on the same key whatever the
+//! keyboard layout; whether a hotkey is free; and how the key left of 1 is labelled.
 
 use std::cell::Cell;
 use std::ptr::null_mut;
 
 use windows_sys::Win32::Foundation::HWND;
+use windows_sys::Win32::Globalization::LCIDToLocaleName;
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
     GetKeyboardLayout, GetKeyboardLayoutList, HKL, HOT_KEY_MODIFIERS, MAPVK_VK_TO_CHAR, MAPVK_VSC_TO_VK_EX, MOD_ALT,
     MOD_CONTROL, MOD_NOREPEAT, MOD_SHIFT, MOD_WIN, MapVirtualKeyExW, RegisterHotKey, UnregisterHotKey, VK_0, VK_A,
@@ -13,7 +14,7 @@ use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId, KillTimer, SetTimer};
 
-use crate::text::tr;
+use crate::text::{Language, tr};
 
 /// A hotkey: the modifier keys and the key itself.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -113,8 +114,43 @@ fn key_named(name: &str) -> Option<Key> {
     }))
 }
 
+/// How the key left of 1 is labelled on the user's keyboard, in the layout of `language` if the
+/// user has one and in the first of their layouts otherwise: "Ё" in Russian, "^" in German, "²" in
+/// French, and "~" where it types `, as in English. Nothing where it types nothing: on Japanese
+/// keyboards it switches the input method.
+pub fn left_of_one(language: Language) -> Option<String> {
+    let layouts = layouts();
+    let layout = layouts.iter().copied().find(|&layout| speaks(layout, language)).or(layouts.first().copied())?;
+    let code = unsafe { MapVirtualKeyExW(LEFT_OF_ONE, MAPVK_VSC_TO_VK_EX, layout) };
+    // The top bit marks a dead key, such as ^ in German, which types its letter with the next one.
+    let typed = unsafe { MapVirtualKeyExW(code, MAPVK_VK_TO_CHAR, layout) } & 0x7FFF_FFFF;
+    let typed = char::from_u32(typed).filter(|c| code != 0 && !c.is_control())?;
+    Some(if typed == '`' { "~".into() } else { typed.to_uppercase().collect() })
+}
+
+/// Whether a keyboard layout is one of a language.
+fn speaks(layout: HKL, language: Language) -> bool {
+    // LOCALE_NAME_MAX_LENGTH: no name of a language is longer.
+    let mut name = [0u16; 85];
+    let len = unsafe { LCIDToLocaleName(layout as usize as u32 & 0xFFFF, name.as_mut_ptr(), name.len() as i32, 0) };
+    len > 1 && Language::from_tag(&String::from_utf16_lossy(&name[..len as usize - 1])) == language
+}
+
 /// The hotkey's number among the window's hotkeys.
 const ID: i32 = 1;
+/// The number a hotkey is tried with, to learn whether another program has it.
+const TRIED: i32 = 2;
+
+/// Whether no other program has a hotkey: the program takes it for a moment and lets it go. The
+/// program's own is free only while it is held back.
+pub fn free(window: HWND, hotkey: Hotkey) -> bool {
+    let code = hotkey.key.code(layout_in_front());
+    let took = unsafe { RegisterHotKey(window, TRIED, hotkey.modifiers, code.into()) } != 0;
+    if took {
+        unsafe { UnregisterHotKey(window, TRIED) };
+    }
+    took
+}
 /// The timer that looks at the layout in front while the layouts give the hotkey's key different
 /// codes, and how often, in milliseconds.
 pub const TIMER: usize = 0x484B;
@@ -233,6 +269,19 @@ mod tests {
         assert!(parse("Ctrl").is_err());
         assert!(parse("Ctrl+A+B").is_err());
         assert!(parse("Ctrl+Hyper").is_err());
+    }
+
+    /// The key left of 1 has a label in the language of every layout the user has, unless it
+    /// switches the input method there: one letter or sign, and ~ for `.
+    #[test]
+    fn the_key_left_of_1_has_a_label() {
+        for layout in layouts() {
+            let language = Language::all().find(|&language| speaks(layout, language)).unwrap_or(Language::EN);
+            if let Some(label) = left_of_one(language) {
+                assert_eq!(label.chars().count(), 1, "{layout:?}: {label}");
+                assert!(label != "`" && !label.chars().any(char::is_control), "{layout:?}: {label}");
+            }
+        }
     }
 
     /// In every layout the user has, the code taken for "~" is that of the key left of 1, or of

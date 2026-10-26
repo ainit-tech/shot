@@ -96,6 +96,7 @@
     "The folder didn't open": "A pasta não abriu",
     "The settings file didn't open": "O arquivo de configurações não abriu",
     "The site didn't open": "O site não abriu",
+    "Windows Settings didn't open": "As Configurações do Windows não abriram",
     "Windows couldn't open {}.": "O Windows não conseguiu abrir {}.",
     "Folder for screenshots": "Pasta de capturas de tela",
     "Couldn't add the icon to the notification area.": "Não foi possível adicionar o ícone à área de notificação.",
@@ -374,6 +375,25 @@
     "un": "Idiomas da ONU",
     "all": "Todos os idiomas"
   },
+  "keys": {
+    "title": "Teclas para uma captura",
+    "intro": "Pressione-as em qualquer programa: a tela congela, e você seleciona o que capturar.",
+    "pressOther": "Pressione outras teclas para usá-las no lugar.",
+    "pressKeys": "Pressione uma combinação",
+    "backTo": "Voltar para {keys}",
+    "free": "Estas teclas estão livres",
+    "taken": "Outro programa usa estas teclas: pressione outras ou feche esse programa.",
+    "keyUnknown": "O programa não aceita esta tecla. Servem letras, dígitos, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp e PageDown.",
+    "keyAlone": "{keys} atrapalharia a digitação: adicione Ctrl, Alt ou Win.",
+    "snipping": "No Windows, a tecla Print Screen abre a captura de tela do próprio Windows. Desative isso, e a tecla fará capturas com o ainitShot.",
+    "turnOff": "Desativar",
+    "snippingOff": "Pronto: a tecla Print Screen agora é do ainitShot.",
+    "snippingLater": "O Windows só vai liberar a tecla depois que você entrar de novo. Para tê-la já, desative a chave da tecla Print Screen na página das Configurações do Windows que vai abrir.",
+    "openSettings": "Abrir as Configurações do Windows",
+    "tip": "Dica: experimente {keys}: uma captura só com a mão esquerda, enquanto a direita fica no mouse.",
+    "use": "Usar",
+    "next": "Avançar"
+  },
   "installer": {
     "installTitle": "Instalar o ainitShot {version}",
     "installedTitle": "O ainitShot está instalado",
@@ -383,6 +403,7 @@
     "removeData": "Remover também as configurações do ainitShot e o login no Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Reproduzir",
     "ui.pause": "Pausar",
     "ui.chapters": "Capítulos",

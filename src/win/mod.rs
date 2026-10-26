@@ -14,6 +14,7 @@ mod guide;
 mod hotkey;
 mod http;
 mod invite;
+mod keys;
 mod languages;
 mod masking;
 mod models;

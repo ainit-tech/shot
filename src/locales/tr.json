@@ -96,6 +96,7 @@
     "The folder didn't open": "Klasör açılmadı",
     "The settings file didn't open": "Ayar dosyası açılmadı",
     "The site didn't open": "Site açılmadı",
+    "Windows Settings didn't open": "Windows Ayarları açılmadı",
     "Windows couldn't open {}.": "Windows {} öğesini açamadı.",
     "Folder for screenshots": "Ekran görüntüleri klasörü",
     "Couldn't add the icon to the notification area.": "Simge bildirim alanına eklenemedi.",
@@ -374,6 +375,25 @@
     "un": "BM dilleri",
     "all": "Tüm diller"
   },
+  "keys": {
+    "title": "Ekran görüntüsü tuşları",
+    "intro": "Bunlara herhangi bir programda basın: ekran donar ve neyi alacağınızı seçersiniz.",
+    "pressOther": "Yerine başka tuşları almak için onlara basın.",
+    "pressKeys": "Bir tuş bileşimine basın",
+    "backTo": "Geri dön: {keys}",
+    "free": "Bu tuşlar boş",
+    "taken": "Bu tuşlar başka bir programda: başka tuşlara basın veya o programı kapatın.",
+    "keyUnknown": "Program bu tuşu kullanamıyor. Harfler, rakamlar, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp ve PageDown uygundur.",
+    "keyAlone": "{keys} yazmayı engeller: Ctrl, Alt veya Win ekleyin.",
+    "snipping": "Windows'ta Print Screen tuşu, Windows'un kendi ekran yakalamasını açar. Bunu kapatın, tuş ekran görüntülerini ainitShot ile alsın.",
+    "turnOff": "Kapat",
+    "snippingOff": "Tamam: Print Screen tuşu artık ainitShot'ın.",
+    "snippingLater": "Windows tuşu ancak yeniden oturum açtıktan sonra bırakacak. Hemen kullanmak için açılacak Windows Ayarları sayfasında Print Screen anahtarını kapatın.",
+    "openSettings": "Windows Ayarları'nı aç",
+    "tip": "İpucu: {keys} deneyin: yalnızca sol elle ekran görüntüsü, sağ el ise farede kalır.",
+    "use": "Kullan",
+    "next": "İleri"
+  },
   "installer": {
     "installTitle": "ainitShot {version} kurulumu",
     "installedTitle": "ainitShot kuruldu",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot ayarları ve Google oturumu da kaldırılsın mı?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Oynat",
     "ui.pause": "Duraklat",
     "ui.chapters": "Bölümler",

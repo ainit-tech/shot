@@ -96,6 +96,7 @@
     "The folder didn't open": "Папка не открылась",
     "The settings file didn't open": "Файл настроек не открылся",
     "The site didn't open": "Сайт не открылся",
+    "Windows Settings didn't open": "Параметры Windows не открылись",
     "Windows couldn't open {}.": "Windows не смог открыть {}.",
     "Folder for screenshots": "Папка для скриншотов",
     "Couldn't add the icon to the notification area.": "Не удалось добавить значок в область уведомлений.",
@@ -374,6 +375,25 @@
     "un": "Языки ООН",
     "all": "Все языки"
   },
+  "keys": {
+    "title": "Клавиши для снимка",
+    "intro": "Нажимаешь их в любой программе — экран замирает, и ты выделяешь, что снять.",
+    "pressOther": "Нажми другие клавиши, чтобы выбрать их.",
+    "pressKeys": "Нажми сочетание",
+    "backTo": "Вернуть {keys}",
+    "free": "Эти клавиши свободны",
+    "taken": "Эти клавиши заняты другой программой: нажми другие или закрой ту программу.",
+    "keyUnknown": "Эту клавишу программа не умеет. Подойдут буквы, цифры, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp и PageDown.",
+    "keyAlone": "{keys} мешала бы печатать: добавь Ctrl, Alt или Win.",
+    "snipping": "Windows открывает клавишей Print Screen свой захват экрана. Отключи это — и клавиша будет делать снимки в ainitShot.",
+    "turnOff": "Отключить",
+    "snippingOff": "Готово: Print Screen теперь у ainitShot.",
+    "snippingLater": "Windows отпустит клавишу только после нового входа в систему. Чтобы сразу, выключи переключатель Print Screen на странице параметров Windows, которая откроется.",
+    "openSettings": "Открыть параметры Windows",
+    "tip": "Совет: попробуй {keys} — снимок одной левой рукой, а правая остаётся на мышке.",
+    "use": "Использовать",
+    "next": "Дальше"
+  },
   "installer": {
     "installTitle": "Установка ainitShot {version}",
     "installedTitle": "ainitShot установлен",
@@ -383,6 +403,7 @@
     "removeData": "Удалить заодно настройки ainitShot и вход в Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Воспроизвести",
     "ui.pause": "Пауза",
     "ui.chapters": "Главы",

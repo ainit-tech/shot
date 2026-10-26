@@ -21,19 +21,24 @@ use windows_sys::Win32::System::Threading::CreateMutexW;
 use windows_sys::Win32::UI::HiDpi::{DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2, SetProcessDpiAwarenessContext};
 use windows_sys::Win32::UI::Shell::NIN_BALLOONUSERCLICK;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW, MB_ICONERROR, MB_ICONINFORMATION,
-    MB_OK, MESSAGEBOX_STYLE, MSG, MessageBoxW, PostMessageW, PostQuitMessage, RegisterClassExW, RegisterWindowMessageW,
-    SetTimer, TranslateMessage, WM_CLOSE, WM_DESTROY, WM_HOTKEY, WM_LBUTTONUP, WM_RBUTTONUP, WM_TIMER, WNDCLASSEXW,
+    ASFW_ANY, AllowSetForegroundWindow, CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, FindWindowW,
+    GetMessageW, MB_ICONERROR, MB_ICONINFORMATION, MB_OK, MESSAGEBOX_STYLE, MSG, MessageBoxW, PostMessageW,
+    PostQuitMessage, RegisterClassExW, RegisterWindowMessageW, SetTimer, TranslateMessage, WM_APP, WM_CLOSE, WM_DESTROY,
+    WM_HOTKEY, WM_LBUTTONUP, WM_RBUTTONUP, WM_TIMER, WNDCLASSEXW,
 };
 use windows_sys::core::BOOL;
 use windows_sys::w;
 
 use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
-use super::{browser, guide, invite, languages, last_error, models, overlay, preferences, shell, update, wide};
+use super::{browser, guide, invite, keys, languages, last_error, models, overlay, preferences, shell, update, wide};
 use crate::settings::{self, Settings};
 use crate::site;
 use crate::text::{self, Language, tr};
+
+/// What another start of the program with `--first-run` asks of the copy running: to show the
+/// windows of the first start.
+const FIRST_RUN: u32 = WM_APP + 12;
 
 /// How often the settings file is looked at, in milliseconds.
 const SETTINGS_TICK: u32 = 1000;
@@ -161,6 +166,29 @@ pub fn hold_hotkey(held: bool) {
     }
 }
 
+/// Takes the hotkey of the settings again after the choice of the keys, which held it back; tells
+/// the user if another program has it.
+pub fn retake_hotkey() {
+    let window = main_window();
+    if window.is_null() {
+        return;
+    }
+    hotkey::release(window);
+    match register(window, &settings().hotkey) {
+        Ok(hotkey) => change_state(|state| state.hotkey = Some(hotkey)),
+        Err(problem) => {
+            change_state(|state| state.hotkey = None);
+            let click = tr("A click on the icon takes a screenshot.");
+            notify(tr("The hotkey doesn't work"), &format!("{problem} {click}"));
+        }
+    }
+}
+
+/// The program's hidden window, which holds the hotkey; none until the program has started.
+pub fn main_window() -> HWND {
+    MAIN_WINDOW.load(Ordering::Acquire)
+}
+
 /// Finds out again whether someone is signed in to Google in the program's window, for the
 /// settings window: after the window closes, where the user may have signed in or out, and as
 /// the settings window opens.
@@ -242,10 +270,21 @@ pub fn run() -> io::Result<()> {
         let windows = shell::windows_language();
         text::set(windows);
 
-        // One copy of the program at a time; the handle stays open while the process runs.
+        // `--first-run` shows the windows of the first start again, to see them: the language, the
+        // keys and how to use the program. Nothing changes in the settings unless one chooses there.
+        let first_run = std::env::args().any(|argument| argument == "--first-run");
+
+        // One copy of the program at a time; the handle stays open while the process runs. With
+        // `--first-run`, the copy running shows the windows itself.
         let _single = CreateMutexW(null(), 0, w!("Local\\ainitShot"));
         if GetLastError() == ERROR_ALREADY_EXISTS {
-            tell(tr("ainitShot is already running."), MB_ICONINFORMATION);
+            let running = FindWindowW(w!("ainitShot.main"), null());
+            if first_run && !running.is_null() {
+                AllowSetForegroundWindow(ASFW_ANY);
+                PostMessageW(running, FIRST_RUN, 0, 0);
+            } else {
+                tell(tr("ainitShot is already running."), MB_ICONINFORMATION);
+            }
             return Ok(());
         }
 
@@ -300,6 +339,8 @@ pub fn run() -> io::Result<()> {
         models::start(window, settings.privacy_filter);
         match register(window, &settings.hotkey) {
             Ok(hotkey) => change_state(|state| state.hotkey = Some(hotkey)),
+            // On the first start the choice of the keys says it, and offers others.
+            Err(problem) if first || first_run => eprintln!("{problem}"),
             Err(problem) => {
                 let click = tr("A click on the icon takes a screenshot.");
                 notify(tr("The hotkey doesn't work"), &format!("{problem} {click}"));
@@ -311,10 +352,11 @@ pub fn run() -> io::Result<()> {
         shell::remove_pages(Duration::ZERO);
         // The first question goes to a page ready in the background, as every one after it does.
         browser::prepare();
-        // The first time, the program asks which language to speak, and then shows how to use it;
-        // a program that has spoken before only asks the language, if it was never chosen.
-        if first || unchosen {
-            languages::open(first);
+        // The first time, the program asks which language to speak and which keys take a
+        // screenshot, and then shows how to use it; a program that has spoken before only asks the
+        // language, if it was never chosen.
+        if first || unchosen || first_run {
+            languages::open(first || first_run);
         }
         // Google serves someone signed in better: if nobody is, the program invites to sign in,
         // once the presentation is closed if it is open.
@@ -324,7 +366,7 @@ pub fn run() -> io::Result<()> {
                 eprintln!("Signed in to Google.");
             } else {
                 eprintln!("Not signed in to Google: the program invites to sign in.");
-                if guide::is_open() || languages::is_open() {
+                if guide::is_open() || languages::is_open() || keys::is_open() {
                     guide::invite_when_closed();
                 } else {
                     invite::open();
@@ -495,6 +537,11 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
         WM_TIMER if wparam == update::TIMER => update::tick(),
         update::MESSAGE => update::heard(lparam),
         models::MESSAGE => models::heard(wparam != 0),
+        FIRST_RUN => {
+            if !languages::is_open() && !keys::is_open() {
+                languages::open(true);
+            }
+        }
         tray::MESSAGE => match lparam as u32 {
             WM_LBUTTONUP => overlay::open(),
             WM_RBUTTONUP => match tray::menu(window, &settings().hotkey, update::menu_item().as_deref()) {
@@ -522,6 +569,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             preferences::close();
             guide::close();
             languages::close();
+            keys::close();
             invite::close();
             browser::close();
             shell::remove_pages(Duration::ZERO);

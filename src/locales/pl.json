@@ -96,6 +96,7 @@
     "The folder didn't open": "Folder się nie otworzył",
     "The settings file didn't open": "Plik ustawień się nie otworzył",
     "The site didn't open": "Strona się nie otworzyła",
+    "Windows Settings didn't open": "Ustawienia systemu Windows się nie otworzyły",
     "Windows couldn't open {}.": "Windows nie mógł otworzyć {}.",
     "Folder for screenshots": "Folder zrzutów ekranu",
     "Couldn't add the icon to the notification area.": "Nie udało się dodać ikony do obszaru powiadomień.",
@@ -374,6 +375,25 @@
     "un": "Języki ONZ",
     "all": "Wszystkie języki"
   },
+  "keys": {
+    "title": "Klawisze do zrzutu ekranu",
+    "intro": "Naciśnij je w dowolnym programie: ekran zastyga, a Ty zaznaczasz, co chcesz uchwycić.",
+    "pressOther": "Naciśnij inne klawisze, aby użyć ich zamiast tych.",
+    "pressKeys": "Naciśnij kombinację",
+    "backTo": "Wróć do {keys}",
+    "free": "Te klawisze są wolne",
+    "taken": "Te klawisze ma inny program: naciśnij inne albo zamknij tamten program.",
+    "keyUnknown": "Program nie obsługuje tego klawisza. Pasują litery, cyfry, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp i PageDown.",
+    "keyAlone": "{keys} będzie przeszkadzać w pisaniu: dodaj Ctrl, Alt lub Win.",
+    "snipping": "W Windows klawisz Print Screen otwiera własne przechwytywanie ekranu Windows. Wyłącz to, a klawisz będzie robić zrzuty w ainitShot.",
+    "turnOff": "Wyłącz",
+    "snippingOff": "Gotowe: klawisz Print Screen należy teraz do ainitShot.",
+    "snippingLater": "Windows zwolni klawisz dopiero po ponownym zalogowaniu. Aby mieć go od razu, wyłącz przełącznik klawisza Print Screen na stronie Ustawień systemu Windows, która się otworzy.",
+    "openSettings": "Otwórz Ustawienia systemu Windows",
+    "tip": "Wskazówka: spróbuj {keys}: zrzut samą lewą ręką, a prawa zostaje na myszy.",
+    "use": "Użyj",
+    "next": "Dalej"
+  },
   "installer": {
     "installTitle": "Instalacja ainitShot {version}",
     "installedTitle": "ainitShot jest zainstalowany",
@@ -383,6 +403,7 @@
     "removeData": "Usunąć też ustawienia ainitShot i logowanie do Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Odtwórz",
     "ui.pause": "Wstrzymaj",
     "ui.chapters": "Rozdziały",

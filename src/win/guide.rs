@@ -25,14 +25,15 @@ use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW, IsIconic,
-    LoadCursorW, RegisterClassExW, SW_RESTORE, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow, SetWindowPos,
-    SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_CLOSE, WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_CAPTION,
-    WS_MINIMIZEBOX, WS_OVERLAPPED, WS_SYSMENU,
+    LoadCursorW, RegisterClassExW, SW_RESTORE, SW_SHOW, SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOZORDER,
+    SetForegroundWindow, SetWindowPos, SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_CLOSE, WM_DPICHANGED,
+    WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_CAPTION, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_MINIMIZEBOX, WS_OVERLAPPED,
+    WS_SYSMENU,
 };
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, browser, invite, last_error, preferences, tray, wide};
+use super::{QUIET, app, browser, invite, keys, last_error, out_of_sight, preferences, tray, wide};
 use crate::icons::{self, Part};
 use crate::text::{self, tr};
 
@@ -102,7 +103,7 @@ pub fn refresh() {
 
 /// A message to the page with what it needs to speak the language in force: its code, whether it
 /// is written from right to left, the window's texts in it, the clip's own words in it and the
-/// program's words that the clip shows.
+/// program's words that the clip shows, and the names of keys on the user's keyboard.
 fn speaking(mut message: Value) -> Value {
     let language = text::current();
     if let Value::Object(fields) = &mut message {
@@ -111,6 +112,7 @@ fn speaking(mut message: Value) -> Value {
         fields.insert("texts".into(), text::page("guide"));
         fields.insert("clip".into(), text::page("clip"));
         fields.insert("terms".into(), terms());
+        fields.insert("names".into(), keys::names());
     }
     message
 }
@@ -200,6 +202,10 @@ fn controller() -> Option<ICoreWebView2Controller> {
 
 fn bring_up(window: HWND) {
     unsafe {
+        if QUIET {
+            ShowWindow(window, SW_SHOWNOACTIVATE);
+            return;
+        }
         ShowWindow(window, if IsIconic(window) != 0 { SW_RESTORE } else { SW_SHOW });
         SetForegroundWindow(window);
     }
@@ -358,9 +364,12 @@ fn create_window() -> std::io::Result<HWND> {
             }
             REGISTERED.set(true);
         }
-        let place = place();
+        let (place, quiet) = match QUIET {
+            true => (out_of_sight(place()), WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE),
+            false => (place(), 0),
+        };
         let window = CreateWindowExW(
-            0,
+            quiet,
             CLASS,
             wide(&title()).as_ptr(),
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,

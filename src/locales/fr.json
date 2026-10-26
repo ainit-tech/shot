@@ -96,6 +96,7 @@
     "The folder didn't open": "Le dossier ne s’est pas ouvert",
     "The settings file didn't open": "Le fichier de réglages ne s’est pas ouvert",
     "The site didn't open": "Le site ne s’est pas ouvert",
+    "Windows Settings didn't open": "Les Paramètres Windows ne se sont pas ouverts",
     "Windows couldn't open {}.": "Windows n’a pas pu ouvrir {}.",
     "Folder for screenshots": "Dossier des captures",
     "Couldn't add the icon to the notification area.": "Impossible d’ajouter l’icône à la zone de notification.",
@@ -374,6 +375,25 @@
     "un": "Langues de l’ONU",
     "all": "Toutes les langues"
   },
+  "keys": {
+    "title": "Touches pour une capture",
+    "intro": "Appuyez dessus dans n’importe quel programme : l’écran se fige, et vous sélectionnez ce qu’il faut capturer.",
+    "pressOther": "Appuyez sur d’autres touches pour les choisir à la place.",
+    "pressKeys": "Appuyez sur une combinaison",
+    "backTo": "Revenir à {keys}",
+    "free": "Ces touches sont libres",
+    "taken": "Un autre programme utilise ces touches : appuyez sur d’autres ou fermez ce programme.",
+    "keyUnknown": "Le programme ne gère pas cette touche. Conviennent : lettres, chiffres, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp et PageDown.",
+    "keyAlone": "{keys} gênerait la saisie : ajoutez Ctrl, Alt ou Win.",
+    "snipping": "Dans Windows, la touche Impr. écran ouvre la capture d’écran de Windows lui-même. Désactivez cela, et la touche fera des captures avec ainitShot.",
+    "turnOff": "Désactiver",
+    "snippingOff": "C’est fait : la touche Impr. écran est désormais à ainitShot.",
+    "snippingLater": "Windows ne libérera la touche qu’après une nouvelle connexion. Pour l’avoir tout de suite, désactivez l’interrupteur de la touche Impr. écran sur la page des Paramètres Windows qui va s’ouvrir.",
+    "openSettings": "Ouvrir les Paramètres Windows",
+    "tip": "Astuce : essayez {keys} : une capture de la seule main gauche, pendant que la droite reste sur la souris.",
+    "use": "Utiliser",
+    "next": "Suivant"
+  },
   "installer": {
     "installTitle": "Installer ainitShot {version}",
     "installedTitle": "ainitShot est installé",
@@ -383,6 +403,7 @@
     "removeData": "Supprimer aussi les réglages d’ainitShot et sa connexion à Google ?"
   },
   "clip": {
+    "keys.PrintScreen": "Impr. écran",
     "ui.play": "Lire",
     "ui.pause": "Pause",
     "ui.chapters": "Chapitres",

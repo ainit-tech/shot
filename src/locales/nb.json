@@ -96,6 +96,7 @@
     "The folder didn't open": "Mappen ble ikke åpnet",
     "The settings file didn't open": "Innstillingsfilen ble ikke åpnet",
     "The site didn't open": "Nettstedet ble ikke åpnet",
+    "Windows Settings didn't open": "Windows-innstillingene ble ikke åpnet",
     "Windows couldn't open {}.": "Windows kunne ikke åpne {}.",
     "Folder for screenshots": "Mappe for skjermbilder",
     "Couldn't add the icon to the notification area.": "Kunne ikke legge til ikonet i varslingsområdet.",
@@ -374,6 +375,25 @@
     "un": "FN-språk",
     "all": "Alle språk"
   },
+  "keys": {
+    "title": "Taster for skjermbilde",
+    "intro": "Trykk på dem i et hvilket som helst program: skjermen fryser, og du markerer det som skal tas.",
+    "pressOther": "Trykk på andre taster for å bruke dem i stedet.",
+    "pressKeys": "Trykk på en kombinasjon",
+    "backTo": "Tilbake til {keys}",
+    "free": "Disse tastene er ledige",
+    "taken": "Et annet program har disse tastene: trykk på andre, eller lukk det programmet.",
+    "keyUnknown": "Programmet kan ikke bruke denne tasten. Bokstaver, sifre, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp og PageDown fungerer.",
+    "keyAlone": "{keys} ville vært i veien når du skriver: legg til Ctrl, Alt eller Win.",
+    "snipping": "I Windows åpner Print Screen Windows' egen skjermfangst. Slå det av, så tar tasten skjermbilder med ainitShot.",
+    "turnOff": "Slå av",
+    "snippingOff": "Ferdig: Print Screen tilhører nå ainitShot.",
+    "snippingLater": "Windows slipper tasten først når du logger på igjen. Vil du ha den med en gang, slår du av bryteren for Print Screen på siden i Windows-innstillingene som åpnes.",
+    "openSettings": "Åpne Windows-innstillingene",
+    "tip": "Tips: prøv {keys}: et skjermbilde med bare venstre hånd, mens den høyre blir på musen.",
+    "use": "Bruk",
+    "next": "Neste"
+  },
   "installer": {
     "installTitle": "Installer ainitShot {version}",
     "installedTitle": "ainitShot er installert",
@@ -383,6 +403,7 @@
     "removeData": "Vil du også fjerne innstillingene for ainitShot og påloggingen til Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Spill av",
     "ui.pause": "Pause",
     "ui.chapters": "Kapitler",

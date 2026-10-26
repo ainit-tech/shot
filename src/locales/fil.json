@@ -96,6 +96,7 @@
     "The folder didn't open": "Hindi nabuksan ang folder",
     "The settings file didn't open": "Hindi nabuksan ang file ng mga setting",
     "The site didn't open": "Hindi nabuksan ang site",
+    "Windows Settings didn't open": "Hindi nagbukas ang Windows Settings",
     "Windows couldn't open {}.": "Hindi mabuksan ng Windows ang {}.",
     "Folder for screenshots": "Folder ng mga screenshot",
     "Couldn't add the icon to the notification area.": "Hindi maidagdag ang icon sa notification area.",
@@ -374,6 +375,25 @@
     "un": "Mga wika ng UN",
     "all": "Lahat ng wika"
   },
+  "keys": {
+    "title": "Mga key para sa screenshot",
+    "intro": "Pindutin ang mga ito sa kahit anong program: titigil ang screen, at pipiliin mo ang kukunan.",
+    "pressOther": "Pindutin ang ibang key para iyon ang gamitin.",
+    "pressKeys": "Pumindot ng kombinasyon",
+    "backTo": "Bumalik sa {keys}",
+    "free": "Bakante ang mga key na ito",
+    "taken": "May ibang program na gumagamit ng mga key na ito: pindutin ang iba o isara ang program na iyon.",
+    "keyUnknown": "Hindi magagamit ng program ang key na ito. Puwede ang mga titik, digit, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp at PageDown.",
+    "keyAlone": "Makakaabala ang {keys} sa pag-type: magdagdag ng Ctrl, Alt o Win.",
+    "snipping": "Sa Windows, binubuksan ng Print Screen ang sariling screen capture ng Windows. I-off iyon, at kukuha ang key ng screenshot gamit ang ainitShot.",
+    "turnOff": "I-off",
+    "snippingOff": "Tapos na: sa ainitShot na ang Print Screen.",
+    "snippingLater": "Bibitawan lang ng Windows ang key pagkatapos mong mag-sign in ulit. Para magamit agad, i-off ang switch ng Print Screen sa page ng Windows Settings na magbubukas.",
+    "openSettings": "Buksan ang Windows Settings",
+    "tip": "Tip: subukan ang {keys}: screenshot gamit ang kaliwang kamay lang, habang nasa mouse ang kanan.",
+    "use": "Gamitin",
+    "next": "Susunod"
+  },
   "installer": {
     "installTitle": "I-install ang ainitShot {version}",
     "installedTitle": "Naka-install na ang ainitShot",
@@ -383,6 +403,7 @@
     "removeData": "Alisin din ang mga setting ng ainitShot at ang pag-sign in nito sa Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "I-play",
     "ui.pause": "I-pause",
     "ui.chapters": "Mga kabanata",

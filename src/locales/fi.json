@@ -96,6 +96,7 @@
     "The folder didn't open": "Kansio ei avautunut",
     "The settings file didn't open": "Asetustiedosto ei avautunut",
     "The site didn't open": "Sivusto ei avautunut",
+    "Windows Settings didn't open": "Windowsin asetukset eivät avautuneet",
     "Windows couldn't open {}.": "Windows ei voinut avata kohdetta {}.",
     "Folder for screenshots": "Kuvakaappausten kansio",
     "Couldn't add the icon to the notification area.": "Kuvaketta ei voitu lisätä ilmaisinalueelle.",
@@ -374,6 +375,25 @@
     "un": "YK:n kielet",
     "all": "Kaikki kielet"
   },
+  "keys": {
+    "title": "Kuvakaappauksen näppäimet",
+    "intro": "Paina niitä missä tahansa ohjelmassa: näyttö pysähtyy, ja valitset, mitä kaapataan.",
+    "pressOther": "Paina muita näppäimiä ottaaksesi ne käyttöön.",
+    "pressKeys": "Paina yhdistelmää",
+    "backTo": "Takaisin: {keys}",
+    "free": "Nämä näppäimet ovat vapaina",
+    "taken": "Toinen ohjelma käyttää näitä näppäimiä: paina muita tai sulje se ohjelma.",
+    "keyUnknown": "Ohjelma ei osaa käyttää tätä näppäintä. Käyvät kirjaimet, numerot, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp ja PageDown.",
+    "keyAlone": "{keys} haittaisi kirjoittamista: lisää Ctrl, Alt tai Win.",
+    "snipping": "Windowsissa Print Screen avaa Windowsin oman näyttökaappauksen. Poista se käytöstä, niin näppäin ottaa kuvakaappauksia ainitShotilla.",
+    "turnOff": "Poista käytöstä",
+    "snippingOff": "Valmis: Print Screen on nyt ainitShotin käytössä.",
+    "snippingLater": "Windows vapauttaa näppäimen vasta, kun kirjaudut uudelleen. Saat sen heti käyttöön, kun poistat avautuvalla Windowsin asetussivulla Print Screenin valitsimen käytöstä.",
+    "openSettings": "Avaa Windowsin asetukset",
+    "tip": "Vinkki: kokeile {keys}: kuvakaappaus pelkällä vasemmalla kädellä, kun oikea pysyy hiirellä.",
+    "use": "Käytä",
+    "next": "Seuraava"
+  },
   "installer": {
     "installTitle": "Asenna ainitShot {version}",
     "installedTitle": "ainitShot on asennettu",
@@ -383,6 +403,7 @@
     "removeData": "Poistetaanko myös ainitShotin asetukset ja Google-kirjautuminen?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Toista",
     "ui.pause": "Tauko",
     "ui.chapters": "Luvut",

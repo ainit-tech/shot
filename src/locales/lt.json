@@ -96,6 +96,7 @@
     "The folder didn't open": "Aplankas neatsidarė",
     "The settings file didn't open": "Nustatymų failas neatsidarė",
     "The site didn't open": "Svetainė neatsidarė",
+    "Windows Settings didn't open": "„Windows“ parametrai neatsidarė",
     "Windows couldn't open {}.": "„Windows“ nepavyko atidaryti {}.",
     "Folder for screenshots": "Ekrano kopijų aplankas",
     "Couldn't add the icon to the notification area.": "Nepavyko įtraukti piktogramos į pranešimų sritį.",
@@ -374,6 +375,25 @@
     "un": "JT kalbos",
     "all": "Visos kalbos"
   },
+  "keys": {
+    "title": "Klavišai ekrano kopijai",
+    "intro": "Paspauskite juos bet kurioje programoje: ekranas sustingsta, o jūs pažymite, ką užfiksuoti.",
+    "pressOther": "Paspauskite kitus klavišus, kad naudotumėte juos.",
+    "pressKeys": "Paspauskite derinį",
+    "backTo": "Grįžti prie {keys}",
+    "free": "Šie klavišai laisvi",
+    "taken": "Šiuos klavišus naudoja kita programa: paspauskite kitus arba uždarykite tą programą.",
+    "keyUnknown": "Programa negali naudoti šio klavišo. Tinka raidės, skaitmenys, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp ir PageDown.",
+    "keyAlone": "{keys} trukdytų rašyti: pridėkite Ctrl, Alt arba Win.",
+    "snipping": "„Windows“ klavišas „Print Screen“ atidaro paties „Windows“ ekrano fiksavimą. Išjunkite tai, ir klavišas darys ekrano kopijas su „ainitShot“.",
+    "turnOff": "Išjungti",
+    "snippingOff": "Atlikta: klavišas „Print Screen“ dabar priklauso „ainitShot“.",
+    "snippingLater": "„Windows“ klavišą atleis tik vėl prisijungus. Kad gautumėte jį iš karto, išjunkite „Print Screen“ jungiklį atsidarysiančiame „Windows“ parametrų puslapyje.",
+    "openSettings": "Atidaryti „Windows“ parametrus",
+    "tip": "Patarimas: išbandykite {keys}: ekrano kopija vien kaire ranka, o dešinė lieka ant pelės.",
+    "use": "Naudoti",
+    "next": "Toliau"
+  },
   "installer": {
     "installTitle": "Įdiegti „ainitShot“ {version}",
     "installedTitle": "„ainitShot“ įdiegta",
@@ -383,6 +403,7 @@
     "removeData": "Ar pašalinti ir „ainitShot“ nustatymus bei prisijungimą prie „Google“?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Leisti",
     "ui.pause": "Pristabdyti",
     "ui.chapters": "Skyriai",

@@ -96,6 +96,7 @@
     "The folder didn't open": "საქაღალდე არ გაიხსნა",
     "The settings file didn't open": "პარამეტრების ფაილი არ გაიხსნა",
     "The site didn't open": "საიტი არ გაიხსნა",
+    "Windows Settings didn't open": "Windows-ის პარამეტრები არ გაიხსნა",
     "Windows couldn't open {}.": "Windows-მა ვერ გახსნა {}.",
     "Folder for screenshots": "ეკრანის ანაბეჭდების საქაღალდე",
     "Couldn't add the icon to the notification area.": "ხატულის შეტყობინებების არეში დამატება ვერ მოხერხდა.",
@@ -374,6 +375,25 @@
     "un": "გაეროს ენები",
     "all": "ყველა ენა"
   },
+  "keys": {
+    "title": "ეკრანის ანაბეჭდის ღილაკები",
+    "intro": "დააჭირეთ მათ ნებისმიერ პროგრამაში: ეკრანი ჩერდება და თქვენ ირჩევთ, რა გადაიღოთ.",
+    "pressOther": "სხვა ღილაკების ასარჩევად დააჭირეთ მათ.",
+    "pressKeys": "დააჭირეთ კომბინაციას",
+    "backTo": "დაბრუნება: {keys}",
+    "free": "ეს ღილაკები თავისუფალია",
+    "taken": "ეს ღილაკები სხვა პროგრამას უკავია: დააჭირეთ სხვებს ან დახურეთ ის პროგრამა.",
+    "keyUnknown": "პროგრამას ამ კლავიშის მიღება არ შეუძლია. გამოდგება ასოები, ციფრები, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp და PageDown.",
+    "keyAlone": "{keys} ბეჭდვას შეუშლიდა ხელს: დაამატეთ Ctrl, Alt ან Win.",
+    "snipping": "Windows-ში Print Screen ღილაკი Windows-ის საკუთარ ეკრანის გადაღებას ხსნის. გამორთეთ ეს და ღილაკი ainitShot-ით გადაიღებს ეკრანს.",
+    "turnOff": "გამორთვა",
+    "snippingOff": "მზადაა: Print Screen ახლა ainitShot-ს ეკუთვნის.",
+    "snippingLater": "Windows ღილაკს მხოლოდ ხელახლა შესვლის შემდეგ გაათავისუფლებს. მყისიერად რომ მიიღოთ, გამორთეთ Print Screen-ის გადამრთველი Windows-ის პარამეტრების გვერდზე, რომელიც გაიხსნება.",
+    "openSettings": "Windows-ის პარამეტრების გახსნა",
+    "tip": "რჩევა: სცადეთ {keys}: ეკრანის ანაბეჭდი მხოლოდ მარცხენა ხელით, ხოლო მარჯვენა მაუსზე რჩება.",
+    "use": "გამოყენება",
+    "next": "შემდეგი"
+  },
   "installer": {
     "installTitle": "ainitShot {version}-ის ინსტალაცია",
     "installedTitle": "ainitShot დაინსტალირდა",
@@ -383,6 +403,7 @@
     "removeData": "წაიშალოს ainitShot-ის პარამეტრები და Google-ში შესვლაც?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "დაკვრა",
     "ui.pause": "პაუზა",
     "ui.chapters": "თავები",

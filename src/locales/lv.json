@@ -96,6 +96,7 @@
     "The folder didn't open": "Mape neatvērās",
     "The settings file didn't open": "Iestatījumu fails neatvērās",
     "The site didn't open": "Vietne neatvērās",
+    "Windows Settings didn't open": "Windows iestatījumi netika atvērti",
     "Windows couldn't open {}.": "Windows neizdevās atvērt {}.",
     "Folder for screenshots": "Ekrānuzņēmumu mape",
     "Couldn't add the icon to the notification area.": "Neizdevās pievienot ikonu paziņojumu apgabalā.",
@@ -374,6 +375,25 @@
     "un": "ANO valodas",
     "all": "Visas valodas"
   },
+  "keys": {
+    "title": "Taustiņi ekrānuzņēmumam",
+    "intro": "Nospiediet tos jebkurā programmā: ekrāns sastingst, un jūs atlasāt, ko uzņemt.",
+    "pressOther": "Nospiediet citus taustiņus, lai izmantotu tos.",
+    "pressKeys": "Nospiediet kombināciju",
+    "backTo": "Atpakaļ uz {keys}",
+    "free": "Šie taustiņi ir brīvi",
+    "taken": "Šos taustiņus izmanto cita programma: nospiediet citus vai aizveriet to programmu.",
+    "keyUnknown": "Programma nevar izmantot šo taustiņu. Der burti, cipari, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp un PageDown.",
+    "keyAlone": "{keys} traucētu rakstīt: pievienojiet Ctrl, Alt vai Win.",
+    "snipping": "Sistēmā Windows taustiņš Print Screen atver pašas Windows ekrāna tveršanu. Izslēdziet to, un taustiņš uzņems ekrānuzņēmumus ar ainitShot.",
+    "turnOff": "Izslēgt",
+    "snippingOff": "Gatavs: taustiņš Print Screen tagad pieder ainitShot.",
+    "snippingLater": "Windows atbrīvos taustiņu tikai pēc atkārtotas pierakstīšanās. Lai to iegūtu uzreiz, izslēdziet Print Screen slēdzi Windows iestatījumu lapā, kas atvērsies.",
+    "openSettings": "Atvērt Windows iestatījumus",
+    "tip": "Padoms: izmēģiniet {keys}: ekrānuzņēmums tikai ar kreiso roku, kamēr labā paliek uz peles.",
+    "use": "Izmantot",
+    "next": "Tālāk"
+  },
   "installer": {
     "installTitle": "Instalēt ainitShot {version}",
     "installedTitle": "ainitShot ir instalēta",
@@ -383,6 +403,7 @@
     "removeData": "Vai noņemt arī ainitShot iestatījumus un pieteikšanos Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Atskaņot",
     "ui.pause": "Pauze",
     "ui.chapters": "Nodaļas",

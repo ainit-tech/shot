@@ -96,6 +96,7 @@
     "The folder didn't open": "Složka se neotevřela",
     "The settings file didn't open": "Soubor nastavení se neotevřel",
     "The site didn't open": "Web se neotevřel",
+    "Windows Settings didn't open": "Nastavení Windows se neotevřelo",
     "Windows couldn't open {}.": "Systém Windows nedokázal otevřít {}.",
     "Folder for screenshots": "Složka snímků obrazovky",
     "Couldn't add the icon to the notification area.": "Ikonu se nepodařilo přidat do oznamovací oblasti.",
@@ -374,6 +375,25 @@
     "un": "Jazyky OSN",
     "all": "Všechny jazyky"
   },
+  "keys": {
+    "title": "Klávesy pro snímek",
+    "intro": "Stiskněte je v libovolném programu: obrazovka zamrzne a vy vyberete, co nasnímat.",
+    "pressOther": "Stiskněte jiné klávesy, chcete-li použít je.",
+    "pressKeys": "Stiskněte kombinaci",
+    "backTo": "Zpět na {keys}",
+    "free": "Tyto klávesy jsou volné",
+    "taken": "Tyto klávesy má jiný program: stiskněte jiné nebo ten program zavřete.",
+    "keyUnknown": "Tuto klávesu program neumí použít. Hodí se písmena, číslice, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp a PageDown.",
+    "keyAlone": "Zkratka {keys} by překážela při psaní: přidejte Ctrl, Alt nebo Win.",
+    "snipping": "Ve Windows otevírá klávesa Print Screen vlastní výstřižek obrazovky Windows. Vypněte to a klávesa bude pořizovat snímky v ainitShot.",
+    "turnOff": "Vypnout",
+    "snippingOff": "Hotovo: klávesa Print Screen teď patří ainitShot.",
+    "snippingLater": "Windows klávesu uvolní až po novém přihlášení. Chcete-li ji hned, vypněte přepínač Print Screen na stránce Nastavení Windows, která se otevře.",
+    "openSettings": "Otevřít Nastavení Windows",
+    "tip": "Tip: zkuste {keys}: snímek jen levou rukou, zatímco pravá zůstává na myši.",
+    "use": "Použít",
+    "next": "Další"
+  },
   "installer": {
     "installTitle": "Instalace ainitShot {version}",
     "installedTitle": "ainitShot je nainstalován",
@@ -383,6 +403,7 @@
     "removeData": "Odstranit také nastavení ainitShot a přihlášení k účtu Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Přehrát",
     "ui.pause": "Pozastavit",
     "ui.chapters": "Kapitoly",

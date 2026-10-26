@@ -96,6 +96,7 @@
     "The folder didn't open": "La carpeta no se abrió",
     "The settings file didn't open": "El archivo de ajustes no se abrió",
     "The site didn't open": "El sitio web no se abrió",
+    "Windows Settings didn't open": "No se abrió la Configuración de Windows",
     "Windows couldn't open {}.": "Windows no pudo abrir {}.",
     "Folder for screenshots": "Carpeta de capturas",
     "Couldn't add the icon to the notification area.": "No se pudo añadir el icono al área de notificaciones.",
@@ -374,6 +375,25 @@
     "un": "Idiomas de la ONU",
     "all": "Todos los idiomas"
   },
+  "keys": {
+    "title": "Teclas para una captura",
+    "intro": "Púlsalas en cualquier programa: la pantalla se congela y seleccionas lo que quieres capturar.",
+    "pressOther": "Pulsa otras teclas para usarlas en su lugar.",
+    "pressKeys": "Pulsa una combinación",
+    "backTo": "Volver a {keys}",
+    "free": "Estas teclas están libres",
+    "taken": "Otro programa usa estas teclas: pulsa otras o cierra ese programa.",
+    "keyUnknown": "El programa no admite esta tecla. Sirven letras, dígitos, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp y PageDown.",
+    "keyAlone": "{keys} estorbaría al escribir: añade Ctrl, Alt o Win.",
+    "snipping": "En Windows, Impr Pant abre la captura de pantalla del propio Windows. Desactívalo y la tecla hará capturas con ainitShot.",
+    "turnOff": "Desactivar",
+    "snippingOff": "Listo: Impr Pant ahora es de ainitShot.",
+    "snippingLater": "Windows soltará la tecla solo cuando vuelvas a iniciar sesión. Para tenerla ya, desactiva el interruptor de Impr Pant en la página de Configuración de Windows que se abrirá.",
+    "openSettings": "Abrir Configuración de Windows",
+    "tip": "Consejo: prueba {keys}: una captura solo con la mano izquierda, mientras la derecha sigue en el ratón.",
+    "use": "Usar",
+    "next": "Siguiente"
+  },
   "installer": {
     "installTitle": "Instalar ainitShot {version}",
     "installedTitle": "ainitShot está instalado",
@@ -383,6 +403,7 @@
     "removeData": "¿Eliminar también los ajustes de ainitShot y su inicio de sesión en Google?"
   },
   "clip": {
+    "keys.PrintScreen": "Impr Pant",
     "ui.play": "Reproducir",
     "ui.pause": "Pausar",
     "ui.chapters": "Capítulos",

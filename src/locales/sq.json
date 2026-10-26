@@ -96,6 +96,7 @@
     "The folder didn't open": "Dosja nuk u hap",
     "The settings file didn't open": "Skedari i cilësimeve nuk u hap",
     "The site didn't open": "Sajti nuk u hap",
+    "Windows Settings didn't open": "Cilësimet e Windows nuk u hapën",
     "Windows couldn't open {}.": "Windows nuk e hapi dot {}.",
     "Folder for screenshots": "Dosja e pamjeve të ekranit",
     "Couldn't add the icon to the notification area.": "Ikona nuk u shtua dot në zonën e njoftimeve.",
@@ -374,6 +375,25 @@
     "un": "Gjuhët e OKB-së",
     "all": "Të gjitha gjuhët"
   },
+  "keys": {
+    "title": "Tastet për një pamje ekrani",
+    "intro": "Shtypi në çdo program: ekrani ngrin dhe ti zgjedh çfarë të kapësh.",
+    "pressOther": "Shtyp taste të tjera për t'i përdorur ato në vend të këtyre.",
+    "pressKeys": "Shtyp një kombinim",
+    "backTo": "Kthehu te {keys}",
+    "free": "Këto taste janë të lira",
+    "taken": "Këto taste i ka një program tjetër: shtyp të tjera ose mbyll atë program.",
+    "keyUnknown": "Programi nuk e merr dot këtë tast. Bëjnë shkronjat, shifrat, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp dhe PageDown.",
+    "keyAlone": "{keys} do të pengonte shkrimin: shto Ctrl, Alt ose Win.",
+    "snipping": "Në Windows, tasti Print Screen hap kapjen e ekranit të vetë Windows. Çaktivizoje këtë dhe tasti do të bëjë pamje ekrani me ainitShot.",
+    "turnOff": "Çaktivizo",
+    "snippingOff": "U krye: tasti Print Screen tani i përket ainitShot.",
+    "snippingLater": "Windows do ta lëshojë tastin vetëm pasi të hysh përsëri. Për ta pasur menjëherë, çaktivizo çelësin e Print Screen në faqen e Cilësimeve të Windows që do të hapet.",
+    "openSettings": "Hap Cilësimet e Windows",
+    "tip": "Këshillë: provo {keys}: pamje ekrani vetëm me dorën e majtë, ndërsa e djathta mbetet te miu.",
+    "use": "Përdor",
+    "next": "Para"
+  },
   "installer": {
     "installTitle": "Instalo ainitShot {version}",
     "installedTitle": "ainitShot u instalua",
@@ -383,6 +403,7 @@
     "removeData": "Të hiqen edhe cilësimet e ainitShot dhe hyrja në Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Luaj",
     "ui.pause": "Pauzë",
     "ui.chapters": "Kapitujt",

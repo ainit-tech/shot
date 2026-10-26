@@ -96,6 +96,7 @@
     "The folder didn't open": "Папка не відкрилася",
     "The settings file didn't open": "Файл налаштувань не відкрився",
     "The site didn't open": "Сайт не відкрився",
+    "Windows Settings didn't open": "Параметри Windows не відкрилися",
     "Windows couldn't open {}.": "Windows не вдалося відкрити {}.",
     "Folder for screenshots": "Папка для знімків екрана",
     "Couldn't add the icon to the notification area.": "Не вдалося додати значок в область сповіщень.",
@@ -374,6 +375,25 @@
     "un": "Мови ООН",
     "all": "Усі мови"
   },
+  "keys": {
+    "title": "Клавіші для знімка",
+    "intro": "Натискайте їх у будь-якій програмі: екран завмирає, і ви виділяєте, що зняти.",
+    "pressOther": "Натисніть інші клавіші, щоб вибрати їх.",
+    "pressKeys": "Натисніть сполучення",
+    "backTo": "Повернути {keys}",
+    "free": "Ці клавіші вільні",
+    "taken": "Ці клавіші зайняті іншою програмою: натисніть інші або закрийте ту програму.",
+    "keyUnknown": "Цю клавішу програма не підтримує. Підійдуть літери, цифри, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp і PageDown.",
+    "keyAlone": "{keys} заважатиме друкувати: додайте Ctrl, Alt або Win.",
+    "snipping": "У Windows клавіша Print Screen відкриває власне захоплення екрана Windows. Вимкніть це — і клавіша робитиме знімки в ainitShot.",
+    "turnOff": "Вимкнути",
+    "snippingOff": "Готово: клавіша Print Screen тепер у ainitShot.",
+    "snippingLater": "Windows відпустить клавішу лише після нового входу в систему. Щоб одразу, вимкніть перемикач Print Screen на сторінці параметрів Windows, яка відкриється.",
+    "openSettings": "Відкрити параметри Windows",
+    "tip": "Порада: спробуйте {keys} — знімок однією лівою рукою, а права лишається на миші.",
+    "use": "Використати",
+    "next": "Далі"
+  },
   "installer": {
     "installTitle": "Встановлення ainitShot {version}",
     "installedTitle": "ainitShot встановлено",
@@ -383,6 +403,7 @@
     "removeData": "Видалити також налаштування ainitShot і вхід у Google?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Відтворити",
     "ui.pause": "Пауза",
     "ui.chapters": "Розділи",

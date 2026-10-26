@@ -96,6 +96,7 @@
     "The folder didn't open": "फ़ोल्डर नहीं खुला",
     "The settings file didn't open": "सेटिंग्स की फ़ाइल नहीं खुली",
     "The site didn't open": "साइट नहीं खुली",
+    "Windows Settings didn't open": "Windows सेटिंग्स नहीं खुलीं",
     "Windows couldn't open {}.": "Windows {} नहीं खोल सका।",
     "Folder for screenshots": "स्क्रीनशॉट का फ़ोल्डर",
     "Couldn't add the icon to the notification area.": "सूचना क्षेत्र में आइकन नहीं जोड़ा जा सका।",
@@ -374,6 +375,25 @@
     "un": "संयुक्त राष्ट्र की भाषाएँ",
     "all": "सभी भाषाएँ"
   },
+  "keys": {
+    "title": "स्क्रीनशॉट की कुंजियाँ",
+    "intro": "इन्हें किसी भी प्रोग्राम में दबाएँ: स्क्रीन थम जाती है, और आप चुनते हैं कि क्या लेना है।",
+    "pressOther": "इनकी जगह दूसरी कुंजियाँ लेने के लिए उन्हें दबाएँ।",
+    "pressKeys": "संयोजन दबाएँ",
+    "backTo": "{keys} पर लौटें",
+    "free": "ये कुंजियाँ खाली हैं",
+    "taken": "ये कुंजियाँ किसी दूसरे प्रोग्राम के पास हैं: दूसरी कुंजियाँ दबाएँ या वह प्रोग्राम बंद करें।",
+    "keyUnknown": "प्रोग्राम यह कुंजी नहीं ले सकता। अक्षर, अंक, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp और PageDown चलेंगे।",
+    "keyAlone": "{keys} टाइप करने में रुकावट बनेगी: Ctrl, Alt या Win जोड़ें।",
+    "snipping": "Windows में Print Screen कुंजी Windows का अपना स्क्रीन कैप्चर खोलती है। इसे बंद करें, तो यह कुंजी ainitShot से स्क्रीनशॉट लेगी।",
+    "turnOff": "बंद करें",
+    "snippingOff": "हो गया: Print Screen कुंजी अब ainitShot की है।",
+    "snippingLater": "Windows यह कुंजी दोबारा साइन इन करने के बाद ही छोड़ेगा। इसे तुरंत पाने के लिए, खुलने वाले Windows सेटिंग्स पेज पर Print Screen का स्विच बंद करें।",
+    "openSettings": "Windows सेटिंग्स खोलें",
+    "tip": "सुझाव: {keys} आज़माएँ: सिर्फ़ बाएँ हाथ से स्क्रीनशॉट, जबकि दायाँ हाथ माउस पर रहता है।",
+    "use": "इस्तेमाल करें",
+    "next": "आगे"
+  },
   "installer": {
     "installTitle": "ainitShot {version} इंस्टॉल करें",
     "installedTitle": "ainitShot इंस्टॉल हो गया",
@@ -383,6 +403,7 @@
     "removeData": "क्या ainitShot की सेटिंग्स और Google में साइन इन भी हटाएँ?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "चलाएँ",
     "ui.pause": "रोकें",
     "ui.chapters": "अध्याय",

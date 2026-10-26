@@ -96,6 +96,7 @@
     "The folder didn't open": "Qovluq açılmadı",
     "The settings file didn't open": "Ayarlar faylı açılmadı",
     "The site didn't open": "Sayt açılmadı",
+    "Windows Settings didn't open": "Windows parametrləri açılmadı",
     "Windows couldn't open {}.": "Windows bunu aça bilmədi: {}.",
     "Folder for screenshots": "Ekran şəkilləri qovluğu",
     "Couldn't add the icon to the notification area.": "Nişanı bildiriş sahəsinə əlavə etmək alınmadı.",
@@ -374,6 +375,25 @@
     "un": "BMT dilləri",
     "all": "Bütün dillər"
   },
+  "keys": {
+    "title": "Ekran şəkli düymələri",
+    "intro": "Onları istənilən proqramda basın: ekran donur, siz isə nəyi çəkəcəyinizi seçirsiniz.",
+    "pressOther": "Onların yerinə başqa düymələr götürmək üçün həmin düymələri basın.",
+    "pressKeys": "Kombinasiya basın",
+    "backTo": "Geri qaytar: {keys}",
+    "free": "Bu düymələr boşdur",
+    "taken": "Bu düymələr başqa proqramdadır: başqalarını basın və ya həmin proqramı bağlayın.",
+    "keyUnknown": "Proqram bu klavişi qəbul edə bilmir. Hərflər, rəqəmlər, ~, F1–F24, PrintScreen, Pause, Space, Insert, Delete, Home, End, PageUp və PageDown uyğundur.",
+    "keyAlone": "{keys} yazmağa mane olardı: Ctrl, Alt və ya Win əlavə edin.",
+    "snipping": "Windows-da Print Screen düyməsi Windows-un öz ekran çəkmə alətini açır. Bunu söndürün, düymə ainitShot ilə ekran şəkli çəksin.",
+    "turnOff": "Söndür",
+    "snippingOff": "Hazırdır: Print Screen düyməsi indi ainitShot-a məxsusdur.",
+    "snippingLater": "Windows düyməni yalnız yenidən daxil olduqdan sonra buraxacaq. Dərhal istifadə etmək üçün açılacaq Windows parametrləri səhifəsində Print Screen açarını söndürün.",
+    "openSettings": "Windows parametrlərini aç",
+    "tip": "Məsləhət: {keys} birləşməsini sınayın: ekran şəkli yalnız sol əllə, sağ əl isə siçanın üstündə qalır.",
+    "use": "İstifadə et",
+    "next": "Növbəti"
+  },
   "installer": {
     "installTitle": "ainitShot {version} quraşdırılması",
     "installedTitle": "ainitShot quraşdırıldı",
@@ -383,6 +403,7 @@
     "removeData": "ainitShot ayarları və Google-a giriş də silinsin?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "Oynat",
     "ui.pause": "Fasilə",
     "ui.chapters": "Fəsillər",

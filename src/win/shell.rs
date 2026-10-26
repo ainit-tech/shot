@@ -1,17 +1,17 @@
 //! The rest of Windows that the program needs: opening addresses and files, the user's folders,
-//! the save dialog, the clock, the user's language, the dark or light of Windows and starting
-//! together with Windows.
+//! the save dialog, the clock, the user's language, the dark or light of Windows, Print Screen and
+//! the Snipping Tool, and starting together with Windows.
 
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::ptr::{null, null_mut};
 use std::time::{Duration, SystemTime};
 
-use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, SYSTEMTIME};
+use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, LPARAM, SYSTEMTIME};
 use windows_sys::Win32::System::Com::CoTaskMemFree;
 use windows_sys::Win32::System::Registry::{
-    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_DWORD, RRF_RT_REG_SZ, RegCloseKey,
-    RegDeleteValueW, RegGetValueW, RegOpenKeyExW, RegSetValueExW,
+    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_DWORD, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_DWORD, RRF_RT_REG_SZ,
+    RegCloseKey, RegDeleteValueW, RegGetValueW, RegOpenKeyExW, RegSetValueExW,
 };
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::UI::Controls::Dialogs::{
@@ -21,7 +21,10 @@ use windows_sys::Win32::UI::Shell::{
     ASSOCF_NONE, ASSOCSTR_COMMAND, AssocQueryStringW, FOLDERID_Pictures, FOLDERID_Screenshots, KF_FLAG_CREATE,
     SHGetKnownFolderPath, ShellExecuteW,
 };
-use windows_sys::Win32::UI::WindowsAndMessaging::{ASFW_ANY, AllowSetForegroundWindow, SW_SHOWNORMAL};
+use windows_sys::Win32::UI::WindowsAndMessaging::{
+    ASFW_ANY, AllowSetForegroundWindow, HWND_BROADCAST, SMTO_ABORTIFHUNG, SW_SHOWNORMAL, SendMessageTimeoutW,
+    WM_SETTINGCHANGE,
+};
 use windows_sys::core::{GUID, PCWSTR, PWSTR};
 use windows_sys::w;
 
@@ -47,6 +50,45 @@ pub fn windows_dark() -> bool {
         RegGetValueW(HKEY_CURRENT_USER, key, value, RRF_RT_REG_DWORD, null_mut(), (&mut light as *mut u32).cast(), &mut size)
     } == 0;
     found && light == 0
+}
+
+/// Where Windows keeps whether Print Screen opens its own screen capture, the Snipping Tool: the
+/// switch in Settings → Accessibility → Keyboard.
+const KEYBOARD: PCWSTR = w!("Control Panel\\Keyboard");
+const SNIPPING: PCWSTR = w!("PrintScreenKeyForSnippingEnabled");
+/// The page of Settings with that switch.
+pub const KEYBOARD_SETTINGS: &str = "ms-settings:easeofaccess-keyboard";
+
+/// Whether Print Screen opens the Snipping Tool, as the user's settings say; nothing where they
+/// don't, and Windows does as it does by default.
+pub fn print_screen_snips() -> Option<bool> {
+    let mut on: u32 = 0;
+    let mut size = size_of::<u32>() as u32;
+    let found = unsafe {
+        RegGetValueW(HKEY_CURRENT_USER, KEYBOARD, SNIPPING, RRF_RT_REG_DWORD, null_mut(), (&mut on as *mut u32).cast(), &mut size)
+    } == 0;
+    found.then_some(on != 0)
+}
+
+/// Lets Print Screen go to the programs: Windows stops opening the Snipping Tool with it for this
+/// user, as the switch in Settings does, and hears that the keyboard's settings have changed.
+pub fn stop_print_screen_snipping() -> Result<(), String> {
+    let mut key: HKEY = null_mut();
+    let opened = unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, KEYBOARD, 0, KEY_SET_VALUE, &mut key) };
+    if opened != 0 {
+        return Err(std::io::Error::from_raw_os_error(opened as i32).to_string());
+    }
+    let off: u32 = 0;
+    let written = unsafe { RegSetValueExW(key, SNIPPING, 0, REG_DWORD, (&off as *const u32).cast(), size_of::<u32>() as u32) };
+    unsafe { RegCloseKey(key) };
+    if written != 0 {
+        return Err(std::io::Error::from_raw_os_error(written as i32).to_string());
+    }
+    let mut result = 0;
+    unsafe {
+        SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, w!("Keyboard") as LPARAM, SMTO_ABORTIFHUNG, 1000, &mut result)
+    };
+    Ok(())
 }
 
 /// Where the installer leaves the language it spoke.

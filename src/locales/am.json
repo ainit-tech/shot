@@ -96,6 +96,7 @@
     "The folder didn't open": "አቃፊው አልተከፈተም",
     "The settings file didn't open": "የቅንብሮች ፋይሉ አልተከፈተም",
     "The site didn't open": "ድር ጣቢያው አልተከፈተም",
+    "Windows Settings didn't open": "የWindows ቅንብሮች አልተከፈቱም",
     "Windows couldn't open {}.": "Windows {} መክፈት አልቻለም።",
     "Folder for screenshots": "የቅጽበታዊ ገጽ እይታዎች አቃፊ",
     "Couldn't add the icon to the notification area.": "አዶውን ወደ ማሳወቂያ ቦታው ማከል አልተቻለም።",
@@ -374,6 +375,25 @@
     "un": "የተባበሩት መንግሥታት ቋንቋዎች",
     "all": "ሁሉም ቋንቋዎች"
   },
+  "keys": {
+    "title": "የቅጽበታዊ ገጽ እይታ ቁልፎች",
+    "intro": "በማንኛውም ፕሮግራም ውስጥ ይጫኗቸው: ማያ ገጹ ይቆማል፣ የሚነሱትንም ይመርጣሉ።",
+    "pressOther": "በምትካቸው ሌሎች ቁልፎችን ለመጠቀም እነሱን ይጫኑ።",
+    "pressKeys": "ጥምረት ይጫኑ",
+    "backTo": "ወደ {keys} ይመለሱ",
+    "free": "እነዚህ ቁልፎች ነፃ ናቸው",
+    "taken": "ሌላ ፕሮግራም እነዚህን ቁልፎች ይዟል: ሌሎች ቁልፎችን ይጫኑ ወይም ያንን ፕሮግራም ይዝጉ።",
+    "keyUnknown": "ፕሮግራሙ ይህን ቁልፍ መጠቀም አይችልም። ፊደላት፣ አሃዞች፣ ~፣ F1–F24፣ PrintScreen፣ Pause፣ Space፣ Insert፣ Delete፣ Home፣ End፣ PageUp እና PageDown ይሆናሉ።",
+    "keyAlone": "{keys} መተየብን ያስቸግራል: Ctrl፣ Alt ወይም Win ያክሉ።",
+    "snipping": "በWindows ውስጥ Print Screen የWindowsን የራሱን የማያ ገጽ ቀረጻ ይከፍታል። ይህን ያጥፉ፣ ቁልፉም በainitShot ቅጽበታዊ ገጽ እይታዎችን ያነሳል።",
+    "turnOff": "አጥፋ",
+    "snippingOff": "ተጠናቋል: Print Screen አሁን የainitShot ነው።",
+    "snippingLater": "Windows ቁልፉን የሚለቀው እንደገና ከገቡ በኋላ ብቻ ነው። ወዲያውኑ ለማግኘት፣ በሚከፈተው የWindows ቅንብሮች ገጽ ላይ የPrint Screen መቀየሪያውን ያጥፉ።",
+    "openSettings": "የWindows ቅንብሮችን ክፈት",
+    "tip": "ጠቃሚ ምክር: {keys}ን ይሞክሩ: በግራ እጅ ብቻ ቅጽበታዊ ገጽ እይታ፣ ቀኝ እጅ ግን በመዳፊቱ ላይ ይቆያል።",
+    "use": "ተጠቀም",
+    "next": "ቀጣይ"
+  },
   "installer": {
     "installTitle": "ainitShot {version} መጫን",
     "installedTitle": "ainitShot ተጭኗል",
@@ -383,6 +403,7 @@
     "removeData": "የainitShot ቅንብሮች እና የGoogle መግቢያውም ይወገዱ?"
   },
   "clip": {
+    "keys.PrintScreen": "PrtSc",
     "ui.play": "አጫውት",
     "ui.pause": "ለአፍታ አቁም",
     "ui.chapters": "ምዕራፎች",
