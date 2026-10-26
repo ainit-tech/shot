@@ -408,7 +408,7 @@
     "ui.pause": "Pauzeren",
     "ui.chapters": "Hoofdstukken",
     "scenes.freeze.title": "Eén toets voor een schermafbeelding",
-    "scenes.freeze.caption": "{hotkey} bevriest het scherm. Klik op een venster om het in zijn geheel te nemen, of sleep over het deel dat je nodig hebt.",
+    "scenes.freeze.caption": "{hotkey} bevriest het scherm. Klik op een venster om het in zijn geheel te nemen, of sleep over het deel dat je nodig hebt. Druk nog een keer op {hotkey} om opnieuw te kiezen.",
     "scenes.magic.title": "Toverpotlood",
     "scenes.magic.caption": "Omcirkel iets slordig en je krijgt netjes een ovaal of rechthoek.",
     "scenes.cover.title": "Gevulde rechthoek",

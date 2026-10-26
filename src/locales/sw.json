@@ -408,7 +408,7 @@
     "ui.pause": "Sitisha",
     "ui.chapters": "Sura",
     "scenes.freeze.title": "Kitufe kimoja kwa picha ya skrini",
-    "scenes.freeze.caption": "{hotkey} hugandisha skrini. Bofya dirisha ili ulichukue lote, au buruta juu ya sehemu unayohitaji.",
+    "scenes.freeze.caption": "{hotkey} hugandisha skrini. Bofya dirisha ili ulichukue lote, au buruta juu ya sehemu unayohitaji. Bonyeza {hotkey} tena ili uchague upya.",
     "scenes.magic.title": "Penseli ya ajabu",
     "scenes.magic.caption": "Zungushia kitu ovyo, upate duaradufu au mstatili nadhifu.",
     "scenes.cover.title": "Mstatili uliojazwa",

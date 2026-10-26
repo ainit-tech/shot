@@ -408,7 +408,7 @@
     "ui.pause": "Pause",
     "ui.chapters": "Kapitler",
     "scenes.freeze.title": "Én tast for et skjermbilde",
-    "scenes.freeze.caption": "{hotkey} fryser skjermen. Klikk på et vindu for å ta hele, eller dra over den delen du trenger.",
+    "scenes.freeze.caption": "{hotkey} fryser skjermen. Klikk på et vindu for å ta hele, eller dra over den delen du trenger. Trykk på {hotkey} igjen for å velge på nytt.",
     "scenes.magic.title": "Magisk blyant",
     "scenes.magic.caption": "Tegn en grov ring rundt noe, og få en pen oval eller et pent rektangel.",
     "scenes.cover.title": "Fylt rektangel",

@@ -408,7 +408,7 @@
     "ui.pause": "ለአፍታ አቁም",
     "ui.chapters": "ምዕራፎች",
     "scenes.freeze.title": "ለቅጽበታዊ ገጽ እይታ አንድ ቁልፍ",
-    "scenes.freeze.caption": "{hotkey} ማያ ገጹን ያቆማል። መስኮቱን ሙሉ ለመውሰድ ጠቅ ያድርጉት፣ ወይም በሚፈልጉት ክፍል ላይ ይጎትቱ።",
+    "scenes.freeze.caption": "{hotkey} ማያ ገጹን ያቆማል። መስኮቱን ሙሉ ለመውሰድ ጠቅ ያድርጉት፣ ወይም በሚፈልጉት ክፍል ላይ ይጎትቱ። እንደገና ለመምረጥ {hotkey} ደግመው ይጫኑ።",
     "scenes.magic.title": "አስማታዊ እርሳስ",
     "scenes.magic.caption": "አንድን ነገር በግምት ይክበቡ፣ ንጹሕ ሞላላ ወይም አራት ማዕዘን ያገኛሉ።",
     "scenes.cover.title": "የተሞላ አራት ማዕዘን",

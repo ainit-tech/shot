@@ -408,7 +408,7 @@
     "ui.pause": "Wstrzymaj",
     "ui.chapters": "Rozdziały",
     "scenes.freeze.title": "Jeden klawisz do zrzutu ekranu",
-    "scenes.freeze.caption": "{hotkey} zamraża ekran. Kliknij okno, aby wziąć je w całości, albo przeciągnij po potrzebnej części.",
+    "scenes.freeze.caption": "{hotkey} zamraża ekran. Kliknij okno, aby wziąć je w całości, albo przeciągnij po potrzebnej części. Naciśnij {hotkey} jeszcze raz, aby wybrać od nowa.",
     "scenes.magic.title": "Magiczny ołówek",
     "scenes.magic.caption": "Obrysuj coś niedbale, a dostaniesz równy owal lub prostokąt.",
     "scenes.cover.title": "Wypełniony prostokąt",

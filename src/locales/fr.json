@@ -407,7 +407,7 @@
     "ui.pause": "Pause",
     "ui.chapters": "Chapitres",
     "scenes.freeze.title": "Une touche pour une capture",
-    "scenes.freeze.caption": "{hotkey} fige l’écran. Cliquez sur une fenêtre pour la prendre en entier, ou tracez un cadre autour de la partie qu’il vous faut.",
+    "scenes.freeze.caption": "{hotkey} fige l’écran. Cliquez sur une fenêtre pour la prendre en entier, ou tracez un cadre autour de la partie qu’il vous faut. Appuyez de nouveau sur {hotkey} pour choisir à nouveau.",
     "scenes.magic.title": "Crayon magique",
     "scenes.magic.caption": "Entourez grossièrement quelque chose, vous obtenez un ovale ou un rectangle net.",
     "scenes.cover.title": "Rectangle plein",

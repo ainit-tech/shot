@@ -408,7 +408,7 @@
     "ui.pause": "Duraklat",
     "ui.chapters": "Bölümler",
     "scenes.freeze.title": "Ekran görüntüsü için tek tuş",
-    "scenes.freeze.caption": "{hotkey} ekranı dondurur. Bir pencerenin tamamını almak için ona tıklayın veya ihtiyacınız olan bölgenin üzerinde sürükleyin.",
+    "scenes.freeze.caption": "{hotkey} ekranı dondurur. Bir pencerenin tamamını almak için ona tıklayın veya ihtiyacınız olan bölgenin üzerinde sürükleyin. Yeniden seçmek için {hotkey} tuşuna bir kez daha basın.",
     "scenes.magic.title": "Sihirli kalem",
     "scenes.magic.caption": "Bir şeyi kabaca daire içine alın, düzgün bir oval veya dikdörtgen elde edin.",
     "scenes.cover.title": "Dolu dikdörtgen",

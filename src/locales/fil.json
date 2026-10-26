@@ -408,7 +408,7 @@
     "ui.pause": "I-pause",
     "ui.chapters": "Mga kabanata",
     "scenes.freeze.title": "Isang key para sa screenshot",
-    "scenes.freeze.caption": "Fini-freeze ng {hotkey} ang screen. Mag-click sa isang window para kunin ito nang buo, o i-drag sa bahaging kailangan mo.",
+    "scenes.freeze.caption": "Fini-freeze ng {hotkey} ang screen. Mag-click sa isang window para kunin ito nang buo, o i-drag sa bahaging kailangan mo. Pindutin ulit ang {hotkey} para pumili muli.",
     "scenes.magic.title": "Mahiwagang lapis",
     "scenes.magic.caption": "Bilugan nang pabaya ang anumang bagay, at makakuha ng maayos na oval o parihaba.",
     "scenes.cover.title": "Solidong parihaba",

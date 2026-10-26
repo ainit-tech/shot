@@ -408,7 +408,7 @@
     "ui.pause": "השהיה",
     "ui.chapters": "פרקים",
     "scenes.freeze.title": "מקש אחד לצילום מסך",
-    "scenes.freeze.caption": "{hotkey} מקפיא את המסך. לחצו על חלון כדי לצלם אותו כולו, או גררו מעל החלק שאתם צריכים.",
+    "scenes.freeze.caption": "{hotkey} מקפיא את המסך. לחצו על חלון כדי לצלם אותו כולו, או גררו מעל החלק שאתם צריכים. לחצו שוב על {hotkey} כדי לבחור מחדש.",
     "scenes.magic.title": "עיפרון קסם",
     "scenes.magic.caption": "הקיפו משהו בערך, ותקבלו אליפסה או מלבן מסודרים.",
     "scenes.cover.title": "מלבן מלא",

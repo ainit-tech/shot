@@ -407,7 +407,7 @@
     "ui.pause": "暂停",
     "ui.chapters": "章节",
     "scenes.freeze.title": "一个键就能截图",
-    "scenes.freeze.caption": "{hotkey} 冻结屏幕。点击一个窗口即可整个截取，或者拖动鼠标框出需要的部分。",
+    "scenes.freeze.caption": "{hotkey} 冻结屏幕。点击一个窗口即可整个截取，或者拖动鼠标框出需要的部分。再按一次 {hotkey}，就能重新选择。",
     "scenes.magic.title": "魔法铅笔",
     "scenes.magic.caption": "随手圈一圈，就会变成整齐的椭圆或矩形。",
     "scenes.cover.title": "实心矩形",

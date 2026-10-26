@@ -408,7 +408,7 @@
     "ui.pause": "Pozastavit",
     "ui.chapters": "Kapitoly",
     "scenes.freeze.title": "Jedna klávesa pro snímek obrazovky",
-    "scenes.freeze.caption": "{hotkey} zmrazí obrazovku. Klikněte na okno a vezměte ho celé, nebo táhněte přes část, kterou potřebujete.",
+    "scenes.freeze.caption": "{hotkey} zmrazí obrazovku. Klikněte na okno a vezměte ho celé, nebo táhněte přes část, kterou potřebujete. Dalším stisknutím {hotkey} vyberete znovu.",
     "scenes.magic.title": "Kouzelná tužka",
     "scenes.magic.caption": "Zakroužkujte něco zhruba a dostanete úhledný ovál nebo obdélník.",
     "scenes.cover.title": "Vyplněný obdélník",

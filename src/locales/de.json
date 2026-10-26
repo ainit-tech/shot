@@ -408,7 +408,7 @@
     "ui.pause": "Pause",
     "ui.chapters": "Kapitel",
     "scenes.freeze.title": "Eine Taste für einen Screenshot",
-    "scenes.freeze.caption": "{hotkey} friert den Bildschirm ein. Klicke auf ein Fenster, um es ganz aufzunehmen, oder zieh über den Teil, den du brauchst.",
+    "scenes.freeze.caption": "{hotkey} friert den Bildschirm ein. Klicke auf ein Fenster, um es ganz aufzunehmen, oder zieh über den Teil, den du brauchst. Drück {hotkey} noch einmal, um neu zu wählen.",
     "scenes.magic.title": "Zauberstift",
     "scenes.magic.caption": "Kreise etwas grob ein – und du bekommst ein sauberes Oval oder Rechteck.",
     "scenes.cover.title": "Gefülltes Rechteck",

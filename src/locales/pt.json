@@ -408,7 +408,7 @@
     "ui.pause": "Pausar",
     "ui.chapters": "Capítulos",
     "scenes.freeze.title": "Uma tecla para uma captura de tela",
-    "scenes.freeze.caption": "{hotkey} congela a tela. Clique numa janela para pegá-la inteira ou arraste sobre a parte de que precisa.",
+    "scenes.freeze.caption": "{hotkey} congela a tela. Clique numa janela para pegá-la inteira ou arraste sobre a parte de que precisa. Pressione {hotkey} de novo para escolher outra vez.",
     "scenes.magic.title": "Lápis mágico",
     "scenes.magic.caption": "Contorne algo de qualquer jeito e ganhe um oval ou um retângulo certinho.",
     "scenes.cover.title": "Retângulo preenchido",

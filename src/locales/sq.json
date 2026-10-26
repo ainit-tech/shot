@@ -408,7 +408,7 @@
     "ui.pause": "Pauzë",
     "ui.chapters": "Kapitujt",
     "scenes.freeze.title": "Një tast për një pamje ekrani",
-    "scenes.freeze.caption": "{hotkey} ngrin ekranin. Kliko një dritare për ta marrë të tërën, ose tërhiq miun mbi pjesën që të duhet.",
+    "scenes.freeze.caption": "{hotkey} ngrin ekranin. Kliko një dritare për ta marrë të tërën, ose tërhiq miun mbi pjesën që të duhet. Shtyp sërish {hotkey} për të zgjedhur nga e para.",
     "scenes.magic.title": "Laps magjik",
     "scenes.magic.caption": "Rrethoje diçka përafërsisht dhe merr një oval ose drejtkëndësh të rregullt.",
     "scenes.cover.title": "Drejtkëndësh i mbushur",

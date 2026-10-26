@@ -408,7 +408,7 @@
     "ui.pause": "Jeda",
     "ui.chapters": "Bab",
     "scenes.freeze.title": "Satu kekunci untuk tangkapan skrin",
-    "scenes.freeze.caption": "{hotkey} membekukan skrin. Klik tetingkap untuk mengambil keseluruhannya, atau seret pada bahagian yang anda perlukan.",
+    "scenes.freeze.caption": "{hotkey} membekukan skrin. Klik tetingkap untuk mengambil keseluruhannya, atau seret pada bahagian yang anda perlukan. Tekan {hotkey} sekali lagi untuk memilih semula.",
     "scenes.magic.title": "Pensel ajaib",
     "scenes.magic.caption": "Bulatkan sesuatu secara kasar, dan dapatkan bujur atau segi empat tepat yang kemas.",
     "scenes.cover.title": "Segi empat tepat berisi",

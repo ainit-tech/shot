@@ -408,7 +408,7 @@
     "ui.pause": "一時停止",
     "ui.chapters": "チャプター",
     "scenes.freeze.title": "キー 1 つでスクリーンショット",
-    "scenes.freeze.caption": "{hotkey} で画面が静止します。ウィンドウをクリックすればウィンドウ全体を、ドラッグすれば必要な部分を撮れます。",
+    "scenes.freeze.caption": "{hotkey} で画面が静止します。ウィンドウをクリックすればウィンドウ全体を、ドラッグすれば必要な部分を撮れます。 もう一度 {hotkey} を押すと、選び直せます。",
     "scenes.magic.title": "魔法の鉛筆",
     "scenes.magic.caption": "ざっと囲むだけで、きれいな楕円や四角形になります。",
     "scenes.cover.title": "塗りつぶし四角形",

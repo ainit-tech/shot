@@ -408,7 +408,7 @@
     "ui.pause": "Pozastaviť",
     "ui.chapters": "Kapitoly",
     "scenes.freeze.title": "Jeden kláves na snímku obrazovky",
-    "scenes.freeze.caption": "{hotkey} zmrazí obrazovku. Kliknite na okno a vezmite ho celé, alebo ťahajte cez časť, ktorú potrebujete.",
+    "scenes.freeze.caption": "{hotkey} zmrazí obrazovku. Kliknite na okno a vezmite ho celé, alebo ťahajte cez časť, ktorú potrebujete. Ďalším stlačením {hotkey} vyberiete znova.",
     "scenes.magic.title": "Čarovná ceruzka",
     "scenes.magic.caption": "Zakrúžkujte niečo približne a dostanete úhľadný ovál alebo obdĺžnik.",
     "scenes.cover.title": "Vyplnený obdĺžnik",

@@ -408,7 +408,7 @@
     "ui.pause": "Pauză",
     "ui.chapters": "Capitole",
     "scenes.freeze.title": "O tastă pentru o captură de ecran",
-    "scenes.freeze.caption": "{hotkey} îngheață ecranul. Faceți clic pe o fereastră ca s-o luați întreagă sau trageți peste partea de care aveți nevoie.",
+    "scenes.freeze.caption": "{hotkey} îngheață ecranul. Faceți clic pe o fereastră ca s-o luați întreagă sau trageți peste partea de care aveți nevoie. Apăsați încă o dată {hotkey} ca să alegeți din nou.",
     "scenes.magic.title": "Creion magic",
     "scenes.magic.caption": "Încercuiți ceva aproximativ și obțineți un oval sau un dreptunghi îngrijit.",
     "scenes.cover.title": "Dreptunghi plin",

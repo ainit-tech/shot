@@ -408,7 +408,7 @@
     "ui.pause": "Fasilə",
     "ui.chapters": "Fəsillər",
     "scenes.freeze.title": "Ekran şəkli üçün bir klaviş",
-    "scenes.freeze.caption": "{hotkey} ekranı dondurur. Pəncərəni bütövlükdə götürmək üçün ona klikləyin və ya lazım olan hissənin üzərindən siçanla çəkin.",
+    "scenes.freeze.caption": "{hotkey} ekranı dondurur. Pəncərəni bütövlükdə götürmək üçün ona klikləyin və ya lazım olan hissənin üzərindən siçanla çəkin. Yenidən seçmək üçün {hotkey} düyməsini bir daha basın.",
     "scenes.magic.title": "Sehrli karandaş",
     "scenes.magic.caption": "Nəyisə təxmini dairəyə alın və səliqəli oval və ya düzbucaqlı alın.",
     "scenes.cover.title": "Doldurulmuş düzbucaqlı",

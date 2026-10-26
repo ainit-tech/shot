@@ -408,7 +408,7 @@
     "ui.pause": "Pristabdyti",
     "ui.chapters": "Skyriai",
     "scenes.freeze.title": "Vienas klavišas ekrano kopijai",
-    "scenes.freeze.caption": "{hotkey} užšaldo ekraną. Spustelėkite langą, kad paimtumėte jį visą, arba vilkite pele per reikiamą dalį.",
+    "scenes.freeze.caption": "{hotkey} užšaldo ekraną. Spustelėkite langą, kad paimtumėte jį visą, arba vilkite pele per reikiamą dalį. Paspauskite {hotkey} dar kartą, kad pasirinktumėte iš naujo.",
     "scenes.magic.title": "Stebuklingas pieštukas",
     "scenes.magic.caption": "Apveskite ką nors apytiksliai ir gausite tvarkingą ovalą ar stačiakampį.",
     "scenes.cover.title": "Užpildytas stačiakampis",

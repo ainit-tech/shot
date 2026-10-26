@@ -408,7 +408,7 @@
     "ui.pause": "Tạm dừng",
     "ui.chapters": "Chương",
     "scenes.freeze.title": "Một phím để chụp màn hình",
-    "scenes.freeze.caption": "{hotkey} đóng băng màn hình. Nhấp vào một cửa sổ để lấy cả cửa sổ, hoặc kéo qua phần bạn cần.",
+    "scenes.freeze.caption": "{hotkey} đóng băng màn hình. Nhấp vào một cửa sổ để lấy cả cửa sổ, hoặc kéo qua phần bạn cần. Nhấn {hotkey} thêm lần nữa để chọn lại.",
     "scenes.magic.title": "Bút chì thần kỳ",
     "scenes.magic.caption": "Khoanh đại khái một thứ gì đó và nhận được hình bầu dục hoặc hình chữ nhật ngay ngắn.",
     "scenes.cover.title": "Hình chữ nhật tô kín",

@@ -408,7 +408,7 @@
     "ui.pause": "Pauza",
     "ui.chapters": "Poglavlja",
     "scenes.freeze.title": "Jedna tipka za snimku zaslona",
-    "scenes.freeze.caption": "{hotkey} zamrzava zaslon. Kliknite prozor da biste ga snimili cijelog ili povucite mišem preko dijela koji vam treba.",
+    "scenes.freeze.caption": "{hotkey} zamrzava zaslon. Kliknite prozor da biste ga snimili cijelog ili povucite mišem preko dijela koji vam treba. Ponovno pritisnite {hotkey} da biste odabrali iznova.",
     "scenes.magic.title": "Čarobna olovka",
     "scenes.magic.caption": "Zaokružite nešto otprilike i dobit ćete uredan oval ili pravokutnik.",
     "scenes.cover.title": "Ispunjeni pravokutnik",

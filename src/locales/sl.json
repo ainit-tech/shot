@@ -408,7 +408,7 @@
     "ui.pause": "Premor",
     "ui.chapters": "Poglavja",
     "scenes.freeze.title": "Ena tipka za posnetek zaslona",
-    "scenes.freeze.caption": "{hotkey} zamrzne zaslon. Kliknite okno, da ga zajamete celega, ali povlecite čez del, ki ga potrebujete.",
+    "scenes.freeze.caption": "{hotkey} zamrzne zaslon. Kliknite okno, da ga zajamete celega, ali povlecite čez del, ki ga potrebujete. Znova pritisnite {hotkey}, da izberete na novo.",
     "scenes.magic.title": "Čarobni svinčnik",
     "scenes.magic.caption": "Nekaj približno obkrožite in dobili boste lep oval ali pravokotnik.",
     "scenes.cover.title": "Zapolnjen pravokotnik",

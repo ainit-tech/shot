@@ -408,7 +408,7 @@
     "ui.pause": "Pausa",
     "ui.chapters": "Capitoli",
     "scenes.freeze.title": "Un tasto per uno screenshot",
-    "scenes.freeze.caption": "{hotkey} congela lo schermo. Fai clic su una finestra per prenderla intera o trascina sulla parte che ti serve.",
+    "scenes.freeze.caption": "{hotkey} congela lo schermo. Fai clic su una finestra per prenderla intera o trascina sulla parte che ti serve. Premi di nuovo {hotkey} per scegliere da capo.",
     "scenes.magic.title": "Matita magica",
     "scenes.magic.caption": "Cerchia qualcosa alla buona e ottieni un ovale o un rettangolo perfetto.",
     "scenes.cover.title": "Rettangolo pieno",

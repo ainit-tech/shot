@@ -408,7 +408,7 @@
     "ui.pause": "Pause",
     "ui.chapters": "Kapitler",
     "scenes.freeze.title": "Én tast til et skærmbillede",
-    "scenes.freeze.caption": "{hotkey} fryser skærmen. Klik på et vindue for at tage det hele, eller træk hen over den del, du skal bruge.",
+    "scenes.freeze.caption": "{hotkey} fryser skærmen. Klik på et vindue for at tage det hele, eller træk hen over den del, du skal bruge. Tryk på {hotkey} igen for at vælge forfra.",
     "scenes.magic.title": "Magisk blyant",
     "scenes.magic.caption": "Tegn en grov ring om noget, og få en pæn oval eller et pænt rektangel.",
     "scenes.cover.title": "Udfyldt rektangel",
