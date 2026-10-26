@@ -350,6 +350,33 @@ mod tests {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
     }
 
+    /// The first start goes from the choice of the language to the choice of the keys, and from
+    /// there to "How to use", each window out of sight; each window closes as the next opens. It
+    /// starts WebView2: `LOCALAPPDATA=<folder> cargo test -p ainitshot -- --ignored --exact
+    /// win::languages::tests::the_first_start_goes_from_the_language_to_the_keys_and_how_to_use`.
+    #[test]
+    #[ignore]
+    fn the_first_start_goes_from_the_language_to_the_keys_and_how_to_use() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        open(true);
+        let ready = pump_until(30, || controller().is_some() && evaluate("document.body.className") == "\"\"");
+        // The tile of Russian chosen: the program has no settings to save in the test, and speaks
+        // Russian all the same.
+        heard(r#"{"type":"choose","language":"ru"}"#);
+        let keys_open = pump_until(10, keys::is_open);
+        let language_closed = !is_open();
+        // "Next" with Print Screen, the keys of the settings.
+        keys::page_says(r#"{"type":"next","hotkey":"PrintScreen"}"#);
+        let guide_open = pump_until(10, guide::is_open);
+        let keys_closed = !keys::is_open();
+        guide::close();
+        browser::close();
+        assert_eq!(
+            [ready, language_closed, keys_open, keys_closed, guide_open, text::current() == Language::RU],
+            [true; 6]
+        );
+    }
+
     /// Opens the choice of a language: the six tiles of the UN's languages, the one of Windows
     /// marked, then a tile for every language, each with its flag, and typing finds one. It starts
     /// WebView2, so it runs only when asked: `LOCALAPPDATA=<folder> cargo test -p ainitshot

@@ -203,6 +203,12 @@ fn attach(controller: &ICoreWebView2Controller, window: HWND) -> windows_core::R
     Ok(())
 }
 
+/// What the page would ask for, in the tests that go through the first start.
+#[cfg(test)]
+pub fn page_says(message: &str) {
+    heard(message);
+}
+
 /// What the page asks for.
 fn heard(message: &str) {
     let Ok(message) = serde_json::from_str::<Value>(message) else { return };
