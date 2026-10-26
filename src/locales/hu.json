@@ -245,6 +245,7 @@
     "about": "Névjegy",
     "aboutIntro": "Az ainit kis programja: rögzíti a képernyő egy részét, rajzolhatsz rá, aztán kimásolja, elmenti vagy megkérdezi róla a Google-t.",
     "aboutSite": "Webhely",
+    "sourceCode": "Forráskód",
     "aboutLicense": "Licenc",
     "aboutLicenseDesc": "Az ainitShot a GNU General Public License 3-as vagy újabb verziója alá tartozó szabad szoftver: a licenc feltételei szerint használhatod, terjesztheted és módosíthatod. Semmiféle garancia nem jár hozzá.",
     "aboutComponents": "Nyílt forráskódú összetevők",

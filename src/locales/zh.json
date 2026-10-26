@@ -245,6 +245,7 @@
     "about": "关于",
     "aboutIntro": "由 ainit 开发的小巧程序：截取屏幕的一部分，可以在上面绘制，然后复制、保存，或就截图向 Google 提问。",
     "aboutSite": "网站",
+    "sourceCode": "源代码",
     "aboutLicense": "许可证",
     "aboutLicenseDesc": "ainitShot 是自由软件，采用 GNU General Public License 第 3 版或更高版本：可按照该许可证的条款使用、分享和修改本程序。本程序不提供任何担保。",
     "aboutComponents": "开源组件",

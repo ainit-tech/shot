@@ -731,6 +731,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
       <div class="about-foot item" data-k="kAbout">
         <div class="links">
           <button class="link" id="about-site"><span class="find" data-t="aboutSite"></span><svg class="glyph"><use href="#i-open"/></svg></button>
+          <button class="link" id="about-source"><span class="find" data-t="sourceCode"></span><svg class="glyph"><use href="#i-open"/></svg></button>
           <button class="link" id="about-license"><span class="find" data-t="aboutLicense"></span></button>
           <button class="link" id="about-components"><span class="find" data-t="aboutComponents"></span></button>
         </div>
@@ -884,6 +885,7 @@ const TEXT = {
   about: "About",
   aboutIntro: "A small program by ainit: it takes a part of the screen, lets you draw on it, and copies it, saves it or asks Google about it.",
   aboutSite: "Website",
+  sourceCode: "Source code",
   aboutLicense: "License",
   aboutLicenseDesc: "ainitShot is free software under the GNU General Public License, version 3 or later: you may use, share and change it on its terms. It comes with no warranty.",
   aboutComponents: "Open source components",
@@ -1529,8 +1531,8 @@ function renderModels() {
   pause.textContent = t(models.state === "paused" ? "resume" : "pause");
 }
 
-// About: the program and its version, its updates, a way to support it, and its site, its license
-// and the open source components it is made of. The license and the components, which the program
+// About: the program and its version, its updates, a way to support it, and its site, its source
+// code, its license and the open source components it is made of. The license and the components, which the program
 // gives when the section is first opened, are pages of their own in the section.
 let licensesAsked = false;
 function askLicenses() {
@@ -1558,6 +1560,7 @@ $("#about-home").addEventListener("click", () => {
   if (!searching()) aboutPage("main");
 });
 $("#about-site").addEventListener("click", () => send({ type: "openSite" }));
+$("#about-source").addEventListener("click", () => send({ type: "openSource" }));
 $("#about-license").addEventListener("click", () => aboutPage("license"));
 $("#about-components").addEventListener("click", () => aboutPage("components"));
 $("#support").addEventListener("click", () => send({ type: "support" }));

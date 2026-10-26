@@ -245,6 +245,7 @@
     "about": "À propos",
     "aboutIntro": "Un petit programme d’ainit : il capture une partie de l’écran, vous permet de dessiner dessus, puis la copie, l’enregistre ou interroge Google à son sujet.",
     "aboutSite": "Site web",
+    "sourceCode": "Code source",
     "aboutLicense": "Licence",
     "aboutLicenseDesc": "ainitShot est un logiciel libre sous licence GNU General Public License, version 3 ou ultérieure : vous pouvez l’utiliser, le partager et le modifier selon les termes de cette licence. Il est fourni sans aucune garantie.",
     "aboutComponents": "Composants open source",

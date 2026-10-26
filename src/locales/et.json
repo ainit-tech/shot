@@ -245,6 +245,7 @@
     "about": "Teave",
     "aboutIntro": "Väike programm, mille on teinud ainit: see jäädvustab osa ekraanist, laseb teil sellele joonistada ning seejärel kopeerib selle, salvestab selle või küsib selle kohta Google'ilt.",
     "aboutSite": "Veebisait",
+    "sourceCode": "Lähtekood",
     "aboutLicense": "Litsents",
     "aboutLicenseDesc": "ainitShot on vaba tarkvara, mille litsents on GNU General Public License, versioon 3 või uuem: seda võib kasutada, jagada ja muuta selle litsentsi tingimustel. Garantiid sellele ei anta.",
     "aboutComponents": "Avatud lähtekoodiga komponendid",

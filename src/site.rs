@@ -1,6 +1,6 @@
-//! The program's site, shot.ainit.tech. It speaks the six languages of the UN: English at its root
-//! and the other five under their codes, so that a page has an address in each, "/support" and
-//! "/ru/support".
+//! The program's site, shot.ainit.tech, and its source code. The site speaks the six languages of
+//! the UN: English at its root and the other five under their codes, so that a page has an address
+//! in each, "/support" and "/ru/support".
 
 use crate::text::Language;
 
@@ -10,6 +10,8 @@ const ORIGIN: &str = "https://shot.ainit.tech";
 pub const OVERVIEW: &str = "/";
 /// The page where people support the program.
 pub const SUPPORT: &str = "/support";
+/// The program's source code, in its public repository.
+pub const SOURCE: &str = "https://sourcecraft.dev/ainit-tech/shot";
 
 /// A page of the site in a language of the program: in that language where the site speaks it,
 /// in English otherwise. `path` starts with a slash; the overview is "/".

@@ -330,6 +330,11 @@ fn heard(message: &str) {
         "pauseModels" => models::pause(message["paused"].as_bool().unwrap_or(false)),
         "licenses" => post(&licenses()),
         "openSite" => app::open_site(site::OVERVIEW),
+        "openSource" => {
+            if let Err(problem) = shell::open(site::SOURCE) {
+                app::notify(tr("The site didn't open"), &problem);
+            }
+        }
         "support" => app::open_site(site::SUPPORT),
         _ => {}
     }
@@ -757,8 +762,8 @@ mod tests {
             evaluate("document.querySelector('#updates-button').click()");
             seen.push(told("m.type"));
             seen.push(evaluate("document.querySelector('#updates-title').textContent + ' | ' + document.querySelector('#updates-button').textContent"));
-            // The card of support and the site's link ask the program to open the site.
-            evaluate("told.length = 0; document.querySelector('#support').click(); document.querySelector('#about-site').click()");
+            // The card of support and the links ask the program to open the site and the source.
+            evaluate("told.length = 0; ['#support', '#about-site', '#about-source'].forEach(s => document.querySelector(s).click())");
             seen.push(told("m.type"));
             // The model of masking: its switch is saved as the other settings are; its download
             // shows how far it has come, and its button pauses it.
@@ -852,7 +857,7 @@ mod tests {
                 r#""[\"checkUpdates\"]""#,
                 r#""[\"installUpdate\"]""#,
                 "\"Доступна версия 0.2.0 | Обновить до 0.2.0\"",
-                r#""[\"support\",\"openSite\"]""#,
+                r#""[\"support\",\"openSite\",\"openSource\"]""#,
                 r#""[\"save:false\"]""#,
                 "\"39% · 380 из 951 МБ · 12,3 МБ/с | 40%\"",
                 r#""[\"pauseModels:true\"]""#,

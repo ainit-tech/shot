@@ -245,6 +245,7 @@
     "about": "Par programmu",
     "aboutIntro": "Neliela ainit programma: tā uzņem daļu ekrāna, ļauj uz tās zīmēt un pēc tam to kopē, saglabā vai jautā par to Google.",
     "aboutSite": "Vietne",
+    "sourceCode": "Pirmkods",
     "aboutLicense": "Licence",
     "aboutLicenseDesc": "ainitShot ir brīvā programmatūra, uz ko attiecas GNU General Public License 3. vai jaunāka versija: to drīkst izmantot, izplatīt un mainīt saskaņā ar šīs licences noteikumiem. Tai netiek sniegta nekāda garantija.",
     "aboutComponents": "Atvērtā pirmkoda komponenti",

@@ -245,6 +245,7 @@
     "about": "O programu",
     "aboutIntro": "Malý program od ainit: pořídí snímek části obrazovky, umožní do něj kreslit a pak ho zkopíruje, uloží nebo k němu pošle dotaz na Google.",
     "aboutSite": "Web",
+    "sourceCode": "Zdrojový kód",
     "aboutLicense": "Licence",
     "aboutLicenseDesc": "ainitShot je svobodný software pod licencí GNU General Public License verze 3 nebo novější: můžete ho používat, šířit a upravovat za jejích podmínek. Neposkytuje se na něj žádná záruka.",
     "aboutComponents": "Open source komponenty",

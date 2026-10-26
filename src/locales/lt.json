@@ -245,6 +245,7 @@
     "about": "Apie programą",
     "aboutIntro": "Nedidelė „ainit“ programa: ji užfiksuoja ekrano dalį, leidžia ant jos piešti, o tada ją nukopijuoja, įrašo arba paklausia apie ją „Google“.",
     "aboutSite": "Svetainė",
+    "sourceCode": "Šaltinio kodas",
     "aboutLicense": "Licencija",
     "aboutLicenseDesc": "„ainitShot“ yra laisvoji programinė įranga pagal „GNU General Public License“ 3 arba vėlesnę versiją: ją galima naudoti, platinti ir keisti šios licencijos sąlygomis. Jokia garantija nesuteikiama.",
     "aboutComponents": "Atvirojo kodo komponentai",

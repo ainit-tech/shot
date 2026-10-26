@@ -245,6 +245,7 @@
     "about": "Tietoja",
     "aboutIntro": "Pieni ohjelma, jonka on tehnyt ainit: se kaappaa osan näytöstä, antaa sinun piirtää sen päälle ja sitten kopioi sen, tallentaa sen tai kysyy siitä Googlelta.",
     "aboutSite": "Sivusto",
+    "sourceCode": "Lähdekoodi",
     "aboutLicense": "Lisenssi",
     "aboutLicenseDesc": "ainitShot on vapaa ohjelmisto, jonka lisenssi on GNU General Public License, versio 3 tai uudempi: saat käyttää, jakaa ja muuttaa sitä lisenssin ehtojen mukaisesti. Sillä ei ole minkäänlaista takuuta.",
     "aboutComponents": "Avoimen lähdekoodin komponentit",

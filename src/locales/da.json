@@ -245,6 +245,7 @@
     "about": "Om",
     "aboutIntro": "Et lille program fra ainit: det tager et billede af en del af skærmen, lader dig tegne på det og kopierer det derefter, gemmer det eller spørger Google om det.",
     "aboutSite": "Hjemmeside",
+    "sourceCode": "Kildekode",
     "aboutLicense": "Licens",
     "aboutLicenseDesc": "ainitShot er fri software under GNU General Public License, version 3 eller nyere: du må bruge, dele og ændre det på licensens vilkår. Det leveres uden nogen form for garanti.",
     "aboutComponents": "Open source-komponenter",

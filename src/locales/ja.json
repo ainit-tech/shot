@@ -245,6 +245,7 @@
     "about": "バージョン情報",
     "aboutIntro": "ainit が作った小さなプログラムです。画面の一部を取り込んで描き込みを加え、コピーや保存をしたり、その画像について Google に質問したりできます。",
     "aboutSite": "Web サイト",
+    "sourceCode": "ソースコード",
     "aboutLicense": "ライセンス",
     "aboutLicenseDesc": "ainitShot は GNU General Public License バージョン 3 以降に基づくフリー ソフトウェアです。このライセンスの条件に従って、使用、共有、改変できます。保証は一切ありません。",
     "aboutComponents": "オープンソース コンポーネント",

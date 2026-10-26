@@ -245,6 +245,7 @@
     "about": "O programu",
     "aboutIntro": "Majhen program, ki ga je naredil ainit: zajame del zaslona, vam omogoča risanje po njem ter ga nato kopira, shrani ali o njem povpraša Google.",
     "aboutSite": "Spletno mesto",
+    "sourceCode": "Izvorna koda",
     "aboutLicense": "Licenca",
     "aboutLicenseDesc": "ainitShot je prosto programje z licenco GNU General Public License, različica 3 ali novejša: lahko ga uporabljate, delite z drugimi in spreminjate pod njenimi pogoji. Zanj ni nobenega jamstva.",
     "aboutComponents": "Odprtokodne komponente",

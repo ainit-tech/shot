@@ -245,6 +245,7 @@
     "about": "Info",
     "aboutIntro": "Een klein programma van ainit: het legt een deel van het scherm vast, laat je erop tekenen en kopieert het daarna, slaat het op of vraagt Google ernaar.",
     "aboutSite": "Website",
+    "sourceCode": "Broncode",
     "aboutLicense": "Licentie",
     "aboutLicenseDesc": "ainitShot is vrije software onder de GNU General Public License, versie 3 of later: je mag het gebruiken, delen en aanpassen volgens de voorwaarden van die licentie. Het wordt geleverd zonder enige garantie.",
     "aboutComponents": "Opensourcecomponenten",

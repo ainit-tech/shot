@@ -245,6 +245,7 @@
     "about": "Hakkında",
     "aboutIntro": "ainit tarafından yapılmış küçük bir program: ekranın bir bölümünü alır, üzerine çizim yapmanızı sağlar, ardından onu kopyalar, kaydeder veya onun hakkında Google'a soru sorar.",
     "aboutSite": "Web sitesi",
+    "sourceCode": "Kaynak kodu",
     "aboutLicense": "Lisans",
     "aboutLicenseDesc": "ainitShot, GNU General Public License sürüm 3 veya üzeri ile sunulan özgür bir yazılımdır: onu bu lisansın koşullarına göre kullanabilir, paylaşabilir ve değiştirebilirsiniz. Hiçbir garanti verilmez.",
     "aboutComponents": "Açık kaynak bileşenler",

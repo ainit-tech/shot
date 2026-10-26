@@ -245,6 +245,7 @@
     "about": "Giới thiệu",
     "aboutIntro": "Một chương trình nhỏ của ainit: chụp một phần màn hình, cho phép bạn vẽ lên đó, rồi sao chép, lưu hoặc hỏi Google về nó.",
     "aboutSite": "Trang web",
+    "sourceCode": "Mã nguồn",
     "aboutLicense": "Giấy phép",
     "aboutLicenseDesc": "ainitShot là phần mềm tự do theo giấy phép GNU General Public License, phiên bản 3 trở lên: bạn có thể sử dụng, chia sẻ và sửa đổi chương trình theo các điều khoản của giấy phép này. Chương trình không đi kèm bất kỳ bảo đảm nào.",
     "aboutComponents": "Thành phần mã nguồn mở",

@@ -245,6 +245,7 @@
     "about": "O programu",
     "aboutIntro": "Mali program koji je izradio ainit: snima dio zaslona, omogućuje vam crtanje po njemu, a zatim ga kopira, sprema ili o njemu pita Google.",
     "aboutSite": "Web-stranica",
+    "sourceCode": "Izvorni kod",
     "aboutLicense": "Licenca",
     "aboutLicenseDesc": "ainitShot je slobodan softver pod licencom GNU General Public License, verzija 3 ili novija: možete ga upotrebljavati, dijeliti i mijenjati pod njezinim uvjetima. Ne daje se nikakvo jamstvo.",
     "aboutComponents": "Komponente otvorenog koda",

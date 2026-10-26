@@ -245,6 +245,7 @@
     "about": "Rreth programit",
     "aboutIntro": "Një program i vogël nga ainit: kap një pjesë të ekranit, të lejon të vizatosh mbi të dhe pastaj e kopjon, e ruan ose pyet për të në Google.",
     "aboutSite": "Sajti",
+    "sourceCode": "Kodi burimor",
     "aboutLicense": "Licenca",
     "aboutLicenseDesc": "ainitShot është softuer i lirë me licencën GNU General Public License, versioni 3 ose më i ri: mund ta përdorësh, ta ndash dhe ta ndryshosh sipas kushteve të saj. Nuk jepet asnjë garanci.",
     "aboutComponents": "Komponentë me burim të hapur",
