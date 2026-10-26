@@ -35,6 +35,9 @@ A loop on a screenshot says "look here". A neat ellipse or rectangle says it jus
 
 - While the loop is being drawn, it follows the mouse like the pencil.
 - When the button is released and the ends of the loop are close, both an ellipse and a rectangle are fitted to it, and the one with the smaller error wins. If neither fits well, the stroke stays as drawn.
+  - A loop drawn on past its start ends where it reached the start: the part drawn twice would otherwise weigh twice and pull the ellipse off the loop.
+  - The ellipse keeps the loop's proportions however long it is: its radii are fitted by least squares, since the points of a long loop crowd on its long sides.
+  - Tried on loops drawn as by hand, careful, usual and hasty, circles and ovals up to three times as long as high became ellipses, and boxes rectangles; a shape between the two, a box with very round corners, becomes an ellipse.
 - Holding Shift on release keeps the stroke as drawn.
 - If the outline along the edge is added, the model reads the selection in the background as soon as it is made, so the outline appears about 50 ms after the button is released.
 
