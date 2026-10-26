@@ -25,17 +25,19 @@ use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{GetDpiForMonitor, GetDpiForWindow, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW, IsIconic,
-    LoadCursorW, MINMAXINFO, PostMessageW, RegisterClassExW, SW_RESTORE, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER,
-    SetForegroundWindow, SetTimer, SetWindowPos, SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE,
-    WM_DPICHANGED, WM_GETMINMAXINFO, WM_MOVE, WM_SIZE, WM_TIMER, WNDCLASSEXW, WS_OVERLAPPEDWINDOW,
+    LoadCursorW, MINMAXINFO, PostMessageW, RegisterClassExW, SW_RESTORE, SW_SHOW, SW_SHOWNOACTIVATE, SWP_NOACTIVATE,
+    SWP_NOZORDER, SetForegroundWindow, SetTimer, SetWindowPos, SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE,
+    WM_APP, WM_CLOSE, WM_DPICHANGED, WM_GETMINMAXINFO, WM_MOVE, WM_SIZE, WM_TIMER, WNDCLASSEXW, WS_EX_NOACTIVATE,
+    WS_EX_TOOLWINDOW, WS_OVERLAPPEDWINDOW,
 };
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, browser, last_error, models, shell, tray, update, wide};
+use super::{QUIET, app, browser, last_error, models, out_of_sight, shell, tray, update, wide};
 use crate::annotation::Tool;
 use crate::icons::{self, Part};
 use crate::settings::Settings;
+use crate::site;
 use crate::text::{self, Language, tr};
 
 const CLASS: PCWSTR = w!("ainitShot.settings");
@@ -197,6 +199,10 @@ fn controller() -> Option<ICoreWebView2Controller> {
 
 fn bring_up(window: HWND) {
     unsafe {
+        if QUIET {
+            ShowWindow(window, SW_SHOWNOACTIVATE);
+            return;
+        }
         ShowWindow(window, if IsIconic(window) != 0 { SW_RESTORE } else { SW_SHOW });
         SetForegroundWindow(window);
     }
@@ -323,17 +329,11 @@ fn heard(message: &str) {
         "installUpdate" => update::install_now(),
         "pauseModels" => models::pause(message["paused"].as_bool().unwrap_or(false)),
         "licenses" => post(&licenses()),
-        "openSite" => {
-            if let Err(problem) = shell::open(SITE) {
-                app::notify(tr("The site didn't open"), &problem);
-            }
-        }
+        "openSite" => app::open_site(site::OVERVIEW),
+        "support" => app::open_site(site::SUPPORT),
         _ => {}
     }
 }
-
-/// The program's site.
-const SITE: &str = "https://shot.ainit.tech";
 
 /// The program's own license and the open source components it is made of, each with its
 /// license, for the section "About". The list is written by `tools/licenses.py`.
@@ -421,9 +421,12 @@ fn create_window() -> std::io::Result<HWND> {
             }
             REGISTERED.set(true);
         }
-        let place = place();
+        let (place, quiet) = match QUIET {
+            true => (out_of_sight(place()), WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE),
+            false => (place(), 0),
+        };
         let window = CreateWindowExW(
-            0,
+            quiet,
             CLASS,
             wide(&title()).as_ptr(),
             WS_OVERLAPPEDWINDOW,
@@ -565,6 +568,23 @@ mod tests {
         assert!(licenses["license"].as_str().unwrap().contains("GNU GENERAL PUBLIC LICENSE"));
     }
 
+    /// The page's texts are those of the catalogs: every text the page has in English is in the
+    /// Russian catalog, which every other catalog follows, and the catalog has none that the page
+    /// no longer has.
+    #[test]
+    fn the_catalogs_have_the_pages_texts() {
+        let start = PAGE.find("const TEXT = {").unwrap();
+        let end = start + PAGE[start..].find("\n};").unwrap();
+        let mut page: Vec<&str> =
+            PAGE[start..end].lines().skip(1).filter_map(|line| Some(line.strip_prefix("  ")?.split_once(':')?.0)).collect();
+        let catalog: Value = serde_json::from_str(include_str!("../locales/ru.json")).unwrap();
+        let mut russian: Vec<&str> = catalog["settings"].as_object().unwrap().keys().map(String::as_str).collect();
+        page.sort_unstable();
+        russian.sort_unstable();
+        assert!(page.len() > 150, "{}", page.len());
+        assert_eq!(page, russian);
+    }
+
     /// What a script returns on the settings page, as JSON.
     fn evaluate(script: &str) -> String {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
@@ -576,9 +596,10 @@ mod tests {
     }
 
     /// Shows the settings window in every language the program speaks: every text of the page has
-    /// all three, and the page says which language it is in. With `SCREENSHOT_PREVIEW=<folder>`
-    /// it saves the first section and a query button opened in each:
-    /// `LOCALAPPDATA=<folder> cargo test -p ainitshot speaks_every -- --ignored`.
+    /// its translation, those its elements show and those its script writes, and the page says
+    /// which language it is in. With `SCREENSHOT_PREVIEW=<folder>` it saves the first section and
+    /// a query button opened in each: `LOCALAPPDATA=<folder> cargo test -p ainitshot speaks_every
+    /// -- --ignored`.
     #[test]
     #[ignore]
     fn the_settings_window_speaks_every_language() {
@@ -592,9 +613,10 @@ mod tests {
                 text::set(language);
                 refresh();
                 pump_until(2, || false);
-                let missing = "[...document.querySelectorAll('[data-t],[data-t-title],[data-t-aria],[data-t-placeholder],[data-k]')]
+                let missing = "[...new Set([...document.querySelectorAll('[data-t],[data-t-title],[data-t-aria],[data-t-placeholder],[data-k]')]
                     .flatMap(e => [e.dataset.t, e.dataset.tTitle, e.dataset.tAria, e.dataset.tPlaceholder, e.dataset.k])
-                    .filter(key => key && !(TEXT[key] && (state.language === 'en' || state.texts[key])))";
+                    .filter(Boolean).concat(Object.keys(TEXT)))]
+                    .filter(key => !(TEXT[key] && (state.language === 'en' || state.texts[key])))";
                 seen.push(evaluate(&format!("document.documentElement.lang + ' ' + JSON.stringify({missing})")));
                 if let Some(folder) = &preview {
                     evaluate("document.querySelector('nav [data-section=general]').click()");
@@ -611,6 +633,54 @@ mod tests {
         assert!(ready, "the page didn't get its settings");
         let expected: Vec<String> = Language::all().chain([Language::RU]).map(|l| format!("\"{} []\"", l.code())).collect();
         assert_eq!(seen, expected);
+    }
+
+    /// Saves pictures of the section "About" into the folder `SCREENSHOT_PREVIEW`, in Russian and
+    /// in Arabic: the latest version, installed by itself; a new version while updates are
+    /// installed by hand; and the page of the components. The window opens out of sight:
+    /// `LOCALAPPDATA=<folder> SCREENSHOT_PREVIEW=<folder> cargo test -p ainitshot
+    /// about_section_in_pictures -- --ignored`.
+    #[test]
+    #[ignore]
+    fn the_about_section_in_pictures() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        let folder = PathBuf::from(std::env::var_os("SCREENSHOT_PREVIEW").expect("a folder for the pictures"));
+        open();
+        let ready = pump_until(30, || controller().is_some() && evaluate("document.body.className") == "\"\"");
+        let mut saved = Vec::new();
+        // The last check was this morning. The page keeps what a script declares, so each script
+        // declares it in a block of its own.
+        let checked = "const now = new Date(), two = n => String(n).padStart(2, '0'); \
+                       const checked = `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())} 09:41`;";
+        let mut save = |name: String| {
+            pump_until(1, || false);
+            let path = folder.join(name);
+            save_page(&path);
+            saved.push(path.exists());
+        };
+        if ready {
+            for language in [Language::RU, Language::AR] {
+                text::set(language);
+                refresh();
+                pump_until(2, || false);
+                let code = language.code();
+                evaluate("document.querySelector('nav [data-section=about]').click()");
+                pump_until(5, || evaluate("document.querySelectorAll('#components .component').length") != "0");
+                evaluate(&format!("{{ {checked} state.draft.autoupdate = true; renderSwitch('autoupdate', true); \
+                    heard({{ type: 'updates', updates: {{ current: state.version, state: 'latest', checked }} }}) }}"));
+                save(format!("about-{code}.png"));
+                evaluate(&format!("{{ {checked} state.draft.autoupdate = false; renderSwitch('autoupdate', false); \
+                    heard({{ type: 'updates', updates: {{ current: state.version, state: 'available', version: '0.3.0', checked }} }}) }}"));
+                save(format!("about-{code}-update.png"));
+                evaluate("aboutPage('components')");
+                save(format!("about-{code}-components.png"));
+                evaluate("aboutPage('main')");
+            }
+        }
+        close();
+        browser::close();
+        assert!(ready, "the page didn't get its settings");
+        assert_eq!(saved, [true; 6]);
     }
 
     /// Opens the settings window with the default settings and goes through its sections and
@@ -654,14 +724,23 @@ mod tests {
             look("nothing");
             seen.push(evaluate("document.body.classList.contains('nothing')"));
             evaluate("clearSearch()");
-            // About: the page asks the program for the licenses as the section opens; every
-            // component comes, and a click on one shows its license.
+            // About: the page asks the program for the licenses as the section opens. The license
+            // and the components are pages of their own under the section's title: every
+            // component comes, a click on one shows its license, and the title leads back.
             evaluate("document.querySelector('nav [data-section=about]').click()");
             pump_until(5, || evaluate("document.querySelectorAll('#components .component').length") != "0");
+            look("about");
+            let pages = "['#about-main', '#license-page', '#components-page'].map(p => document.querySelector(p).checkVisibility() ? 1 : 0).join('')";
+            evaluate("document.querySelector('#about-components').click()");
+            seen.push(evaluate(&format!("{pages} + ' ' + document.querySelector('#about-sub').textContent")));
             seen.push(evaluate("document.querySelectorAll('#components .component').length + ' ' + document.querySelectorAll('#components .group').length"));
             evaluate("document.querySelector('#components .component').click()");
             seen.push(evaluate("document.querySelector('#components .component-text').textContent.includes('Permission is hereby granted')"));
-            look("about");
+            look("about-components");
+            evaluate("document.querySelector('#about-home').click(); document.querySelector('#about-license').click()");
+            seen.push(evaluate(&format!("{pages} + ' ' + document.querySelector('#license-text').textContent.includes('GNU GENERAL PUBLIC LICENSE')")));
+            evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))");
+            seen.push(evaluate(pages));
             // What the page sends the program is kept, without the program behind it.
             evaluate("window.told = []; chrome.webview.postMessage = m => told.push(JSON.parse(m))");
             let told = |what: &str| evaluate(&format!("JSON.stringify(told.map(m => {what}))"));
@@ -677,7 +756,10 @@ mod tests {
             evaluate("told.length = 0; heard({ type: 'updates', updates: { current: '0.1.0', state: 'available', version: '0.2.0' } })");
             evaluate("document.querySelector('#updates-button').click()");
             seen.push(told("m.type"));
-            seen.push(evaluate("document.querySelector('#updates-state').textContent + ' | ' + document.querySelector('#updates-button').textContent"));
+            seen.push(evaluate("document.querySelector('#updates-title').textContent + ' | ' + document.querySelector('#updates-button').textContent"));
+            // The card of support and the site's link ask the program to open the site.
+            evaluate("told.length = 0; document.querySelector('#support').click(); document.querySelector('#about-site').click()");
+            seen.push(told("m.type"));
             // The model of masking: its switch is saved as the other settings are; its download
             // shows how far it has come, and its button pauses it.
             evaluate("document.querySelector('nav [data-section=models]').click()");
@@ -760,13 +842,17 @@ mod tests {
                 "false",
                 "\"2\"",
                 "true",
+                "\"001 Открытые компоненты\"",
                 "\"122 2\"",
                 "true",
+                "\"010 true\"",
+                "\"100\"",
                 r#""[\"save:true\"]""#,
                 r#""[\"save:false\"]""#,
                 r#""[\"checkUpdates\"]""#,
                 r#""[\"installUpdate\"]""#,
-                "\"Версия 0.1.0 · доступна 0.2.0 | Обновить до 0.2.0\"",
+                "\"Доступна версия 0.2.0 | Обновить до 0.2.0\"",
+                r#""[\"support\",\"openSite\"]""#,
                 r#""[\"save:false\"]""#,
                 "\"39% · 380 из 951 МБ · 12,3 МБ/с | 40%\"",
                 r#""[\"pauseModels:true\"]""#,

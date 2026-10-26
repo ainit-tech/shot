@@ -32,6 +32,7 @@ use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
 use super::{browser, guide, invite, languages, last_error, models, overlay, preferences, shell, update, wide};
 use crate::settings::{self, Settings};
+use crate::site;
 use crate::text::{self, Language, tr};
 
 /// How often the settings file is looked at, in milliseconds.
@@ -194,6 +195,14 @@ fn change_state(change: impl FnOnce(&mut State)) {
             change(state);
         }
     });
+}
+
+/// Opens a page of the program's site in the user's browser, in the program's language where the
+/// site speaks it.
+pub fn open_site(path: &str) {
+    if let Err(problem) = shell::open(&site::page(text::current(), path)) {
+        notify(tr("The site didn't open"), &problem);
+    }
 }
 
 /// Tells the user of a problem next to the icon in the notification area.
@@ -493,6 +502,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
                 Some(tray::Command::Settings) => preferences::open(),
                 Some(tray::Command::Guide) => guide::open(),
                 Some(tray::Command::Update) => update::menu_chosen(),
+                Some(tray::Command::Support) => open_site(site::SUPPORT),
                 Some(tray::Command::Exit) => unsafe {
                     DestroyWindow(window);
                 },

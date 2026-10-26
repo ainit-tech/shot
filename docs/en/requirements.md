@@ -27,6 +27,8 @@ The program speaks 50 languages, those of most countries: the six official langu
 
 On the program's first start, once the language is chosen, and later from the menu of the icon in the notification area, "How to use" plays a clip of the program at work, the one the site shows: short chapters on taking a screenshot, the magic pencil, hiding and masking what is private, putting annotations right, copying the text, saving, the queries to Google, aloud too, the languages and the settings. The clip speaks the program's language and shows the hotkey and the query buttons from the settings; the list of its chapters and the arrow keys go to any of them. Under the clip the window offers to sign in to Google while nobody is signed in, and opens the settings.
 
+The menu of the icon in the notification area takes a screenshot and opens the settings, "How to use" and the site's page where people support the program, in the program's language where the site speaks it; while updates are installed by hand, it offers a newer version too. The menu is dark or light, as Windows is.
+
 ## Tools
 
 | Tool | Key | What it draws | Compared with Lightshot |
@@ -83,4 +85,4 @@ Whatever Lightshot has and this page doesn't: uploading to prnt.sc with public s
 
 ## Where it runs
 
-Only on Windows ([why](decisions/002-windows-only.md)). The program is written in Rust and waits in the background for the hotkey ([why](decisions/003-rust.md)). The settings are in a text file, changed in a settings window with sections and a search ([decision](decisions/007-settings-in-a-file.md)); its section "About" shows the version, the license and the open source components with theirs ([decision](decisions/012-license.md)). An installer puts it in place for the current user, without administrator rights, and has it start with Windows; then the program keeps itself up to date, installing a newer version by itself unless the settings say otherwise and never going back to an older one ([decision](decisions/013-updates-and-releases.md)).
+Only on Windows ([why](decisions/002-windows-only.md)). The program is written in Rust and waits in the background for the hotkey ([why](decisions/003-rust.md)). The settings are in a text file, changed in a settings window with sections and a search ([decision](decisions/007-settings-in-a-file.md)); its section "About" shows the version and where updates stand, invites to support the program, and leads to the site, the license and the open source components with theirs ([decision](decisions/012-license.md)). An installer puts it in place for the current user, without administrator rights, and has it start with Windows; then the program keeps itself up to date, installing a newer version by itself unless the settings say otherwise and never going back to an older one ([decision](decisions/013-updates-and-releases.md)).

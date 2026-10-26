@@ -45,7 +45,7 @@ The texts are written in English where they are used, so the code reads as it di
   - the settings window, the presentation and the invitation to sign in;
   - the strip on Google's pages and the answer card;
   - the comments of the settings file.
-- **A new language takes effect at once:** the windows open show it, and the settings file is written with comments in it. Arabic, Hebrew, Persian and Urdu are written from right to left, and the windows' pages turn to them.
+- **A new language takes effect at once:** the windows open show it, and the settings file is written with comments in it. Arabic, Hebrew, Persian and Urdu are written from right to left, and the windows' pages and the tray menu turn to them.
 - **Query buttons:** a standard button's name and question become those of the new language while they are as they were, whatever else was changed, so the standard "Translate" translates into it. What one wrote oneself stays as it is, and so does the name of a saved file one changed.
 - **Google** gets the language too: the address of the AI's answer in the browser and the image search carry it. A few languages go by Google's own codes, such as "zh-CN" for Chinese.
 

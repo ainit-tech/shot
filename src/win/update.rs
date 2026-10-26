@@ -149,24 +149,25 @@ pub fn status() -> Status {
     UPDATES.with(|cell| cell.borrow().as_ref().map_or(Status::Source, |u| u.status.clone()))
 }
 
-/// The item of updates in the tray menu: "Update to …" once a newer version is known, "Check for
-/// updates" otherwise, and none in a program run from its source.
+/// The item of updates in the tray menu: "Update to …" once a newer version is known, while the
+/// settings say not to install updates automatically. Installed by itself, an update needs no item;
+/// the check is in the section "About" of the settings window.
 pub fn menu_item() -> Option<String> {
+    if app::settings().autoupdate {
+        return None;
+    }
     match status() {
-        Status::Source => None,
         Status::Available(version) | Status::Downloading(version) | Status::Ready(version) => {
             Some(tr("Update to {version}").replace("{version}", &version.to_string()))
         }
-        _ => Some(tr("Check for updates").into()),
+        _ => None,
     }
 }
 
 /// The item of updates was chosen in the tray menu.
 pub fn menu_chosen() {
-    match status() {
-        Status::Available(_) | Status::Ready(_) => install_now(),
-        Status::Checking | Status::Downloading(_) => {}
-        _ => check_now(),
+    if matches!(status(), Status::Available(_) | Status::Ready(_)) {
+        install_now();
     }
 }
 

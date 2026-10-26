@@ -168,17 +168,63 @@ body.searching.nothing #nothing { display: block; }
 .error { display: none; margin-top: 6px; color: var(--danger); font-size: 12.5px; }
 .error.shown { display: block; }
 .note { margin-top: 5px; color: var(--faint); font-size: 12px; }
-/* About: the program, its license and the open source components it is made of. */
-.about-head { display: flex; align-items: center; gap: 16px; margin: 0 0 14px; }
-.about-head svg { width: 48px; height: 48px; flex: none; }
-.about-head .name { font: 600 20px var(--display); }
-.about-head .version { margin-top: 2px; color: var(--muted); font-size: 12.5px; }
+/* About: the program and its updates, a way to support it, and its site, license and components;
+   the license and the components are pages of their own, under the title as a breadcrumb. */
+.crumb { padding: 0; border: 0; background: none; font: inherit; color: inherit; }
+.crumb-sub { display: none; }
+.crumb-sep { width: 20px; height: 20px; margin: 0 6px; vertical-align: -2px; color: var(--faint); }
+[dir="rtl"] .crumb-sep { transform: scaleX(-1); }
+#about:not([data-page="main"]) .crumb-sub { display: inline; }
+#about:not([data-page="main"]) .crumb { color: var(--muted); }
+#about:not([data-page="main"]) .crumb:hover { color: var(--text); }
+#about[data-page="main"] .crumb, body.searching .crumb { pointer-events: none; }
+body.searching #about .crumb-sub { display: none; }
+#about .about-page { display: none; }
+#about[data-page="main"] #about-main, #about[data-page="license"] #license-page, #about[data-page="components"] #components-page { display: block; }
+body.searching #about .about-page { display: none; }
+body.searching #about #about-main { display: block; }
+.hero { display: flex; align-items: flex-start; gap: 18px; margin: 8px 0 28px; }
+.hero > svg { width: 56px; height: 56px; flex: none; border-radius: 12px; box-shadow: 0 8px 22px rgba(47, 111, 235, 0.25); }
+.hero-name { font: 600 22px/1.25 var(--display); }
+.hero-version { margin-top: 1px; color: var(--faint); font-size: 12.5px; }
+.hero-text { margin: 8px 0 0; max-width: 560px; color: var(--muted); }
+.group-title { margin: 0 0 8px; font: 600 14px/1.3 var(--display); }
+.rows.group { margin-bottom: 18px; }
+body.searching .hero, body.searching .group-title { display: none; }
+.update-line { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.update-line .label { font-weight: 600; }
+.state-icon {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: none;
+  border-radius: 50%; background: rgba(255, 255, 255, 0.06); color: var(--muted);
+}
+.state-icon.ok { background: rgba(111, 220, 140, 0.13); color: var(--ok); }
+.state-icon.new, .state-icon.busy { background: var(--accent-soft); color: var(--accent-text); }
+.state-icon.bad { background: var(--danger-soft); color: var(--danger); }
+.state-icon.busy svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.support {
+  display: flex; align-items: center; gap: 12px 18px; margin-bottom: 26px; padding: 14px 14px 14px 18px;
+  border: 1px solid rgba(255, 122, 150, 0.24); border-radius: 8px;
+  background: linear-gradient(100deg, rgba(255, 122, 150, 0.1), rgba(255, 122, 150, 0.03));
+}
+.support-text { flex: 1; }
+.support .btn svg { width: 16px; height: 16px; color: #ff7a96; }
+.about-foot {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px;
+  padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px;
+}
+.about-foot .links { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.link { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: none; color: var(--accent-text); }
+.link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.link svg { width: 13px; height: 13px; }
+.copyright { color: var(--faint); }
 .license-text, .component-text {
   margin: 0; max-height: 320px; overflow: auto; padding: 10px 12px;
   border: 1px solid var(--line); border-radius: 6px; background: var(--field); color: var(--muted);
   font: 11.5px/1.45 Consolas, "Cascadia Mono", monospace; white-space: pre-wrap; user-select: text; cursor: text;
 }
-.components { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; }
+.license-text { max-height: none; padding: 14px 16px; }
+.components { border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
 .components:empty { display: none; }
 .components .group { position: sticky; top: 0; padding: 8px 12px 5px; background: var(--card); color: var(--faint); font-size: 12px; }
 .components .component { display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 6px 12px; border: 0; background: none; text-align: start; }
@@ -449,6 +495,11 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     <symbol id="i-swap" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 4 7 H 15.5 M 12.5 4 L 15.5 7 L 12.5 10 M 16 13 H 4.5 M 7.5 10 L 4.5 13 L 7.5 16"/></symbol>
     <symbol id="i-panels" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="3" y="3" width="10.5" height="8.5" rx="1.5" stroke-width="1.5"/><path d="M 6.5 15.5 H 13.5 M 16.5 5.5 V 11.5" stroke-width="2.6"/></symbol>
     <symbol id="i-model" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 2.5 L 16.5 6 V 14 L 10 17.5 L 3.5 14 V 6 Z M 3.5 6 L 10 9.5 L 16.5 6 M 10 9.5 V 17.5"/></symbol>
+    <symbol id="i-chevron-end" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 8 5.5 L 12.5 10 L 8 14.5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M 10 3.5 V 12.5 M 6 8.8 L 10 12.8 L 14 8.8 M 4.5 16 H 15.5"/></symbol>
+    <symbol id="i-spinner" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M 10 3.5 A 6.5 6.5 0 1 1 3.5 10"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M 10 6.5 V 10 L 12.5 11.5"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 20 20" fill="currentColor"><path d="M 10 17.3 C 9.6 17.3 9.2 17.1 8.9 16.9 C 5.4 14.3 2.5 11.6 2.5 8.1 C 2.5 5.6 4.4 3.6 6.8 3.6 C 8.2 3.6 9.3 4.3 10 5.4 C 10.7 4.3 11.8 3.6 13.2 3.6 C 15.6 3.6 17.5 5.6 17.5 8.1 C 17.5 11.6 14.6 14.3 11.1 16.9 C 10.8 17.1 10.4 17.3 10 17.3 Z"/></symbol>
     <symbol id="i-open" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 11 3.5 H 16.5 V 9 M 16.5 3.5 L 9.5 10.5 M 14.5 12 V 15 C 14.5 15.8 13.8 16.5 13 16.5 H 5 C 4.2 16.5 3.5 15.8 3.5 15 V 7 C 3.5 6.2 4.2 5.5 5 5.5 H 8"/></symbol>
   </defs>
 </svg>
@@ -648,38 +699,51 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     </div>
   </section>
 
-  <section id="about">
-    <h1 data-t="about"></h1>
-    <div class="about-head">
-      <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div>
-        <div class="name">ainitShot</div>
-        <div class="version">© 2026 ainit</div>
+  <section id="about" data-page="main">
+    <h1><button class="crumb" id="about-home" data-t="about" tabindex="-1"></button><span class="crumb-sub"><svg class="crumb-sep" aria-hidden="true"><use href="#i-chevron-end"/></svg><span id="about-sub"></span></span></h1>
+    <div class="about-page" id="about-main">
+      <div class="hero">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="#2f6feb"/><path d="M 4 7 V 4 H 7 M 9 4 H 12 V 7 M 12 9 V 12 H 9 M 7 12 H 4 V 9" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div>
+          <div class="hero-name">ainitShot</div>
+          <div class="hero-version" id="about-version"></div>
+          <p class="hero-text" data-t="aboutIntro"></p>
+        </div>
+      </div>
+      <h2 class="group-title" data-t="updates"></h2>
+      <div class="rows group">
+        <div class="row item" data-k="kUpdates">
+          <div class="update-line">
+            <span class="state-icon" id="updates-icon"></span>
+            <div><div class="label find" id="updates-title"></div><div class="desc" id="updates-desc"></div></div>
+          </div>
+          <div class="control"><button class="btn hidden" id="updates-button"></button></div>
+        </div>
+        <div class="row item" data-k="kUpdates">
+          <div><div class="label find" data-t="autoupdate"></div><div class="desc find" data-t="autoupdateDesc"></div></div>
+          <div class="control"><button class="switch" id="autoupdate" role="switch" data-t-aria="autoupdate"><span class="state"></span><span class="track"></span></button></div>
+        </div>
+      </div>
+      <div class="support item" data-k="kSupport">
+        <div class="support-text find" data-t="supportText"></div>
+        <button class="btn" id="support"><svg class="glyph"><use href="#i-heart"/></svg><span data-t="supportButton"></span></button>
+      </div>
+      <div class="about-foot item" data-k="kAbout">
+        <div class="links">
+          <button class="link" id="about-site"><span class="find" data-t="aboutSite"></span><svg class="glyph"><use href="#i-open"/></svg></button>
+          <button class="link" id="about-license"><span class="find" data-t="aboutLicense"></span></button>
+          <button class="link" id="about-components"><span class="find" data-t="aboutComponents"></span></button>
+        </div>
+        <div class="copyright">© 2026 ainit</div>
       </div>
     </div>
-    <p class="intro" data-t="aboutIntro"></p>
-    <div class="rows">
-      <div class="row item" data-k="kUpdates">
-        <div><div class="label find" data-t="updates"></div><div class="desc" id="updates-state"></div></div>
-        <div class="control"><button class="btn hidden" id="updates-button"></button></div>
-      </div>
-      <div class="row item" data-k="kUpdates">
-        <div><div class="label find" data-t="autoupdate"></div><div class="desc find" data-t="autoupdateDesc"></div></div>
-        <div class="control"><button class="switch" id="autoupdate" role="switch" data-t-aria="autoupdate"><span class="state"></span><span class="track"></span></button></div>
-      </div>
-      <div class="row item" data-k="kAbout">
-        <div><div class="label find" data-t="aboutSite"></div><div class="desc find">shot.ainit.tech</div></div>
-        <div class="control"><button class="btn" id="about-site"><svg class="glyph"><use href="#i-open"/></svg><span data-t="open"></span></button></div>
-      </div>
-      <div class="row wide item" data-k="kAbout">
-        <div><div class="label find" data-t="aboutLicense"></div><div class="desc find" data-t="aboutLicenseDesc"></div></div>
-        <div class="control"><button class="btn" id="license-toggle"></button></div>
-        <div class="body hidden" id="license-body"><pre class="license-text" id="license-text"></pre></div>
-      </div>
-      <div class="row wide item" data-k="kAbout">
-        <div><div class="label find" data-t="aboutComponents"></div><div class="desc" id="components-desc"></div></div>
-        <div class="body"><div class="components" id="components"></div></div>
-      </div>
+    <div class="about-page" id="license-page">
+      <p class="intro" data-t="aboutLicenseDesc"></p>
+      <pre class="license-text" id="license-text"></pre>
+    </div>
+    <div class="about-page" id="components-page">
+      <p class="intro" id="components-desc"></p>
+      <div class="components" id="components"></div>
     </div>
   </section>
 
@@ -741,13 +805,15 @@ const TEXT = {
   autostartDesc: "The program will wait for the hotkey right after you sign in to Windows.",
   updates: "Updates",
   updatesVersion: "Version {version}",
-  updatesLatest: "the latest",
-  updatesAvailable: "{version} is available",
-  updatesChecking: "checking…",
-  updatesDownloading: "downloading {version}…",
-  updatesReady: "{version} is ready to install",
-  updatesSource: "a program run from its source doesn't update itself",
-  updatesChecked: "checked {time}",
+  upToDate: "You have the latest version",
+  notCheckedYet: "Not checked for updates yet",
+  checkingForUpdates: "Checking for updates…",
+  versionAvailable: "Version {version} is available",
+  downloadingVersion: "Downloading version {version}…",
+  versionReady: "Version {version} is ready to install",
+  installsWhenClosed: "It installs itself once the program's windows are closed.",
+  lastChecked: "Last checked: {time}",
+  fromSource: "A program run from its source doesn't update itself",
   checkUpdates: "Check for updates",
   updateTo: "Update to {version}",
   autoupdate: "Install updates automatically",
@@ -824,8 +890,8 @@ const TEXT = {
   componentsDesc: "Open source libraries in the program: {count}, each under its own license; a click on one shows it.",
   builtIn: "Built into the program",
   downloadedModels: "Downloaded for masking",
-  show: "Show",
-  hide: "Hide",
+  supportText: "ainitShot is free and has no ads. If it saves you time, you can support its development.",
+  supportButton: "Support ainitShot",
   accountIntro: "The program's window is a browser of its own with its own sign-in to Google: AI Mode and the image search work in it under this account.",
   accountUnknownTitle: "Signing in to Google",
   accountUnknownDesc: "Sign in, switch the account or sign out: the account's page opens in the program's window.",
@@ -905,6 +971,7 @@ const TEXT = {
   kButtons: "add new button query standard default bring back",
   kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
   kAbout: "about program version license gpl copyright open source components libraries website site authors ainit",
+  kSupport: "support donate donation help thanks author development",
   kAccount: "google account sign in sign out switch profile user login",
 };
 
@@ -1153,6 +1220,7 @@ function banner(text) {
 function showSection(id) {
   state.section = id;
   if (id === "about") askLicenses();
+  if ($("#about").dataset.page !== "main") aboutPage("main");
   for (const button of $$("nav button")) {
     if (button.dataset.section === id) button.setAttribute("aria-current", "page");
     else button.removeAttribute("aria-current");
@@ -1419,6 +1487,7 @@ $("#autostart").addEventListener("click", () => {
 $("#autoupdate").addEventListener("click", () => {
   state.draft.autoupdate = !state.draft.autoupdate;
   renderSwitch("autoupdate", state.draft.autoupdate);
+  renderUpdates();
   changed();
 });
 $("#privacy-filter").addEventListener("click", () => {
@@ -1460,8 +1529,9 @@ function renderModels() {
   pause.textContent = t(models.state === "paused" ? "resume" : "pause");
 }
 
-// About: the program's version, its license, and the open source components it is made of, which
-// the program gives when the section is first opened.
+// About: the program and its version, its updates, a way to support it, and its site, its license
+// and the open source components it is made of. The license and the components, which the program
+// gives when the section is first opened, are pages of their own in the section.
 let licensesAsked = false;
 function askLicenses() {
   if (licensesAsked) return;
@@ -1469,17 +1539,28 @@ function askLicenses() {
   send({ type: "licenses" });
 }
 
+/** Shows a page of the section: "main", "license" or "components". */
+function aboutPage(page) {
+  $("#about").dataset.page = page;
+  $("#about-home").tabIndex = page === "main" ? -1 : 0;
+  renderAbout();
+  $("#main").scrollTop = 0;
+}
+
 function renderAbout() {
-  $("#license-toggle").textContent = t($("#license-body").classList.contains("hidden") ? "show" : "hide");
+  const page = $("#about").dataset.page;
+  $("#about-sub").textContent = { license: t("aboutLicense"), components: t("aboutComponents") }[page] || "";
+  $("#about-version").textContent = t("updatesVersion", { version: state.version || "" });
   renderComponents();
 }
 
-$("#license-toggle").addEventListener("click", () => {
-  $("#license-body").classList.toggle("hidden");
-  askLicenses();
-  renderAbout();
+$("#about-home").addEventListener("click", () => {
+  if (!searching()) aboutPage("main");
 });
 $("#about-site").addEventListener("click", () => send({ type: "openSite" }));
+$("#about-license").addEventListener("click", () => aboutPage("license"));
+$("#about-components").addEventListener("click", () => aboutPage("components"));
+$("#support").addEventListener("click", () => send({ type: "support" }));
 
 /** The components in two groups, those built into the program and those downloaded with the
  * model of masking, each opening the text of its license with a click. */
@@ -1533,29 +1614,37 @@ function checkedAt(text) {
   }
 }
 
-/** Where the program stands with updates: the version installed, the one available or what kept
- * the last check from succeeding, and the button that checks or installs. */
+/** Where the program stands with updates: what is going on, with its sign; when the last check
+ * was, or that a version downloaded waits for the windows to close; and the button that checks or
+ * installs. */
 function renderUpdates() {
   const updates = state.updates;
   if (!updates) return;
-  const says = {
-    source: t("updatesSource"),
-    checking: t("updatesChecking"),
-    latest: t("updatesLatest"),
-    available: t("updatesAvailable", { version: updates.version }),
-    downloading: t("updatesDownloading", { version: updates.version }),
-    ready: t("updatesReady", { version: updates.version }),
-    failed: updates.problem,
-  }[updates.state];
-  const parts = [t("updatesVersion", { version: updates.current }), says];
-  if (updates.checked && !["checking", "downloading"].includes(updates.state)) parts.push(t("updatesChecked", { time: checkedAt(updates.checked) }));
-  $("#updates-state").textContent = parts.filter(Boolean).join(" · ");
+  const version = { version: updates.version };
+  const checked = updates.checked ? t("lastChecked", { time: checkedAt(updates.checked) }) : "";
+  const automatic = !!(state.draft && state.draft.autoupdate);
+  const [icon, tone, title, desc] = {
+    source: ["info", "", t("fromSource"), ""],
+    waiting: ["clock", "", t("notCheckedYet"), ""],
+    checking: ["spinner", "busy", t("checkingForUpdates"), ""],
+    latest: ["check", "ok", t("upToDate"), checked],
+    available: ["download", "new", t("versionAvailable", version), checked],
+    downloading: ["spinner", "busy", t("downloadingVersion", version), ""],
+    ready: ["download", "new", t("versionReady", version), automatic ? t("installsWhenClosed") : checked],
+    failed: ["warning", "bad", updates.problem || "", checked],
+  }[updates.state] || ["info", "", "", ""];
+  const sign = $("#updates-icon");
+  sign.className = `state-icon ${tone}`;
+  sign.replaceChildren(symbol(icon));
+  $("#updates-title").textContent = title;
+  $("#updates-desc").textContent = desc;
+  $("#updates-desc").classList.toggle("hidden", !desc);
   const button = $("#updates-button");
-  const newer = ["available", "ready"].includes(updates.state);
+  const newer = ["available", "downloading", "ready"].includes(updates.state);
   button.classList.toggle("hidden", updates.state === "source");
   button.classList.toggle("accent", newer);
   button.disabled = ["checking", "downloading"].includes(updates.state);
-  button.textContent = newer ? t("updateTo", { version: updates.version }) : t("checkUpdates");
+  button.textContent = newer ? t("updateTo", version) : t("checkUpdates");
 }
 $("#ask").addEventListener("click", () => {
   state.draft.save.ask = !state.draft.save.ask;
@@ -2393,6 +2482,8 @@ document.addEventListener("keydown", event => {
     $("#search").select();
   } else if (event.key === "Escape" && $("#toast").classList.contains("shown")) {
     hideToast();
+  } else if (event.key === "Escape" && state.section === "about" && $("#about").dataset.page !== "main" && !searching()) {
+    aboutPage("main");
   }
 });
 // A dropped file doesn't take the window's place, and only text fields have a menu.

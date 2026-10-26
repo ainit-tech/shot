@@ -34,7 +34,7 @@ The program lives in the tray and is started with Windows, so its users rarely t
   - writes `latest.json` with the version and the size and SHA-256 of the installer;
   - signs both with minisign (Ed25519);
   - copies them to https://shot.ainit.tech/download/: the installer to `<version>/ainitShot-<version>-windows-x64-setup.exe`, the version's files first and `latest.json` last.
-- **The check:** in the background half a minute after the start, then once a day, and with "Check for updates" in the section "About" of the settings window and in the tray menu. That section shows the version installed and the one available, where people look for them.
+- **The check:** in the background half a minute after the start, then once a day, and with "Check for updates" in the section "About" of the settings window. People look for the version installed there, so the section shows it, and under "Updates" what goes on: the latest version installed, a newer one available, downloading or ready, or what kept the last check from succeeding, with the time of the last check.
 - **What may go wrong:** no connection, the site down, a broken or badly signed answer. Every request has a strict time limit. The program waits for the next check and notes what happened in the settings and in its log; nothing else changes.
 - **Only forward:** the program takes only a version newer than its own. The signature covers the whole of `latest.json`, which ties the version to the file's size and SHA-256, so an older installer can't pass for a newer one.
 - **Installing:**
@@ -43,7 +43,7 @@ The program lives in the tray and is started with Windows, so its users rarely t
   - Then it closes as "Exit" does and runs the installer silently, which replaces the program and starts it again.
   - The command never changes, since an installed version runs the installer of the next one with it: `ainitShot-X.Y.Z-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE`. Every installer from 0.2.1 on takes it: it closes the program, replaces it, leaves starting with Windows as it is and starts the new version with `--updated`.
   - After the start, a notification names the new version.
-- **Automatically by default:** `autoupdate = true` in the settings file, "Install updates automatically" in the settings window. When it is off, the program only checks and shows; "Update" installs the new version.
+- **Automatically by default:** `autoupdate = true` in the settings file, "Install updates automatically" in the settings window. When it is off, the program only checks and shows; "Update to X" installs the new version, in the section "About" and in the tray menu, which offers it only then.
 - **Only an installed program updates itself.** A program built and started from the source never replaces itself.
 - **The installer** is made with Inno Setup, in its dark look, as the program is:
   - its first page has the version, the box "Start with Windows" and "Install"; there is no choice of the folder and no summary;

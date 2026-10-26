@@ -19,6 +19,7 @@ mod privacy;
 mod query;
 mod selection;
 mod settings;
+mod site;
 mod text;
 mod toolbar;
 mod update;

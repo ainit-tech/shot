@@ -29,7 +29,7 @@ A program that sees the whole screen and sends pictures to Google should have co
 ## How it works
 
 - The license's text is the file `LICENSE` at the root of the repository, and `Cargo.toml` names it: `GPL-3.0-or-later`.
-- The libraries the program uses are under MIT, Apache-2.0, BSD, Zlib and similar licenses, which combine with the GPL-3.0. Their licenses ask for their notices to go with the program: the section "About" of the settings window lists every library built into it, and the model it downloads, each with the text of its license, and shows the program's own license. `tools/licenses.py` writes the list from the dependencies, and a test finds a list that no longer matches them.
+- The libraries the program uses are under MIT, Apache-2.0, BSD, Zlib and similar licenses, which combine with the GPL-3.0. Their licenses ask for their notices to go with the program: the section "About" of the settings window leads to the program's own license and to the list of every library built into it, and the model it downloads, each with the text of its license, both pages of their own. `tools/licenses.py` writes the list from the dependencies, and a test finds a list that no longer matches them.
 - The license covers the code; it gives no rights to the name ainitShot.
 
 ## Consequences

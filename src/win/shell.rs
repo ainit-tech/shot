@@ -1,5 +1,6 @@
 //! The rest of Windows that the program needs: opening addresses and files, the user's folders,
-//! the save dialog, the clock, the user's language and starting together with Windows.
+//! the save dialog, the clock, the user's language, the dark or light of Windows and starting
+//! together with Windows.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -9,8 +10,8 @@ use std::time::{Duration, SystemTime};
 use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, SYSTEMTIME};
 use windows_sys::Win32::System::Com::CoTaskMemFree;
 use windows_sys::Win32::System::Registry::{
-    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_SZ, RegCloseKey, RegDeleteValueW,
-    RegGetValueW, RegOpenKeyExW, RegSetValueExW,
+    HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_DWORD, RRF_RT_REG_SZ, RegCloseKey,
+    RegDeleteValueW, RegGetValueW, RegOpenKeyExW, RegSetValueExW,
 };
 use windows_sys::Win32::System::SystemInformation::GetLocalTime;
 use windows_sys::Win32::UI::Controls::Dialogs::{
@@ -33,6 +34,19 @@ pub fn windows_language() -> Language {
     use windows::System::UserProfile::GlobalizationPreferences;
     let first = GlobalizationPreferences::Languages().ok().and_then(|tags| tags.into_iter().next());
     first.map_or(Language::EN, |tag| Language::from_tag(&tag.to_string()))
+}
+
+/// Whether Windows is dark: its taskbar, Start and the menus of the notification area, which
+/// Settings calls "Choose your Windows mode". Light where Windows doesn't say.
+pub fn windows_dark() -> bool {
+    let mut light: u32 = 1;
+    let mut size = size_of::<u32>() as u32;
+    let found = unsafe {
+        let key = w!("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
+        let value = w!("SystemUsesLightTheme");
+        RegGetValueW(HKEY_CURRENT_USER, key, value, RRF_RT_REG_DWORD, null_mut(), (&mut light as *mut u32).cast(), &mut size)
+    } == 0;
+    found && light == 0
 }
 
 /// Where the installer leaves the language it spoke.
