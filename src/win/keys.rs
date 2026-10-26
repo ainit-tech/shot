@@ -388,7 +388,7 @@ mod tests {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
     }
 
-    /// Opens the choice of the keys out of sight, in Russian, Arabic and Japanese: Print Screen
+    /// Opens the choice of the keys out of sight, in Russian, English, Arabic and Japanese: Print Screen
     /// comes chosen; keys pressed take its place, and a letter alone is refused; the tip offers Alt
     /// with the key left of 1 and takes it on a click; Windows' own screen capture with Print
     /// Screen is explained. The tip names the key as the user's layout labels it: the Arabic and
@@ -402,7 +402,8 @@ mod tests {
         unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
         let preview = std::env::var_os("SCREENSHOT_PREVIEW").map(PathBuf::from);
         let mut seen = Vec::new();
-        for (language, label) in [(Language::RU, None), (Language::AR, Some("'ذ'")), (Language::from_code("ja").unwrap(), Some("null"))] {
+        let japanese = Language::from_code("ja").unwrap();
+        for (language, label) in [(Language::RU, None), (Language::EN, None), (Language::AR, Some("'ذ'")), (japanese, Some("null"))] {
             text::set(language);
             open();
             let ready = pump_until(30, || controller().is_some() && evaluate("document.body.className") == "\"\"");
@@ -449,6 +450,12 @@ mod tests {
             seen,
             [
                 printscreen("ru"),
+                "true".into(),
+                "true".into(),
+                r#""Ctrl+Shift+S [\"try:Ctrl+Shift+S\"]""#.into(),
+                r#""Alt+~ true [\"try:Alt+~\"]""#.into(),
+                r#""[\"next:Alt+~\"]""#.into(),
+                printscreen("en"),
                 "true".into(),
                 "true".into(),
                 r#""Ctrl+Shift+S [\"try:Ctrl+Shift+S\"]""#.into(),
