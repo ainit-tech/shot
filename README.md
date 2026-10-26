@@ -1,6 +1,6 @@
 # ainitShot
 
-A small screenshot program for Windows that replaces Lightshot. A hotkey freezes the screen; you select a part of it, draw and write on it, and then copy it or its text, save it, or ask Google's AI Mode about it. It speaks 50 languages.
+A screenshot program for Windows that replaces Lightshot. A hotkey freezes the screen; you select a part of it, draw and write on it, and then copy it or its text, save it, or ask Google's AI Mode about it. It speaks 50 languages.
 
 - Site and download: https://shot.ainit.tech
 - Documentation, in English, Russian and Hindi: [docs](docs/README.md)

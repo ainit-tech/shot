@@ -244,7 +244,7 @@
     "pause": "Peata",
     "resume": "Jätka",
     "about": "Teave",
-    "aboutIntro": "Väike programm, mille on teinud ainit: see jäädvustab osa ekraanist, laseb teil sellele joonistada ning seejärel kopeerib selle, salvestab selle või küsib selle kohta Google'ilt.",
+    "aboutIntro": "Programm, mille on teinud ainit: see jäädvustab osa ekraanist, laseb teil sellele joonistada ning seejärel kopeerib selle, salvestab selle või küsib selle kohta Google'ilt.",
     "aboutSite": "Veebisait",
     "sourceCode": "Lähtekood",
     "aboutLicense": "Litsents",

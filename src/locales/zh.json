@@ -244,7 +244,7 @@
     "pause": "暂停",
     "resume": "继续",
     "about": "关于",
-    "aboutIntro": "由 ainit 开发的小巧程序：截取屏幕的一部分，可以在上面绘制，然后复制、保存，或就截图向 Google 提问。",
+    "aboutIntro": "由 ainit 开发的程序：截取屏幕的一部分，可以在上面绘制，然后复制、保存，或就截图向 Google 提问。",
     "aboutSite": "网站",
     "sourceCode": "源代码",
     "aboutLicense": "许可证",
