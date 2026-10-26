@@ -174,7 +174,7 @@
     "signIn": "Prihlásiť sa",
     "open": "Otvoriť",
     "hotkey": "Klávesová skratka",
-    "hotkeyDesc": "Zmrazí obrazovku, aby ste mohli vybrať oblasť. Kliknite do poľa a stlačte novú kombináciu.",
+    "hotkeyDesc": "Zmrazí obrazovku, aby ste mohli vybrať oblasť; ďalším stlačením začnete výber odznova. Kliknite do poľa a stlačte novú kombináciu.",
     "language": "Jazyk",
     "languageDesc": "Okien programu, popisov a správ. Prepnú sa naň aj štandardné tlačidlá dopytov.",
     "languageAuto": "Ako vo Windows",

@@ -174,7 +174,7 @@
     "signIn": "Se connecter",
     "open": "Ouvrir",
     "hotkey": "Raccourci",
-    "hotkeyDesc": "Fige l’écran pour sélectionner une zone. Cliquez dans le champ et appuyez sur une nouvelle combinaison.",
+    "hotkeyDesc": "Fige l’écran pour sélectionner une zone ; un nouvel appui recommence la sélection. Cliquez dans le champ et appuyez sur une nouvelle combinaison.",
     "language": "Langue",
     "languageDesc": "Des fenêtres, info-bulles et messages du programme. Les boutons de requête standard passent aussi à cette langue.",
     "languageAuto": "Comme Windows",

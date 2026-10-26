@@ -125,6 +125,8 @@ struct Session {
     selection: Selection,
     tool: Option<Tool>,
     history: History,
+    /// The selections started over, the last one last.
+    earlier: Vec<Earlier>,
     draft: Option<Draft>,
     layers: Option<Layers>,
     draft_changed: bool,
@@ -192,6 +194,13 @@ struct Grab {
     from: PointF,
     original: Annotation,
     moving: bool,
+}
+
+/// A selection started over, with what was drawn on it and the tool chosen: undo brings it back.
+struct Earlier {
+    selection: Rect,
+    history: History,
+    tool: Option<Tool>,
 }
 
 /// A query on its way: its screenshot is kept for the clipboard in case it doesn't get through.
@@ -286,12 +295,18 @@ pub fn create(instance: HINSTANCE) -> io::Result<()> {
     Ok(())
 }
 
-/// Freezes the screen and shows the overlay over it. Does nothing if it is already shown.
+/// Freezes the screen and shows the overlay over it. Shown already, it starts the selection over
+/// on the same frozen screen: the hotkey has been pressed again.
 pub fn open() {
     let opened = OVERLAY.with(|cell| {
         let mut cell = cell.try_borrow_mut().ok()?;
         let overlay = cell.as_mut()?;
-        if overlay.session.is_some() {
+        let window = overlay.window;
+        if let Some(session) = &mut overlay.session {
+            // While a screenshot is being sent or a question asked, it waits, as clicks do.
+            if !session.busy() {
+                session.start_over(window);
+            }
             return None;
         }
         let session = match Session::start(app::settings(), overlay.color, overlay.width) {
@@ -635,18 +650,7 @@ impl Overlay {
                 session.refresh(window);
             }
             // The first right click starts over, the next one closes the overlay.
-            Some(session) if session.selection.rect().is_some() => {
-                session.drop_text(window);
-                session.selection.clear();
-                session.history.clear();
-                session.picked = None;
-                session.grabbed = None;
-                session.draft = None;
-                session.layers = None;
-                session.tool = None;
-                session.snap = session.screen.window_at(session.cursor());
-                session.refresh(window);
-            }
+            Some(session) if session.selection.rect().is_some() => session.start_over(window),
             _ => self.close(),
         }
     }
@@ -765,8 +769,8 @@ impl Overlay {
             Action::Save => self.save(false),
             Action::SaveAs => self.save(true),
             Action::Mask => self.mask(),
-            Action::Undo => self.change_history(History::undo),
-            Action::Redo => self.change_history(History::redo),
+            Action::Undo => self.change_history(Session::undo),
+            Action::Redo => self.change_history(|session| session.history.redo()),
             Action::SelectMonitor => self.select_monitor(),
             Action::Remove => {
                 if let Some(session) = &mut self.session {
@@ -792,7 +796,7 @@ impl Overlay {
                     session.refresh(window);
                 }
             }
-            Button::Undo => self.change_history(History::undo),
+            Button::Undo => self.change_history(Session::undo),
             Button::Mask => self.mask(),
             Button::Copy => self.copy(),
             Button::CopyText => self.copy_text(),
@@ -828,11 +832,12 @@ impl Overlay {
         session.retype(window);
     }
 
-    /// Undoes or redoes a change of the annotations, and draws the selection anew.
-    fn change_history(&mut self, change: fn(&mut History) -> bool) {
+    /// Undoes or redoes a change of the annotations, or starting over, and draws the selection
+    /// anew.
+    fn change_history(&mut self, change: fn(&mut Session) -> bool) {
         let window = self.window;
         let Some(session) = &mut self.session else { return };
-        if session.draft.is_some() || session.grabbed.is_some() || !change(&mut session.history) {
+        if session.draft.is_some() || session.grabbed.is_some() || !change(session) {
             return;
         }
         session.picked = None;
@@ -1280,7 +1285,11 @@ impl Overlay {
 
 impl Session {
     fn start(settings: Rc<Settings>, color: usize, width: Option<f32>) -> io::Result<Session> {
-        let screen = capture::capture()?;
+        Session::over(capture::capture()?, settings, color, width)
+    }
+
+    /// A screenshot of the screen frozen, with nothing selected yet.
+    fn over(screen: Screen, settings: Rc<Settings>, color: usize, width: Option<f32>) -> io::Result<Session> {
         let buffer = Buffer::new(screen.image.width, screen.image.height)?;
         let mut colors = settings.palette();
         if colors.is_empty() {
@@ -1296,6 +1305,7 @@ impl Session {
             settings,
             tool: None,
             history: History::default(),
+            earlier: Vec::new(),
             draft: None,
             layers: None,
             draft_changed: false,
@@ -1471,6 +1481,50 @@ impl Session {
         }
         self.layers = None;
         self.refresh(window);
+    }
+
+    /// Starts the selection over on the same frozen screen: the window under the mouse lights up
+    /// again, and a click or the mouse selects anew, inside the selection that was too. The text
+    /// being written is put down first; the selection goes with its annotations and the tool,
+    /// for undo to bring back.
+    fn start_over(&mut self, window: HWND) {
+        self.put_down_text(window);
+        if let Some(selection) = self.selection.rect().filter(|r| !r.is_empty()) {
+            let history = std::mem::take(&mut self.history);
+            self.earlier.push(Earlier { selection, history, tool: self.tool });
+        }
+        self.selection.clear();
+        self.history.clear();
+        self.picked = None;
+        self.grabbed = None;
+        self.draft = None;
+        self.layers = None;
+        self.tool = None;
+        self.palette = false;
+        self.hovered = None;
+        self.show_hint = false;
+        self.snap_press = None;
+        self.snap = self.screen.window_at(self.cursor());
+        self.refresh(window);
+    }
+
+    /// Takes back the last change of the annotations; with none left, starting over, which brings
+    /// back the selection with its annotations and the tool. Whether there was anything to take
+    /// back.
+    fn undo(&mut self) -> bool {
+        if self.history.undo() {
+            return true;
+        }
+        if self.selection.is_dragging() {
+            return false;
+        }
+        let Some(earlier) = self.earlier.pop() else { return false };
+        self.selection.select(earlier.selection);
+        self.history = earlier.history;
+        self.tool = earlier.tool;
+        self.snap = None;
+        self.snap_press = None;
+        true
     }
 
     /// Rewrites a label: it leaves the annotations while it is written and comes back to its
@@ -1840,7 +1894,7 @@ impl Session {
             hovered: self.hovered,
             color: self.colors[self.color],
             width: self.width,
-            can_undo: !self.history.is_empty(),
+            can_undo: !self.history.is_empty() || !self.earlier.is_empty(),
             busy: self.sending.as_ref().map(|s| s.button).or(self.listening.as_ref().map(|l| l.button)),
             queries: &queries,
             coming: models::coming(),
@@ -2192,6 +2246,73 @@ mod tests {
         let path = std::env::var("SCREENSHOT_PREVIEW").expect("SCREENSHOT_PREVIEW names the file to write");
         let picture = Image { width: width as u32, height: height as u32, pixels: buffer.frame().pixels.to_vec() };
         std::fs::write(path, picture.to_png().unwrap()).unwrap();
+    }
+
+    /// The hotkey pressed again starts the selection over on the same frozen screen: a window
+    /// selected whole gives way to a smaller part of it. Undo brings the window back with what
+    /// was drawn on it and the tool, and so it does after a right click, which starts over too.
+    #[test]
+    fn the_hotkey_again_starts_the_selection_over_and_undo_brings_it_back() {
+        // A hidden window takes what the overlay would draw anew.
+        let window =
+            unsafe { CreateWindowExW(0, w!("STATIC"), w!(""), WS_POPUP, 0, 0, 0, 0, null_mut(), null_mut(), null_mut(), null()) };
+        assert!(!window.is_null());
+        let big = Rect::new(100, 100, 700, 500);
+        let (width, height) = (800, 600);
+        let screen = Screen {
+            origin: Point::new(0, 0),
+            image: Image { width, height, pixels: vec![255; (width * height * 4) as usize] },
+            monitors: vec![capture::Monitor { rect: Rect::new(0, 0, 800, 600), scale: 1.0 }],
+            windows: vec![big],
+        };
+        let session = Session::over(screen, Rc::new(Settings::default()), 0, None).unwrap();
+        let mut overlay = Overlay { window, session: Some(session), color: 0, width: None, queries: 0 };
+        let drag = |overlay: &mut Overlay, from: (i32, i32), to: (i32, i32)| {
+            overlay.press(Point::new(from.0, from.1));
+            overlay.mouse_move(Point::new(to.0, to.1));
+            overlay.release();
+        };
+        let state = |overlay: &Overlay| {
+            let session = overlay.session.as_ref().unwrap();
+            (session.selection.rect(), session.history.items().len(), session.tool)
+        };
+
+        // A click selects the window under it whole, and an arrow is drawn on it.
+        drag(&mut overlay, (400, 300), (400, 300));
+        overlay.click(Button::Tool(Tool::Arrow));
+        drag(&mut overlay, (200, 200), (300, 250));
+        assert_eq!(state(&overlay), (Some(big), 1, Some(Tool::Arrow)));
+
+        // The hotkey again: nothing is selected, on the same frozen screen.
+        let frozen = overlay.session.as_ref().unwrap().screen.image.pixels.as_ptr();
+        OVERLAY.with(|cell| *cell.borrow_mut() = Some(overlay));
+        open();
+        let mut overlay = OVERLAY.with(|cell| cell.borrow_mut().take()).unwrap();
+        assert_eq!(overlay.session.as_ref().unwrap().screen.image.pixels.as_ptr(), frozen);
+        assert_eq!(state(&overlay), (None, 0, None));
+
+        // The mouse selects a smaller part inside the window that was selected.
+        drag(&mut overlay, (200, 200), (400, 300));
+        assert_eq!(state(&overlay), (Some(Rect::new(200, 200, 400, 300)), 0, None));
+
+        // Undo brings the window back with the arrow and the tool; the next undo takes the arrow
+        // back; there is nothing more.
+        overlay.act(Action::Undo);
+        assert_eq!(state(&overlay), (Some(big), 1, Some(Tool::Arrow)));
+        overlay.act(Action::Undo);
+        assert_eq!(state(&overlay), (Some(big), 0, Some(Tool::Arrow)));
+        overlay.act(Action::Undo);
+        assert_eq!(state(&overlay), (Some(big), 0, Some(Tool::Arrow)));
+
+        // A right click starts over as well; undo brings the window back, and redo the arrow.
+        overlay.right_click();
+        assert_eq!(state(&overlay), (None, 0, None));
+        overlay.act(Action::Undo);
+        overlay.act(Action::Redo);
+        assert_eq!(state(&overlay), (Some(big), 1, Some(Tool::Arrow)));
+
+        drop(overlay);
+        unsafe { DestroyWindow(window) };
     }
 
     /// A window, hidden, gives up its input method and takes it back.

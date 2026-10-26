@@ -174,7 +174,7 @@
     "signIn": "Logi sisse",
     "open": "Ava",
     "hotkey": "Kiirklahv",
-    "hotkeyDesc": "Külmutab ekraani ala valimiseks. Klõpsake välja ja vajutage uut klahvikombinatsiooni.",
+    "hotkeyDesc": "Külmutab ekraani ala valimiseks; uus vajutus alustab valimist otsast peale. Klõpsake välja ja vajutage uut klahvikombinatsiooni.",
     "language": "Keel",
     "languageDesc": "Programmi akende, vihjete ja teadete keel. Ka standardsed päringunupud lähevad sellele üle.",
     "languageAuto": "Nagu Windowsis",

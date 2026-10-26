@@ -174,7 +174,7 @@
     "signIn": "Identifikohu",
     "open": "Hap",
     "hotkey": "Tasti i shpejtë",
-    "hotkeyDesc": "Ngrin ekranin për të përzgjedhur një zonë. Kliko fushën dhe shtyp një kombinim të ri.",
+    "hotkeyDesc": "Ngrin ekranin për të përzgjedhur një zonë; një shtypje e re e nis përzgjedhjen nga e para. Kliko fushën dhe shtyp një kombinim të ri.",
     "language": "Gjuha",
     "languageDesc": "E dritareve, këshillave dhe mesazheve të programit. Edhe butonat standardë të pyetjeve kalojnë në të.",
     "languageAuto": "Si në Windows",

@@ -174,7 +174,7 @@
     "signIn": "Login",
     "open": "Buka",
     "hotkey": "Tombol pintasan",
-    "hotkeyDesc": "Membekukan layar untuk memilih area. Klik kolom ini, lalu tekan kombinasi baru.",
+    "hotkeyDesc": "Membekukan layar untuk memilih area; jika ditekan lagi, pemilihan dimulai dari awal. Klik kolom ini, lalu tekan kombinasi baru.",
     "language": "Bahasa",
     "languageDesc": "Untuk jendela, petunjuk, dan pesan program. Tombol kueri standar juga beralih ke bahasa ini.",
     "languageAuto": "Sama seperti Windows",

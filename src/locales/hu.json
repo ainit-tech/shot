@@ -174,7 +174,7 @@
     "signIn": "Bejelentkezés",
     "open": "Megnyitás",
     "hotkey": "Gyorsbillentyű",
-    "hotkeyDesc": "Kimerevíti a képernyőt, hogy kijelölhess egy területet. Kattints a mezőbe, és nyomj meg egy új billentyűkombinációt.",
+    "hotkeyDesc": "Kimerevíti a képernyőt, hogy kijelölhess egy területet; újbóli lenyomásra a kijelölés elölről kezdődik. Kattints a mezőbe, és nyomj meg egy új billentyűkombinációt.",
     "language": "Nyelv",
     "languageDesc": "A program ablakainak, tippjeinek és üzeneteinek nyelve. Az alapértelmezett kérdésgombok is erre váltanak.",
     "languageAuto": "Mint a Windowsban",

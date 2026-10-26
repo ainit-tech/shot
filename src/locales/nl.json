@@ -174,7 +174,7 @@
     "signIn": "Inloggen",
     "open": "Openen",
     "hotkey": "Sneltoets",
-    "hotkeyDesc": "Bevriest het scherm om een gebied te selecteren. Klik op het veld en druk op een nieuwe combinatie.",
+    "hotkeyDesc": "Bevriest het scherm om een gebied te selecteren; nogmaals indrukken begint de selectie opnieuw. Klik op het veld en druk op een nieuwe combinatie.",
     "language": "Taal",
     "languageDesc": "Van de vensters, tooltips en meldingen van het programma. De standaardzoekknoppen schakelen ook over op deze taal.",
     "languageAuto": "Zoals in Windows",

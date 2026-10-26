@@ -174,7 +174,7 @@
     "signIn": "Zaloguj się",
     "open": "Otwórz",
     "hotkey": "Skrót klawiszowy",
-    "hotkeyDesc": "Zamraża ekran, aby zaznaczyć obszar. Kliknij pole i naciśnij nową kombinację.",
+    "hotkeyDesc": "Zamraża ekran, aby zaznaczyć obszar; ponowne naciśnięcie zaczyna zaznaczanie od nowa. Kliknij pole i naciśnij nową kombinację.",
     "language": "Język",
     "languageDesc": "Okien programu, podpowiedzi i komunikatów. Przechodzą na niego też standardowe przyciski zapytań.",
     "languageAuto": "Jak w Windows",

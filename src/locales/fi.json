@@ -174,7 +174,7 @@
     "signIn": "Kirjaudu sisään",
     "open": "Avaa",
     "hotkey": "Pikanäppäin",
-    "hotkeyDesc": "Jäädyttää näytön alueen valitsemista varten. Napsauta kenttää ja paina uusi yhdistelmä.",
+    "hotkeyDesc": "Jäädyttää näytön alueen valitsemista varten; uusi painallus aloittaa valinnan alusta. Napsauta kenttää ja paina uusi yhdistelmä.",
     "language": "Kieli",
     "languageDesc": "Ohjelman ikkunoiden, vihjeiden ja viestien kieli. Myös vakiokyselypainikkeet vaihtuvat sille.",
     "languageAuto": "Kuten Windowsissa",

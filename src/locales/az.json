@@ -174,7 +174,7 @@
     "signIn": "Daxil ol",
     "open": "Aç",
     "hotkey": "Qısayol klavişi",
-    "hotkeyDesc": "Sahə seçmək üçün ekranı dondurur. Sahəyə klikləyin və yeni kombinasiya basın.",
+    "hotkeyDesc": "Sahə seçmək üçün ekranı dondurur; yenidən basıldıqda seçim təzədən başlayır. Sahəyə klikləyin və yeni kombinasiya basın.",
     "language": "Dil",
     "languageDesc": "Proqramın pəncərələrinin, ipuçlarının və mesajlarının dili. Standart sorğu düymələri də bu dilə keçir.",
     "languageAuto": "Windows-dakı kimi",

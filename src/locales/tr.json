@@ -174,7 +174,7 @@
     "signIn": "Oturum aç",
     "open": "Aç",
     "hotkey": "Kısayol tuşu",
-    "hotkeyDesc": "Bir alan seçmek için ekranı dondurur. Alana tıklayın ve yeni bir tuş bileşimine basın.",
+    "hotkeyDesc": "Bir alan seçmek için ekranı dondurur; yeniden basıldığında seçim baştan başlar. Alana tıklayın ve yeni bir tuş bileşimine basın.",
     "language": "Dil",
     "languageDesc": "Programın pencerelerinin, ipuçlarının ve iletilerinin dili. Standart sorgu düğmeleri de bu dile geçer.",
     "languageAuto": "Windows'taki gibi",

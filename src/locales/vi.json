@@ -174,7 +174,7 @@
     "signIn": "Đăng nhập",
     "open": "Mở",
     "hotkey": "Phím tắt",
-    "hotkeyDesc": "Đóng băng màn hình để chọn một vùng. Nhấp vào ô rồi nhấn tổ hợp phím mới.",
+    "hotkeyDesc": "Đóng băng màn hình để chọn một vùng; nhấn lại lần nữa để chọn lại từ đầu. Nhấp vào ô rồi nhấn tổ hợp phím mới.",
     "language": "Ngôn ngữ",
     "languageDesc": "Của các cửa sổ, gợi ý và thông báo trong chương trình. Các nút truy vấn tiêu chuẩn cũng chuyển sang ngôn ngữ này.",
     "languageAuto": "Theo Windows",

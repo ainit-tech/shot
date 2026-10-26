@@ -174,7 +174,7 @@
     "signIn": "Přihlásit se",
     "open": "Otevřít",
     "hotkey": "Klávesová zkratka",
-    "hotkeyDesc": "Zmrazí obrazovku, abyste mohli vybrat oblast. Klikněte do pole a stiskněte novou kombinaci.",
+    "hotkeyDesc": "Zmrazí obrazovku, abyste mohli vybrat oblast; dalším stisknutím začnete výběr znovu. Klikněte do pole a stiskněte novou kombinaci.",
     "language": "Jazyk",
     "languageDesc": "Oken programu, popisků a zpráv. Přepnou se na něj i standardní tlačítka dotazů.",
     "languageAuto": "Jako ve Windows",

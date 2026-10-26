@@ -174,7 +174,7 @@
     "signIn": "Mag-sign in",
     "open": "Buksan",
     "hotkey": "Hotkey",
-    "hotkeyDesc": "Nagfi-freeze ng screen para pumili ng area. I-click ang field at pindutin ang bagong kombinasyon.",
+    "hotkeyDesc": "Nagfi-freeze ng screen para pumili ng area; kapag pinindot ulit, magsisimula muli ang pagpili. I-click ang field at pindutin ang bagong kombinasyon.",
     "language": "Wika",
     "languageDesc": "Ng mga window, hint at mensahe ng program. Lilipat din dito ang mga karaniwang button ng query.",
     "languageAuto": "Gaya ng sa Windows",

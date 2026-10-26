@@ -174,7 +174,7 @@
     "signIn": "Prisijungti",
     "open": "Atidaryti",
     "hotkey": "Spartusis klavišas",
-    "hotkeyDesc": "Užšaldo ekraną, kad galėtumėte pažymėti sritį. Spustelėkite lauką ir paspauskite naują derinį.",
+    "hotkeyDesc": "Užšaldo ekraną, kad galėtumėte pažymėti sritį; paspaudus dar kartą, žymėjimas pradedamas iš naujo. Spustelėkite lauką ir paspauskite naują derinį.",
     "language": "Kalba",
     "languageDesc": "Programos langų, patarimų ir pranešimų. Į ją persijungia ir standartiniai užklausų mygtukai.",
     "languageAuto": "Kaip „Windows“",

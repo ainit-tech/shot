@@ -174,7 +174,7 @@
     "signIn": "Pierakstīties",
     "open": "Atvērt",
     "hotkey": "Īsinājumtaustiņš",
-    "hotkeyDesc": "Iesaldē ekrānu, lai atlasītu apgabalu. Noklikšķiniet uz lauka un nospiediet jaunu kombināciju.",
+    "hotkeyDesc": "Iesaldē ekrānu, lai atlasītu apgabalu; nospiežot vēlreiz, atlase sākas no jauna. Noklikšķiniet uz lauka un nospiediet jaunu kombināciju.",
     "language": "Valoda",
     "languageDesc": "Programmas logu, padomu un ziņojumu valoda. Uz to pārslēdzas arī standarta vaicājumu pogas.",
     "languageAuto": "Kā sistēmā Windows",

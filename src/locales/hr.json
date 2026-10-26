@@ -174,7 +174,7 @@
     "signIn": "Prijava",
     "open": "Otvori",
     "hotkey": "Tipkovnički prečac",
-    "hotkeyDesc": "Zamrzava zaslon da biste odabrali područje. Kliknite polje i pritisnite novu kombinaciju.",
+    "hotkeyDesc": "Zamrzava zaslon da biste odabrali područje; ponovni pritisak započinje odabir ispočetka. Kliknite polje i pritisnite novu kombinaciju.",
     "language": "Jezik",
     "languageDesc": "Prozora programa, opisa i poruka. Na njega prelaze i standardni gumbi za upite.",
     "languageAuto": "Kao u sustavu Windows",

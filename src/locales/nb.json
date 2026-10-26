@@ -174,7 +174,7 @@
     "signIn": "Logg på",
     "open": "Åpne",
     "hotkey": "Hurtigtast",
-    "hotkeyDesc": "Fryser skjermen så du kan markere et område. Klikk i feltet og trykk på en ny kombinasjon.",
+    "hotkeyDesc": "Fryser skjermen så du kan markere et område; et trykk til starter markeringen forfra. Klikk i feltet og trykk på en ny kombinasjon.",
     "language": "Språk",
     "languageDesc": "For programmets vinduer, verktøytips og meldinger. Standard-spørreknappene bytter også til det.",
     "languageAuto": "Som i Windows",

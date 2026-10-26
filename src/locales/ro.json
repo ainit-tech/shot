@@ -174,7 +174,7 @@
     "signIn": "Conectați-vă",
     "open": "Deschideți",
     "hotkey": "Tastă rapidă",
-    "hotkeyDesc": "Îngheață ecranul pentru a selecta o zonă. Faceți clic pe câmp și apăsați o combinație nouă.",
+    "hotkeyDesc": "Îngheață ecranul pentru a selecta o zonă; o nouă apăsare reia selecția de la capăt. Faceți clic pe câmp și apăsați o combinație nouă.",
     "language": "Limbă",
     "languageDesc": "A ferestrelor, indicațiilor și mesajelor programului. Butoanele de căutare standard trec și ele la această limbă.",
     "languageAuto": "Ca în Windows",

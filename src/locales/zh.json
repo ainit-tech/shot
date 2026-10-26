@@ -174,7 +174,7 @@
     "signIn": "登录",
     "open": "打开",
     "hotkey": "快捷键",
-    "hotkeyDesc": "冻结屏幕以选择区域。点击输入框并按下新的组合键。",
+    "hotkeyDesc": "冻结屏幕以选择区域；再按一次即可重新选择。点击输入框并按下新的组合键。",
     "language": "语言",
     "languageDesc": "程序窗口、提示和消息的语言。标准查询按钮也会随之切换。",
     "languageAuto": "跟随 Windows",

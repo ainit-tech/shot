@@ -174,7 +174,7 @@
     "signIn": "Log masuk",
     "open": "Buka",
     "hotkey": "Kekunci pintas",
-    "hotkeyDesc": "Membekukan skrin untuk memilih kawasan. Klik medan ini dan tekan gabungan baharu.",
+    "hotkeyDesc": "Membekukan skrin untuk memilih kawasan; jika ditekan sekali lagi, pemilihan bermula semula. Klik medan ini dan tekan gabungan baharu.",
     "language": "Bahasa",
     "languageDesc": "Untuk tetingkap, petunjuk dan mesej program. Butang pertanyaan standard juga bertukar kepada bahasa ini.",
     "languageAuto": "Seperti Windows",

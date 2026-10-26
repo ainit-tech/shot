@@ -174,7 +174,7 @@
     "signIn": "Iniciar sesión",
     "open": "Abrir",
     "hotkey": "Tecla rápida",
-    "hotkeyDesc": "Congela la pantalla para seleccionar una zona. Haz clic en el campo y pulsa una nueva combinación.",
+    "hotkeyDesc": "Congela la pantalla para seleccionar una zona; al volver a pulsar, la selección empieza de nuevo. Haz clic en el campo y pulsa una nueva combinación.",
     "language": "Idioma",
     "languageDesc": "De las ventanas, pistas y mensajes del programa. Los botones de consulta estándar también cambian a él.",
     "languageAuto": "Como en Windows",

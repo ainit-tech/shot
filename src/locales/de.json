@@ -174,7 +174,7 @@
     "signIn": "Anmelden",
     "open": "Öffnen",
     "hotkey": "Tastenkürzel",
-    "hotkeyDesc": "Friert den Bildschirm ein, um einen Bereich auszuwählen. Klicke in das Feld und drücke eine neue Kombination.",
+    "hotkeyDesc": "Friert den Bildschirm ein, um einen Bereich auszuwählen; ein erneuter Druck startet die Auswahl neu. Klicke in das Feld und drücke eine neue Kombination.",
     "language": "Sprache",
     "languageDesc": "Für die Fenster, Hinweise und Meldungen des Programms. Auch die Standard-Anfrage-Schaltflächen wechseln in diese Sprache.",
     "languageAuto": "Wie in Windows",

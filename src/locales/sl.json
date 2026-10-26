@@ -174,7 +174,7 @@
     "signIn": "Prijava",
     "open": "Odpri",
     "hotkey": "Bližnjična tipka",
-    "hotkeyDesc": "Zamrzne zaslon, da izberete območje. Kliknite polje in pritisnite novo kombinacijo.",
+    "hotkeyDesc": "Zamrzne zaslon, da izberete območje; ponovni pritisk začne izbiro znova. Kliknite polje in pritisnite novo kombinacijo.",
     "language": "Jezik",
     "languageDesc": "Oken programa, namigov in sporočil. Nanj preklopijo tudi standardni gumbi za poizvedbe.",
     "languageAuto": "Kot v sistemu Windows",

@@ -174,7 +174,7 @@
     "signIn": "Logga in",
     "open": "Öppna",
     "hotkey": "Snabbtangent",
-    "hotkeyDesc": "Fryser skärmen så att du kan markera ett område. Klicka i fältet och tryck på en ny kombination.",
+    "hotkeyDesc": "Fryser skärmen så att du kan markera ett område; ett nytt tryck börjar om markeringen. Klicka i fältet och tryck på en ny kombination.",
     "language": "Språk",
     "languageDesc": "För programmets fönster, knappbeskrivningar och meddelanden. Standardfrågeknapparna byter också till det.",
     "languageAuto": "Som i Windows",

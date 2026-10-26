@@ -174,7 +174,7 @@
     "signIn": "Log ind",
     "open": "Åbn",
     "hotkey": "Genvejstast",
-    "hotkeyDesc": "Fryser skærmen, så du kan markere et område. Klik i feltet, og tryk på en ny kombination.",
+    "hotkeyDesc": "Fryser skærmen, så du kan markere et område; et tryk mere starter markeringen forfra. Klik i feltet, og tryk på en ny kombination.",
     "language": "Sprog",
     "languageDesc": "For programmets vinduer, værktøjstip og meddelelser. Standardforespørgselsknapperne skifter også til det.",
     "languageAuto": "Som i Windows",

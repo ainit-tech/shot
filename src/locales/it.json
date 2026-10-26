@@ -174,7 +174,7 @@
     "signIn": "Accedi",
     "open": "Apri",
     "hotkey": "Tasto di scelta rapida",
-    "hotkeyDesc": "Congela lo schermo per selezionare un'area. Fai clic sul campo e premi una nuova combinazione.",
+    "hotkeyDesc": "Congela lo schermo per selezionare un'area; una nuova pressione ricomincia la selezione. Fai clic sul campo e premi una nuova combinazione.",
     "language": "Lingua",
     "languageDesc": "Delle finestre, dei suggerimenti e dei messaggi del programma. Anche i pulsanti di ricerca standard passano a questa lingua.",
     "languageAuto": "Come in Windows",

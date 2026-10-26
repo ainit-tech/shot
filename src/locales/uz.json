@@ -174,7 +174,7 @@
     "signIn": "Kirish",
     "open": "Ochish",
     "hotkey": "Tezkor klavish",
-    "hotkeyDesc": "Sohani ajratish uchun ekranni muzlatadi. Maydonga bosing, soʻng yangi klavishlar birikmasini bosing.",
+    "hotkeyDesc": "Sohani ajratish uchun ekranni muzlatadi; qayta bosilganda ajratish boshidan boshlanadi. Maydonga bosing, soʻng yangi klavishlar birikmasini bosing.",
     "language": "Til",
     "languageDesc": "Dastur oynalari, maslahatlar va xabarlar tili. Standart soʻrov tugmalari ham unga oʻtadi.",
     "languageAuto": "Windows’dagidek",

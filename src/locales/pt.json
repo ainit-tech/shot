@@ -174,7 +174,7 @@
     "signIn": "Fazer login",
     "open": "Abrir",
     "hotkey": "Tecla de atalho",
-    "hotkeyDesc": "Congela a tela para selecionar uma área. Clique no campo e pressione uma nova combinação.",
+    "hotkeyDesc": "Congela a tela para selecionar uma área; pressionar de novo recomeça a seleção. Clique no campo e pressione uma nova combinação.",
     "language": "Idioma",
     "languageDesc": "Das janelas, dicas e mensagens do programa. Os botões de consulta padrão também mudam para ele.",
     "languageAuto": "Como no Windows",
