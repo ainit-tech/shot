@@ -71,6 +71,8 @@ OutputBaseFilename=ainitShot-{#Version}-windows-x64-setup
 [Files]
 Source: "{#Exe}"; DestDir: "{app}"; DestName: "ainitShot.exe"; Flags: ignoreversion
 Source: "ainitShot.ico"; DestDir: "{app}"; Flags: ignoreversion
+; The icon at every scale for the uninstaller, which has no pictures of its own but Inno Setup's.
+Source: "images\small-*.png"; DestDir: "{app}\images"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\ainitShot"; Filename: "{app}\ainitShot.exe"; IconFilename: "{app}\ainitShot.ico"
@@ -167,7 +169,19 @@ end;
 procedure CurPageChanged(CurPageID: Integer);
 begin
   if CurPageID = wpWelcome then
+  begin
     WizardForm.NextButton.Caption := SetupMessage(msgButtonInstall);
+    { "Install" has the focus, as Enter presses it, rather than the box under the title. }
+    WizardForm.ActiveControl := WizardForm.NextButton;
+  end
+  else if CurPageID = wpFinished then
+  begin
+    { The box that runs the program stands under the title as the box of the first page does,
+      where the empty text under the title would paint over it. }
+    WizardForm.FinishedLabel.Visible := False;
+    WizardForm.AdjustLabelHeight(WizardForm.FinishedHeadingLabel);
+    WizardForm.RunList.Top := WizardForm.FinishedHeadingLabel.Top + WizardForm.FinishedHeadingLabel.Height + ScaleY(20);
+  end;
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
@@ -187,6 +201,32 @@ function InitializeUninstall: Boolean;
 begin
   CloseRunning;
   Result := True;
+end;
+
+{ The uninstaller shows the program's icon at the top, as the installer does, rather than Inno
+  Setup's own picture: the one made for the scale of the screen, among those installed beside the
+  program. }
+procedure InitializeUninstallProgressForm;
+var
+  Image: TBitmapImage;
+  Scale: Integer;
+  Path: String;
+  Png: TPngImage;
+begin
+  Image := UninstallProgressForm.WizardSmallBitmapImage;
+  { 58 pixels wide at 100 %, a picture for every 25 % up to 250 %. }
+  Scale := (Image.Width * 100 div 58 + 12) div 25 * 25;
+  if Scale < 100 then
+    Scale := 100
+  else if Scale > 250 then
+    Scale := 250;
+  Path := ExpandConstant('{app}\images\small-') + IntToStr(Scale) + '.png';
+  if FileExists(Path) then
+  begin
+    Png := TPngImage.Create;
+    Png.LoadFromFile(Path);
+    Image.PngImage := Png;
+  end;
 end;
 
 { The uninstaller takes starting with Windows away, and the models and updates it downloaded,

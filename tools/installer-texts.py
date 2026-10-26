@@ -9,6 +9,7 @@ ci/build.sh runs it before compiling the installer; by hand, from the repository
 python -I tools/installer-texts.py"""
 import json
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -82,6 +83,11 @@ MESSAGES = {
 }
 
 
+# Messages of Inno Setup's translations that have a slip, put right here: the Latvian title of the
+# uninstaller has "%" where the program's name goes.
+FIXES = {"lv": {"UninstallAppFullTitle": "Noņemšana — %1"}}
+
+
 def fail(message):
     print(f"tools/installer-texts.py: {message}", file=sys.stderr)
     sys.exit(1)
@@ -90,6 +96,24 @@ def fail(message):
 def inno(text):
     """A text as a value of the script: the version comes from the preprocessor."""
     return text.replace("{version}", "{#Version}")
+
+
+def message(name, files):
+    """One of Inno Setup's messages in a language: the last of its files that has it wins, as
+    they are laid over Default.isl. A file is in UTF-8, or in the code page its [LangOptions]
+    names."""
+    found = None
+    for file in files:
+        data = (ROOT / "installer" / "languages" / file).read_bytes()
+        try:
+            text = data.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            page = re.search(rb"^LanguageCodePage=(\d+)", data, re.MULTILINE)
+            text = data.decode(f"cp{page.group(1).decode()}" if page else "cp1252")
+        for line in text.splitlines():
+            if line.startswith(f"{name}="):
+                found = line[len(name) + 1:]
+    return found
 
 
 def main():
@@ -126,6 +150,14 @@ def main():
             f"{code}.ClickFinish=",
             f"{code}.ButtonFinish={t['done']}",
         ]
+        lines += [f"{code}.{name}={value}" for name, value in FIXES.get(code, {}).items()]
+        # The uninstaller's question about the settings has the title of its other windows,
+        # "ainitShot Uninstall", rather than "Uninstall" alone.
+        title = FIXES.get(code, {}).get("UninstallAppFullTitle") or message("UninstallAppFullTitle", MESSAGES[code])
+        title = title or "%1 Uninstall"
+        if "%1" not in title:
+            fail(f"the title of the uninstaller in {code} has no place for the program's name: {title}")
+        lines.append(f"{code}.UninstallAppTitle={title.replace('%1', 'ainitShot')}")
     lines += ["", "[CustomMessages]"]
     for code in MESSAGES:
         t = texts[code]
