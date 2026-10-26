@@ -3,9 +3,10 @@
 # ci/build.sh:
 #
 #   bash ci/publish.sh vX.Y.Z
+#   bash ci/publish.sh          in a run started by hand, which names no tag
 #
-# By then dist/ holds latest.json and the installer it points to. Needs minisign, ssh and tar, and
-# two secrets in the environment:
+# By then dist/ holds latest.json and the installer it points to. Needs minisign, ssh, tar and git,
+# and two secrets in the environment:
 #   MINISIGN_KEY     the secret minisign key, without a password, that releases are signed with;
 #   PUBLISH_SSH_KEY  the secret SSH key the server lets do nothing but publish.
 #
@@ -14,8 +15,21 @@
 # signature last (server/publish in the infra repository).
 set -euo pipefail
 
-version="${1#v}"
-[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "publish: \"$1\" isn't vX.Y.Z" >&2; exit 1; }
+# The release's tag: the one CI names as it runs on a tag. A run started by hand names none, and
+# then it is the tag the repository has on the commit built: a commit without a tag vX.Y.Z, say on
+# a branch, is never published. The tag must be the version in Cargo.toml either way.
+tag="${1:-}"
+tag="${tag#refs/tags/}"
+if [ -z "$tag" ]; then
+  head="${SOURCECRAFT_COMMIT_SHA:-$(git rev-parse HEAD)}"
+  tag=$(git ls-remote --tags "${REPOSITORY:-https://git.sourcecraft.dev/ainit-tech/shot.git}" \
+    | awk -v head="$head" '$1 == head && $2 ~ /^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+(\^\{\})?$/ {
+        sub(/^refs\/tags\//, "", $2); sub(/\^\{\}$/, "", $2); print $2; exit }')
+fi
+[[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "publish: \"$tag\" isn't a tag vX.Y.Z of the commit built" >&2; exit 1; }
+version="${tag#v}"
+cargo=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n 1)
+[ "$version" = "$cargo" ] || { echo "publish: the tag $tag isn't the version $cargo in Cargo.toml" >&2; exit 1; }
 dist="${DIST:-dist}"
 installer="ainitShot-$version-windows-x64-setup.exe"
 [ -f "$dist/latest.json" ] && [ -f "$dist/$installer" ] || { echo "publish: $dist/ lacks latest.json or $installer" >&2; exit 1; }
