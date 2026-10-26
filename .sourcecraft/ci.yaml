@@ -14,21 +14,25 @@ workflows:
         cubes:
           - name: build
             # cargo-xwin for x86_64-pc-windows-msvc, pinned, so that a release builds as the one
-            # before it did; ci/build.sh puts in the version of Rust it builds with.
-            image: docker.io/messense/cargo-xwin@sha256:9856b895265d4966f212228ba64802cf89337e2a2a537aa2533c1b8784cbc81b
+            # before it did; ci/build.sh puts in the version of Rust it builds with. The same image
+            # as messense/cargo-xwin of Docker Hub, from GitHub's registry: Docker Hub limits pulls
+            # without an account, and on 2026-10-26 it refused them to the release of 0.2.3.
+            image: ghcr.io/rust-cross/cargo-xwin@sha256:9856b895265d4966f212228ba64802cf89337e2a2a537aa2533c1b8784cbc81b
             # The image has Wine, under which Inno Setup makes the installer, and Python; Xvfb is
             # the screen that Inno Setup's own installer needs.
             script:
               - apt-get update -qq && apt-get install -y -qq xvfb xauth
-              - bash ci/build.sh "$SOURCECRAFT_COMMIT_REF_NAME"
+              # A run started by hand may name the tag in full, refs/tags/vX.Y.Z.
+              - bash ci/build.sh "${SOURCECRAFT_COMMIT_REF_NAME#refs/tags/}"
             artifacts:
               paths:
                 - dist
           - name: publish
-            image: docker.io/library/debian:bookworm-slim
+            # Debian 12, pinned, from Google's mirror of Docker Hub, which doesn't limit pulls.
+            image: mirror.gcr.io/library/debian@sha256:7ff6ba31527b9e336162fa061746c366c4b2032f4d2cff2078bea43f78efe3f8
             env:
               MINISIGN_KEY: ${{ secrets.MINISIGN_KEY }}
               PUBLISH_SSH_KEY: ${{ secrets.PUBLISH_SSH_KEY }}
             script:
               - apt-get update -qq && apt-get install -y -qq minisign openssh-client
-              - bash ci/publish.sh "$SOURCECRAFT_COMMIT_REF_NAME"
+              - bash ci/publish.sh "${SOURCECRAFT_COMMIT_REF_NAME#refs/tags/}"
