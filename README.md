@@ -1,4 +1,4 @@
-**English** · [Русский](README.ru.md)
+**English** · [Русский](README.ru.md) · [中文](README.zh.md) · [Español](README.es.md) · [Français](README.fr.md) · [العربية](README.ar.md)
 
 # ainitShot
 
