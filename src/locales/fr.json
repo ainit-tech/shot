@@ -403,7 +403,6 @@
     "removeData": "Supprimer aussi les réglages d’ainitShot et sa connexion à Google ?"
   },
   "clip": {
-    "keys.PrintScreen": "Impr. écran",
     "ui.play": "Lire",
     "ui.pause": "Pause",
     "ui.chapters": "Chapitres",
@@ -475,6 +474,7 @@
     "picture.images.field": "Recherche à partir de l’image",
     "picture.images.tabs.0": "Tous",
     "picture.images.tabs.1": "Correspondances visuelles",
-    "picture.images.tabs.2": "Correspondances exactes"
+    "picture.images.tabs.2": "Correspondances exactes",
+    "keys.PrintScreen": "Impr. écran"
   }
 }

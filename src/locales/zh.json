@@ -403,7 +403,6 @@
     "removeData": "同时删除 ainitShot 的设置和 Google 登录信息吗？"
   },
   "clip": {
-    "keys.PrintScreen": "PrtSc",
     "ui.play": "播放",
     "ui.pause": "暂停",
     "ui.chapters": "章节",
@@ -475,6 +474,7 @@
     "picture.images.field": "正在以图搜索",
     "picture.images.tabs.0": "全部",
     "picture.images.tabs.1": "视觉匹配",
-    "picture.images.tabs.2": "完全匹配"
+    "picture.images.tabs.2": "完全匹配",
+    "keys.PrintScreen": "PrtSc"
   }
 }

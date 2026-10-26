@@ -403,7 +403,6 @@
     "removeData": "¿Eliminar también los ajustes de ainitShot y su inicio de sesión en Google?"
   },
   "clip": {
-    "keys.PrintScreen": "Impr Pant",
     "ui.play": "Reproducir",
     "ui.pause": "Pausar",
     "ui.chapters": "Capítulos",
@@ -475,6 +474,7 @@
     "picture.images.field": "Buscando por la imagen",
     "picture.images.tabs.0": "Todo",
     "picture.images.tabs.1": "Coincidencias visuales",
-    "picture.images.tabs.2": "Coincidencias exactas"
+    "picture.images.tabs.2": "Coincidencias exactas",
+    "keys.PrintScreen": "Impr Pant"
   }
 }

@@ -403,7 +403,6 @@
     "removeData": "هل تريد أيضًا حذف إعدادات ainitShot وتسجيل الدخول إلى Google؟"
   },
   "clip": {
-    "keys.PrintScreen": "PrtSc",
     "ui.play": "تشغيل",
     "ui.pause": "إيقاف مؤقت",
     "ui.chapters": "الفصول",
@@ -475,6 +474,7 @@
     "picture.images.field": "جارٍ البحث بالصورة",
     "picture.images.tabs.0": "الكل",
     "picture.images.tabs.1": "التطابقات المرئية",
-    "picture.images.tabs.2": "التطابقات التامة"
+    "picture.images.tabs.2": "التطابقات التامة",
+    "keys.PrintScreen": "PrtSc"
   }
 }

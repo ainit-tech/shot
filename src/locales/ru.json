@@ -403,7 +403,6 @@
     "removeData": "Удалить заодно настройки ainitShot и вход в Google?"
   },
   "clip": {
-    "keys.PrintScreen": "PrtSc",
     "ui.play": "Воспроизвести",
     "ui.pause": "Пауза",
     "ui.chapters": "Главы",
@@ -475,6 +474,7 @@
     "picture.images.field": "Поиск по картинке",
     "picture.images.tabs.0": "Все",
     "picture.images.tabs.1": "Визуальные совпадения",
-    "picture.images.tabs.2": "Точные совпадения"
+    "picture.images.tabs.2": "Точные совпадения",
+    "keys.PrintScreen": "PrtSc"
   }
 }
