@@ -67,12 +67,18 @@ const send = message => webview && webview.postMessage(JSON.stringify(message));
 const $ = selector => document.querySelector(selector);
 
 // The window's own words in English; the program gives their translations into the language in
-// force. The clip has its own words.
+// force. The clip has its own words, and four of the program's, which its chapters on asking show
+// (clip/program-terms.json): the window doesn't, but they keep their English here, and every
+// catalog is checked for them as for the window's.
 const TEXT = {
   start: "Start",
   openSettings: "Open the settings",
   signInOffer: "Sign in to Google once: the captcha comes less often, and conversations are kept.",
   signIn: "Sign in",
+  aiMode: "Google's AI Mode",
+  question: "Where was this taken?",
+  speak: "speak while holding",
+  letGo: "let go: the question is sent",
 };
 
 const state = {
