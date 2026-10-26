@@ -10,8 +10,9 @@ const ORIGIN: &str = "https://shot.ainit.tech";
 pub const OVERVIEW: &str = "/";
 /// The page where people support the program.
 pub const SUPPORT: &str = "/support";
-/// The program's source code, in its public repository.
-pub const SOURCE: &str = "https://sourcecraft.dev/ainit-tech/shot";
+/// The program's source code: its mirror on GitHub, which people know and can open anywhere. The
+/// repository itself lives on SourceCraft.
+pub const SOURCE: &str = "https://github.com/ainit-tech/shot";
 
 /// A page of the site in a language of the program: in that language where the site speaks it,
 /// in English otherwise. `path` starts with a slash; the overview is "/".

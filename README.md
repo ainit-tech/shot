@@ -5,13 +5,15 @@ A screenshot program for Windows that replaces Lightshot. A hotkey freezes the s
 - Site and download: https://shot.ainit.tech
 - Documentation, in English, Russian and Hindi: [docs](docs/README.md)
 
+Development happens on SourceCraft ([sourcecraft.dev/ainit-tech/shot](https://sourcecraft.dev/ainit-tech/shot)); this repository on GitHub is its mirror, and issues are welcome here.
+
 ## License, name and logo
 
 ainitShot is free software under the GNU General Public License, version 3 or later ([LICENSE](LICENSE)): you may use, study, change and pass it on. The name ainitShot and its logo are not covered by the license: a fork, or any changed version you pass on, goes by another name and with another logo, so that nobody takes it for ainitShot.
 
 ## Reporting a problem
 
-- **A bug:** open an issue at https://sourcecraft.dev/ainit-tech/shot/issues. Say what you did, what you expected and what happened instead, and give the program's version (Settings → About) and your version of Windows. A screenshot helps; make sure nothing private is on it.
+- **A bug:** open an issue at https://github.com/ainit-tech/shot/issues. Say what you did, what you expected and what happened instead, and give the program's version (Settings → About) and your version of Windows. A screenshot helps; make sure nothing private is on it.
 - **A vulnerability:** don't describe it in an issue, where everyone can read it. Open an issue titled "Security contact" without any details, and we'll agree on a private way for you to send them.
 
 ## What we accept
