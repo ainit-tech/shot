@@ -333,8 +333,9 @@ function render() {
   const un = state.un.filter(code => known.has(code));
   const windows = known.has(state.windows) ? state.windows : null;
   // The language of Windows, marked, comes first: among the UN's when it's one of them, above them
-  // otherwise.
-  const own = windows && !un.includes(windows) ? [tile(known.get(windows), true)] : [];
+  // otherwise; so does the language in force, that of the installation, when it's another.
+  const current = known.has(state.language) && state.language !== windows ? state.language : null;
+  const own = [current, windows].filter(code => code && !un.includes(code)).map(code => tile(known.get(code), code === windows));
   $("#own").replaceChildren(...own);
   $("#own").hidden = !own.length;
   $("#un").replaceChildren(...un.map(code => tile(known.get(code), code === windows)));
@@ -408,8 +409,10 @@ function heard(message) {
   document.documentElement.dir = message.rightToLeft ? "rtl" : "ltr";
   render();
   document.body.classList.remove("loading");
-  const windows = $(".tile.windows") || $(".tile");
-  if (windows) windows.focus({ preventScroll: true });
+  // The language in force is in focus, as Enter would choose it.
+  const current = $(`#own .tile[data-code="${state.language}"], #un .tile[data-code="${state.language}"]`);
+  const first = current || $(".tile.windows") || $(".tile");
+  if (first) first.focus({ preventScroll: true });
 }
 
 if (webview) webview.addEventListener("message", event => heard(event.data));

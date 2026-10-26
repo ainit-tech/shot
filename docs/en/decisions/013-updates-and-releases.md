@@ -51,7 +51,8 @@ The program lives in the tray and is started with Windows, so its users rarely t
   - adds a shortcut to the Start menu and registers the program in Settings → Apps, where it is uninstalled;
   - closes a running ainitShot as "Exit" does before replacing it;
   - its last page says that the program is installed and offers to run it;
-  - speaks the language of Windows in every language of the program: Inno Setup's translations, and ours of what it shows in Amharic, Swahili, Filipino and Burmese, which Inno Setup lacks; its own texts come from the program's catalogs, and the build stops if a language lacks one.
+  - speaks the language of Windows in every language of the program: Inno Setup's translations, and ours of what it shows in Amharic, Swahili, Filipino and Burmese, which Inno Setup lacks; its own texts come from the program's catalogs, and the build stops if a language lacks one;
+  - leaves the language it spoke for the program, which speaks it too ([decision](011-languages.md)).
 
   The uninstaller takes starting with Windows away, and the models and updates the program downloaded; it asks whether to remove the settings and the sign-in to Google too.
 - **Starting with Windows** is what Windows has: the program's entry in Run, unless the list of startup apps in Task Manager or Settings turns it off. The box of the installer and the switch in the settings are this one setting. A first installation turns it on; installing over the program shows it as it is and keeps it; an update doesn't touch it. The program shows it as Windows has it, and turning it on in the program really turns it on.

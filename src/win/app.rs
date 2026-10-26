@@ -32,7 +32,7 @@ use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
 use super::{browser, guide, invite, languages, last_error, models, overlay, preferences, shell, update, wide};
 use crate::settings::{self, Settings};
-use crate::text::{self, tr};
+use crate::text::{self, Language, tr};
 
 /// How often the settings file is looked at, in milliseconds.
 const SETTINGS_TICK: u32 = 1000;
@@ -263,7 +263,7 @@ pub fn run() -> io::Result<()> {
         let path = shell::settings_path();
         // Without a settings file this is the program's first start.
         let first = !path.exists();
-        let (initial, problem) = first_settings(&path);
+        let (initial, problem) = first_settings(&path, windows, shell::installer_language());
         // A settings file from before the program spoke several languages has none chosen.
         let unchosen = !first && fs::read_to_string(&path).is_ok_and(|text| !settings::chooses_language(&text));
         text::set(initial.language.resolve(windows));
@@ -360,8 +360,10 @@ pub fn follow_autostart() -> bool {
 }
 
 /// The settings at the start. The file is written with the defaults if there is none; if it has
-/// a mistake, the defaults are used and the mistake is returned too.
-fn first_settings(path: &PathBuf) -> (Settings, Option<String>) {
+/// a mistake, the defaults are used and the mistake is returned too. After an installation in
+/// another language than that of Windows, settings that haven't chosen a language of their own
+/// speak the installation's (decision 11).
+fn first_settings(path: &PathBuf, windows: Language, installed: Option<Language>) -> (Settings, Option<String>) {
     if !path.exists() {
         // The installer turns starting with Windows on unless told not to; the first settings
         // keep what it chose.
@@ -371,9 +373,17 @@ fn first_settings(path: &PathBuf) -> (Settings, Option<String>) {
             return (Settings::default(), Some(cannot_write(path, &error)));
         }
     }
-    match fs::read_to_string(path).map_err(|e| e.to_string()).and_then(|text| Settings::parse(&text)) {
-        Ok(settings) => (settings, None),
-        Err(problem) => (Settings::default(), Some(problem)),
+    let settings = match fs::read_to_string(path).map_err(|e| e.to_string()).and_then(|text| Settings::parse(&text)) {
+        Ok(settings) => settings,
+        Err(problem) => return (Settings::default(), Some(problem)),
+    };
+    let moved = installed.map(|language| settings.clone().installed_in(language, windows)).filter(|moved| *moved != settings);
+    let Some(moved) = moved else { return (settings, None) };
+    // The file speaks the new language too.
+    text::set(moved.language.resolve(windows));
+    match fs::write(path, moved.to_file()) {
+        Ok(()) => (moved, None),
+        Err(error) => (moved, Some(cannot_write(path, &error))),
     }
 }
 

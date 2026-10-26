@@ -226,6 +226,16 @@ impl Settings {
         self
     }
 
+    /// The settings after an installation in a language other than that of Windows (decision 11):
+    /// settings that speak that of Windows, "auto", speak the installation's from now on, with
+    /// the standard texts in it; a language chosen stays.
+    pub fn installed_in(self, language: Language, windows: Language) -> Settings {
+        if self.language != Choice::Auto || language == windows {
+            return self;
+        }
+        Settings { language: Choice::Own(language), ..self }.speaking(windows, language)
+    }
+
     /// Reads the settings from the text of the file. The error says what is wrong and where.
     pub fn parse(text: &str) -> Result<Settings, String> {
         let settings: Settings = toml::from_str(text).map_err(|e| e.to_string())?;
@@ -726,6 +736,18 @@ mod tests {
         assert!(moved.buttons[1].prompt.contains("हिंदी"), "{}", moved.buttons[1].prompt);
         assert_eq!((&moved.buttons[2].name, &moved.buttons[2].key), (&hindi.buttons[2].name, &own.buttons[2].key));
         assert_eq!((&moved.buttons[3], &moved.save.name), (&own.buttons[3], &own.save.name));
+    }
+
+    #[test]
+    fn an_installation_in_another_language_moves_settings_that_follow_windows() {
+        // English Windows, the installer in Arabic: "auto" becomes Arabic, standard texts and all.
+        let english = Settings::defaults(Language::EN);
+        let arabic = english.clone().installed_in(Language::AR, Language::EN);
+        assert_eq!(arabic, Settings { language: Choice::Own(Language::AR), ..Settings::defaults(Language::AR) });
+        // The installer in the language of Windows changes nothing, nor does it a language chosen.
+        assert_eq!(english.clone().installed_in(Language::EN, Language::EN), english);
+        let russian = Settings { language: Choice::Own(Language::RU), ..Settings::defaults(Language::RU) };
+        assert_eq!(russian.clone().installed_in(Language::AR, Language::EN), russian);
     }
 
     #[test]

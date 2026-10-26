@@ -36,7 +36,8 @@ The texts are written in English where they are used, so the code reads as it di
   - "All languages" follows: every language, the UN's six too, in the alphabetical order of their own names.
   - The language of Windows is marked "As in Windows": among the UN's six, or above them if it isn't one of them.
   - Typing the first letters of a language's name goes to its tile.
-- **Closing the window** keeps the language of Windows. A settings file from before the program spoke several languages chooses none, so the window asks on the next start too, without the presentation.
+- **Closing the window** keeps the language in force: that of Windows, or the installer's. A settings file from before the program spoke several languages chooses none, so the window asks on the next start too, without the presentation.
+- **After an installation** the program speaks the installer's language. The installer leaves it in the registry, `HKCU\Software\ainitShot\Language`, and the program takes it away at its next start, so that it counts once. Where the settings haven't chosen a language of their own, "auto", and the installer's language isn't that of Windows, it goes into the settings, with the standard query buttons and the file's name in it; the window of the first start then speaks it and has its tile in focus. A language chosen stays, and an update leaves the language as it is.
 - **The setting:** `language` in the settings file is "auto", the language of Windows, or a language's code, such as "en", "de" or "ja". The settings window chooses it in "General".
 - **The language of Windows** is the first of the user's languages. One the program doesn't speak gives English.
 - **The catalogs** are files in the program, `src/locales/<code>.json`: the program's own texts by their English, and the texts of each window's page by their names. Every text the program shows comes from them:

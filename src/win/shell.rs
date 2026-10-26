@@ -35,6 +35,30 @@ pub fn windows_language() -> Language {
     first.map_or(Language::EN, |tag| Language::from_tag(&tag.to_string()))
 }
 
+/// Where the installer leaves the language it spoke.
+const PROGRAM: PCWSTR = w!("Software\\ainitShot");
+
+/// The language of an installation since the last start (decision 11): the installer leaves it,
+/// and the program takes it away as it reads it, so that it counts once. Nothing if no
+/// installation has come since, or if it names no language the program speaks.
+pub fn installer_language() -> Option<Language> {
+    let mut code = [0u16; 16];
+    let mut size = size_of_val(&code) as u32;
+    let found = unsafe {
+        let value = w!("Language");
+        RegGetValueW(HKEY_CURRENT_USER, PROGRAM, value, RRF_RT_REG_SZ, null_mut(), code.as_mut_ptr().cast(), &mut size)
+    } == 0;
+    let mut key: HKEY = null_mut();
+    if unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, PROGRAM, 0, KEY_SET_VALUE, &mut key) } == 0 {
+        unsafe {
+            RegDeleteValueW(key, w!("Language"));
+            RegCloseKey(key);
+        }
+    }
+    let len = code.iter().position(|&c| c == 0).unwrap_or(code.len());
+    found.then(|| Language::from_code(&String::from_utf16_lossy(&code[..len]))).flatten()
+}
+
 /// Opens an address in the user's browser, or a file in its program.
 pub fn open(target: &str) -> Result<(), String> {
     // The browser may come to the front only if the program, now in front, lets it.

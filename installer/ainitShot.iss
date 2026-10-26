@@ -1,7 +1,8 @@
 ; The installer of ainitShot (decision 13): Inno Setup 6.7 in its dark look, for the current user,
 ; without administrator rights, into %LOCALAPPDATA%\Programs\ainitShot, with a shortcut in the
 ; Start menu and an entry in Settings > Apps. Its first page offers to start the program with
-; Windows; its last one, to run it. It speaks the language of Windows, if the program does.
+; Windows; its last one, to run it. It speaks the language of Windows, if the program does, and
+; leaves the language it spoke for the program, which speaks it too (decision 11).
 ;
 ; The program updates itself by running it so, and every installer from 0.2.1 on takes this:
 ;   ainitShot-X.Y.Z-windows-x64-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /UPDATE
@@ -73,6 +74,12 @@ Source: "ainitShot.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\ainitShot"; Filename: "{app}\ainitShot.exe"; IconFilename: "{app}\ainitShot.ico"
+
+[Registry]
+; The language of the installation, whose names are the program's codes of languages: the program
+; takes it away at its next start and speaks it, if its settings haven't chosen a language of
+; their own. An update leaves the language as it is.
+Root: HKCU; Subkey: "Software\ainitShot"; ValueType: string; ValueName: "Language"; ValueData: "{language}"; Check: not Updating; Flags: uninsdeletevalue uninsdeletekeyifempty
 
 [Run]
 ; An update starts the new version, which says so; an installation runs it if its box is ticked.

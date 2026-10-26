@@ -1,8 +1,10 @@
 //! The choice of the program's language on its first start, and on a start with a settings file
 //! that has never chosen one: a window of tiles with flags, the six official languages of the UN
-//! first and then every language in alphabetical order, the one of Windows marked. The language
-//! chosen goes into the settings; on the first start the presentation of how to use the program
-//! then opens in it. A page in WebView2, like the program's other windows.
+//! first and then every language in alphabetical order, the one of Windows marked. The window
+//! speaks the language in force, which is in focus: that of Windows, or that of the installation
+//! when it was another (decision 11). The language chosen goes into the settings; on the first
+//! start the presentation of how to use the program then opens in it. A page in WebView2, like the
+//! program's other windows.
 
 use std::cell::{Cell, RefCell};
 use std::ptr::{null, null_mut};
@@ -98,8 +100,8 @@ fn after(then_guide: bool) {
     }
 }
 
-/// The window closed without a choice: the language of Windows stays, and goes into the settings
-/// as "auto", so that it isn't asked again.
+/// The window closed without a choice: the language in force stays, and goes into the settings,
+/// as "auto" for that of Windows, so that it isn't asked again.
 fn keep() {
     if let Err(problem) = app::save_settings(app::settings().as_ref().clone()) {
         eprintln!("The language wasn't saved: {problem}");
