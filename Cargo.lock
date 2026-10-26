@@ -33,7 +33,7 @@ dependencies = [
 
 [[package]]
 name = "ainitshot"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "minisign-verify",
  "miniz_oxide 0.9.1",
