@@ -17,8 +17,8 @@ use webview2_com::Microsoft::Web::WebView2::Win32::{
     COREWEBVIEW2_PERMISSION_KIND_MICROPHONE, COREWEBVIEW2_PERMISSION_STATE_ALLOW, COREWEBVIEW2_WEB_ERROR_STATUS,
     COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED, CreateCoreWebView2EnvironmentWithOptions, ICoreWebView2, ICoreWebView2_2,
     ICoreWebView2Controller, ICoreWebView2Controller2, ICoreWebView2CookieList, ICoreWebView2Environment,
-    ICoreWebView2EnvironmentOptions,
-    ICoreWebView2NavigationCompletedEventArgs, ICoreWebView2NavigationStartingEventArgs,
+    ICoreWebView2EnvironmentOptions, ICoreWebView2NavigationCompletedEventArgs, ICoreWebView2NavigationCompletedEventArgs2,
+    ICoreWebView2NavigationStartingEventArgs,
 };
 use webview2_com::{
     AddScriptToExecuteOnDocumentCreatedCompletedHandler, CoreWebView2EnvironmentOptions,
@@ -275,6 +275,10 @@ struct Browser {
     waiting: Option<String>,
     /// A query waiting for its page to load.
     job: Option<Job>,
+    /// The address of the query's page, until it has been asked for once more: a page that
+    /// doesn't come, or breaks off before it is whole, is, as the user would ask again. Nothing
+    /// can have gone from such a page, nor from the page of WebView2's error in its place.
+    again: Option<String>,
     /// A query whose script runs on the page, until the script tells how it went.
     running: Option<Job>,
     /// The selection of the last query, on the desktop, and where its button sent the screenshot:
@@ -282,6 +286,9 @@ struct Browser {
     beside: Option<(Rect, Mode)>,
     /// Since when the page in the window is a fresh AI Mode ready for the next question, if it is.
     ready: Option<Instant>,
+    /// The navigation started last, the window's own or its page's: what earlier ones come to,
+    /// as it replaces them, is old news.
+    navigation: u64,
     /// Whether the window comes out as the page of the query has its document.
     reveal: bool,
     /// What the program asked the script of a question asked aloud before the script could hear
@@ -325,6 +332,7 @@ pub fn ask(url: &str, job: Job, selection: Option<Rect>) -> Result<(), String> {
     BROWSER.with(|browser| {
         if let Some(browser) = browser.borrow_mut().as_mut() {
             browser.job = Some(job);
+            browser.again = (!fresh).then(|| url.to_string());
             browser.beside = selection.map(|selection| (selection, mode));
             browser.ready = None;
             browser.told_page = None;
@@ -577,9 +585,11 @@ fn start() -> Result<HWND, String> {
                 controller: None,
                 waiting: None,
                 job: None,
+                again: None,
                 running: None,
                 beside: None,
                 ready: None,
+                navigation: 0,
                 reveal: false,
                 told_page: None,
                 environment: None,
@@ -716,14 +726,14 @@ fn attach(controller: &ICoreWebView2Controller, window: HWND) -> windows_core::R
             Ok(())
         }));
         webview.add_DocumentTitleChanged(&title_changed, &mut token)?;
-        let document_ready = DOMContentLoadedEventHandler::create(Box::new(|webview, _args| {
+        let document_ready = DOMContentLoadedEventHandler::create(Box::new(|webview, args| {
+            let mut id = 0;
+            let navigation = args.and_then(|args| args.NavigationId(&mut id).ok()).map(|()| id);
             #[cfg(test)]
-            if let Some(args) = &_args {
-                let mut id = 0u64;
-                let _ = args.NavigationId(&mut id);
-                tests::NAVIGATIONS.with(|all| all.borrow_mut().push(format!("document {id}")));
-            }
-            if let Some(webview) = webview {
+            tests::NAVIGATIONS.with(|all| all.borrow_mut().push(format!("document {id}")));
+            if let Some(webview) = webview
+                && is_current(navigation)
+            {
                 page_ready(&webview);
             }
             Ok(())
@@ -817,7 +827,11 @@ fn page_ready(webview: &ICoreWebView2) {
 
 /// A navigation has ended: if it failed, the query that waited for its page can't go on. One
 /// that another navigation replaced, as the image search's results that move to the tab of exact
-/// matches, hasn't failed.
+/// matches, hasn't failed, and an earlier one that a later navigation has made old news means
+/// nothing now. A page that came, whatever the server answered with it, has the query's script
+/// running on it, which tells how the query went: WebView2 takes any answer but success for a
+/// failure, and Google serves its check that one is not a robot as "too many requests", a check
+/// that often lets one through by itself and goes on to AI Mode.
 fn navigation_completed(args: &ICoreWebView2NavigationCompletedEventArgs) {
     #[cfg(test)]
     {
@@ -833,13 +847,44 @@ fn navigation_completed(args: &ICoreWebView2NavigationCompletedEventArgs) {
     if unsafe { args.WebErrorStatus(&mut status) }.is_ok() && status == COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED {
         return;
     }
-    let job = BROWSER.with(|browser| {
+    let mut id = 0;
+    if !is_current(unsafe { args.NavigationId(&mut id) }.ok().map(|()| id)) {
+        return;
+    }
+    // The server's answer: nothing for a page that never came, as without a connection.
+    let mut code = 0;
+    let answered = args
+        .cast::<ICoreWebView2NavigationCompletedEventArgs2>()
+        .and_then(|args| unsafe { args.HttpStatusCode(&mut code) })
+        .is_ok_and(|()| code != 0);
+    // A page that didn't come, or broke off before it was whole, as one may over a connection
+    // that a pause has worn out, is asked for once more: the query waits for it again, and its
+    // script on WebView2's page of the error, if it began there, goes with that page.
+    let outcome = BROWSER.with(|browser| {
         let mut browser = browser.try_borrow_mut().ok()?;
         let browser = browser.as_mut()?;
-        browser.job.take().or_else(|| browser.running.take())
+        if answered && browser.running.is_some() {
+            return None;
+        }
+        if (browser.job.is_some() || browser.running.is_some())
+            && let Some(url) = browser.again.take()
+        {
+            browser.job = browser.job.take().or_else(|| browser.running.take());
+            return Some(Err(url));
+        }
+        browser.job.take().or_else(|| browser.running.take()).map(Ok)
     });
-    if let Some(job) = job {
-        job_failed(job, tr("Google's page didn't open."));
+    match outcome {
+        Some(Ok(job)) => job_failed(job, tr("Google's page didn't open.")),
+        Some(Err(url)) => {
+            if let Err(problem) = load(&url) {
+                let job = BROWSER.with(|browser| browser.try_borrow_mut().ok()?.as_mut()?.job.take());
+                if let Some(job) = job {
+                    job_failed(job, &problem);
+                }
+            }
+        }
+        None => {}
     }
 }
 
@@ -892,7 +937,26 @@ fn navigation_starting(args: &ICoreWebView2NavigationStartingEventArgs, window: 
     if followed && !local && query::leaves_google(&uri) {
         let _ = unsafe { args.SetCancel(true) };
         open_outside(&uri);
+        return;
     }
+    // The page goes there: what earlier navigations come to is old news from now on.
+    let mut id = 0;
+    if unsafe { args.NavigationId(&mut id) }.is_ok() {
+        BROWSER.with(|browser| {
+            if let Ok(mut browser) = browser.try_borrow_mut()
+                && let Some(browser) = browser.as_mut()
+            {
+                browser.navigation = browser.navigation.max(id);
+            }
+        });
+    }
+}
+
+/// Whether a navigation is the one started last, or its number isn't known: the document or the
+/// end of one that a later navigation has replaced is old news.
+fn is_current(navigation: Option<u64>) -> bool {
+    let last = BROWSER.with(|browser| browser.try_borrow().ok()?.as_ref().map(|b| b.navigation));
+    navigation.zip(last).is_none_or(|(navigation, last)| navigation >= last)
 }
 
 /// Opens the address in the user's own browser; tests only note it down.
@@ -1227,35 +1291,197 @@ pub(super) mod tests {
         pub static NAVIGATIONS: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
     }
 
-    /// A web server of the test's own on this computer, on the port it returns: "/slow" sends
-    /// the start of its page at once and the rest a moment later, as a page coming from far
-    /// away does; any other path gets a whole page at once.
+    /// AI Mode as the program's script sees it: the question field with its send button, which
+    /// takes a pasted picture, and the answer in a block of its own, marked complete a moment
+    /// after the question goes.
+    const AI_MODE_PAGE: &str = r#"<!doctype html><title>AI Mode</title>
+<textarea></textarea><button data-xid="input-plate-send-button" disabled>Send</button>
+<script>
+  const field = document.querySelector("textarea"), send = document.querySelector("button");
+  field.addEventListener("paste", (event) => {
+    for (const file of event.clipboardData.files) {
+      const chip = document.createElement("span");
+      chip.setAttribute("aria-label", file.name);
+      document.body.append(chip);
+      send.disabled = false;
+    }
+  });
+  send.addEventListener("click", () => {
+    const turn = document.createElement("div");
+    turn.setAttribute("data-xid", "aim-mars-turn-root");
+    const block = document.createElement("div");
+    block.setAttribute("data-container-id", "main-col");
+    block.textContent = "Bonjour";
+    turn.append(block);
+    document.body.append(turn);
+    setTimeout(() => block.setAttribute("data-sfc-inited", ""), 300);
+  });
+</script>"#;
+
+    /// Google's check that one is not a robot, which it serves as "too many requests", and which
+    /// may let one through by itself.
+    const CHECK_PAGE: &str = "<!doctype html><title>Sorry</title><p>Are you a robot?</p>";
+
+    /// A web server of the test's own on this computer, on the port it returns:
+    /// - "/slow" sends the start of its page at once and the rest a moment later, as a page
+    ///   coming from far away does;
+    /// - "/ai" is AI Mode ([`AI_MODE_PAGE`]);
+    /// - "/sorry/pass" is Google's check, which goes on to AI Mode by itself after a second, and
+    ///   "/sorry/wait" the check that waits for the user ([`CHECK_PAGE`]);
+    /// - "/ai-flaky" is AI Mode streamed whose connection breaks before the stream's end the
+    ///   first time, and that comes whole after;
+    /// - any other path gets a whole page at once.
     fn serve() -> u16 {
         use std::io::{Read, Write};
+        use std::sync::Arc;
+        use std::sync::atomic::{AtomicBool, Ordering};
         let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
+        let broken = Arc::new(AtomicBool::new(false));
         std::thread::spawn(move || {
             for mut stream in listener.incoming().flatten() {
+                let broken = broken.clone();
                 std::thread::spawn(move || {
                     let mut request = [0u8; 4096];
                     let read = stream.read(&mut request).unwrap_or(0);
-                    let slow = request[..read].starts_with(b"GET /slow");
-                    let head = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nCache-Control: no-store\r\n\
-                                Connection: close\r\n\r\n";
-                    let _ = stream.write_all(head.as_bytes());
-                    if slow {
-                        // Enough for the browser to take it for the window's new document.
-                        let start = format!("<!doctype html><title>slow</title><!--{}-->", " ".repeat(8192));
-                        let _ = stream.write_all(start.as_bytes()).and_then(|()| stream.flush());
-                        std::thread::sleep(Duration::from_millis(1500));
-                        let _ = stream.write_all(b"<p>slow</p>");
-                    } else {
-                        let _ = stream.write_all(b"<!doctype html><title>page</title><p>page</p>");
+                    let request = String::from_utf8_lossy(&request[..read]).into_owned();
+                    let path = request.split(' ').nth(1).unwrap_or("/").to_string();
+                    let status = if path.starts_with("/sorry") { "429 Too Many Requests" } else { "200 OK" };
+                    if path == "/ai-flaky" && !broken.swap(true, Ordering::SeqCst) {
+                        let head = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nCache-Control: no-store\r\n\
+                                    Transfer-Encoding: chunked\r\n\r\n";
+                        let chunk = format!("{:x}\r\n{AI_MODE_PAGE}\r\n", AI_MODE_PAGE.len());
+                        let _ = stream.write_all(head.as_bytes()).and_then(|()| stream.write_all(chunk.as_bytes()));
+                        let _ = stream.flush();
+                        std::thread::sleep(Duration::from_millis(500));
+                        return;
                     }
+                    let head = format!(
+                        "HTTP/1.1 {status}\r\nContent-Type: text/html; charset=utf-8\r\nCache-Control: no-store\r\n\
+                         Connection: close\r\n\r\n"
+                    );
+                    let _ = stream.write_all(head.as_bytes());
+                    let page = match path.as_str() {
+                        "/slow" => {
+                            // Enough for the browser to take it for the window's new document.
+                            let start = format!("<!doctype html><title>slow</title><!--{}-->", " ".repeat(8192));
+                            let _ = stream.write_all(start.as_bytes()).and_then(|()| stream.flush());
+                            std::thread::sleep(Duration::from_millis(1500));
+                            "<p>slow</p>".to_string()
+                        }
+                        "/ai" | "/ai-flaky" => AI_MODE_PAGE.to_string(),
+                        "/sorry/pass" => format!("{CHECK_PAGE}<script>setTimeout(() => location.replace('/ai'), 1000)</script>"),
+                        "/sorry/wait" => CHECK_PAGE.to_string(),
+                        _ => "<!doctype html><title>page</title><p>page</p>".to_string(),
+                    };
+                    let _ = stream.write_all(page.as_bytes());
                 });
             }
         });
         port
+    }
+
+    /// Opens the window on a page of the server, out of sight, and gives the server's port.
+    fn start_on_server() -> u16 {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        let port = serve();
+        load(&format!("http://127.0.0.1:{port}/page")).unwrap();
+        let started = pump_until(30, || controller().is_some() && idle() && evaluate("document.title") == "\"page\"");
+        let first = NAVIGATIONS.with(|all| all.borrow_mut().drain(..).collect::<Vec<_>>().join(", "));
+        assert!(started, "the window's first page didn't load: {first}; {}", evaluate("location.href"));
+        port
+    }
+
+    /// Translate's query as the program makes it, for AI Mode on the test's server.
+    fn translation() -> Job {
+        let picture = Image { width: 1, height: 1, pixels: vec![255; 4] };
+        let button = button("Перевести", Mode::Answer, "Translate the text in the picture into French.");
+        let query::Way::Window { script, .. } = query::send(&button, &picture.to_png().unwrap()) else { panic!("no window") };
+        let script = script.replace("\"www.google.com\"", "\"127.0.0.1\"");
+        assert!(script.contains("\"127.0.0.1\""), "the script names no host of AI Mode");
+        Job { name: button.name, script, picture, mode: Mode::Answer, listener: None }
+    }
+
+    /// Google lets Translate through its check by itself, as it may for someone it has seen pass
+    /// the check before: the check's page, served as "too many requests", goes on to AI Mode, and
+    /// the query goes on there to its answer, the window staying hidden.
+    #[test]
+    #[ignore]
+    fn a_check_that_lets_one_through_by_itself_leaves_the_query_going() {
+        let port = start_on_server();
+        ask(&format!("http://127.0.0.1:{port}/sorry/pass"), translation(), None).unwrap();
+        let done = pump_until(30, idle);
+        let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
+        let failed = FAILED.with(|failed| failed.borrow().clone());
+        let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        close();
+        assert!(done, "the query didn't finish: {navigations}");
+        assert!(failed.is_empty() && !shown, "failed: {failed:?}, the window shown: {shown}; {navigations}");
+        assert_eq!(page, "\"AI Mode 1\"", "the question didn't go: {navigations}");
+    }
+
+    /// AI Mode's connection breaks before the end of its stream, as one may after a pause, and
+    /// the page never says it is whole: the page is asked for once more, as the user would, and
+    /// the query goes on there to its answer, the window staying hidden.
+    #[test]
+    #[ignore]
+    fn a_page_that_breaks_off_is_asked_for_once_more() {
+        let port = start_on_server();
+        let address = format!("http://127.0.0.1:{port}/ai-flaky");
+        ask(&address, translation(), None).unwrap();
+        let done = pump_until(30, idle);
+        let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
+        let failed = FAILED.with(|failed| failed.borrow().clone());
+        let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        close();
+        assert!(navigations.contains(" false "), "the stream didn't break: {navigations}");
+        assert_eq!(navigations.matches(&address).count(), 2, "not asked for once more: {navigations}");
+        assert!(done, "the query didn't finish: {navigations}");
+        assert!(failed.is_empty() && !shown, "failed: {failed:?}, the window shown: {shown}; {navigations}");
+        assert_eq!(page, "\"AI Mode 1\"", "the question didn't go: {navigations}");
+    }
+
+    /// A page that doesn't come at all, where nobody answers, is asked for once more, and then
+    /// the query gives up as before: the window comes out, and the user is told.
+    #[test]
+    #[ignore]
+    fn a_page_that_doesnt_come_fails_after_one_more_try() {
+        start_on_server();
+        let nobody = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port();
+        let address = format!("http://127.0.0.1:{nobody}/ai");
+        ask(&address, translation(), None).unwrap();
+        let done = pump_until(30, idle);
+        let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
+        let failed = FAILED.with(|failed| failed.borrow().clone());
+        let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
+        close();
+        assert_eq!(navigations.matches(&address).count(), 2, "not asked for once more: {navigations}");
+        assert!(done && failed.len() == 1 && shown, "failed: {failed:?}, the window shown: {shown}; {navigations}");
+    }
+
+    /// Google's check waits for the user: after a few seconds the window comes out with it, and
+    /// once the user is through, the query goes on in AI Mode to its answer.
+    #[test]
+    #[ignore]
+    fn a_check_that_waits_shows_the_window_and_the_query_goes_on_after_it() {
+        let port = start_on_server();
+        ask(&format!("http://127.0.0.1:{port}/sorry/wait"), translation(), None).unwrap();
+        let shown = pump_until(20, || unsafe { IsWindowVisible(window().unwrap()) } != 0);
+        let waiting = !idle();
+        let failed_early = FAILED.with(|failed| failed.borrow().clone());
+        // The user passes the check, and Google goes on to AI Mode.
+        evaluate("location.replace('/ai')");
+        let done = pump_until(30, idle);
+        let failed = FAILED.with(|failed| failed.borrow().clone());
+        let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        close();
+        assert!(shown, "the window didn't come out with the check: {navigations}");
+        assert!(waiting && failed_early.is_empty(), "the query gave up at the check: {failed_early:?}; {navigations}");
+        assert!(done && failed.is_empty(), "the query failed after the check: {failed:?}; {navigations}");
+        assert_eq!(page, "\"AI Mode 1\"", "the question didn't go: {navigations}");
     }
 
     /// A query whose page comes while an earlier page is still loading, as when the hotkey has
@@ -1267,13 +1493,8 @@ pub(super) mod tests {
     #[test]
     #[ignore]
     fn a_query_outlives_the_page_it_replaced() {
-        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
-        let port = serve();
+        let port = start_on_server();
         let address = |path: &str| format!("http://127.0.0.1:{port}{path}");
-        load(&address("/page")).unwrap();
-        let started = pump_until(30, || controller().is_some() && idle() && evaluate("document.title") == "\"page\"");
-        let first = NAVIGATIONS.with(|all| all.borrow_mut().drain(..).collect::<Vec<_>>().join(", "));
-        assert!(started, "the window's first page didn't load: {first}; {}", evaluate("location.href"));
         // The page kept ready is made fresh again, and it takes its time...
         load(&address("/slow")).unwrap();
         let since = Instant::now();

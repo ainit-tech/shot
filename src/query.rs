@@ -231,6 +231,26 @@ pub fn leaves_google(url: &str) -> bool {
     !google || matches!(path.split(['?', '#']).next(), Some("/goto" | "/url"))
 }
 
+/// How long a page of Google's own, such as its check that one is not a robot, has to go on by
+/// itself before the window comes out with it for the user, in milliseconds.
+const OWN_PAGE_WAIT: u32 = 5000;
+
+/// The start of a query's script, for a page that isn't the one asked for, as `foreign` says:
+/// Google may show a page of its own first, its check that one is not a robot or of the account.
+/// Often it lets one through by itself and goes on to the page asked for, where the script
+/// starts again; a page that stays a few seconds waits for the user, and the script tells the
+/// program `why` the window comes out with it.
+fn googles_own_page(foreign: &str, why: &str) -> String {
+    format!(
+        r#"const foreign = () => {foreign};
+    if (foreign()) {{
+      await new Promise((resolve) => setTimeout(resolve, {OWN_PAGE_WAIT}));
+      if (foreign()) return report("show:" + {why});
+    }}"#,
+        why = js_string(why),
+    )
+}
+
 /// The script that the program runs on AI Mode's page in its own window, as soon as the page's
 /// document is there. It does what the user would: pastes the screenshot into the question
 /// field, as Ctrl+V does, types the question and sends it; with `answer`, it also waits for the
@@ -282,10 +302,7 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
     window.addEventListener("load", check);
   }});
   try {{
-    // Google may show a page of its own first, a captcha for one, which the user has to see.
-    if (location.hostname !== "www.google.com" || location.pathname.startsWith("/sorry")) {{
-      return report("show:" + {captcha});
-    }}{listening}
+    {own_page}{listening}
     const sendButton = () => document.querySelector('button[data-xid="input-plate-send-button"]');
     const field = await until(() => sendButton() && [...document.querySelectorAll("textarea")].find((t) => t.offsetParent), 60);
     if (!field) return report({no_field});
@@ -333,7 +350,10 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
 }})();
 "#,
         data = base64(png),
-        captcha = js_string(tr("Google showed a page of its own instead of AI Mode, such as a check that you're not a robot.")),
+        own_page = googles_own_page(
+            r#"location.hostname !== "www.google.com" || location.pathname.startsWith("/sorry")"#,
+            tr("Google showed a page of its own instead of AI Mode, such as a check that you're not a robot."),
+        ),
         no_field = js_string(tr("AI Mode's question field didn't appear.")),
         not_taken = js_string(tr("AI Mode didn't take the screenshot.")),
         not_uploaded = js_string(tr("The screenshot never finished uploading to AI Mode.")),
@@ -404,10 +424,7 @@ fn images_script(png: &[u8]) -> String {
         r##"(async () => {{
   const report = (what) => window.chrome.webview.postMessage(what);
   try {{
-    // Google may show a page of its own first, a captcha for one, which the user has to see.
-    if (!["images.google.com", "www.google.com"].includes(location.hostname) || location.pathname.startsWith("/sorry")) {{
-      return report("show:" + {captcha});
-    }}
+    {own_page}
     if (location.pathname === "/search") return report("sent");
     const png = new Blob([Uint8Array.from(atob("{data}"), (c) => c.charCodeAt(0))], {{ type: "image/png" }});
     const picture = await createImageBitmap(png);
@@ -444,7 +461,10 @@ fn images_script(png: &[u8]) -> String {
 }})();
 "##,
         data = base64(png),
-        captcha = js_string(tr("Google showed a page of its own instead of the image search, such as a check that you're not a robot.")),
+        own_page = googles_own_page(
+            r#"!["images.google.com", "www.google.com"].includes(location.hostname) || location.pathname.startsWith("/sorry")"#,
+            tr("Google showed a page of its own instead of the image search, such as a check that you're not a robot."),
+        ),
         stopped = js_string(stopped()),
     )
 }
