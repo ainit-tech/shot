@@ -38,7 +38,8 @@ use windows_sys::Win32::Graphics::Gdi::{
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{AdjustWindowRectExForDpi, GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DestroyWindow, GetClientRect, GetCursorPos, IDC_ARROW, IsIconic, IsWindowVisible,
+    CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW, IsIconic,
+    IsWindowVisible,
     IsZoomed, LoadCursorW, PostMessageW, RegisterClassExW, SW_HIDE, SW_RESTORE, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER,
     SetForegroundWindow, SetWindowPos, SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE,
     WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_OVERLAPPEDWINDOW,
@@ -46,7 +47,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, card, clipboard, last_error, shell, wide};
+use super::{app, card, clipboard, last_error, shell, tray, wide};
 use crate::card as layout;
 use crate::geometry::Rect;
 use crate::image::Image;
@@ -265,6 +266,8 @@ thread_local! {
 
 struct Browser {
     window: HWND,
+    /// The program's icon on the window's title bar and on the taskbar, destroyed with the window.
+    icons: Vec<HICON>,
     /// Comes a moment after the window, once WebView2 has started.
     controller: Option<ICoreWebView2Controller>,
     /// The address to open as soon as the window can: once WebView2 is ready, or once the
@@ -561,10 +564,12 @@ fn bring_up(window: HWND) {
 fn start() -> Result<HWND, String> {
     let window = create_window()
         .map_err(|e| format!("{} {e}.", tr("The window wasn't made:")))?;
+    let icons = tray::give_icon(window);
     BROWSER.with(|browser| {
         *browser.borrow_mut() =
             Some(Browser {
                 window,
+                icons,
                 controller: None,
                 waiting: None,
                 job: None,
@@ -609,8 +614,11 @@ fn start() -> Result<HWND, String> {
     };
     if let Err(error) = started {
         // Without WebView2 the window is of no use.
-        BROWSER.with(|browser| *browser.borrow_mut() = None);
+        let icons = BROWSER.with(|browser| browser.borrow_mut().take()).map(|browser| browser.icons).unwrap_or_default();
         unsafe { DestroyWindow(window) };
+        for icon in icons {
+            unsafe { DestroyIcon(icon) };
+        }
         environment_failed();
         let failed = tr("WebView2 didn't start:");
         return Err(format!("{failed} {}", error.message()));
@@ -975,6 +983,9 @@ pub fn close() {
         let _ = unsafe { controller.Close() };
     }
     unsafe { DestroyWindow(browser.window) };
+    for icon in browser.icons {
+        unsafe { DestroyIcon(icon) };
+    }
 }
 
 fn navigate(controller: &ICoreWebView2Controller, url: &str) -> windows_core::Result<()> {
