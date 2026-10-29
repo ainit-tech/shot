@@ -39,15 +39,15 @@ use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{AdjustWindowRectExForDpi, GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW, IsIconic,
-    IsWindowVisible,
-    IsZoomed, LoadCursorW, PostMessageW, RegisterClassExW, SW_HIDE, SW_RESTORE, SW_SHOW, SWP_NOACTIVATE, SWP_NOZORDER,
-    SetForegroundWindow, SetWindowPos, SetWindowTextW, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE,
-    WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_OVERLAPPEDWINDOW,
+    IsWindowVisible, IsZoomed, LoadCursorW, PostMessageW, RegisterClassExW, SW_HIDE, SW_RESTORE, SW_SHOW,
+    SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow, SetWindowPos, SetWindowTextW, ShowWindow,
+    WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE, WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_EX_NOACTIVATE,
+    WS_EX_TOOLWINDOW, WS_OVERLAPPEDWINDOW,
 };
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
-use super::{app, card, clipboard, last_error, shell, tray, wide};
+use super::{QUIET, app, card, clipboard, last_error, out_of_sight, shell, tray, wide};
 use crate::card as layout;
 use crate::geometry::Rect;
 use crate::image::Image;
@@ -552,6 +552,10 @@ fn load(url: &str) -> Result<HWND, String> {
 
 fn bring_up(window: HWND) {
     unsafe {
+        if QUIET {
+            ShowWindow(window, SW_SHOWNOACTIVATE);
+            return;
+        }
         ShowWindow(window, if IsIconic(window) != 0 { SW_RESTORE } else { SW_SHOW });
         SetForegroundWindow(window);
     }
@@ -712,7 +716,13 @@ fn attach(controller: &ICoreWebView2Controller, window: HWND) -> windows_core::R
             Ok(())
         }));
         webview.add_DocumentTitleChanged(&title_changed, &mut token)?;
-        let document_ready = DOMContentLoadedEventHandler::create(Box::new(|webview, _| {
+        let document_ready = DOMContentLoadedEventHandler::create(Box::new(|webview, _args| {
+            #[cfg(test)]
+            if let Some(args) = &_args {
+                let mut id = 0u64;
+                let _ = args.NavigationId(&mut id);
+                tests::NAVIGATIONS.with(|all| all.borrow_mut().push(format!("document {id}")));
+            }
             if let Some(webview) = webview {
                 page_ready(&webview);
             }
@@ -809,6 +819,12 @@ fn page_ready(webview: &ICoreWebView2) {
 /// that another navigation replaced, as the image search's results that move to the tab of exact
 /// matches, hasn't failed.
 fn navigation_completed(args: &ICoreWebView2NavigationCompletedEventArgs) {
+    #[cfg(test)]
+    {
+        let (mut id, mut success, mut status) = (0u64, ComBool::default(), COREWEBVIEW2_WEB_ERROR_STATUS::default());
+        let _ = unsafe { args.NavigationId(&mut id).and(args.IsSuccess(&mut success)).and(args.WebErrorStatus(&mut status)) };
+        tests::NAVIGATIONS.with(|all| all.borrow_mut().push(format!("end {id} {} {}", success.as_bool(), status.0)));
+    }
     let mut success = ComBool::default();
     if unsafe { args.IsSuccess(&mut success) }.is_ok() && success.as_bool() {
         return;
@@ -831,6 +847,12 @@ fn navigation_completed(args: &ICoreWebView2NavigationCompletedEventArgs) {
 /// they load; a link that the user follows out of Google, to another site or through Google's
 /// own way out to one, opens in the user's own browser instead of the window.
 fn navigation_starting(args: &ICoreWebView2NavigationStartingEventArgs, window: HWND) {
+    #[cfg(test)]
+    {
+        let (mut id, mut uri) = (0u64, ComString::null());
+        let _ = unsafe { args.NavigationId(&mut id).and(args.Uri(&mut uri)) };
+        tests::NAVIGATIONS.with(|all| all.borrow_mut().push(format!("start {id} {}", take_pwstr(uri))));
+    }
     BROWSER.with(|browser| {
         if let Ok(mut browser) = browser.try_borrow_mut()
             && let Some(browser) = browser.as_mut()
@@ -865,7 +887,9 @@ fn navigation_starting(args: &ICoreWebView2NavigationStartingEventArgs, window: 
     let followed = unsafe { args.IsUserInitiated(&mut user).and(args.IsRedirected(&mut redirected)) }.is_ok()
         && user.as_bool()
         && !redirected.as_bool();
-    if followed && query::leaves_google(&uri) {
+    // A server of the tests' own, on this computer, stands for Google.
+    let local = cfg!(test) && uri.starts_with("http://127.0.0.1:");
+    if followed && !local && query::leaves_google(&uri) {
         let _ = unsafe { args.SetCancel(true) };
         open_outside(&uri);
     }
@@ -964,12 +988,15 @@ fn job_failed(job: Job, why: &str) {
         tell(listener, Heard::Failed(why.into()));
         return;
     }
+    #[cfg(test)]
+    tests::FAILED.with(|failed| failed.borrow_mut().push(why.to_string()));
     if job.mode == Mode::Answer {
         card::close();
     }
     show();
+    // The tests leave the user's clipboard alone.
     let owner = window().unwrap_or(null_mut());
-    let copied = clipboard::put(owner, &job.picture).is_ok();
+    let copied = !QUIET && clipboard::put(owner, &job.picture).is_ok();
     let how = if copied { format!(" {}", query::paste_hint(job.mode)) } else { String::new() };
     app::notify(&job.name, &format!("{why}{how}"));
 }
@@ -1026,9 +1053,10 @@ fn create_window() -> io::Result<HWND> {
         };
         // The class stays registered if an earlier window failed to start.
         RegisterClassExW(&class);
-        let place = place();
+        let place = seen_at(place());
+        let quiet = if QUIET { WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE } else { 0 };
         let window = CreateWindowExW(
-            0,
+            quiet,
             CLASS,
             w!("ainitShot"),
             WS_OVERLAPPEDWINDOW,
@@ -1077,6 +1105,7 @@ fn beside(selection: Rect, mode: Mode) -> Rect {
 }
 
 fn move_to(window: HWND, place: Rect) {
+    let place = seen_at(place);
     unsafe {
         if IsZoomed(window) != 0 {
             ShowWindow(window, SW_RESTORE);
@@ -1087,6 +1116,16 @@ fn move_to(window: HWND, place: Rect) {
             SetWindowPos(window, null_mut(), place.left, place.top, place.width(), place.height(), SWP_NOZORDER | SWP_NOACTIVATE);
         }
     }
+}
+
+/// Where the window goes: the place itself, or as far right of all the screens while the tests
+/// look at it, at the same height and size (see `QUIET`).
+fn seen_at(place: Rect) -> Rect {
+    if !QUIET {
+        return place;
+    }
+    let away = out_of_sight(RECT { left: place.left, top: place.top, right: place.right, bottom: place.bottom });
+    Rect::new(away.left, away.top, away.right, away.bottom)
 }
 
 /// Where the window appears when no query brings it: in the middle of the monitor under the
@@ -1182,6 +1221,78 @@ pub(super) mod tests {
         pub static OPENED_OUTSIDE: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
         /// What the page told the window that listens to a question asked aloud.
         static HEARD: RefCell<Vec<Heard>> = const { RefCell::new(Vec::new()) };
+        /// Why queries failed, as the user would be told.
+        pub static FAILED: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+        /// The window's navigations as they start, have their document and end, in order.
+        pub static NAVIGATIONS: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+    }
+
+    /// A web server of the test's own on this computer, on the port it returns: "/slow" sends
+    /// the start of its page at once and the rest a moment later, as a page coming from far
+    /// away does; any other path gets a whole page at once.
+    fn serve() -> u16 {
+        use std::io::{Read, Write};
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            for mut stream in listener.incoming().flatten() {
+                std::thread::spawn(move || {
+                    let mut request = [0u8; 4096];
+                    let read = stream.read(&mut request).unwrap_or(0);
+                    let slow = request[..read].starts_with(b"GET /slow");
+                    let head = "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nCache-Control: no-store\r\n\
+                                Connection: close\r\n\r\n";
+                    let _ = stream.write_all(head.as_bytes());
+                    if slow {
+                        // Enough for the browser to take it for the window's new document.
+                        let start = format!("<!doctype html><title>slow</title><!--{}-->", " ".repeat(8192));
+                        let _ = stream.write_all(start.as_bytes()).and_then(|()| stream.flush());
+                        std::thread::sleep(Duration::from_millis(1500));
+                        let _ = stream.write_all(b"<p>slow</p>");
+                    } else {
+                        let _ = stream.write_all(b"<!doctype html><title>page</title><p>page</p>");
+                    }
+                });
+            }
+        });
+        port
+    }
+
+    /// A query whose page comes while an earlier page is still loading, as when the hotkey has
+    /// made the page kept ready fresh again after half an hour and Translate follows at once:
+    /// the earlier page's end isn't the query's, and the query goes on to its answer, the window
+    /// staying hidden. On a server of the test's own, out of sight: `LOCALAPPDATA=<folder> cargo
+    /// test -p ainitshot -- win::browser::tests::a_query_outlives_the_page_it_replaced --exact
+    /// --ignored`.
+    #[test]
+    #[ignore]
+    fn a_query_outlives_the_page_it_replaced() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        let port = serve();
+        let address = |path: &str| format!("http://127.0.0.1:{port}{path}");
+        load(&address("/page")).unwrap();
+        let started = pump_until(30, || controller().is_some() && idle() && evaluate("document.title") == "\"page\"");
+        let first = NAVIGATIONS.with(|all| all.borrow_mut().drain(..).collect::<Vec<_>>().join(", "));
+        assert!(started, "the window's first page didn't load: {first}; {}", evaluate("location.href"));
+        // The page kept ready is made fresh again, and it takes its time...
+        load(&address("/slow")).unwrap();
+        let since = Instant::now();
+        pump_until(2, || since.elapsed() > Duration::from_millis(300));
+        // ...while Translate sends its screenshot on a page of its own; its script takes a moment.
+        let script = "setTimeout(() => window.chrome.webview.postMessage('sent'), 1500)".to_string();
+        let picture = Image { width: 1, height: 1, pixels: vec![255; 4] };
+        let job = Job { name: "Перевести".into(), script, picture, mode: Mode::Answer, listener: None };
+        ask(&address("/page"), job, None).unwrap();
+        let done = pump_until(10, idle);
+        // The slow page's end may come later still.
+        let since = Instant::now();
+        pump_until(4, || since.elapsed() > Duration::from_secs(3));
+        let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
+        let failed = FAILED.with(|failed| failed.borrow().clone());
+        let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
+        close();
+        assert!(done, "the query didn't finish: {navigations}");
+        assert!(failed.is_empty() && !shown, "the query failed: {failed:?}, the window shown: {shown}; {navigations}");
     }
 
     unsafe extern "system" fn listener_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
