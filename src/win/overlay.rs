@@ -1200,13 +1200,13 @@ impl Overlay {
         let Some(listening) = &mut session.listening else { return };
         let button = listening.button;
         match heard {
-            // The dot turns red and stays, and the chime says to speak.
+            // The dot turns red and stays, and the chime says to speak, once.
             Heard::Listening => {
-                listening.on = true;
-                stop_waiting(window);
-                if session.settings.listening_sound {
+                if !listening.on && session.settings.listening_sound {
                     shell::chime();
                 }
+                listening.on = true;
+                stop_waiting(window);
             }
             Heard::Words(words) => listening.words = words,
             Heard::Sent => {

@@ -173,6 +173,7 @@ const SPEECH_SCRIPT: &str = r##"(() => {
       let ended = false;
       let stopping = false;
       let heard = false;
+      let audible = false;
       let quiet = null;
       const timers = [];
       const later = (action, ms) => timers.push(setTimeout(action, ms));
@@ -209,7 +210,14 @@ const SPEECH_SCRIPT: &str = r##"(() => {
         running = recogniser({
           language,
           additionalLanguages: [],
-          listeningStartHandler: () => ended || fire(this, "audiostart"),
+          // Google's recogniser says that it listens twice: as the microphone opens, and again as
+          // the sound begins to go to its server, which gets what was said in between too. The
+          // browser's recognition says so once, as the microphone opens.
+          listeningStartHandler: () => {
+            if (ended || audible) return;
+            audible = true;
+            fire(this, "audiostart");
+          },
           speechStartHandler: () => ended || fire(this, "speechstart"),
           recognitionResultHandler: (said, stable, final) => {
             if (ended) return;
@@ -2411,10 +2419,10 @@ pub(super) mod tests {
         assert!(address.to_lowercase().contains(&words.to_lowercase()), "AI Mode heard another question: {address}");
     }
 
-    /// Asks AI Mode a question aloud as a held "Ask Google" does, on the fresh AI Mode kept
-    /// ready: the microphone goes on soon in the hidden window, the words come as they are
-    /// heard, and once the button is let go the question goes with the screenshot and the window
-    /// comes out next to the selection. The browser hears a recording instead of the microphone,
+    /// Asks AI Mode a question aloud as a held "Ask Google" does, on the spare page: the
+    /// microphone goes on soon in the hidden window, which says so once, the words come as they
+    /// are heard, and once the button is let go the question goes with the screenshot and the
+    /// window comes out next to the selection. The browser hears a recording instead of the microphone,
     /// as in `ai_modes_microphone_hears_the_question`:
     /// `SCREENSHOT_BROWSER_ARGUMENTS=... SCREENSHOT_SPEECH="what is in this picture"
     /// LOCALAPPDATA=<folder> cargo test -p ainitshot aloud -- --ignored --nocapture`.
@@ -2444,9 +2452,11 @@ pub(super) mod tests {
         let mut frame = RECT::default();
         unsafe { GetWindowRect(window().unwrap(), &mut frame) };
         let log = all_heard();
+        let told_on = HEARD.with(|all| all.borrow().iter().filter(|heard| **heard == Heard::Listening).count());
         close();
         assert!(ready, "no fresh AI Mode was made ready");
         assert!(on, "the microphone didn't go on: {log}");
+        assert_eq!(told_on, 1, "the microphone was said to go on {told_on} times: {log}");
         assert!(hidden, "the window showed while it listened");
         assert!(all, "the words weren't heard: {log}");
         assert!(sent && shown, "the question didn't go: {log}");
