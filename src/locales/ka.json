@@ -149,7 +149,12 @@
     "Version {version} is installed.": "დაყენებულია ვერსია {version}.",
     "Version {version} is the latest.": "ვერსია {version} უახლესია.",
     "ainitShot is updated": "ainitShot განახლდა",
-    "ainitShot {version} is available": "ხელმისაწვდომია ainitShot {version}"
+    "ainitShot {version} is available": "ხელმისაწვდომია ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "მიკროფონი ჯერ არ იყო ჩართული: გეჭიროთ {key}, სანამ წითელი წერტილი არ აინთება.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "მიკროფონი ჯერ არ იყო ჩართული: გეჭიროთ ღილაკი, სანამ წითელი წერტილი არ აინთება.",
+    "The microphone didn't turn on.": "მიკროფონი არ ჩაირთო.",
+    "The question asked aloud didn't go.": "ხმით დასმული კითხვა არ გაიგზავნა.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ლაპარაკის ნიშანი."
   },
   "settings": {
     "settings": "პარამეტრები",
@@ -350,7 +355,10 @@
     "updateTo": "{version} ვერსიამდე განახლება",
     "autoupdate": "განახლებების ავტომატური დაყენება",
     "autoupdateDesc": "პროგრამა ახალ ვერსიას გაშვებისას და დღეში ერთხელ ეძებს და აყენებს მას, როცა მისი არცერთი ფანჯარა არ არის ღია.",
-    "kUpdates": "განახლებები განახლება ვერსია ახალი ვერსია დაყენება ინსტალაცია ავტომატური შემოწმება ჩამოტვირთვა updates update version upgrade install automatic check download"
+    "kUpdates": "განახლებები განახლება ვერსია ახალი ვერსია დაყენება ინსტალაცია ავტომატური შემოწმება ჩამოტვირთვა updates update version upgrade install automatic check download",
+    "listeningSound": "ხმა, როცა მიკროფონი უსმენს",
+    "listeningSoundDesc": "მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ილაპარაკეთ მის შემდეგ.",
+    "kListeningSound": "ხმა სიგნალი მიკროფონი ხმით ლაპარაკი მოსმენა sound microphone"
   },
   "guide": {
     "start": "დაწყება",

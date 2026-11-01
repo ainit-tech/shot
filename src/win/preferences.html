@@ -671,6 +671,12 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
       <button class="btn dashed" id="add-button"><svg class="glyph"><use href="#i-plus"/></svg><span class="find" data-t="addButton"></span></button>
       <button class="btn quiet" id="reset-buttons"><span class="find" data-t="resetButtons"></span></button>
     </div>
+    <div class="rows">
+      <div class="row item" data-k="kListeningSound">
+        <div><div class="label find" data-t="listeningSound"></div><div class="desc find" data-t="listeningSoundDesc"></div></div>
+        <div class="control"><button class="switch" id="listening-sound" role="switch" data-t-aria="listeningSound"><span class="state"></span><span class="track"></span></button></div>
+      </div>
+    </div>
   </section>
 
   <section id="models">
@@ -870,6 +876,8 @@ const TEXT = {
   resetButtons: "Bring back the standard buttons",
   models: "Models",
   modelsIntro: "Some features find more with a model. The program downloads it by itself, in the background, and works without it meanwhile; a model runs on the computer, without the internet.",
+  listeningSound: "Sound when the microphone listens",
+  listeningSoundDesc: "A short sound as the microphone begins to listen to a question asked aloud: speak after it.",
   privacyFilterDesc: "With it masking finds names, addresses, dates and links too, not only keys, passwords, cards, e-mail and phones. Off removes it from the computer.",
   modelOff: "Not downloaded · {size} MB",
   modelWaiting: "Will be downloaded in a moment · {size} MB",
@@ -970,6 +978,7 @@ const TEXT = {
   kSaveCopy: "clipboard copy paste also",
   kFolder: "folder path directory place saving pictures screenshots",
   kName: "file name pattern date time format png",
+  kListeningSound: "sound chime beep signal microphone voice aloud speak listen",
   kButtons: "add new button query standard default bring back",
   kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
   kAbout: "about program version license gpl copyright open source components libraries website site authors ainit",
@@ -1073,6 +1082,7 @@ function toSettings(draft) {
     autostart: draft.autostart,
     autoupdate: draft.autoupdate,
     privacy_filter: draft.privacy_filter,
+    listening_sound: draft.listening_sound,
     colors: [...draft.colors],
     width: draft.width,
     save: { ask: draft.save.ask, copy: draft.save.copy, folder: draft.save.folder, name: draft.save.name },
@@ -1500,6 +1510,11 @@ $("#autoupdate").addEventListener("click", () => {
 $("#privacy-filter").addEventListener("click", () => {
   state.draft.privacy_filter = !state.draft.privacy_filter;
   renderSwitch("privacy-filter", state.draft.privacy_filter);
+  changed();
+});
+$("#listening-sound").addEventListener("click", () => {
+  state.draft.listening_sound = !state.draft.listening_sound;
+  renderSwitch("listening-sound", state.draft.listening_sound);
   changed();
 });
 $("#filter-pause").addEventListener("click", () => send({ type: "pauseModels", paused: !!state.models && state.models.state !== "paused" }));
@@ -2377,6 +2392,7 @@ function renderAll() {
   renderSwitch("autoupdate", state.draft.autoupdate);
   renderUpdates();
   renderSwitch("privacy-filter", state.draft.privacy_filter);
+  renderSwitch("listening-sound", state.draft.listening_sound);
   renderModels();
   renderAbout();
   renderColors();

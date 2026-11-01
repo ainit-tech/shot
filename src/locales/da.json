@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Version {version} er installeret.",
     "Version {version} is the latest.": "Version {version} er den nyeste.",
     "ainitShot is updated": "ainitShot er opdateret",
-    "ainitShot {version} is available": "ainitShot {version} er tilgængelig"
+    "ainitShot {version} is available": "ainitShot {version} er tilgængelig",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofonen var ikke tændt endnu: hold {key} nede, til den røde prik lyser.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonen var ikke tændt endnu: hold knappen nede, til den røde prik lyser.",
+    "The microphone didn't turn on.": "Mikrofonen tændte ikke.",
+    "The question asked aloud didn't go.": "Spørgsmålet stillet med stemmen blev ikke sendt.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tegnet til at tale."
   },
   "settings": {
     "settings": "Indstillinger",
@@ -350,7 +355,10 @@
     "updateTo": "Opdater til {version}",
     "autoupdate": "Installer opdateringer automatisk",
     "autoupdateDesc": "Programmet søger efter en ny version ved opstart og én gang om dagen og installerer den, når ingen af dets vinduer er åbne.",
-    "kUpdates": "opdateringer opdatering opdater opdatere version ny nye installer installere automatisk søg søge tjek kontroller download downloade hent update upgrade"
+    "kUpdates": "opdateringer opdatering opdater opdatere version ny nye installer installere automatisk søg søge tjek kontroller download downloade hent update upgrade",
+    "listeningSound": "Lyd, når mikrofonen lytter",
+    "listeningSoundDesc": "En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tal efter den.",
+    "kListeningSound": "lyd signal bip mikrofon stemme tale lytte sound microphone"
   },
   "guide": {
     "start": "Kom i gang",

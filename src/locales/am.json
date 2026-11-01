@@ -149,7 +149,12 @@
     "Version {version} is installed.": "ስሪት {version} ተጭኗል።",
     "Version {version} is the latest.": "ስሪት {version} የቅርብ ጊዜው ነው።",
     "ainitShot is updated": "ainitShot ተዘምኗል",
-    "ainitShot {version} is available": "ainitShot {version} ይገኛል"
+    "ainitShot {version} is available": "ainitShot {version} ይገኛል",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "ማይክሮፎኑ ገና አልበራም፦ ቀዩ ነጥብ እስኪበራ ድረስ {key} ቁልፍን ተጭነው ይያዙ።",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "ማይክሮፎኑ ገና አልበራም፦ ቀዩ ነጥብ እስኪበራ ድረስ አዝራሩን ተጭነው ይያዙ።",
+    "The microphone didn't turn on.": "ማይክሮፎኑ አልበራም።",
+    "The question asked aloud didn't go.": "በድምፅ የተጠየቀው ጥያቄ አልተላከም።",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ለመናገር ምልክት።"
   },
   "settings": {
     "settings": "ቅንብሮች",
@@ -350,7 +355,10 @@
     "updateTo": "ወደ {version} አዘምን",
     "autoupdate": "ዝማኔዎችን በራስ-ሰር ጫን",
     "autoupdateDesc": "ፕሮግራሙ ሲጀምር እና በቀን አንድ ጊዜ አዲስ ስሪት ይፈልጋል፤ ከመስኮቶቹ አንዱም ክፍት በማይሆንበት ጊዜ ይጭነዋል።",
-    "kUpdates": "ዝማኔ ዝማኔዎች አዘምን ማዘመን ስሪት አዲስ ስሪት ማሻሻያ ጫን መጫን በራስ-ሰር ፈትሽ አውርድ ማውረድ update upgrade install"
+    "kUpdates": "ዝማኔ ዝማኔዎች አዘምን ማዘመን ስሪት አዲስ ስሪት ማሻሻያ ጫን መጫን በራስ-ሰር ፈትሽ አውርድ ማውረድ update upgrade install",
+    "listeningSound": "ማይክሮፎኑ ሲያዳምጥ ድምፅ",
+    "listeningSoundDesc": "በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ከእሱ በኋላ ይናገሩ።",
+    "kListeningSound": "ድምፅ ምልክት ማይክሮፎን በድምፅ መናገር ማዳመጥ sound microphone"
   },
   "guide": {
     "start": "ጀምር",

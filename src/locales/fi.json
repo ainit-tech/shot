@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versio {version} on asennettu.",
     "Version {version} is the latest.": "Versio {version} on uusin.",
     "ainitShot is updated": "ainitShot on päivitetty",
-    "ainitShot {version} is available": "ainitShot {version} on saatavilla"
+    "ainitShot {version} is available": "ainitShot {version} on saatavilla",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofoni ei ollut vielä päällä: pidä {key} painettuna, kunnes punainen piste syttyy.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofoni ei ollut vielä päällä: pidä painiketta painettuna, kunnes punainen piste syttyy.",
+    "The microphone didn't turn on.": "Mikrofoni ei mennyt päälle.",
+    "The question asked aloud didn't go.": "Ääneen esitettyä kysymystä ei lähetetty.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: merkki puhua."
   },
   "settings": {
     "settings": "Asetukset",
@@ -350,7 +355,10 @@
     "updateTo": "Päivitä versioon {version}",
     "autoupdate": "Asenna päivitykset automaattisesti",
     "autoupdateDesc": "Ohjelma etsii uutta versiota käynnistyessään ja kerran päivässä ja asentaa sen, kun mikään sen ikkunoista ei ole auki.",
-    "kUpdates": "päivitykset päivitys päivitä päivittäminen versio uusi uudempi uusin asennus asenna automaattinen automaattisesti tarkista tarkistus lataa lataus update updates upgrade version install download"
+    "kUpdates": "päivitykset päivitys päivitä päivittäminen versio uusi uudempi uusin asennus asenna automaattinen automaattisesti tarkista tarkistus lataa lataus update updates upgrade version install download",
+    "listeningSound": "Ääni, kun mikrofoni kuuntelee",
+    "listeningSoundDesc": "Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: puhu sen jälkeen.",
+    "kListeningSound": "ääni merkki piippaus mikrofoni puhe puhua kuunnella sound microphone"
   },
   "guide": {
     "start": "Aloita",

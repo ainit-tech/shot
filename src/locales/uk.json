@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Версію {version} встановлено.",
     "Version {version} is the latest.": "Версія {version} — найновіша.",
     "ainitShot is updated": "ainitShot оновлено",
-    "ainitShot {version} is available": "Доступний ainitShot {version}"
+    "ainitShot {version} is available": "Доступний ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Мікрофон ще не ввімкнувся: тримайте {key}, доки не засвітиться червона крапка.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Мікрофон ще не ввімкнувся: тримайте кнопку, доки не засвітиться червона крапка.",
+    "The microphone didn't turn on.": "Мікрофон не ввімкнувся.",
+    "The question asked aloud didn't go.": "Питання голосом не надіслано.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, коли мікрофон починає слухати питання голосом: знак, що можна говорити."
   },
   "settings": {
     "settings": "Налаштування",
@@ -350,7 +355,10 @@
     "updateTo": "Оновити до {version}",
     "autoupdate": "Автоматично встановлювати оновлення",
     "autoupdateDesc": "Програма шукає нову версію під час запуску й раз на день і встановлює її, коли жодне з її вікон не відкрите.",
-    "kUpdates": "оновлення оновити версія нова новіша найновіша встановлення встановити інсталяція автоматично перевірка перевірити завантаження завантажити апдейт update updates upgrade version install download"
+    "kUpdates": "оновлення оновити версія нова новіша найновіша встановлення встановити інсталяція автоматично перевірка перевірити завантаження завантажити апдейт update updates upgrade version install download",
+    "listeningSound": "Звук, коли мікрофон слухає",
+    "listeningSoundDesc": "Короткий звук, коли мікрофон починає слухати питання голосом: говоріть після нього.",
+    "kListeningSound": "звук сигнал мікрофон голос голосом говорити слухати sound microphone"
   },
   "guide": {
     "start": "Почати",

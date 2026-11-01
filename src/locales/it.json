@@ -149,7 +149,12 @@
     "Version {version} is installed.": "La versione {version} è stata installata.",
     "Version {version} is the latest.": "La versione {version} è la più recente.",
     "ainitShot is updated": "ainitShot è stato aggiornato",
-    "ainitShot {version} is available": "ainitShot {version} è disponibile"
+    "ainitShot {version} is available": "ainitShot {version} è disponibile",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Il microfono non era ancora acceso: tieni premuto {key} finché non si accende il punto rosso.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Il microfono non era ancora acceso: tieni premuto il pulsante finché non si accende il punto rosso.",
+    "The microphone didn't turn on.": "Il microfono non si è acceso.",
+    "The question asked aloud didn't go.": "La domanda a voce non è partita.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un breve suono quando il microfono inizia ad ascoltare una domanda a voce: il segnale per parlare."
   },
   "settings": {
     "settings": "Impostazioni",
@@ -350,7 +355,10 @@
     "updateTo": "Aggiorna a {version}",
     "autoupdate": "Installa automaticamente gli aggiornamenti",
     "autoupdateDesc": "Il programma cerca una nuova versione all'avvio e una volta al giorno, e la installa quando nessuna delle sue finestre è aperta.",
-    "kUpdates": "aggiornamenti aggiornamento aggiornare aggiorna versione nuova installare installa automatico automatici controlla controllo scaricare download update upgrade"
+    "kUpdates": "aggiornamenti aggiornamento aggiornare aggiorna versione nuova installare installa automatico automatici controlla controllo scaricare download update upgrade",
+    "listeningSound": "Suono quando il microfono ascolta",
+    "listeningSoundDesc": "Un breve suono quando il microfono inizia ad ascoltare una domanda a voce: parla dopo di esso.",
+    "kListeningSound": "suono segnale bip microfono voce parlare ascoltare sound microphone"
   },
   "guide": {
     "start": "Inizia",

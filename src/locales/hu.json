@@ -149,7 +149,12 @@
     "Version {version} is installed.": "A telepített verzió: {version}.",
     "Version {version} is the latest.": "Ez a legújabb verzió: {version}.",
     "ainitShot is updated": "Az ainitShot frissült",
-    "ainitShot {version} is available": "Elérhető az ainitShot {version}"
+    "ainitShot {version} is available": "Elérhető az ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "A mikrofon még nem kapcsolt be: tartsd lenyomva a(z) {key} billentyűt, amíg a piros pont ki nem gyullad.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "A mikrofon még nem kapcsolt be: tartsd lenyomva a gombot, amíg a piros pont ki nem gyullad.",
+    "The microphone didn't turn on.": "A mikrofon nem kapcsolt be.",
+    "The question asked aloud didn't go.": "A hangosan feltett kérdés nem ment el.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: jel, hogy beszélhetsz."
   },
   "settings": {
     "settings": "Beállítások",
@@ -350,7 +355,10 @@
     "updateTo": "Frissítés erre: {version}",
     "autoupdate": "Frissítések automatikus telepítése",
     "autoupdateDesc": "A program induláskor és naponta egyszer új verziót keres, és telepíti, amikor egyik ablaka sincs nyitva.",
-    "kUpdates": "frissítések frissítés verzió új verzió telepítés automatikus automatikusan keresés ellenőrzés letöltés updates update version upgrade install automatic check download"
+    "kUpdates": "frissítések frissítés verzió új verzió telepítés automatikus automatikusan keresés ellenőrzés letöltés updates update version upgrade install automatic check download",
+    "listeningSound": "Hang, amikor a mikrofon hallgat",
+    "listeningSoundDesc": "Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: utána beszélj.",
+    "kListeningSound": "hang jelzés sípolás mikrofon hangos beszéd hallgat sound microphone"
   },
   "guide": {
     "start": "Kezdés",

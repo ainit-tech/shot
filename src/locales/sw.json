@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Toleo {version} limesakinishwa.",
     "Version {version} is the latest.": "Toleo {version} ndilo jipya zaidi.",
     "ainitShot is updated": "ainitShot imesasishwa",
-    "ainitShot {version} is available": "ainitShot {version} inapatikana"
+    "ainitShot {version} is available": "ainitShot {version} inapatikana",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Maikrofoni ilikuwa bado haijawaka: shikilia {key} hadi kitone chekundu kiwake.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Maikrofoni ilikuwa bado haijawaka: shikilia kitufe hadi kitone chekundu kiwake.",
+    "The microphone didn't turn on.": "Maikrofoni haikuwaka.",
+    "The question asked aloud didn't go.": "Swali la kwa sauti halikutumwa.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Sauti fupi maikrofoni inapoanza kusikiliza swali la kwa sauti: ishara ya kuzungumza."
   },
   "settings": {
     "settings": "Mipangilio",
@@ -350,7 +355,10 @@
     "updateTo": "Sasisha hadi {version}",
     "autoupdate": "Sakinisha masasisho kiotomatiki",
     "autoupdateDesc": "Programu hutafuta toleo jipya inapoanza na mara moja kwa siku, na hulisakinisha wakati hakuna dirisha lake lililo wazi.",
-    "kUpdates": "masasisho sasisho sasisha toleo matoleo toleo jipya pandisha daraja sakinisha kiotomatiki angalia pakua update upgrade install"
+    "kUpdates": "masasisho sasisho sasisha toleo matoleo toleo jipya pandisha daraja sakinisha kiotomatiki angalia pakua update upgrade install",
+    "listeningSound": "Sauti maikrofoni inaposikiliza",
+    "listeningSoundDesc": "Sauti fupi maikrofoni inapoanza kusikiliza swali la kwa sauti: zungumza baada yake.",
+    "kListeningSound": "sauti ishara mlio maikrofoni zungumza sikiliza sound microphone"
   },
   "guide": {
     "start": "Anza",

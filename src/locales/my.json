@@ -149,7 +149,12 @@
     "Version {version} is installed.": "ဗားရှင်း {version} ကို ထည့်သွင်းပြီးပါပြီ။",
     "Version {version} is the latest.": "ဗားရှင်း {version} သည် နောက်ဆုံးဗားရှင်း ဖြစ်ပါသည်။",
     "ainitShot is updated": "ainitShot ကို အပ်ဒိတ်လုပ်ပြီးပါပြီ",
-    "ainitShot {version} is available": "ainitShot {version} ရနိုင်ပါပြီ"
+    "ainitShot {version} is available": "ainitShot {version} ရနိုင်ပါပြီ",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "မိုက်ခရိုဖုန်း မပွင့်သေးပါ- အနီရောင်အစက် လင်းလာသည်အထိ {key} ကို ဖိထားပါ။",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "မိုက်ခရိုဖုန်း မပွင့်သေးပါ- အနီရောင်အစက် လင်းလာသည်အထိ ခလုတ်ကို ဖိထားပါ။",
+    "The microphone didn't turn on.": "မိုက်ခရိုဖုန်း မပွင့်ပါ။",
+    "The question asked aloud didn't go.": "အသံဖြင့်မေးသော မေးခွန်း မပို့ရပါ။",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- စကားပြောရန် အချက်ပြ။"
   },
   "settings": {
     "settings": "ဆက်တင်များ",
@@ -350,7 +355,10 @@
     "updateTo": "{version} သို့ အပ်ဒိတ်လုပ်ရန်",
     "autoupdate": "အပ်ဒိတ်များကို အလိုအလျောက် ထည့်သွင်းရန်",
     "autoupdateDesc": "ပရိုဂရမ်သည် စတင်သည့်အခါနှင့် တစ်နေ့လျှင် တစ်ကြိမ် ဗားရှင်းအသစ်ကို ရှာပြီး ၎င်း၏ ဝင်းဒိုး တစ်ခုမှ မဖွင့်ထားချိန်တွင် ထည့်သွင်းမည်။",
-    "kUpdates": "အပ်ဒိတ် အပ်ဒိတ်များ ဗားရှင်း ဗားရှင်းအသစ် အဆင့်မြှင့် ထည့်သွင်း အလိုအလျောက် စစ်ဆေး ဒေါင်းလုဒ် နောက်ဆုံး update upgrade install"
+    "kUpdates": "အပ်ဒိတ် အပ်ဒိတ်များ ဗားရှင်း ဗားရှင်းအသစ် အဆင့်မြှင့် ထည့်သွင်း အလိုအလျောက် စစ်ဆေး ဒေါင်းလုဒ် နောက်ဆုံး update upgrade install",
+    "listeningSound": "မိုက်ခရိုဖုန်း နားထောင်သည့်အခါ အသံ",
+    "listeningSoundDesc": "အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- ၎င်းနောက်မှ ပြောပါ။",
+    "kListeningSound": "အသံ အချက်ပြ မိုက်ခရိုဖုန်း ပြော နားထောင် sound microphone"
   },
   "guide": {
     "start": "စတင်ရန်",

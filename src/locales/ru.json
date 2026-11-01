@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Установлена версия {version}.",
     "Version {version} is the latest.": "Версия {version} — последняя.",
     "ainitShot is updated": "ainitShot обновлён",
-    "ainitShot {version} is available": "Доступен ainitShot {version}"
+    "ainitShot {version} is available": "Доступен ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Микрофон ещё не включился: держи {key}, пока не загорится красная точка.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Микрофон ещё не включился: держи кнопку, пока не загорится красная точка.",
+    "The microphone didn't turn on.": "Микрофон не включился.",
+    "The question asked aloud didn't go.": "Вопрос голосом не ушёл.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, когда микрофон начинает слушать вопрос голосом: знак, что можно говорить."
   },
   "settings": {
     "settings": "Настройки",
@@ -350,7 +355,10 @@
     "updateTo": "Обновить до {version}",
     "autoupdate": "Обновлять автоматически",
     "autoupdateDesc": "Программа ищет новую версию при запуске и раз в сутки и ставит её, когда ни одно её окно не открыто.",
-    "kUpdates": "обновления обновить обновление версия новая установить автоматически проверить скачать апдейт update version upgrade"
+    "kUpdates": "обновления обновить обновление версия новая установить автоматически проверить скачать апдейт update version upgrade",
+    "listeningSound": "Звук, когда микрофон слушает",
+    "listeningSoundDesc": "Короткий звук, когда микрофон начинает слушать вопрос голосом: говори после него.",
+    "kListeningSound": "звук сигнал микрофон голос голосом говорить слушать sound microphone"
   },
   "guide": {
     "start": "Начать",

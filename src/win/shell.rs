@@ -1,13 +1,15 @@
 //! The rest of Windows that the program needs: opening addresses and files, the user's folders,
 //! the save dialog, the clock, the user's language, the dark or light of Windows, Print Screen and
-//! the Snipping Tool, and starting together with Windows.
+//! the Snipping Tool, starting together with Windows, and the program's one sound.
 
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::ptr::{null, null_mut};
+use std::sync::OnceLock;
 use std::time::{Duration, SystemTime};
 
 use windows_sys::Win32::Foundation::{ERROR_FILE_NOT_FOUND, HWND, LPARAM, SYSTEMTIME};
+use windows_sys::Win32::Media::Audio::{PlaySoundW, SND_ASYNC, SND_MEMORY, SND_NODEFAULT};
 use windows_sys::Win32::System::Com::CoTaskMemFree;
 use windows_sys::Win32::System::Registry::{
     HKEY, HKEY_CURRENT_USER, KEY_SET_VALUE, REG_DWORD, REG_SZ, RRF_RT_REG_BINARY, RRF_RT_REG_DWORD, RRF_RT_REG_SZ,
@@ -41,6 +43,14 @@ pub fn windows_language() -> Language {
 
 /// Whether Windows is dark: its taskbar, Start and the menus of the notification area, which
 /// Settings calls "Choose your Windows mode". Light where Windows doesn't say.
+/// Plays the chime that says the microphone has begun to listen, and goes on at once. The sound
+/// plays from memory, which it keeps for as long as the program runs.
+pub fn chime() {
+    static CHIME: OnceLock<Vec<u8>> = OnceLock::new();
+    let wav = CHIME.get_or_init(crate::chime::wav);
+    unsafe { PlaySoundW(wav.as_ptr().cast(), null_mut(), SND_MEMORY | SND_ASYNC | SND_NODEFAULT) };
+}
+
 pub fn windows_dark() -> bool {
     let mut light: u32 = 1;
     let mut size = size_of::<u32>() as u32;

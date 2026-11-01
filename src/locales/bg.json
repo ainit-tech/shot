@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Версия {version} е инсталирана.",
     "Version {version} is the latest.": "Версия {version} е най-новата.",
     "ainitShot is updated": "ainitShot е актуализиран",
-    "ainitShot {version} is available": "Наличен е ainitShot {version}"
+    "ainitShot {version} is available": "Наличен е ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Микрофонът още не беше включен: задръжте {key}, докато не светне червената точка.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Микрофонът още не беше включен: задръжте бутона, докато не светне червената точка.",
+    "The microphone didn't turn on.": "Микрофонът не се включи.",
+    "The question asked aloud didn't go.": "Гласовият въпрос не беше изпратен.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Кратък звук, когато микрофонът започне да слуша гласов въпрос: знак да говорите."
   },
   "settings": {
     "settings": "Настройки",
@@ -350,7 +355,10 @@
     "updateTo": "Актуализиране до {version}",
     "autoupdate": "Автоматично инсталиране на актуализации",
     "autoupdateDesc": "Програмата търси нова версия при стартиране и веднъж на ден и я инсталира, когато нито един неин прозорец не е отворен.",
-    "kUpdates": "актуализации актуализация актуализиране обновяване надграждане версия нова по-нова най-новата инсталиране инсталация автоматично проверка изтегляне update updates upgrade version install download"
+    "kUpdates": "актуализации актуализация актуализиране обновяване надграждане версия нова по-нова най-новата инсталиране инсталация автоматично проверка изтегляне update updates upgrade version install download",
+    "listeningSound": "Звук, когато микрофонът слуша",
+    "listeningSoundDesc": "Кратък звук, когато микрофонът започне да слуша гласов въпрос: говорете след него.",
+    "kListeningSound": "звук сигнал микрофон глас гласов говорене слушане sound microphone"
   },
   "guide": {
     "start": "Начало",

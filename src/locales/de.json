@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Version {version} ist installiert.",
     "Version {version} is the latest.": "Version {version} ist die neueste.",
     "ainitShot is updated": "ainitShot wurde aktualisiert",
-    "ainitShot {version} is available": "ainitShot {version} ist verfügbar"
+    "ainitShot {version} is available": "ainitShot {version} ist verfügbar",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Das Mikrofon war noch nicht an: Halte {key} gedrückt, bis der rote Punkt leuchtet.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Das Mikrofon war noch nicht an: Halte die Schaltfläche gedrückt, bis der rote Punkt leuchtet.",
+    "The microphone didn't turn on.": "Das Mikrofon hat sich nicht eingeschaltet.",
+    "The question asked aloud didn't go.": "Die gesprochene Frage wurde nicht gesendet.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: das Zeichen zum Sprechen."
   },
   "settings": {
     "settings": "Einstellungen",
@@ -350,7 +355,10 @@
     "updateTo": "Auf {version} aktualisieren",
     "autoupdate": "Updates automatisch installieren",
     "autoupdateDesc": "Das Programm sucht beim Start und einmal täglich nach einer neuen Version und installiert sie, sobald keines seiner Fenster geöffnet ist.",
-    "kUpdates": "updates update aktualisierung aktualisierungen aktualisieren version neu neue installieren automatisch suchen prüfen herunterladen download upgrade"
+    "kUpdates": "updates update aktualisierung aktualisierungen aktualisieren version neu neue installieren automatisch suchen prüfen herunterladen download upgrade",
+    "listeningSound": "Ton, wenn das Mikrofon zuhört",
+    "listeningSoundDesc": "Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: Sprich danach.",
+    "kListeningSound": "ton klang signal piepton mikrofon stimme sprechen zuhören sound microphone"
   },
   "guide": {
     "start": "Los geht’s",

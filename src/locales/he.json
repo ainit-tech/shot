@@ -149,7 +149,12 @@
     "Version {version} is installed.": "גרסה {version} הותקנה.",
     "Version {version} is the latest.": "גרסה {version} היא העדכנית ביותר.",
     "ainitShot is updated": "ainitShot עודכן",
-    "ainitShot {version} is available": "ainitShot {version} זמין"
+    "ainitShot {version} is available": "ainitShot {version} זמין",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "המיקרופון עוד לא הופעל: החזיקו את {key} עד שהנקודה האדומה תידלק.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "המיקרופון עוד לא הופעל: החזיקו את הכפתור עד שהנקודה האדומה תידלק.",
+    "The microphone didn't turn on.": "המיקרופון לא הופעל.",
+    "The question asked aloud didn't go.": "השאלה בקול לא נשלחה.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: הסימן לדבר."
   },
   "settings": {
     "settings": "הגדרות",
@@ -350,7 +355,10 @@
     "updateTo": "עדכון לגרסה {version}",
     "autoupdate": "התקנה אוטומטית של עדכונים",
     "autoupdateDesc": "התוכנה מחפשת גרסה חדשה בהפעלה ופעם ביום, ומתקינה אותה כשאף אחד מהחלונות שלה לא פתוח.",
-    "kUpdates": "עדכונים עדכון עדכן גרסה גרסה חדשה שדרוג התקנה התקן אוטומטי אוטומטית בדיקה בדוק הורדה הורד updates update version upgrade install automatic check download"
+    "kUpdates": "עדכונים עדכון עדכן גרסה גרסה חדשה שדרוג התקנה התקן אוטומטי אוטומטית בדיקה בדוק הורדה הורד updates update version upgrade install automatic check download",
+    "listeningSound": "צליל כשהמיקרופון מאזין",
+    "listeningSoundDesc": "צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: דברו אחריו.",
+    "kListeningSound": "צליל אות צפצוף מיקרופון קול דיבור האזנה sound microphone"
   },
   "guide": {
     "start": "התחלה",

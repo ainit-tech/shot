@@ -149,7 +149,12 @@
     "Version {version} is installed.": "ติดตั้งเวอร์ชัน {version} แล้ว",
     "Version {version} is the latest.": "เวอร์ชัน {version} เป็นเวอร์ชันล่าสุด",
     "ainitShot is updated": "อัปเดต ainitShot แล้ว",
-    "ainitShot {version} is available": "ainitShot {version} พร้อมให้ใช้งานแล้ว"
+    "ainitShot {version} is available": "ainitShot {version} พร้อมให้ใช้งานแล้ว",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "ไมโครโฟนยังไม่เปิด: กด {key} ค้างไว้จนจุดสีแดงสว่างขึ้น",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "ไมโครโฟนยังไม่เปิด: กดปุ่มค้างไว้จนจุดสีแดงสว่างขึ้น",
+    "The microphone didn't turn on.": "ไมโครโฟนไม่เปิด",
+    "The question asked aloud didn't go.": "คำถามที่พูดไม่ได้ถูกส่งไป",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# เสียงสั้น ๆ เมื่อไมโครโฟนเริ่มฟังคำถามที่พูด: สัญญาณให้เริ่มพูด"
   },
   "settings": {
     "settings": "การตั้งค่า",
@@ -350,7 +355,10 @@
     "updateTo": "อัปเดตเป็น {version}",
     "autoupdate": "ติดตั้งการอัปเดตโดยอัตโนมัติ",
     "autoupdateDesc": "โปรแกรมจะตรวจหาเวอร์ชันใหม่เมื่อเริ่มทำงานและวันละครั้ง แล้วติดตั้งเมื่อไม่มีหน้าต่างใดของโปรแกรมเปิดอยู่",
-    "kUpdates": "อัปเดต การอัปเดต อัพเดท เวอร์ชัน เวอร์ชันใหม่ อัปเกรด ติดตั้ง อัตโนมัติ ตรวจสอบ ตรวจหา ดาวน์โหลด ล่าสุด update upgrade install"
+    "kUpdates": "อัปเดต การอัปเดต อัพเดท เวอร์ชัน เวอร์ชันใหม่ อัปเกรด ติดตั้ง อัตโนมัติ ตรวจสอบ ตรวจหา ดาวน์โหลด ล่าสุด update upgrade install",
+    "listeningSound": "เสียงเมื่อไมโครโฟนกำลังฟัง",
+    "listeningSoundDesc": "เสียงสั้น ๆ เมื่อไมโครโฟนเริ่มฟังคำถามที่พูด: พูดหลังเสียงนั้น",
+    "kListeningSound": "เสียง สัญญาณ บี๊บ ไมโครโฟน พูด ฟัง sound microphone"
   },
   "guide": {
     "start": "เริ่มต้น",

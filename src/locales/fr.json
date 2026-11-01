@@ -149,7 +149,12 @@
     "Version {version} is installed.": "La version {version} est installée.",
     "Version {version} is the latest.": "La version {version} est la plus récente.",
     "ainitShot is updated": "ainitShot a été mis à jour",
-    "ainitShot {version} is available": "ainitShot {version} est disponible"
+    "ainitShot {version} is available": "ainitShot {version} est disponible",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Le micro n’était pas encore activé : maintenez {key} jusqu’à ce que le point rouge s’allume.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Le micro n’était pas encore activé : maintenez le bouton jusqu’à ce que le point rouge s’allume.",
+    "The microphone didn't turn on.": "Le micro ne s’est pas activé.",
+    "The question asked aloud didn't go.": "La question posée à voix haute n’est pas partie.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un son bref quand le micro commence à écouter une question posée à voix haute : le signal pour parler."
   },
   "settings": {
     "settings": "Réglages",
@@ -350,7 +355,10 @@
     "updateTo": "Mettre à jour vers {version}",
     "autoupdate": "Installer les mises à jour automatiquement",
     "autoupdateDesc": "Le programme recherche une nouvelle version au démarrage puis une fois par jour, et l’installe dès qu’aucune de ses fenêtres n’est ouverte.",
-    "kUpdates": "mises à jour mise à jour mettre à jour version nouvelle installer automatique automatiquement rechercher vérifier télécharger update upgrade"
+    "kUpdates": "mises à jour mise à jour mettre à jour version nouvelle installer automatique automatiquement rechercher vérifier télécharger update upgrade",
+    "listeningSound": "Son quand le micro écoute",
+    "listeningSoundDesc": "Un son bref quand le micro commence à écouter une question posée à voix haute : parlez après lui.",
+    "kListeningSound": "son signal bip micro microphone voix parler écouter sound"
   },
   "guide": {
     "start": "Commencer",

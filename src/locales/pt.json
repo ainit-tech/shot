@@ -149,7 +149,12 @@
     "Version {version} is installed.": "A versão {version} foi instalada.",
     "Version {version} is the latest.": "A versão {version} é a mais recente.",
     "ainitShot is updated": "O ainitShot foi atualizado",
-    "ainitShot {version} is available": "O ainitShot {version} está disponível"
+    "ainitShot {version} is available": "O ainitShot {version} está disponível",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "O microfone ainda não estava ligado: segure {key} até o ponto vermelho acender.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "O microfone ainda não estava ligado: segure o botão até o ponto vermelho acender.",
+    "The microphone didn't turn on.": "O microfone não ligou.",
+    "The question asked aloud didn't go.": "A pergunta em voz alta não foi enviada.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: o sinal para falar."
   },
   "settings": {
     "settings": "Configurações",
@@ -350,7 +355,10 @@
     "updateTo": "Atualizar para {version}",
     "autoupdate": "Instalar atualizações automaticamente",
     "autoupdateDesc": "O programa procura uma nova versão ao iniciar e uma vez por dia, e a instala quando nenhuma das suas janelas está aberta.",
-    "kUpdates": "atualizações atualização atualizar versão nova instalar automático automática automaticamente verificar procurar baixar download update upgrade"
+    "kUpdates": "atualizações atualização atualizar versão nova instalar automático automática automaticamente verificar procurar baixar download update upgrade",
+    "listeningSound": "Som quando o microfone escuta",
+    "listeningSoundDesc": "Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: fale depois dele.",
+    "kListeningSound": "som sinal bipe microfone voz falar ouvir sound microphone"
   },
   "guide": {
     "start": "Começar",

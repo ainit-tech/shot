@@ -8,6 +8,7 @@
 
 mod annotation;
 mod card;
+mod chime;
 mod color;
 mod draw;
 mod geometry;

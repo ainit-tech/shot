@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versie {version} is geïnstalleerd.",
     "Version {version} is the latest.": "Versie {version} is de nieuwste.",
     "ainitShot is updated": "ainitShot is bijgewerkt",
-    "ainitShot {version} is available": "ainitShot {version} is beschikbaar"
+    "ainitShot {version} is available": "ainitShot {version} is beschikbaar",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "De microfoon stond nog niet aan: houd {key} ingedrukt tot de rode stip oplicht.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "De microfoon stond nog niet aan: houd de knop ingedrukt tot de rode stip oplicht.",
+    "The microphone didn't turn on.": "De microfoon ging niet aan.",
+    "The question asked aloud didn't go.": "De gesproken vraag is niet verstuurd.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: het teken om te praten."
   },
   "settings": {
     "settings": "Instellingen",
@@ -350,7 +355,10 @@
     "updateTo": "Bijwerken naar {version}",
     "autoupdate": "Updates automatisch installeren",
     "autoupdateDesc": "Het programma zoekt bij het starten en één keer per dag naar een nieuwe versie, en installeert die zodra geen van zijn vensters open is.",
-    "kUpdates": "updates update bijwerken versie nieuw nieuwe installeren automatisch controleren zoeken downloaden upgrade"
+    "kUpdates": "updates update bijwerken versie nieuw nieuwe installeren automatisch controleren zoeken downloaden upgrade",
+    "listeningSound": "Geluid als de microfoon luistert",
+    "listeningSoundDesc": "Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: praat daarna.",
+    "kListeningSound": "geluid signaal piep microfoon stem spreken praten luisteren sound microphone"
   },
   "guide": {
     "start": "Beginnen",

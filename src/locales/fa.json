@@ -149,7 +149,12 @@
     "Version {version} is installed.": "نسخهٔ {version} نصب شد.",
     "Version {version} is the latest.": "نسخهٔ {version} جدیدترین است.",
     "ainitShot is updated": "ainitShot به‌روز شد",
-    "ainitShot {version} is available": "ainitShot {version} در دسترس است"
+    "ainitShot {version} is available": "ainitShot {version} در دسترس است",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "میکروفون هنوز روشن نشده بود: {key} را نگه دارید تا نقطهٔ قرمز روشن شود.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "میکروفون هنوز روشن نشده بود: دکمه را نگه دارید تا نقطهٔ قرمز روشن شود.",
+    "The microphone didn't turn on.": "میکروفون روشن نشد.",
+    "The question asked aloud didn't go.": "پرسش صوتی فرستاده نشد.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: نشانهٔ صحبت کردن."
   },
   "settings": {
     "settings": "تنظیمات",
@@ -350,7 +355,10 @@
     "updateTo": "به‌روزرسانی به نسخهٔ {version}",
     "autoupdate": "نصب خودکار به‌روزرسانی‌ها",
     "autoupdateDesc": "برنامه هنگام اجرا و روزی یک بار به دنبال نسخهٔ جدید می‌گردد و وقتی هیچ‌یک از پنجره‌هایش باز نباشد، آن را نصب می‌کند.",
-    "kUpdates": "به‌روزرسانی به‌روزرسانی‌ها بروزرسانی آپدیت نسخه نسخهٔ جدید ارتقا نصب خودکار بررسی دانلود بارگیری updates update version upgrade install automatic check download"
+    "kUpdates": "به‌روزرسانی به‌روزرسانی‌ها بروزرسانی آپدیت نسخه نسخهٔ جدید ارتقا نصب خودکار بررسی دانلود بارگیری updates update version upgrade install automatic check download",
+    "listeningSound": "صدا هنگام شنیدن میکروفون",
+    "listeningSoundDesc": "صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: پس از آن صحبت کنید.",
+    "kListeningSound": "صدا علامت بوق میکروفون صوتی صحبت شنیدن sound microphone"
   },
   "guide": {
     "start": "شروع",

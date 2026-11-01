@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Različica {version} je nameščena.",
     "Version {version} is the latest.": "Različica {version} je najnovejša.",
     "ainitShot is updated": "ainitShot je posodobljen",
-    "ainitShot {version} is available": "Na voljo je ainitShot {version}"
+    "ainitShot {version} is available": "Na voljo je ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon še ni bil vklopljen: držite {key}, dokler ne zasveti rdeča pika.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon še ni bil vklopljen: držite gumb, dokler ne zasveti rdeča pika.",
+    "The microphone didn't turn on.": "Mikrofon se ni vklopil.",
+    "The question asked aloud didn't go.": "Glasovno vprašanje ni bilo poslano.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Kratek zvok, ko mikrofon začne poslušati glasovno vprašanje: znak, da lahko govorite."
   },
   "settings": {
     "settings": "Nastavitve",
@@ -350,7 +355,10 @@
     "updateTo": "Posodobi na {version}",
     "autoupdate": "Samodejno namesti posodobitve",
     "autoupdateDesc": "Program išče novo različico ob zagonu in enkrat na dan ter jo namesti, ko ni odprto nobeno njegovo okno.",
-    "kUpdates": "posodobitve posodobitev posodobi posodabljanje nadgradnja različica nova novejša najnovejša namestitev namesti samodejno preveri preverjanje prenos prenesi update updates upgrade version install download"
+    "kUpdates": "posodobitve posodobitev posodobi posodabljanje nadgradnja različica nova novejša najnovejša namestitev namesti samodejno preveri preverjanje prenos prenesi update updates upgrade version install download",
+    "listeningSound": "Zvok, ko mikrofon posluša",
+    "listeningSoundDesc": "Kratek zvok, ko mikrofon začne poslušati glasovno vprašanje: govorite po njem.",
+    "kListeningSound": "zvok signal pisk mikrofon glas govoriti poslušati sound microphone"
   },
   "guide": {
     "start": "Začni",

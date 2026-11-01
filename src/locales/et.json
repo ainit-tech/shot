@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versioon {version} on installitud.",
     "Version {version} is the latest.": "Versioon {version} on uusim.",
     "ainitShot is updated": "ainitShot on värskendatud",
-    "ainitShot {version} is available": "Saadaval on ainitShot {version}"
+    "ainitShot {version} is available": "Saadaval on ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon polnud veel sees: hoidke {key} all, kuni punane täpp süttib.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon polnud veel sees: hoidke nuppu all, kuni punane täpp süttib.",
+    "The microphone didn't turn on.": "Mikrofon ei läinud sisse.",
+    "The question asked aloud didn't go.": "Häälega esitatud küsimust ei saadetud.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: märk, et võib rääkida."
   },
   "settings": {
     "settings": "Sätted",
@@ -350,7 +355,10 @@
     "updateTo": "Värskenda versioonile {version}",
     "autoupdate": "Installi värskendused automaatselt",
     "autoupdateDesc": "Programm otsib uut versiooni käivitamisel ja kord päevas ning installib selle, kui ükski programmi aken pole avatud.",
-    "kUpdates": "värskendused värskendus värskenda värskendamine uuendus uuendused uuenda versioon uus uuem uusim installi installimine automaatselt kontrolli otsi allalaadimine laadi alla update updates upgrade version install download"
+    "kUpdates": "värskendused värskendus värskenda värskendamine uuendus uuendused uuenda versioon uus uuem uusim installi installimine automaatselt kontrolli otsi allalaadimine laadi alla update updates upgrade version install download",
+    "listeningSound": "Heli, kui mikrofon kuulab",
+    "listeningSoundDesc": "Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: rääkige pärast seda.",
+    "kListeningSound": "heli signaal piiks mikrofon hääl rääkida kuulata sound microphone"
   },
   "guide": {
     "start": "Alusta",

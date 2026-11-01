@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Zainstalowano wersję {version}.",
     "Version {version} is the latest.": "Wersja {version} jest najnowsza.",
     "ainitShot is updated": "Zaktualizowano ainitShot",
-    "ainitShot {version} is available": "Dostępny jest ainitShot {version}"
+    "ainitShot {version} is available": "Dostępny jest ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon nie był jeszcze włączony: przytrzymaj {key}, aż zapali się czerwona kropka.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon nie był jeszcze włączony: przytrzymaj przycisk, aż zapali się czerwona kropka.",
+    "The microphone didn't turn on.": "Mikrofon się nie włączył.",
+    "The question asked aloud didn't go.": "Pytanie zadane głosem nie zostało wysłane.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krótki dźwięk, gdy mikrofon zaczyna słuchać pytania zadawanego głosem: znak, by mówić."
   },
   "settings": {
     "settings": "Ustawienia",
@@ -350,7 +355,10 @@
     "updateTo": "Zaktualizuj do {version}",
     "autoupdate": "Instaluj aktualizacje automatycznie",
     "autoupdateDesc": "Program szuka nowej wersji przy uruchomieniu i raz dziennie, a instaluje ją, gdy żadne z jego okien nie jest otwarte.",
-    "kUpdates": "aktualizacje aktualizacja aktualizuj zaktualizuj uaktualnienie wersja nowa najnowsza instaluj instalacja zainstaluj automatycznie sprawdź sprawdzanie pobierz pobieranie update updates upgrade version install download"
+    "kUpdates": "aktualizacje aktualizacja aktualizuj zaktualizuj uaktualnienie wersja nowa najnowsza instaluj instalacja zainstaluj automatycznie sprawdź sprawdzanie pobierz pobieranie update updates upgrade version install download",
+    "listeningSound": "Dźwięk, gdy mikrofon słucha",
+    "listeningSoundDesc": "Krótki dźwięk, gdy mikrofon zaczyna słuchać pytania zadawanego głosem: mów po nim.",
+    "kListeningSound": "dźwięk sygnał piknięcie mikrofon głos mówić słuchać sound microphone"
   },
   "guide": {
     "start": "Rozpocznij",

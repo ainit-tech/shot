@@ -149,7 +149,12 @@
     "Version {version} is installed.": "ورژن {version} انسٹال ہو گیا ہے۔",
     "Version {version} is the latest.": "ورژن {version} تازہ ترین ہے۔",
     "ainitShot is updated": "ainitShot اپ ڈیٹ ہو گیا",
-    "ainitShot {version} is available": "ainitShot {version} دستیاب ہے"
+    "ainitShot {version} is available": "ainitShot {version} دستیاب ہے",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "مائیکروفون ابھی آن نہیں ہوا تھا: سرخ نقطہ روشن ہونے تک {key} دبائے رکھیں۔",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "مائیکروفون ابھی آن نہیں ہوا تھا: سرخ نقطہ روشن ہونے تک بٹن دبائے رکھیں۔",
+    "The microphone didn't turn on.": "مائیکروفون آن نہیں ہوا۔",
+    "The question asked aloud didn't go.": "بول کر پوچھا گیا سوال نہیں گیا۔",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز: بولنے کا اشارہ۔"
   },
   "settings": {
     "settings": "ترتیبات",
@@ -350,7 +355,10 @@
     "updateTo": "{version} پر اپ ڈیٹ کریں",
     "autoupdate": "اپ ڈیٹس خود بخود انسٹال کریں",
     "autoupdateDesc": "پروگرام شروع ہوتے وقت اور دن میں ایک بار نیا ورژن تلاش کرتا ہے، اور جب اس کی کوئی ونڈو کھلی نہ ہو تو اسے انسٹال کر دیتا ہے۔",
-    "kUpdates": "اپ ڈیٹ اپ ڈیٹس ورژن نیا ورژن اپ گریڈ انسٹال خودکار چیک ڈاؤن لوڈ تازہ ترین update upgrade install"
+    "kUpdates": "اپ ڈیٹ اپ ڈیٹس ورژن نیا ورژن اپ گریڈ انسٹال خودکار چیک ڈاؤن لوڈ تازہ ترین update upgrade install",
+    "listeningSound": "مائیکروفون کے سننے پر آواز",
+    "listeningSoundDesc": "جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز آتی ہے: اس کے بعد بولیں۔",
+    "kListeningSound": "آواز اشارہ بیپ مائیکروفون بولنا سننا sound microphone"
   },
   "guide": {
     "start": "شروع کریں",

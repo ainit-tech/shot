@@ -149,7 +149,12 @@
     "Version {version} is installed.": "संस्करण {version} इंस्टॉल हो गया है।",
     "Version {version} is the latest.": "संस्करण {version} सबसे नया है।",
     "ainitShot is updated": "ainitShot अपडेट हो गया",
-    "ainitShot {version} is available": "ainitShot {version} उपलब्ध है"
+    "ainitShot {version} is available": "ainitShot {version} उपलब्ध है",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "माइक्रोफ़ोन अभी चालू नहीं हुआ था: लाल बिंदु जलने तक {key} दबाए रखो।",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "माइक्रोफ़ोन अभी चालू नहीं हुआ था: लाल बिंदु जलने तक बटन दबाए रखो।",
+    "The microphone didn't turn on.": "माइक्रोफ़ोन चालू नहीं हुआ।",
+    "The question asked aloud didn't go.": "बोलकर पूछा गया सवाल नहीं गया।",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# जब माइक्रोफ़ोन बोलकर पूछे गए सवाल को सुनना शुरू करता है, तब एक छोटी आवाज़: बोलने का संकेत।"
   },
   "settings": {
     "settings": "सेटिंग्स",
@@ -350,7 +355,10 @@
     "updateTo": "{version} पर अपडेट करें",
     "autoupdate": "अपडेट अपने-आप इंस्टॉल करें",
     "autoupdateDesc": "प्रोग्राम शुरू होने पर और दिन में एक बार नया संस्करण ढूँढ़ता है और उसे तब इंस्टॉल करता है, जब उसकी कोई विंडो खुली न हो।",
-    "kUpdates": "अपडेट संस्करण नया इंस्टॉल अपने-आप जाँच डाउनलोड update version upgrade install"
+    "kUpdates": "अपडेट संस्करण नया इंस्टॉल अपने-आप जाँच डाउनलोड update version upgrade install",
+    "listeningSound": "माइक्रोफ़ोन के सुनने पर आवाज़",
+    "listeningSoundDesc": "जब माइक्रोफ़ोन बोलकर पूछे गए सवाल को सुनना शुरू करता है, तब एक छोटी आवाज़: उसके बाद बोलो।",
+    "kListeningSound": "आवाज़ संकेत बीप माइक्रोफ़ोन बोलना सुनना sound microphone"
   },
   "guide": {
     "start": "शुरू करें",

@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versiunea {version} a fost instalată.",
     "Version {version} is the latest.": "Versiunea {version} este cea mai recentă.",
     "ainitShot is updated": "ainitShot a fost actualizat",
-    "ainitShot {version} is available": "ainitShot {version} este disponibil"
+    "ainitShot {version} is available": "ainitShot {version} este disponibil",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Microfonul nu era încă pornit: țineți apăsat {key} până se aprinde punctul roșu.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Microfonul nu era încă pornit: țineți apăsat butonul până se aprinde punctul roșu.",
+    "The microphone didn't turn on.": "Microfonul nu a pornit.",
+    "The question asked aloud didn't go.": "Întrebarea pusă cu voce tare nu a plecat.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: semnalul să vorbiți."
   },
   "settings": {
     "settings": "Setări",
@@ -350,7 +355,10 @@
     "updateTo": "Actualizați la {version}",
     "autoupdate": "Instalează automat actualizările",
     "autoupdateDesc": "Programul caută o versiune nouă la pornire și o dată pe zi și o instalează atunci când nu are nicio fereastră deschisă.",
-    "kUpdates": "actualizări actualizare actualizați actualizari versiune nouă instalare instalează automat verificare căutare descărcare descarcare update upgrade"
+    "kUpdates": "actualizări actualizare actualizați actualizari versiune nouă instalare instalează automat verificare căutare descărcare descarcare update upgrade",
+    "listeningSound": "Sunet când microfonul ascultă",
+    "listeningSoundDesc": "Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: vorbiți după el.",
+    "kListeningSound": "sunet semnal bip microfon voce vorbire ascultare sound microphone"
   },
   "guide": {
     "start": "Începeți",

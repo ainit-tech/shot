@@ -149,7 +149,12 @@
     "Version {version} is installed.": "সংস্করণ {version} ইনস্টল হয়েছে।",
     "Version {version} is the latest.": "সংস্করণ {version}-ই সর্বশেষ।",
     "ainitShot is updated": "ainitShot আপডেট হয়েছে",
-    "ainitShot {version} is available": "ainitShot {version} পাওয়া যাচ্ছে"
+    "ainitShot {version} is available": "ainitShot {version} পাওয়া যাচ্ছে",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "মাইক্রোফোন তখনও চালু হয়নি: লাল বিন্দু জ্বলে না ওঠা পর্যন্ত {key} চেপে ধরে রাখুন।",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "মাইক্রোফোন তখনও চালু হয়নি: লাল বিন্দু জ্বলে না ওঠা পর্যন্ত বোতামটি চেপে ধরে রাখুন।",
+    "The microphone didn't turn on.": "মাইক্রোফোন চালু হয়নি।",
+    "The question asked aloud didn't go.": "মুখে বলা প্রশ্নটি পাঠানো হয়নি।",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: বলার সংকেত।"
   },
   "settings": {
     "settings": "সেটিংস",
@@ -350,7 +355,10 @@
     "updateTo": "{version}-এ আপডেট করুন",
     "autoupdate": "আপডেট স্বয়ংক্রিয়ভাবে ইনস্টল করুন",
     "autoupdateDesc": "প্রোগ্রাম চালু হওয়ার সময় ও দিনে একবার নতুন সংস্করণ খোঁজে, আর এর কোনো উইন্ডো খোলা না থাকলে সেটি ইনস্টল করে।",
-    "kUpdates": "আপডেট সংস্করণ ভার্সন নতুন সংস্করণ আপগ্রেড ইনস্টল স্বয়ংক্রিয় অটো চেক ডাউনলোড সর্বশেষ update upgrade install"
+    "kUpdates": "আপডেট সংস্করণ ভার্সন নতুন সংস্করণ আপগ্রেড ইনস্টল স্বয়ংক্রিয় অটো চেক ডাউনলোড সর্বশেষ update upgrade install",
+    "listeningSound": "মাইক্রোফোন শুনলে শব্দ",
+    "listeningSoundDesc": "মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: এর পরে বলুন।",
+    "kListeningSound": "শব্দ সংকেত মাইক্রোফোন ভয়েস বলা শোনা sound microphone"
   },
   "guide": {
     "start": "শুরু করুন",

@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Na-install ang bersyon {version}.",
     "Version {version} is the latest.": "Ang bersyon {version} ang pinakabago.",
     "ainitShot is updated": "Na-update ang ainitShot",
-    "ainitShot {version} is available": "Available na ang ainitShot {version}"
+    "ainitShot {version} is available": "Available na ang ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Hindi pa bukas ang mikropono: pindutin nang matagal ang {key} hanggang umilaw ang pulang tuldok.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Hindi pa bukas ang mikropono: pindutin nang matagal ang button hanggang umilaw ang pulang tuldok.",
+    "The microphone didn't turn on.": "Hindi bumukas ang mikropono.",
+    "The question asked aloud didn't go.": "Hindi naipadala ang tanong na binigkas.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: hudyat para magsalita."
   },
   "settings": {
     "settings": "Mga Setting",
@@ -350,7 +355,10 @@
     "updateTo": "Mag-update sa {version}",
     "autoupdate": "Awtomatikong i-install ang mga update",
     "autoupdateDesc": "Naghahanap ang program ng bagong bersyon sa pagsisimula nito at isang beses sa isang araw, at ini-install ito kapag walang bukas na window nito.",
-    "kUpdates": "update mga update i-update bersyon bagong bersyon i-upgrade i-install awtomatiko tingnan i-download pinakabago upgrade install download"
+    "kUpdates": "update mga update i-update bersyon bagong bersyon i-upgrade i-install awtomatiko tingnan i-download pinakabago upgrade install download",
+    "listeningSound": "Tunog kapag nakikinig ang mikropono",
+    "listeningSoundDesc": "Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: magsalita pagkatapos nito.",
+    "kListeningSound": "tunog hudyat beep mikropono boses magsalita makinig sound microphone"
   },
   "guide": {
     "start": "Magsimula",

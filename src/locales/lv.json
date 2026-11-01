@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versija {version} ir instalēta.",
     "Version {version} is the latest.": "Versija {version} ir jaunākā.",
     "ainitShot is updated": "Programma ainitShot ir atjaunināta",
-    "ainitShot {version} is available": "Pieejama ainitShot versija {version}"
+    "ainitShot {version} is available": "Pieejama ainitShot versija {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofons vēl nebija ieslēgts: turiet {key}, līdz iedegas sarkanais punkts.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofons vēl nebija ieslēgts: turiet pogu, līdz iedegas sarkanais punkts.",
+    "The microphone didn't turn on.": "Mikrofons neieslēdzās.",
+    "The question asked aloud didn't go.": "Balsī uzdotais jautājums netika nosūtīts.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: zīme runāt."
   },
   "settings": {
     "settings": "Iestatījumi",
@@ -350,7 +355,10 @@
     "updateTo": "Atjaunināt uz {version}",
     "autoupdate": "Automātiski instalēt atjauninājumus",
     "autoupdateDesc": "Programma meklē jaunu versiju palaišanas laikā un reizi dienā un instalē to, kad nav atvērts neviens tās logs.",
-    "kUpdates": "atjauninājumi atjauninājums atjaunināt jaunināt jaunināšana versija jauna jaunāka jaunākā instalēt instalēšana automātiski pārbaudīt pārbaude lejupielādēt lejupielāde update updates upgrade version install download"
+    "kUpdates": "atjauninājumi atjauninājums atjaunināt jaunināt jaunināšana versija jauna jaunāka jaunākā instalēt instalēšana automātiski pārbaudīt pārbaude lejupielādēt lejupielāde update updates upgrade version install download",
+    "listeningSound": "Skaņa, kad mikrofons klausās",
+    "listeningSoundDesc": "Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: runājiet pēc tās.",
+    "kListeningSound": "skaņa signāls pīkstiens mikrofons balss runāt klausīties sound microphone"
   },
   "guide": {
     "start": "Sākt",

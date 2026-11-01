@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Version {version} är installerad.",
     "Version {version} is the latest.": "Version {version} är den senaste.",
     "ainitShot is updated": "ainitShot har uppdaterats",
-    "ainitShot {version} is available": "ainitShot {version} är tillgänglig"
+    "ainitShot {version} is available": "ainitShot {version} är tillgänglig",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofonen var inte på än: håll ned {key} tills den röda pricken lyser.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonen var inte på än: håll ned knappen tills den röda pricken lyser.",
+    "The microphone didn't turn on.": "Mikrofonen slogs inte på.",
+    "The question asked aloud didn't go.": "Frågan som ställdes med rösten skickades inte.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tecknet att tala."
   },
   "settings": {
     "settings": "Inställningar",
@@ -350,7 +355,10 @@
     "updateTo": "Uppdatera till {version}",
     "autoupdate": "Installera uppdateringar automatiskt",
     "autoupdateDesc": "Programmet söker efter en ny version när det startar och en gång om dagen, och installerar den när inget av dess fönster är öppet.",
-    "kUpdates": "uppdateringar uppdatering uppdatera version ny nya installera automatiskt sök söka kontrollera ladda ned ladda ner hämta update upgrade"
+    "kUpdates": "uppdateringar uppdatering uppdatera version ny nya installera automatiskt sök söka kontrollera ladda ned ladda ner hämta update upgrade",
+    "listeningSound": "Ljud när mikrofonen lyssnar",
+    "listeningSoundDesc": "Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tala efter det.",
+    "kListeningSound": "ljud signal pip mikrofon röst tala lyssna sound microphone"
   },
   "guide": {
     "start": "Kom igång",

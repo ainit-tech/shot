@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Se ha instalado la versión {version}.",
     "Version {version} is the latest.": "La versión {version} es la más reciente.",
     "ainitShot is updated": "ainitShot se ha actualizado",
-    "ainitShot {version} is available": "ainitShot {version} está disponible"
+    "ainitShot {version} is available": "ainitShot {version} está disponible",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "El micrófono aún no estaba encendido: mantén pulsada {key} hasta que se encienda el punto rojo.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "El micrófono aún no estaba encendido: mantén pulsado el botón hasta que se encienda el punto rojo.",
+    "The microphone didn't turn on.": "El micrófono no se encendió.",
+    "The question asked aloud didn't go.": "La pregunta en voz alta no se envió.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un sonido corto cuando el micrófono empieza a escuchar una pregunta en voz alta: la señal para hablar."
   },
   "settings": {
     "settings": "Ajustes",
@@ -350,7 +355,10 @@
     "updateTo": "Actualizar a {version}",
     "autoupdate": "Instalar actualizaciones automáticamente",
     "autoupdateDesc": "El programa busca una nueva versión al iniciarse y una vez al día, y la instala cuando ninguna de sus ventanas está abierta.",
-    "kUpdates": "actualizaciones actualización actualizar versión nueva instalar automático automáticamente buscar comprobar descargar update upgrade version"
+    "kUpdates": "actualizaciones actualización actualizar versión nueva instalar automático automáticamente buscar comprobar descargar update upgrade version",
+    "listeningSound": "Sonido cuando el micrófono escucha",
+    "listeningSoundDesc": "Un sonido corto cuando el micrófono empieza a escuchar una pregunta en voz alta: habla después de él.",
+    "kListeningSound": "sonido señal pitido micrófono voz hablar escuchar sound microphone"
   },
   "guide": {
     "start": "Empezar",

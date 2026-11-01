@@ -149,7 +149,12 @@
     "Version {version} is installed.": "版本 {version} 已安装。",
     "Version {version} is the latest.": "版本 {version} 已是最新。",
     "ainitShot is updated": "ainitShot 已更新",
-    "ainitShot {version} is available": "ainitShot {version} 现已推出"
+    "ainitShot {version} is available": "ainitShot {version} 现已推出",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "麦克风还没打开：按住 {key}，直到红点亮起。",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "麦克风还没打开：按住按钮，直到红点亮起。",
+    "The microphone didn't turn on.": "麦克风没有打开。",
+    "The question asked aloud didn't go.": "语音提问没有发出。",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 麦克风开始聆听语音提问时发出的短促声音：提示可以说话了。"
   },
   "settings": {
     "settings": "设置",
@@ -350,7 +355,10 @@
     "updateTo": "更新到 {version}",
     "autoupdate": "自动安装更新",
     "autoupdateDesc": "程序会在启动时和每天一次查找新版本，并在它的窗口都关闭时安装。",
-    "kUpdates": "更新 自动更新 升级 版本 新版本 安装 自动 检查 检查更新 下载 update upgrade version"
+    "kUpdates": "更新 自动更新 升级 版本 新版本 安装 自动 检查 检查更新 下载 update upgrade version",
+    "listeningSound": "麦克风聆听时的提示音",
+    "listeningSoundDesc": "麦克风开始聆听语音提问时，会发出一声短促的提示音：听到后再说话。",
+    "kListeningSound": "声音 提示音 信号 麦克风 语音 说话 聆听 sound microphone"
   },
   "guide": {
     "start": "开始使用",

@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Η έκδοση {version} εγκαταστάθηκε.",
     "Version {version} is the latest.": "Η έκδοση {version} είναι η πιο πρόσφατη.",
     "ainitShot is updated": "Το ainitShot ενημερώθηκε",
-    "ainitShot {version} is available": "Το ainitShot {version} είναι διαθέσιμο"
+    "ainitShot {version} is available": "Το ainitShot {version} είναι διαθέσιμο",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Το μικρόφωνο δεν είχε ενεργοποιηθεί ακόμη: κρατήστε πατημένο το {key} μέχρι να ανάψει η κόκκινη κουκκίδα.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Το μικρόφωνο δεν είχε ενεργοποιηθεί ακόμη: κρατήστε πατημένο το κουμπί μέχρι να ανάψει η κόκκινη κουκκίδα.",
+    "The microphone didn't turn on.": "Το μικρόφωνο δεν ενεργοποιήθηκε.",
+    "The question asked aloud didn't go.": "Η φωνητική ερώτηση δεν στάλθηκε.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ένας σύντομος ήχος όταν το μικρόφωνο αρχίζει να ακούει μια φωνητική ερώτηση: το σήμα για να μιλήσετε."
   },
   "settings": {
     "settings": "Ρυθμίσεις",
@@ -350,7 +355,10 @@
     "updateTo": "Ενημέρωση στην έκδοση {version}",
     "autoupdate": "Αυτόματη εγκατάσταση ενημερώσεων",
     "autoupdateDesc": "Το πρόγραμμα αναζητά νέα έκδοση κατά την εκκίνηση και μία φορά την ημέρα και την εγκαθιστά όταν δεν είναι ανοιχτό κανένα από τα παράθυρά του.",
-    "kUpdates": "ενημερώσεις ενημέρωση έκδοση νέα έκδοση αναβάθμιση εγκατάσταση αυτόματη αυτόματα έλεγχος λήψη κατέβασμα updates update version upgrade install automatic check download"
+    "kUpdates": "ενημερώσεις ενημέρωση έκδοση νέα έκδοση αναβάθμιση εγκατάσταση αυτόματη αυτόματα έλεγχος λήψη κατέβασμα updates update version upgrade install automatic check download",
+    "listeningSound": "Ήχος όταν ακούει το μικρόφωνο",
+    "listeningSoundDesc": "Ένας σύντομος ήχος όταν το μικρόφωνο αρχίζει να ακούει μια φωνητική ερώτηση: μιλήστε μετά από αυτόν.",
+    "kListeningSound": "ήχος σήμα μπιπ μικρόφωνο φωνή φωνητική μιλώ ακούω sound microphone"
   },
   "guide": {
     "start": "Έναρξη",

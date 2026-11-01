@@ -149,7 +149,12 @@
     "Version {version} is installed.": "{version} нұсқасы орнатылды.",
     "Version {version} is the latest.": "{version} нұсқасы — ең соңғысы.",
     "ainitShot is updated": "ainitShot жаңартылды",
-    "ainitShot {version} is available": "ainitShot {version} қолжетімді"
+    "ainitShot {version} is available": "ainitShot {version} қолжетімді",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Микрофон әлі қосылмаған еді: қызыл нүкте жанғанша {key} пернесін басып тұрыңыз.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Микрофон әлі қосылмаған еді: қызыл нүкте жанғанша түймені басып тұрыңыз.",
+    "The microphone didn't turn on.": "Микрофон қосылмады.",
+    "The question asked aloud didn't go.": "Дауыспен қойылған сұрақ жіберілмеді.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Микрофон дауыспен қойылған сұрақты тыңдай бастағанда шығатын қысқа дыбыс: сөйлеу белгісі."
   },
   "settings": {
     "settings": "Параметрлер",
@@ -350,7 +355,10 @@
     "updateTo": "{version} нұсқасына жаңарту",
     "autoupdate": "Жаңартуларды автоматты түрде орнату",
     "autoupdateDesc": "Бағдарлама іске қосылғанда және күніне бір рет жаңа нұсқаны іздейді де, терезелерінің ешқайсысы ашық болмағанда оны орнатады.",
-    "kUpdates": "жаңартулар жаңарту нұсқа жаңа нұсқа орнату автоматты тексеру жүктеп алу жүктеу updates update version upgrade install automatic check download"
+    "kUpdates": "жаңартулар жаңарту нұсқа жаңа нұсқа орнату автоматты тексеру жүктеп алу жүктеу updates update version upgrade install automatic check download",
+    "listeningSound": "Микрофон тыңдағанда дыбыс",
+    "listeningSoundDesc": "Микрофон дауыспен қойылған сұрақты тыңдай бастағанда қысқа дыбыс шығады: одан кейін сөйлеңіз.",
+    "kListeningSound": "дыбыс белгі сигнал микрофон дауыс сөйлеу тыңдау sound microphone"
   },
   "guide": {
     "start": "Бастау",

@@ -30,6 +30,8 @@ pub struct Settings {
     pub autoupdate: bool,
     /// Whether masking has OpenAI Privacy Filter: the program downloads it, or removes it.
     pub privacy_filter: bool,
+    /// Whether a chime says that the microphone has begun to listen to a question asked aloud.
+    pub listening_sound: bool,
     pub colors: Vec<String>,
     pub width: f32,
     pub save: Save,
@@ -193,6 +195,7 @@ impl Settings {
             autostart: false,
             autoupdate: true,
             privacy_filter: true,
+            listening_sound: true,
             colors: ["#E53935", "#FB8C00", "#FDD835", "#43A047", "#1E88E5", "#8E24AA", "#212121", "#FFFFFF"]
                 .map(String::from)
                 .into(),
@@ -275,6 +278,9 @@ autoupdate = {autoupdate}
 {privacy_filter_note}
 privacy_filter = {privacy_filter}
 
+{listening_sound_note}
+listening_sound = {listening_sound}
+
 {colors_note}
 colors = [{colors}]
 
@@ -313,6 +319,8 @@ first = \"{first}\"
             autoupdate = self.autoupdate,
             privacy_filter_note = notes.privacy_filter,
             privacy_filter = self.privacy_filter,
+            listening_sound_note = notes.listening_sound,
+            listening_sound = self.listening_sound,
             colors_note = notes.colors,
             colors = colors.join(", "),
             width_note = notes.width,
@@ -426,6 +434,7 @@ impl Notes {
             autostart: tr_in(language, self.autostart),
             autoupdate: tr_in(language, self.autoupdate),
             privacy_filter: tr_in(language, self.privacy_filter),
+            listening_sound: tr_in(language, self.listening_sound),
             colors: tr_in(language, self.colors),
             width: tr_in(language, self.width),
             ask: tr_in(language, self.ask),
@@ -443,7 +452,7 @@ impl Notes {
 
 /// The comments of the settings file in English, for the test that every catalog has them.
 #[cfg(test)]
-pub fn notes() -> [&'static str; 17] {
+pub fn notes() -> [&'static str; 18] {
     let Notes {
         head,
         hotkey,
@@ -451,6 +460,7 @@ pub fn notes() -> [&'static str; 17] {
         autostart,
         autoupdate,
         privacy_filter,
+        listening_sound,
         colors,
         width,
         ask,
@@ -463,7 +473,10 @@ pub fn notes() -> [&'static str; 17] {
         first,
         buttons,
     } = NOTES;
-    [head, hotkey, language, autostart, autoupdate, privacy_filter, colors, width, ask, copy, folder, name, panels, tools, queries, first, buttons]
+    [
+        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, colors, width, ask, copy, folder, name, panels,
+        tools, queries, first, buttons,
+    ]
 }
 
 /// The comments of the settings file, in English: one before each setting or group.
@@ -474,6 +487,7 @@ struct Notes {
     autostart: &'static str,
     autoupdate: &'static str,
     privacy_filter: &'static str,
+    listening_sound: &'static str,
     colors: &'static str,
     width: &'static str,
     ask: &'static str,
@@ -502,6 +516,7 @@ const NOTES: Notes = Notes {
     privacy_filter: "# OpenAI Privacy Filter, a model with which masking finds names, addresses, dates and links
 # too, not only keys, passwords, cards, e-mail and phones. It runs on the computer. The program
 # downloads it by itself, about 950 MB, and masks without it meanwhile; false removes it.",
+    listening_sound: "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.",
     colors: "# The colours for drawing, as \"#RRGGBB\"; the first one is chosen at once.",
     width: "# The width of the line in pixels at the screen's scale of 100%. While drawing, the mouse wheel changes it.",
     ask: "# Ask where to save. If false, the screenshot is saved into the folder at once.

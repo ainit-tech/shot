@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Verze {version} je nainstalována.",
     "Version {version} is the latest.": "Verze {version} je nejnovější.",
     "ainitShot is updated": "ainitShot byl aktualizován",
-    "ainitShot {version} is available": "ainitShot {version} je k dispozici"
+    "ainitShot {version} is available": "ainitShot {version} je k dispozici",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon ještě nebyl zapnutý: držte {key}, dokud se nerozsvítí červená tečka.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon ještě nebyl zapnutý: držte tlačítko, dokud se nerozsvítí červená tečka.",
+    "The microphone didn't turn on.": "Mikrofon se nezapnul.",
+    "The question asked aloud didn't go.": "Otázka položená hlasem se neodeslala.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krátký zvuk, když mikrofon začne poslouchat otázku kladenou hlasem: znamení, že můžete mluvit."
   },
   "settings": {
     "settings": "Nastavení",
@@ -350,7 +355,10 @@
     "updateTo": "Aktualizovat na {version}",
     "autoupdate": "Instalovat aktualizace automaticky",
     "autoupdateDesc": "Program hledá novou verzi při spuštění a jednou denně a nainstaluje ji, když není otevřené žádné jeho okno.",
-    "kUpdates": "aktualizace aktualizovat verze nová novější nejnovější instalace instalovat nainstalovat automaticky kontrola zkontrolovat stáhnout stahování update updates upgrade version install download"
+    "kUpdates": "aktualizace aktualizovat verze nová novější nejnovější instalace instalovat nainstalovat automaticky kontrola zkontrolovat stáhnout stahování update updates upgrade version install download",
+    "listeningSound": "Zvuk, když mikrofon poslouchá",
+    "listeningSoundDesc": "Krátký zvuk, když mikrofon začne poslouchat otázku kladenou hlasem: mluvte po něm.",
+    "kListeningSound": "zvuk signál pípnutí mikrofon hlas hlasem mluvit poslouchat sound microphone"
   },
   "guide": {
     "start": "Začít",

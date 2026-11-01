@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versioni {version} u instalua.",
     "Version {version} is the latest.": "Versioni {version} është më i fundit.",
     "ainitShot is updated": "ainitShot u përditësua",
-    "ainitShot {version} is available": "ainitShot {version} është i disponueshëm"
+    "ainitShot {version} is available": "ainitShot {version} është i disponueshëm",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofoni nuk ishte ndezur ende: mbaj shtypur {key} derisa të ndizet pika e kuqe.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofoni nuk ishte ndezur ende: mbaj shtypur butonin derisa të ndizet pika e kuqe.",
+    "The microphone didn't turn on.": "Mikrofoni nuk u ndez.",
+    "The question asked aloud didn't go.": "Pyetja me zë nuk u dërgua.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: shenja për të folur."
   },
   "settings": {
     "settings": "Cilësimet",
@@ -350,7 +355,10 @@
     "updateTo": "Përditëso në versionin {version}",
     "autoupdate": "Instalo përditësimet automatikisht",
     "autoupdateDesc": "Programi kërkon një version të ri kur niset dhe një herë në ditë, dhe e instalon kur asnjë nga dritaret e tij nuk është e hapur.",
-    "kUpdates": "përditësime përditësim përditëso version i ri përmirësim instalim instalo automatik automatikisht kontroll kontrollo shkarkim shkarko updates update version upgrade install automatic check download"
+    "kUpdates": "përditësime përditësim përditëso version i ri përmirësim instalim instalo automatik automatikisht kontroll kontrollo shkarkim shkarko updates update version upgrade install automatic check download",
+    "listeningSound": "Tingull kur mikrofoni dëgjon",
+    "listeningSoundDesc": "Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: fol pas tij.",
+    "kListeningSound": "tingull sinjal bip mikrofon zë flas dëgjoj sound microphone"
   },
   "guide": {
     "start": "Fillo",

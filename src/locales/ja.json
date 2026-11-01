@@ -149,7 +149,12 @@
     "Version {version} is installed.": "バージョン {version} をインストールしました。",
     "Version {version} is the latest.": "バージョン {version} が最新です。",
     "ainitShot is updated": "ainitShot をアップデートしました",
-    "ainitShot {version} is available": "ainitShot {version} が利用可能です"
+    "ainitShot {version} is available": "ainitShot {version} が利用可能です",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "マイクはまだオンになっていませんでした。赤い点が点灯するまで {key} を押し続けてください。",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "マイクはまだオンになっていませんでした。赤い点が点灯するまでボタンを押し続けてください。",
+    "The microphone didn't turn on.": "マイクがオンになりませんでした。",
+    "The question asked aloud didn't go.": "音声の質問は送信されませんでした。",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 音声の質問をマイクが聞き始めたときの短い音: 話し始める合図です。"
   },
   "settings": {
     "settings": "設定",
@@ -350,7 +355,10 @@
     "updateTo": "{version} にアップデート",
     "autoupdate": "アップデートを自動でインストール",
     "autoupdateDesc": "プログラムは起動時と1日1回新しいバージョンを探し、自身のウィンドウが1つも開いていないときにインストールします。",
-    "kUpdates": "アップデート 更新 バージョン 新しいバージョン アップグレード インストール 自動 確認 チェック ダウンロード 最新 update upgrade install"
+    "kUpdates": "アップデート 更新 バージョン 新しいバージョン アップグレード インストール 自動 確認 チェック ダウンロード 最新 update upgrade install",
+    "listeningSound": "マイクが聞いているときの音",
+    "listeningSoundDesc": "音声の質問をマイクが聞き始めたときに短い音が鳴ります。音のあとに話してください。",
+    "kListeningSound": "音 サウンド 合図 ビープ マイク 音声 話す 聞く sound microphone"
   },
   "guide": {
     "start": "始める",

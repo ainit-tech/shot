@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Տեղադրվեց {version} տարբերակը։",
     "Version {version} is the latest.": "{version} տարբերակը վերջինն է։",
     "ainitShot is updated": "ainitShot-ը թարմացվեց",
-    "ainitShot {version} is available": "Հասանելի է ainitShot {version} տարբերակը"
+    "ainitShot {version} is available": "Հասանելի է ainitShot {version} տարբերակը",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Միկրոֆոնը դեռ միացված չէր՝ պահեք {key} ստեղնը սեղմած, մինչև կարմիր կետը վառվի։",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Միկրոֆոնը դեռ միացված չէր՝ պահեք կոճակը սեղմած, մինչև կարմիր կետը վառվի։",
+    "The microphone didn't turn on.": "Միկրոֆոնը չմիացավ։",
+    "The question asked aloud didn't go.": "Բարձրաձայն տրված հարցը չուղարկվեց։",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսելու նշան։"
   },
   "settings": {
     "settings": "Կարգավորումներ",
@@ -350,7 +355,10 @@
     "updateTo": "Թարմացնել մինչև {version}",
     "autoupdate": "Ավտոմատ տեղադրել թարմացումները",
     "autoupdateDesc": "Ծրագիրը նոր տարբերակ է որոնում մեկնարկելիս և օրը մեկ անգամ, և տեղադրում է այն, երբ իր պատուհաններից ոչ մեկը բաց չէ։",
-    "kUpdates": "թարմացումներ թարմացում թարմացնել տարբերակ նոր տարբերակ արդիացում տեղադրել տեղադրում ավտոմատ ստուգել ներբեռնել updates update version upgrade install automatic check download"
+    "kUpdates": "թարմացումներ թարմացում թարմացնել տարբերակ նոր տարբերակ արդիացում տեղադրել տեղադրում ավտոմատ ստուգել ներբեռնել updates update version upgrade install automatic check download",
+    "listeningSound": "Ձայն, երբ միկրոֆոնը լսում է",
+    "listeningSoundDesc": "Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսեք դրանից հետո։",
+    "kListeningSound": "ձայն ազդանշան միկրոֆոն խոսել լսել sound microphone"
   },
   "guide": {
     "start": "Սկսել",

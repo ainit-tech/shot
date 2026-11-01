@@ -149,7 +149,12 @@
     "Version {version} is installed.": "تم تثبيت الإصدار {version}.",
     "Version {version} is the latest.": "الإصدار {version} هو الأحدث.",
     "ainitShot is updated": "تم تحديث ainitShot",
-    "ainitShot {version} is available": "أصبح ainitShot {version} متاحًا"
+    "ainitShot {version} is available": "أصبح ainitShot {version} متاحًا",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "لم يكن الميكروفون قد اشتغل بعد: اضغط {key} باستمرار حتى تضيء النقطة الحمراء.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "لم يكن الميكروفون قد اشتغل بعد: اضغط الزر باستمرار حتى تضيء النقطة الحمراء.",
+    "The microphone didn't turn on.": "لم يشتغل الميكروفون.",
+    "The question asked aloud didn't go.": "لم يُرسَل السؤال الصوتي.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صوت قصير عندما يبدأ الميكروفون الاستماع إلى سؤال صوتي: إشارة لتبدأ الكلام."
   },
   "settings": {
     "settings": "الإعدادات",
@@ -350,7 +355,10 @@
     "updateTo": "التحديث إلى {version}",
     "autoupdate": "تثبيت التحديثات تلقائيًا",
     "autoupdateDesc": "يبحث البرنامج عن إصدار جديد عند بدء تشغيله ومرة واحدة يوميًا، ويثبّته عندما تكون جميع نوافذه مغلقة.",
-    "kUpdates": "تحديثات التحديثات تحديث إصدار الإصدار جديد ترقية تثبيت تلقائي تحقق التحقق تنزيل update upgrade version"
+    "kUpdates": "تحديثات التحديثات تحديث إصدار الإصدار جديد ترقية تثبيت تلقائي تحقق التحقق تنزيل update upgrade version",
+    "listeningSound": "صوت عندما يستمع الميكروفون",
+    "listeningSoundDesc": "صوت قصير عندما يبدأ الميكروفون الاستماع إلى سؤال صوتي: تكلّم بعده.",
+    "kListeningSound": "صوت إشارة تنبيه ميكروفون صوتي تكلم استماع sound microphone"
   },
   "guide": {
     "start": "ابدأ",

@@ -149,7 +149,12 @@
     "Version {version} is installed.": "{version} 버전이 설치되었습니다.",
     "Version {version} is the latest.": "{version} 버전이 최신입니다.",
     "ainitShot is updated": "ainitShot이 업데이트되었습니다",
-    "ainitShot {version} is available": "ainitShot {version} 업데이트가 있습니다"
+    "ainitShot {version} is available": "ainitShot {version} 업데이트가 있습니다",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "마이크가 아직 켜지지 않았습니다. 빨간 점이 켜질 때까지 {key} 키를 누르고 있으세요.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "마이크가 아직 켜지지 않았습니다. 빨간 점이 켜질 때까지 버튼을 누르고 있으세요.",
+    "The microphone didn't turn on.": "마이크가 켜지지 않았습니다.",
+    "The question asked aloud didn't go.": "음성 질문을 보내지 못했습니다.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 마이크가 음성 질문을 듣기 시작할 때 나는 짧은 소리: 말하라는 신호입니다."
   },
   "settings": {
     "settings": "설정",
@@ -350,7 +355,10 @@
     "updateTo": "{version} 버전으로 업데이트",
     "autoupdate": "업데이트 자동 설치",
     "autoupdateDesc": "프로그램은 시작할 때와 하루에 한 번 새 버전을 찾고, 프로그램 창이 하나도 열려 있지 않을 때 설치합니다.",
-    "kUpdates": "업데이트 버전 새 버전 업그레이드 설치 자동 확인 다운로드 최신 갱신 update upgrade install"
+    "kUpdates": "업데이트 버전 새 버전 업그레이드 설치 자동 확인 다운로드 최신 갱신 update upgrade install",
+    "listeningSound": "마이크가 들을 때 소리",
+    "listeningSoundDesc": "마이크가 음성 질문을 듣기 시작하면 짧은 소리가 납니다. 소리가 난 뒤에 말하세요.",
+    "kListeningSound": "소리 신호 알림음 마이크 음성 말하기 듣기 sound microphone"
   },
   "guide": {
     "start": "시작",

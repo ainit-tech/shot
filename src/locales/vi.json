@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Đã cài đặt phiên bản {version}.",
     "Version {version} is the latest.": "Phiên bản {version} là mới nhất.",
     "ainitShot is updated": "Đã cập nhật ainitShot",
-    "ainitShot {version} is available": "Đã có ainitShot {version}"
+    "ainitShot {version} is available": "Đã có ainitShot {version}",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Micrô chưa bật: giữ {key} cho đến khi chấm đỏ sáng lên.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Micrô chưa bật: giữ nút cho đến khi chấm đỏ sáng lên.",
+    "The microphone didn't turn on.": "Micrô không bật.",
+    "The question asked aloud didn't go.": "Câu hỏi bằng giọng nói chưa được gửi.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Một âm thanh ngắn khi micrô bắt đầu nghe câu hỏi bằng giọng nói: tín hiệu để nói."
   },
   "settings": {
     "settings": "Cài đặt",
@@ -350,7 +355,10 @@
     "updateTo": "Cập nhật lên {version}",
     "autoupdate": "Tự động cài đặt bản cập nhật",
     "autoupdateDesc": "Chương trình tìm phiên bản mới khi khởi động và mỗi ngày một lần, rồi cài đặt khi không có cửa sổ nào của chương trình đang mở.",
-    "kUpdates": "cập nhật bản cập nhật phiên bản phiên bản mới nâng cấp cài đặt tự động kiểm tra tải xuống mới nhất update upgrade install"
+    "kUpdates": "cập nhật bản cập nhật phiên bản phiên bản mới nâng cấp cài đặt tự động kiểm tra tải xuống mới nhất update upgrade install",
+    "listeningSound": "Âm thanh khi micrô đang nghe",
+    "listeningSoundDesc": "Một âm thanh ngắn khi micrô bắt đầu nghe câu hỏi bằng giọng nói: hãy nói sau âm thanh đó.",
+    "kListeningSound": "âm thanh tín hiệu bíp micrô giọng nói nói nghe sound microphone"
   },
   "guide": {
     "start": "Bắt đầu",

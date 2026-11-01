@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Verzia {version} je nainštalovaná.",
     "Version {version} is the latest.": "Verzia {version} je najnovšia.",
     "ainitShot is updated": "ainitShot je aktualizovaný",
-    "ainitShot {version} is available": "ainitShot {version} je k dispozícii"
+    "ainitShot {version} is available": "ainitShot {version} je k dispozícii",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofón ešte nebol zapnutý: držte {key}, kým sa nerozsvieti červená bodka.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofón ešte nebol zapnutý: držte tlačidlo, kým sa nerozsvieti červená bodka.",
+    "The microphone didn't turn on.": "Mikrofón sa nezapol.",
+    "The question asked aloud didn't go.": "Otázka položená hlasom sa neodoslala.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: znamenie, že môžete hovoriť."
   },
   "settings": {
     "settings": "Nastavenia",
@@ -350,7 +355,10 @@
     "updateTo": "Aktualizovať na {version}",
     "autoupdate": "Inštalovať aktualizácie automaticky",
     "autoupdateDesc": "Program hľadá novú verziu pri spustení a raz denne a nainštaluje ju, keď nie je otvorené žiadne jeho okno.",
-    "kUpdates": "aktualizácie aktualizácia aktualizovať verzia nová novšia najnovšia inštalácia inštalovať nainštalovať automaticky kontrola skontrolovať stiahnuť sťahovanie update updates upgrade version install download"
+    "kUpdates": "aktualizácie aktualizácia aktualizovať verzia nová novšia najnovšia inštalácia inštalovať nainštalovať automaticky kontrola skontrolovať stiahnuť sťahovanie update updates upgrade version install download",
+    "listeningSound": "Zvuk, keď mikrofón počúva",
+    "listeningSoundDesc": "Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: hovorte po ňom.",
+    "kListeningSound": "zvuk signál pípnutie mikrofón hlas hovoriť počúvať sound microphone"
   },
   "guide": {
     "start": "Začať",

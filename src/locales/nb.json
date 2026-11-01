@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versjon {version} er installert.",
     "Version {version} is the latest.": "Versjon {version} er den nyeste.",
     "ainitShot is updated": "ainitShot er oppdatert",
-    "ainitShot {version} is available": "ainitShot {version} er tilgjengelig"
+    "ainitShot {version} is available": "ainitShot {version} er tilgjengelig",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofonen var ikke på ennå: hold {key} nede til den røde prikken lyser.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonen var ikke på ennå: hold knappen nede til den røde prikken lyser.",
+    "The microphone didn't turn on.": "Mikrofonen ble ikke slått på.",
+    "The question asked aloud didn't go.": "Spørsmålet stilt med stemmen ble ikke sendt.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# En kort lyd når mikrofonen begynner å lytte til et spørsmål stilt med stemmen: tegnet til å snakke."
   },
   "settings": {
     "settings": "Innstillinger",
@@ -350,7 +355,10 @@
     "updateTo": "Oppdater til {version}",
     "autoupdate": "Installer oppdateringer automatisk",
     "autoupdateDesc": "Programmet ser etter en ny versjon når det starter og én gang om dagen, og installerer den når ingen av vinduene er åpne.",
-    "kUpdates": "oppdateringer oppdatering oppdater oppdatere versjon ny nye installer installere automatisk se etter sjekk sjekke last ned nedlasting update upgrade"
+    "kUpdates": "oppdateringer oppdatering oppdater oppdatere versjon ny nye installer installere automatisk se etter sjekk sjekke last ned nedlasting update upgrade",
+    "listeningSound": "Lyd når mikrofonen lytter",
+    "listeningSoundDesc": "En kort lyd når mikrofonen begynner å lytte til et spørsmål stilt med stemmen: snakk etter den.",
+    "kListeningSound": "lyd signal pip mikrofon stemme snakke lytte sound microphone"
   },
   "guide": {
     "start": "Kom i gang",

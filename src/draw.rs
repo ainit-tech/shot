@@ -37,6 +37,10 @@ const INK_OFF: Rgba = [236, 236, 236, 80];
 const TRACK: Rgba = [236, 236, 236, 46];
 const SEPARATOR: Rgba = [255, 255, 255, 30];
 pub const TEXT: Rgba = [242, 242, 242, 255];
+/// The dot in the hint of a question asked aloud: grey while the microphone is turned on, red
+/// while it listens.
+pub const MIC_WAITING: Rgba = [158, 158, 158, 255];
+pub const MIC_LISTENING: Rgba = [229, 57, 53, 255];
 
 // Sizes in pixels at the scale of 100%.
 const HANDLE_RADIUS: f32 = 4.0;
@@ -44,6 +48,8 @@ const PICKED_RADIUS: f32 = 4.5;
 const LABEL_FONT: f32 = 12.0;
 const PILL_PADDING_X: f32 = 8.0;
 const PILL_PADDING_Y: f32 = 3.0;
+const MIC_DOT_RADIUS: f32 = 5.0;
+const MIC_DOT_GAP: f32 = 6.0;
 const LABEL_GAP: f32 = 6.0;
 const PANEL_RADIUS: f32 = 10.0;
 const BUTTON_RADIUS: f32 = 6.0;
@@ -457,6 +463,31 @@ pub fn label_place(selection: Rect, size: (i32, i32), monitor: Rect, scale: f32,
         .unwrap_or_else(|| at(left, selection.top + gap))
 }
 
+/// The room that the microphone's dot takes at the start of a hint, with the gap after it.
+pub fn mic_dot_room(scale: f32) -> i32 {
+    (2.0 * MIC_DOT_RADIUS * scale).round() as i32 + px(MIC_DOT_GAP, scale)
+}
+
+/// Where the microphone's dot goes in a hint's `pill`, at the start of the line: its centre and
+/// its radius.
+pub fn mic_dot_place(pill: Rect, scale: f32, right_to_left: bool) -> ((f32, f32), f32) {
+    let radius = MIC_DOT_RADIUS * scale;
+    let padding = px(PILL_PADDING_X, scale) as f32;
+    let x = match right_to_left {
+        true => pill.right as f32 - padding - radius,
+        false => pill.left as f32 + padding + radius,
+    };
+    ((x, (pill.top + pill.bottom) as f32 / 2.0), radius)
+}
+
+/// The dot that shows what the microphone does, in a hint.
+pub fn mic_dot(frame: &mut Frame, center: (f32, f32), radius: f32, color: Rgba) {
+    let Some(mut pixmap) = frame.pixmap() else { return };
+    if let Some(dot) = PathBuilder::from_circle(center.0, center.1, radius) {
+        pixmap.fill_path(&dot, &solid(color), FillRule::Winding, Transform::identity(), None);
+    }
+}
+
 /// A dark pill under a label or a hint; its text is drawn over it by the system.
 pub fn pill(frame: &mut Frame, rect: Rect) {
     let Some(mut pixmap) = frame.pixmap() else { return };
@@ -476,6 +507,9 @@ pub struct ToolbarLook<'a> {
     pub can_undo: bool,
     /// The query button whose screenshot is being sent; the other buttons wait meanwhile.
     pub busy: Option<usize>,
+    /// Whether the busy button's microphone listens to a question asked aloud: the button is red,
+    /// as a button that records.
+    pub listening: bool,
     /// The icons of the query buttons.
     pub queries: &'a [Icon],
     /// How far the model of masking has come while it is downloaded, from 0 to 1: a thin line
@@ -519,7 +553,8 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
         );
         if let Some(back) = &back {
             if active {
-                pixmap.fill_path(back, &solid(ACCENT), FillRule::Winding, Transform::identity(), None);
+                let fill = if look.listening && matches!(button, Button::Query(_)) { MIC_LISTENING } else { ACCENT };
+                pixmap.fill_path(back, &solid(fill), FillRule::Winding, Transform::identity(), None);
             } else if enabled && look.hovered == Some(button) {
                 pixmap.fill_path(back, &solid(HOVER), FillRule::Winding, Transform::identity(), None);
             }

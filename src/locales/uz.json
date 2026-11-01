@@ -149,7 +149,12 @@
     "Version {version} is installed.": "{version} versiyasi oʻrnatildi.",
     "Version {version} is the latest.": "{version} versiyasi eng soʻnggisi.",
     "ainitShot is updated": "ainitShot yangilandi",
-    "ainitShot {version} is available": "ainitShot {version} mavjud"
+    "ainitShot {version} is available": "ainitShot {version} mavjud",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon hali yoqilmagan edi: qizil nuqta yonguncha {key} klavishini bosib turing.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon hali yoqilmagan edi: qizil nuqta yonguncha tugmani bosib turing.",
+    "The microphone didn't turn on.": "Mikrofon yoqilmadi.",
+    "The question asked aloud didn't go.": "Ovoz bilan berilgan savol yuborilmadi.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz: gapirish belgisi."
   },
   "settings": {
     "settings": "Sozlamalar",
@@ -350,7 +355,10 @@
     "updateTo": "{version} versiyasiga yangilash",
     "autoupdate": "Yangilanishlarni avtomatik oʻrnatish",
     "autoupdateDesc": "Dastur ishga tushganda va kuniga bir marta yangi versiyani qidiradi hamda oynalaridan hech biri ochiq boʻlmaganda uni oʻrnatadi.",
-    "kUpdates": "yangilanishlar yangilanish yangilash versiya yangi versiya oʻrnatish avtomatik tekshirish yuklab olish yuklash updates update version upgrade install automatic check download"
+    "kUpdates": "yangilanishlar yangilanish yangilash versiya yangi versiya oʻrnatish avtomatik tekshirish yuklab olish yuklash updates update version upgrade install automatic check download",
+    "listeningSound": "Mikrofon tinglayotganda ovoz",
+    "listeningSoundDesc": "Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz chiqadi: undan keyin gapiring.",
+    "kListeningSound": "ovoz signal mikrofon gapirish tinglash sound microphone"
   },
   "guide": {
     "start": "Boshlash",

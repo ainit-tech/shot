@@ -149,7 +149,12 @@
     "Version {version} is installed.": "Versi {version} telah dipasang.",
     "Version {version} is the latest.": "Versi {version} ialah yang terkini.",
     "ainitShot is updated": "ainitShot telah dikemas kini",
-    "ainitShot {version} is available": "ainitShot {version} tersedia"
+    "ainitShot {version} is available": "ainitShot {version} tersedia",
+    "The microphone wasn't on yet: hold {key} until the red dot lights up.": "Mikrofon belum dihidupkan: tahan {key} sehingga titik merah menyala.",
+    "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon belum dihidupkan: tahan butang sehingga titik merah menyala.",
+    "The microphone didn't turn on.": "Mikrofon tidak hidup.",
+    "The question asked aloud didn't go.": "Soalan secara lisan tidak dihantar.",
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: isyarat untuk bercakap."
   },
   "settings": {
     "settings": "Tetapan",
@@ -350,7 +355,10 @@
     "updateTo": "Kemas kini ke {version}",
     "autoupdate": "Pasang kemas kini secara automatik",
     "autoupdateDesc": "Program mencari versi baharu semasa dimulakan dan sekali sehari, lalu memasangnya apabila tiada tetingkap program yang terbuka.",
-    "kUpdates": "kemas kini versi versi baharu baharu naik taraf pasang automatik semak muat turun terkini update upgrade install"
+    "kUpdates": "kemas kini versi versi baharu baharu naik taraf pasang automatik semak muat turun terkini update upgrade install",
+    "listeningSound": "Bunyi apabila mikrofon mendengar",
+    "listeningSoundDesc": "Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: bercakap selepasnya.",
+    "kListeningSound": "bunyi isyarat bip mikrofon lisan suara bercakap dengar sound microphone"
   },
   "guide": {
     "start": "Mula",

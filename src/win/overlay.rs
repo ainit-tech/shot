@@ -48,7 +48,7 @@ use crate::image::Image;
 use crate::query::{self, Way};
 use crate::selection::{Hit, Selection};
 use crate::settings::{Icon, Mode, QueryButton, Settings};
-use crate::text::tr;
+use crate::text::{self, tr};
 use crate::toolbar::{Button, Palette, Toolbar};
 
 const CLASS: PCWSTR = w!("ainitShot.overlay");
@@ -65,6 +65,16 @@ const HOLD_TIMER: usize = 3;
 const HELD_TIMER: usize = 4;
 const NOTE_TIMER: usize = 5;
 const CARET_TIMER: usize = 6;
+const BLINK_TIMER: usize = 7;
+const LIMIT_TIMER: usize = 8;
+/// How often the grey dot of a microphone being turned on blinks, in milliseconds.
+const BLINK: u32 = 400;
+/// How long the microphone may take to turn on before a question asked aloud gives up, in
+/// milliseconds.
+const MIC_LIMIT: u32 = 8000;
+/// How long the page may take to send a question asked aloud once its button is let go, in
+/// milliseconds.
+const SEND_LIMIT: u32 = 20_000;
 /// How often the caret of the text being written blinks, in milliseconds.
 const CARET_BLINK: u32 = 530;
 /// How long the mouse rests on a button before its hint shows, in milliseconds.
@@ -223,10 +233,20 @@ struct Listening {
     picture: Image,
     /// Whether the microphone is on.
     on: bool,
+    /// Whether the grey dot of the microphone being turned on shows, as it blinks.
+    blink: bool,
     /// The words heard so far.
     words: String,
     /// Whether the button has been let go.
     released: bool,
+}
+
+/// A hint next to its toolbar's button, and in the hint of a question asked aloud the dot that
+/// shows what the microphone does: its centre, radius and colour.
+struct Hint {
+    rect: Rect,
+    text: Text,
+    dot: Option<((f32, f32), f32, Rgba)>,
 }
 
 /// Everything around the selection, laid out for drawing.
@@ -242,7 +262,7 @@ struct Scene {
     /// The panel of the actions: masking, the query buttons, copying and saving.
     actions: Option<Toolbar>,
     palette: Option<Palette>,
-    hint: Option<(Rect, Text)>,
+    hint: Option<Hint>,
     ring: Option<(Point, f32)>,
 }
 
@@ -684,6 +704,23 @@ impl Overlay {
             HINT_TIMER => session.show_hint = session.hovered.is_some(),
             RING_TIMER => session.ring = None,
             NOTE_TIMER => session.note = None,
+            BLINK_TIMER => {
+                let Some(listening) = session.listening.as_mut().filter(|listening| !listening.on) else { return };
+                listening.blink = !listening.blink;
+                unsafe { SetTimer(window, BLINK_TIMER, BLINK, None) };
+            }
+            // The microphone didn't come on in time, or the question didn't go once it was let
+            // go: the question asked aloud is given up, and the user is told.
+            LIMIT_TIMER => {
+                let Some(listening) = session.listening.take() else { return };
+                unsafe { KillTimer(window, BLINK_TIMER) };
+                browser::abort_listening();
+                let why = match listening.on {
+                    false => tr("The microphone didn't turn on."),
+                    true => tr("The question asked aloud didn't go."),
+                };
+                return session.set_note(window, Button::Query(listening.button), why.into());
+            }
             _ => return,
         }
         session.refresh(window);
@@ -1051,8 +1088,26 @@ impl Overlay {
             return;
         }
         if let Some(listening) = session.listening.as_mut().filter(|l| l.holder == holder && !l.released) {
-            listening.released = true;
             unsafe { KillTimer(window, HELD_TIMER) };
+            // Let go before the microphone was on, nothing could be heard: the question is given
+            // up at once, the user is told why, and the screenshot stays for another try.
+            if !listening.on {
+                let button = listening.button;
+                let why = match holder {
+                    Holder::Key(_) => match session.settings.buttons[button].key() {
+                        Some(key) => tr("The microphone wasn't on yet: hold {key} until the red dot lights up.")
+                            .replace("{key}", &key.to_string()),
+                        None => tr("The microphone wasn't on yet: hold the button until the red dot lights up.").into(),
+                    },
+                    Holder::Mouse => tr("The microphone wasn't on yet: hold the button until the red dot lights up.").into(),
+                };
+                session.listening = None;
+                stop_waiting(window);
+                browser::abort_listening();
+                return session.set_note(window, Button::Query(button), why);
+            }
+            listening.released = true;
+            unsafe { SetTimer(window, LIMIT_TIMER, SEND_LIMIT, None) };
             browser::stop_listening();
             session.refresh(window);
         }
@@ -1089,8 +1144,15 @@ impl Overlay {
         let Some(picture) = session.picture() else { return };
         let upload = picture.clone();
         let (button, holder) = (press.button, press.holder);
-        session.listening = Some(Listening { id, button, holder, picture, on: false, words: String::new(), released: false });
+        let words = String::new();
+        session.listening = Some(Listening { id, button, holder, picture, on: false, blink: true, words, released: false });
         session.refresh(window);
+        // The grey dot blinks while the microphone is turned on, and the question gives up if
+        // the microphone doesn't come on in time.
+        unsafe {
+            SetTimer(window, BLINK_TIMER, BLINK, None);
+            SetTimer(window, LIMIT_TIMER, MIC_LIMIT, None);
+        }
         let target = window as isize;
         thread::spawn(move || {
             let answer: Answer = upload.to_png().map(|png| query::listen(&png));
@@ -1137,18 +1199,28 @@ impl Overlay {
         let Some(listening) = &mut session.listening else { return };
         let button = listening.button;
         match heard {
-            Heard::Listening => listening.on = true,
+            // The dot turns red and stays, and the chime says to speak.
+            Heard::Listening => {
+                listening.on = true;
+                stop_waiting(window);
+                if session.settings.listening_sound {
+                    shell::chime();
+                }
+            }
             Heard::Words(words) => listening.words = words,
             Heard::Sent => {
                 session.listening = None;
+                stop_waiting(window);
                 return self.close();
             }
             Heard::Silent => {
                 session.listening = None;
+                stop_waiting(window);
                 session.set_note(window, Button::Query(button), tr("Heard nothing").into());
             }
             Heard::Failed(why) => {
                 session.listening = None;
+                stop_waiting(window);
                 session.set_note(window, Button::Query(button), why);
             }
         }
@@ -1165,6 +1237,7 @@ impl Overlay {
         }
         session.pressing = None;
         if session.listening.take().is_some() {
+            stop_waiting(window);
             browser::abort_listening();
         }
         session.refresh(window);
@@ -1264,7 +1337,7 @@ impl Overlay {
         self.color = session.color;
         self.width = Some(session.width);
         unsafe {
-            for timer in [HINT_TIMER, RING_TIMER, HOLD_TIMER, HELD_TIMER, NOTE_TIMER, CARET_TIMER] {
+            for timer in [HINT_TIMER, RING_TIMER, HOLD_TIMER, HELD_TIMER, NOTE_TIMER, CARET_TIMER, BLINK_TIMER, LIMIT_TIMER] {
                 KillTimer(self.window, timer);
             }
             ReleaseCapture();
@@ -1676,8 +1749,10 @@ impl Session {
 
     /// Shows a note next to the query button for a few seconds.
     fn set_note(&mut self, window: HWND, button: Button, note: String) {
+        // Long enough to be read: a longer note stays longer.
+        let time = (note.chars().count() as u32 * 70).clamp(NOTE_TIME, 8000);
         self.note = Some((button, note));
-        unsafe { SetTimer(window, NOTE_TIMER, NOTE_TIME, None) };
+        unsafe { SetTimer(window, NOTE_TIMER, time, None) };
         self.refresh(window);
     }
 
@@ -1786,14 +1861,25 @@ impl Session {
 
     /// The hint of the button under the mouse, what is being sent, what is heard of a question
     /// asked aloud, or what happened to it, next to its toolbar.
-    fn hint(&mut self, main: Option<&Toolbar>, actions: Option<&Toolbar>) -> Option<(Rect, Text)> {
+    fn hint(&mut self, main: Option<&Toolbar>, actions: Option<&Toolbar>) -> Option<Hint> {
+        // A question asked aloud has a dot at the start of its hint: grey and blinking while the
+        // microphone is turned on, red while it listens and until the last words have come;
+        // none as the question goes. The room stays as the grey dot blinks.
+        let mut dot = None;
         let (button, text) = match (&self.sending, &self.listening, &self.note) {
             _ if self.reading == Some(Button::Mask) => (Button::Mask, tr("Looking for private data…").to_string()),
             _ if self.reading.is_some() => (Button::CopyText, tr("Reading the text…").to_string()),
             (Some(sending), _, _) => {
                 (Button::Query(sending.button), tr("Sending to Google…").to_string())
             }
-            (_, Some(listening), _) => (Button::Query(listening.button), self.listening_hint(listening)),
+            (_, Some(listening), _) => {
+                dot = match (listening.on, listening.released, listening.words.is_empty()) {
+                    (false, _, _) => Some(listening.blink.then_some(draw::MIC_WAITING)),
+                    (true, true, false) => None,
+                    _ => Some(Some(draw::MIC_LISTENING)),
+                };
+                (Button::Query(listening.button), self.listening_hint(listening))
+            }
             (_, _, Some((button, note))) => (*button, note.clone()),
             _ if self.show_hint && !self.palette && self.pressing.is_none() => {
                 let button = self.hovered?;
@@ -1802,10 +1888,22 @@ impl Session {
             _ => return None,
         };
         let (toolbar, anchor) = [main, actions].into_iter().flatten().find_map(|bar| Some((bar, bar.button(button)?)))?;
-        let size = draw::label_font(toolbar.scale);
+        let scale = toolbar.scale;
+        let size = draw::label_font(scale);
         let measured = self.measure(&text, size)?;
-        let rect = toolbar.popup(anchor, draw::pill_size(measured, toolbar.scale));
-        Some((rect, Text { text, rect, size, bold: false, color: draw::TEXT }))
+        let (width, height) = draw::pill_size(measured, scale);
+        let room = if dot.is_some() { draw::mic_dot_room(scale) } else { 0 };
+        let rect = toolbar.popup(anchor, (width + room, height));
+        let right_to_left = text::current().right_to_left();
+        let line = match right_to_left {
+            true => Rect::new(rect.left, rect.top, rect.right - room, rect.bottom),
+            false => Rect::new(rect.left + room, rect.top, rect.right, rect.bottom),
+        };
+        let dot = dot.flatten().map(|color| {
+            let (center, radius) = draw::mic_dot_place(rect, scale, right_to_left);
+            (center, radius, color)
+        });
+        Some(Hint { rect, text: Text { text, rect: line, size, bold: false, color: draw::TEXT }, dot })
     }
 
     /// Marks for redrawing what changed around the selection since it was last drawn.
@@ -1861,6 +1959,7 @@ impl Session {
             width: self.width,
             can_undo: !self.history.is_empty(),
             busy: self.sending.as_ref().map(|s| s.button).or(self.listening.as_ref().map(|l| l.button)),
+            listening: self.listening.as_ref().is_some_and(|l| l.on && (!l.released || l.words.is_empty())),
             queries: &queries,
             coming: models::coming(),
         };
@@ -1873,9 +1972,12 @@ impl Session {
                 draw::palette(&mut frame, palette, &self.colors, self.color, toolbar.scale);
             }
         }
-        if let Some((rect, text)) = scene.hint {
-            draw::pill(&mut frame, rect);
-            texts.push(text);
+        if let Some(hint) = scene.hint {
+            draw::pill(&mut frame, hint.rect);
+            if let Some((center, radius, color)) = hint.dot {
+                draw::mic_dot(&mut frame, center, radius, color);
+            }
+            texts.push(hint.text);
         }
         if let Some((at, diameter)) = scene.ring {
             draw::width_ring(&mut frame, at, diameter);
@@ -2006,8 +2108,8 @@ impl Scene {
         if let Some(actions) = &self.actions {
             all = all.union(actions.rect.inflate(draw::shadow_reach(actions.scale)));
         }
-        if let Some((rect, _)) = &self.hint {
-            all = all.union(*rect);
+        if let Some(hint) = &self.hint {
+            all = all.union(hint.rect);
         }
         if let Some((at, diameter)) = self.ring {
             all = all.union(draw::ring_bounds(at, diameter));
@@ -2027,6 +2129,15 @@ fn cannot_save() -> &'static str {
 /// The title of the notification about a query whose picture didn't go.
 fn not_sent(button: &str) -> String {
     tr("{}: the picture didn't go").replace("{}", button)
+}
+
+/// The microphone of a question asked aloud has come on, or the question has ended: the grey dot
+/// stops blinking, and nothing waits for the microphone any more.
+fn stop_waiting(window: HWND) {
+    unsafe {
+        KillTimer(window, BLINK_TIMER);
+        KillTimer(window, LIMIT_TIMER);
+    }
 }
 
 fn key_down(key: u16) -> bool {
@@ -2180,6 +2291,7 @@ mod tests {
             width: 4.0,
             can_undo: true,
             busy: None,
+            listening: false,
             queries: &queries,
             coming: None,
         };
@@ -2261,6 +2373,58 @@ mod tests {
 
         drop(overlay);
         unsafe { DestroyWindow(window) };
+    }
+
+    /// Draws the frozen screen with the hint of a question asked aloud in each of its states into
+    /// PNG files in the folder named by `SCREENSHOT_PREVIEW`: the microphone being turned on, the
+    /// grey dot blinking off, the microphone listening, the words heard, the question asked, and
+    /// the note for a button let go too early:
+    /// `SCREENSHOT_PREVIEW=<folder> cargo test -p ainitshot voice_hints_in_pictures -- --ignored`.
+    #[test]
+    #[ignore]
+    fn the_voice_hints_in_pictures() {
+        let folder = PathBuf::from(std::env::var("SCREENSHOT_PREVIEW").expect("SCREENSHOT_PREVIEW names a folder"));
+        let (width, height) = (760u32, 420u32);
+        let mut pixels = Vec::with_capacity((width * height * 4) as usize);
+        for y in 0..height {
+            for x in 0..width {
+                let shade = 200 + ((x / 40 + y / 40) % 2 * 30) as u8;
+                pixels.extend_from_slice(&[shade, shade - 20, shade - 60, 255]);
+            }
+        }
+        let bounds = Rect::new(0, 0, width as i32, height as i32);
+        let screen = Screen {
+            origin: Point::new(0, 0),
+            image: Image { width, height, pixels },
+            monitors: vec![capture::Monitor { rect: bounds, scale: 1.0 }],
+            windows: Vec::new(),
+        };
+        let mut session = Session::over(screen, Rc::new(Settings::default()), 0, None).unwrap();
+        session.selection.select(Rect::new(60, 40, 460, 300));
+        let picture = Image { width: 1, height: 1, pixels: vec![255; 4] };
+        let heard = "Где это снято";
+        let states = [
+            ("1-turning-on", false, true, false, ""),
+            ("2-turning-on-blink", false, false, false, ""),
+            ("3-listening", true, true, false, ""),
+            ("4-words", true, true, false, heard),
+            ("5-asking", true, true, true, heard),
+        ];
+        let save = |session: &mut Session, name: &str| {
+            session.render(bounds);
+            let picture = Image { width, height, pixels: session.buffer.frame().pixels.to_vec() };
+            std::fs::write(folder.join(format!("voice-{name}.png")), picture.to_png().unwrap()).unwrap();
+        };
+        for (name, on, blink, released, words) in states {
+            let (id, button, holder) = (1, 0, Holder::Key(b'G' as u16));
+            let (picture, words) = (picture.clone(), words.to_string());
+            session.listening = Some(Listening { id, button, holder, picture, on, blink, words, released });
+            save(&mut session, name);
+        }
+        session.listening = None;
+        let why = tr("The microphone wasn't on yet: hold {key} until the red dot lights up.").replace("{key}", "G");
+        session.note = Some((Button::Query(0), why));
+        save(&mut session, "6-too-early");
     }
 
     /// A window, hidden, gives up its input method and takes it back.
