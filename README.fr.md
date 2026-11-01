@@ -10,7 +10,7 @@ Un logiciel de capture d’écran pour Windows, gratuit et open source. Une touc
 
 ## Ce qu’il fait
 
-- **Interroger l’IA de Google sur la capture** — <kbd>G</kbd>. Le Mode IA dit qui ou quoi se trouve sur l’image, et la conversation s’ouvre à côté de la sélection pour poser d’autres questions. Une boucle du crayon magique montre à l’IA où regarder.
+- **Interroger l’IA de Google sur la capture** — <kbd>G</kbd>. Le Mode IA dit qui ou quoi se trouve sur l’image, et la conversation s’ouvre à côté de la sélection pour poser d’autres questions. Chaque question a sa propre fenêtre, et plusieurs conversations peuvent rester côte à côte. Une boucle du crayon magique montre à l’IA où regarder.
 - **Demander à voix haute** — maintenez <kbd>G</kbd>, posez votre question et relâchez : elle part avec l’image.
 - **Traduire ce que vous voyez** — <kbd>T</kbd>. Seule la traduction s’affiche, dans votre langue, dans une carte à côté de la sélection.
 - **Rechercher par image** — <kbd>I</kbd>. Google Images trouve d’où vient l’image et où elle apparaît encore, les correspondances exactes d’abord.

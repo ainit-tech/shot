@@ -10,7 +10,7 @@ Un programa de capturas de pantalla para Windows, gratuito y de código abierto.
 
 ## Qué hace
 
-- **Pregúntale a la IA de Google por la captura** — <kbd>G</kbd>. El Modo IA te dice quién o qué aparece en la imagen, y la conversación se abre junto a la selección para seguir preguntando. Un lazo del lápiz mágico le muestra a la IA dónde mirar.
+- **Pregúntale a la IA de Google por la captura** — <kbd>G</kbd>. El Modo IA te dice quién o qué aparece en la imagen, y la conversación se abre junto a la selección para seguir preguntando. Cada pregunta tiene su propia ventana, así que puedes tener varias conversaciones una al lado de otra. Un lazo del lápiz mágico le muestra a la IA dónde mirar.
 - **Pregunta en voz alta** — mantén pulsada la <kbd>G</kbd>, di tu pregunta y suéltala: se envía junto con la imagen.
 - **Traduce lo que ves** — <kbd>T</kbd>. Solo la traducción aparece, en tu idioma, en una tarjeta junto a la selección.
 - **Busca por imagen** — <kbd>I</kbd>. Google Imágenes encuentra de dónde viene la imagen y dónde más aparece, primero las coincidencias exactas.

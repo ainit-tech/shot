@@ -1,7 +1,8 @@
 //! The answer card (decision 8): a small dark window next to the selection with the answer of
 //! AI Mode alone, while the window it comes from stays hidden. Its text can be selected and
 //! copied, and Ctrl+C with nothing selected copies all of it; Esc or a click elsewhere closes
-//! the card. "Показать разговор" under the text shows the hidden window with the conversation.
+//! the card. "Показать разговор" under the text shows the hidden window with the conversation;
+//! closed without it, the card lets the window go for good.
 
 use std::cell::RefCell;
 use std::ptr::{null, null_mut};
@@ -113,8 +114,9 @@ pub fn text() -> Option<String> {
     CARD.with(|cell| cell.borrow().as_ref().map(|card| card.text.clone()))
 }
 
-/// Closes the card.
+/// Closes the card; the hidden window behind it goes for good, unless the user has seen it.
 pub fn close() {
+    browser::card_closed();
     let Some(card) = CARD.with(|cell| cell.borrow_mut().take()) else { return };
     unsafe { DestroyWindow(card.window) };
 }
@@ -348,7 +350,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
         WM_MOUSELEAVE => hover(window, false),
         WM_LBUTTONUP => {
             if on_link(window, point_of(lparam)) {
-                browser::show();
+                browser::show_conversation();
             }
         }
         WM_SETCURSOR if (lparam & 0xFFFF) as u32 == HTCLIENT && wparam as HWND == window => {

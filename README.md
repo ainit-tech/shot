@@ -10,7 +10,7 @@ A free, open-source screenshot program for Windows. A key freezes the screen: ta
 
 ## What it does
 
-- **Ask Google's AI about the screenshot** — <kbd>G</kbd>. AI Mode says who or what is in the picture, and the conversation opens next to the selection, to ask further. A loop of the magic pencil shows the AI what to look at.
+- **Ask Google's AI about the screenshot** — <kbd>G</kbd>. AI Mode says who or what is in the picture, and the conversation opens next to the selection, to ask further. Every question has a window of its own, so conversations can stand side by side. A loop of the magic pencil shows the AI what to look at.
 - **Ask aloud** — hold <kbd>G</kbd>, say your question and let go: it goes with the picture.
 - **Translate what you see** — <kbd>T</kbd>. The translation alone comes in a card next to the selection, in your language.
 - **Search by image** — <kbd>I</kbd>. Google Images finds where the picture comes from and where else it is, exact matches first.

@@ -1173,7 +1173,8 @@ impl Overlay {
         let started = match answer {
             Ok(Way::Window { url, script }) => {
                 let picture = listening.picture.clone();
-                let job = browser::Job { name: button.name.clone(), script, picture, mode: button.mode, listener: Some(window) };
+                let (name, question) = (button.name.clone(), button.name.clone());
+                let job = browser::Job { name, question, script, picture, mode: button.mode, listener: Some(window) };
                 browser::ask(&url, job, selection)
             }
             Ok(Way::Page(_)) => Err(tr("AI Mode opens only in the program's window.")
@@ -1304,7 +1305,10 @@ impl Overlay {
                     card::open(selection);
                 }
                 let picture = sending.picture.clone();
-                let job = browser::Job { name: button.name.clone(), script, picture, mode: button.mode, listener: None };
+                // The question titles the window; a button without one, its name.
+                let question = if button.prompt.trim().is_empty() { &button.name } else { &button.prompt };
+                let (name, question) = (button.name.clone(), question.clone());
+                let job = browser::Job { name, question, script, picture, mode: button.mode, listener: None };
                 if let Err(problem) = browser::ask(&url, job, selection) {
                     card::close();
                     let title = not_sent(&button.name);
