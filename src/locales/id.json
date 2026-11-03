@@ -414,7 +414,7 @@
     "ui.pause": "Jeda",
     "ui.chapters": "Bab",
     "scenes.freeze.title": "Satu tombol untuk screenshot",
-    "scenes.freeze.caption": "{hotkey} membekukan layar. Klik jendela untuk mengambilnya utuh, atau seret di atas bagian yang Anda perlukan. Tekan {hotkey} sekali lagi untuk memilih ulang.",
+    "scenes.freeze.caption": "{hotkey} membekukan layar. Klik mengambil gambar, pesan, atau panel di bawah mouse, Ctrl dan klik seluruh jendela, dan seret bagian mana pun. Tekan {hotkey} sekali lagi untuk memilih ulang.",
     "scenes.magic.title": "Pensil ajaib",
     "scenes.magic.caption": "Lingkari sesuatu dengan asal, dan dapatkan oval atau persegi panjang yang rapi.",
     "scenes.cover.title": "Persegi panjang terisi",

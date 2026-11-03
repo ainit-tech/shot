@@ -414,7 +414,7 @@
     "ui.pause": "Pausa",
     "ui.chapters": "Kapitel",
     "scenes.freeze.title": "En tangent för en skärmbild",
-    "scenes.freeze.caption": "{hotkey} fryser skärmen. Klicka på ett fönster för att ta hela, eller dra över den del du behöver. Tryck på {hotkey} igen för att välja om.",
+    "scenes.freeze.caption": "{hotkey} fryser skärmen. Ett klick tar bilden, meddelandet eller panelen under musen, Ctrl och ett klick hela fönstret, och ett drag vilken del som helst. Tryck på {hotkey} igen för att välja om.",
     "scenes.magic.title": "Magisk penna",
     "scenes.magic.caption": "Ringa in något slarvigt och få en snygg oval eller rektangel.",
     "scenes.cover.title": "Fylld rektangel",

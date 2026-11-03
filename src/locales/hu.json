@@ -414,7 +414,7 @@
     "ui.pause": "Szünet",
     "ui.chapters": "Fejezetek",
     "scenes.freeze.title": "Egy billentyű a képernyőképhez",
-    "scenes.freeze.caption": "{hotkey}: a képernyő kimerevedik. Kattints egy ablakra, hogy egészben vedd fel, vagy húzd az egeret a kellő rész fölött. Még egy {hotkey}, és újra választhatsz.",
+    "scenes.freeze.caption": "{hotkey}: a képernyő kimerevedik. Egy kattintás felveszi az egér alatti képet, üzenetet vagy panelt, a Ctrl és egy kattintás az egész ablakot, a húzás pedig bármelyik részt. Még egy {hotkey}, és újra választhatsz.",
     "scenes.magic.title": "Varázsceruza",
     "scenes.magic.caption": "Karikázz be valamit nagyjából, és szabályos ovális vagy téglalap lesz belőle.",
     "scenes.cover.title": "Kitöltött téglalap",

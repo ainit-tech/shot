@@ -414,7 +414,7 @@
     "ui.pause": "Tauko",
     "ui.chapters": "Luvut",
     "scenes.freeze.title": "Yksi näppäin kuvakaappaukseen",
-    "scenes.freeze.caption": "{hotkey} jäädyttää näytön. Napsauta ikkunaa ottaaksesi sen kokonaan tai vedä tarvitsemasi osan yli. Paina {hotkey} uudelleen valitaksesi alusta.",
+    "scenes.freeze.caption": "{hotkey} jäädyttää näytön. Napsautus ottaa hiiren alla olevan kuvan, viestin tai paneelin, Ctrl ja napsautus koko ikkunan ja vetäminen minkä tahansa osan. Paina {hotkey} uudelleen valitaksesi alusta.",
     "scenes.magic.title": "Taikakynä",
     "scenes.magic.caption": "Ympyröi jotain summittaisesti, niin saat siistin soikion tai suorakulmion.",
     "scenes.cover.title": "Täytetty suorakulmio",

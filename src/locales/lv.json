@@ -414,7 +414,7 @@
     "ui.pause": "Pauze",
     "ui.chapters": "Nodaļas",
     "scenes.freeze.title": "Viens taustiņš ekrānuzņēmumam",
-    "scenes.freeze.caption": "{hotkey} iesaldē ekrānu. Noklikšķiniet uz loga, lai to uzņemtu visu, vai velciet ar peli pār vajadzīgo daļu. Nospiediet {hotkey} vēlreiz, lai izvēlētos no jauna.",
+    "scenes.freeze.caption": "{hotkey} iesaldē ekrānu. Klikšķis uzņem attēlu, ziņu vai paneli zem peles, Ctrl un klikšķis – visu logu, bet vilkšana – jebkuru daļu. Nospiediet {hotkey} vēlreiz, lai izvēlētos no jauna.",
     "scenes.magic.title": "Burvju zīmulis",
     "scenes.magic.caption": "Aptuveni apvelciet kaut ko un iegūstiet glītu ovālu vai taisnstūri.",
     "scenes.cover.title": "Aizpildīts taisnstūris",

@@ -414,7 +414,7 @@
     "ui.pause": "Pause",
     "ui.chapters": "Kapitel",
     "scenes.freeze.title": "Eine Taste für einen Screenshot",
-    "scenes.freeze.caption": "{hotkey} friert den Bildschirm ein. Klicken Sie auf ein Fenster, um es ganz aufzunehmen, oder ziehen Sie über den Teil, den Sie brauchen. Drücken Sie {hotkey} noch einmal, um neu zu wählen.",
+    "scenes.freeze.caption": "{hotkey} friert den Bildschirm ein. Ein Klick nimmt das Bild, die Nachricht oder den Bereich unter der Maus auf, Strg und ein Klick das ganze Fenster, Ziehen jeden beliebigen Teil. Drücken Sie {hotkey} noch einmal, um neu zu wählen.",
     "scenes.magic.title": "Zauberstift",
     "scenes.magic.caption": "Kreisen Sie etwas grob ein – und Sie bekommen ein sauberes Oval oder Rechteck.",
     "scenes.cover.title": "Gefülltes Rechteck",
