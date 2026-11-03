@@ -56,6 +56,8 @@ const CHAIN: f32 = 8.0;
 const CELLS: usize = 4;
 const LINED_CELLS: usize = 3;
 const ONE_SIZE: f32 = 1.5;
+/// How much the gaps between the rows of a list may differ from one another.
+const LIST: f32 = 0.25;
 /// A block with no more of its pixels differing from their neighbours, and at least this much of
 /// it of the colour of its ground, is sparse, as text is, rather than dense, as a picture is: even
 /// a smooth picture has colours of its own.
@@ -301,10 +303,22 @@ impl Areas {
             let content = self.content(image, rect, ground);
             return content.into_iter().filter(|content| content.rect != rect).collect();
         }
-        let across = row_widest >= column_widest;
+        // The rows of a list or of a table go across it before its columns, however wide the
+        // space between the columns: a piece of a column is nothing to take.
+        let (row_list, column_list) = (list(&row_gaps, row_span), list(&column_gaps, column_span));
+        let across = if row_list != column_list { row_list } else { row_widest >= column_widest };
         let (gaps, span, widest) =
             if across { (row_gaps, row_span, row_widest) } else { (column_gaps, column_span, column_widest) };
-        let least = ((widest as f32 * TIER).ceil() as usize).max(1);
+        let listed = (across && row_list) || (!across && column_list);
+        if listed {
+            // The list itself is a part of the box, with the empty space around it, and its rows
+            // are the parts of the list.
+            let list = Rect::new(rect.left + column_span.0 as i32, rect.top + row_span.0 as i32, rect.left + column_span.1 as i32, rect.top + row_span.1 as i32);
+            if !near(rect, list) {
+                return self.content(image, rect, ground).into_iter().collect();
+            }
+        }
+        let least = if listed { 1 } else { ((widest as f32 * TIER).ceil() as usize).max(1) };
         let mut bands = Vec::new();
         let mut start = span.0;
         for &(gap_start, gap_end) in gaps.iter().filter(|(start, end)| end - start >= least) {
@@ -678,6 +692,33 @@ fn span(blank: &[bool]) -> Option<(usize, usize)> {
     Some((first, last + 1))
 }
 
+/// Whether the gaps across a box, inside the span of its content, are those between the rows of a
+/// list or a table: `CELLS` rows at least, most of about one size, with gaps of about one width
+/// between them, some narrower, as where a row is lit up, but none much wider, as between the
+/// paragraphs of a text.
+fn list(gaps: &[(usize, usize)], span: (usize, usize)) -> bool {
+    if gaps.len() + 1 < CELLS {
+        return false;
+    }
+    let mostly = |mut sizes: Vec<usize>, by: f32| {
+        sizes.sort_unstable();
+        let median = sizes[sizes.len() / 2] as f32;
+        let alike = sizes.iter().filter(|&&size| (size as f32 - median).abs() <= by * median).count();
+        (4 * alike >= 3 * sizes.len(), sizes[sizes.len() - 1] as f32 <= ONE_SIZE * median)
+    };
+    let widths: Vec<usize> = gaps.iter().map(|(start, end)| end - start).collect();
+    let mut rows = Vec::new();
+    let mut start = span.0;
+    for &(gap_start, gap_end) in gaps {
+        rows.push(gap_start - start);
+        start = gap_end;
+    }
+    rows.push(span.1 - start);
+    let (gaps_alike, none_wider) = mostly(widths, LIST);
+    let (rows_alike, _) = mostly(rows, ONE_SIZE - 1.0);
+    gaps_alike && none_wider && rows_alike
+}
+
 /// The runs of empty rows inside the span, as (start, end).
 fn gaps(blank: &[bool], span: (usize, usize)) -> Vec<(usize, usize)> {
     let mut gaps = Vec::new();
@@ -781,7 +822,8 @@ mod tests {
         }
     }
 
-    /// Lines of made-up text: dark specks in rows, as words of letters.
+    /// Lines of made-up text: words of dark strokes in rows, with the paper showing between them,
+    /// as between the strokes of letters.
     fn text(image: &mut Image, rect: Rect, line: i32) {
         let mut y = rect.top;
         while y + line <= rect.bottom {
@@ -789,7 +831,10 @@ mod tests {
             let mut n = 0;
             while x < rect.right - 4 {
                 let word = 12 + (n * 7) % 30;
-                fill(image, Rect::new(x, y + 3, (x + word).min(rect.right), y + line - 4), [40, 40, 40]);
+                let end = (x + word).min(rect.right);
+                for stroke in (x..end).step_by(4) {
+                    fill(image, Rect::new(stroke, y + 3, (stroke + 2).min(end), y + line - 4), [40, 40, 40]);
+                }
                 x += word + 6;
                 n += 1;
             }
@@ -879,6 +924,22 @@ mod tests {
         assert_eq!(sidebar, Rect::new(0, 81, 261, 800));
         // The toolbar is a strip: the window, nothing of its own.
         assert_eq!(at(&mut areas, 600, 50), None);
+    }
+
+    #[test]
+    fn a_table_lights_up_whole_and_not_a_column_of_it() {
+        // Ten rows in three columns, as files in a folder, with more space between the columns than
+        // between the rows.
+        let mut image = canvas(1000, 700, [255, 255, 255]);
+        for row in 0..10 {
+            let y = 100 + row * 30;
+            for (left, right) in [(100, 300), (360, 480), (540, 640)] {
+                text(&mut image, Rect::new(left, y, right, y + 16), 16);
+            }
+        }
+        let mut areas = Areas::new(&image);
+        let area = areas.at(&image, image.bounds(), Point::new(400, 200), 1.0).expect("no area");
+        assert!(area.left <= 100 && area.right >= 640 && area.top <= 103 && area.bottom >= 380, "{area:?}");
     }
 
     /// Draws the areas that the mouse would find all over screenshots of windows, each in a
