@@ -38,7 +38,7 @@ impl From<Point> for PointF {
 
 /// A rectangle in pixels. It includes its left and top edges and ends just before its right
 /// and bottom ones, so its width is `right - left`.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Rect {
     pub left: i32,
     pub top: i32,

@@ -7,6 +7,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod annotation;
+mod areas;
 mod card;
 mod chime;
 mod color;

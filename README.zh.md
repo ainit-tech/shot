@@ -2,7 +2,7 @@
 
 # ainitShot
 
-免费、开源的 Windows 截图程序。按一个键冻结屏幕：选取一个窗口或其中任意部分，在上面绘图、遮盖个人信息，然后复制截图或其中的文字、保存它，或就它向 Google AI 提问。
+免费、开源的 Windows 截图程序。按一个键冻结屏幕：单击即可选取鼠标下的图片、消息或面板，按住 Ctrl 单击选取整个窗口，也可以用鼠标框选任意部分；在上面绘图、遮盖个人信息，然后复制截图或其中的文字、保存它，或就它向 Google AI 提问。
 
 **[下载 Windows 版](https://shot.ainit.tech/zh/get)** · [网站](https://shot.ainit.tech/zh) · [文档（英文）](docs/en/README.md)
 

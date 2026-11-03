@@ -2,7 +2,7 @@
 
 # ainitShot
 
-Un programa de capturas de pantalla para Windows, gratuito y de código abierto. Una tecla congela la pantalla: toma una ventana o cualquier parte de ella, dibuja encima, oculta lo privado y luego copia la captura o su texto, guárdala o pregúntale por ella a la IA de Google.
+Un programa de capturas de pantalla para Windows, gratuito y de código abierto. Una tecla congela la pantalla: un clic toma la imagen, el mensaje o el panel bajo el ratón; Ctrl y un clic, la ventana entera; arrastrando, cualquier parte. Dibuja encima, oculta lo privado y luego copia la captura o su texto, guárdala o pregúntale por ella a la IA de Google.
 
 **[Descargar para Windows](https://shot.ainit.tech/es/get)** · [Sitio web](https://shot.ainit.tech/es) · [Documentación (en inglés)](docs/en/README.md)
 

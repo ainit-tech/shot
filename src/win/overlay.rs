@@ -41,6 +41,7 @@ use super::gdi::{self, Buffer, Font};
 use super::browser::{self, Heard};
 use super::{app, card, clipboard, last_error, masking, models, ocr, shell};
 use crate::annotation::{self, Annotation, Draft, Grip, History, Label, Shape, Tool};
+use crate::areas::Areas;
 use crate::color::Rgba;
 use crate::draw::{self, Text, ToolbarLook};
 use crate::geometry::{Point, PointF, Rect};
@@ -158,11 +159,14 @@ struct Session {
     picked: Option<usize>,
     /// An annotation being moved or reshaped with the mouse.
     grabbed: Option<Grab>,
-    /// While nothing is selected, the window under the mouse, which a click selects.
+    /// While nothing is selected, what a click selects under the mouse: the area of the window
+    /// there, a picture, a message, a panel, or with Ctrl held the window itself.
     snap: Option<Rect>,
-    /// The window under the mouse where a new selection began, selected if the mouse doesn't
-    /// move before it is let go.
+    /// What was under the mouse where a new selection began, selected if the mouse doesn't move
+    /// before it is let go.
     snap_press: Option<Rect>,
+    /// The areas of the windows of the frozen screen, found as the mouse comes to them.
+    areas: Areas,
     /// What everything around the selection covered when it was last drawn.
     decorated: Option<Rect>,
     fonts: Vec<((i32, bool), Font)>,
@@ -329,9 +333,10 @@ pub fn open() {
         };
         let place = session.screen.image.bounds().offset(session.screen.origin.x, session.screen.origin.y);
         let mut session = session;
-        // The window under the mouse is lit up at once, and remembered as drawn, so that it
-        // goes dark again when the mouse leaves it.
-        session.snap = session.screen.window_at(session.cursor());
+        // The area under the mouse is lit up at once, and remembered as drawn, so that it goes
+        // dark again when the mouse leaves it.
+        let cursor = session.cursor();
+        session.snap = session.snap_at(cursor);
         session.refresh(overlay.window);
         overlay.session = Some(session);
         Some((overlay.window, place))
@@ -441,13 +446,22 @@ impl Overlay {
             WM_LBUTTONDBLCLK => self.double_click(point(lparam)),
             WM_MOUSEMOVE => self.mouse_move(point(lparam)),
             WM_LBUTTONUP => self.release(),
-            WM_KEYUP => self.let_go(Holder::Key(wparam as u16)),
+            WM_KEYUP => {
+                self.control(wparam as u16);
+                self.let_go(Holder::Key(wparam as u16));
+            }
             WM_CHAR => self.typed(wparam as u32),
             WM_CAPTURECHANGED => self.end_drag(),
             WM_RBUTTONUP => self.right_click(),
             WM_MOUSEWHEEL => self.wheel((wparam >> 16) as u16 as i16),
             // A key held down comes again and again; only its first press counts for holding.
-            WM_KEYDOWN => self.key(wparam as u16, lparam & (1 << 30) != 0),
+            WM_KEYDOWN => {
+                let repeated = lparam & (1 << 30) != 0;
+                if !repeated {
+                    self.control(wparam as u16);
+                }
+                self.key(wparam as u16, repeated);
+            }
             WM_TIMER => self.timer(wparam),
             // Switching to another window cancels the screenshot.
             WM_ACTIVATE if (wparam & 0xFFFF) as u32 == WA_INACTIVE => self.close(),
@@ -537,7 +551,7 @@ impl Overlay {
             // aren't lost by accident.
             (Some(_), Hit::Outside, _) if !session.history.is_empty() => return,
             _ => {
-                session.snap_press = session.screen.window_at(p);
+                session.snap_press = session.snap_at(p);
                 session.selection.press(p, reach);
             }
         }
@@ -583,7 +597,7 @@ impl Overlay {
             session.selection.drag_to(p);
             session.refresh(window);
         } else {
-            let snap = if session.selection.rect().is_none() { session.screen.window_at(p) } else { None };
+            let snap = if session.selection.rect().is_none() { session.snap_at(p) } else { None };
             if snap != session.snap {
                 session.snap = snap;
                 session.refresh(window);
@@ -600,6 +614,22 @@ impl Overlay {
                 }
                 session.refresh(window);
             }
+        }
+    }
+
+    /// Ctrl pressed or let go while nothing is selected: the window under the mouse lights up in
+    /// place of its area, or the area again.
+    fn control(&mut self, key: u16) {
+        let window = self.window;
+        let Some(session) = &mut self.session else { return };
+        if key != VK_CONTROL || session.selection.rect().is_some() || session.selection.is_dragging() {
+            return;
+        }
+        let cursor = session.cursor();
+        let snap = session.snap_at(cursor);
+        if snap != session.snap {
+            session.snap = snap;
+            session.refresh(window);
         }
     }
 
@@ -1358,6 +1388,7 @@ impl Session {
     /// A screenshot of the screen frozen, with nothing selected yet.
     fn over(screen: Screen, settings: Rc<Settings>, color: usize, width: Option<f32>) -> io::Result<Session> {
         let buffer = Buffer::new(screen.image.width, screen.image.height)?;
+        let areas = Areas::new(&screen.image);
         let mut colors = settings.palette();
         if colors.is_empty() {
             colors.push([229, 57, 53, 255]);
@@ -1389,9 +1420,21 @@ impl Session {
             grabbed: None,
             snap: None,
             snap_press: None,
+            areas,
             decorated: None,
             fonts: Vec::new(),
         })
+    }
+
+    /// What a click selects at the point while nothing is selected: the area of the window under
+    /// it, or the whole window with Ctrl held or where the window has no area there.
+    fn snap_at(&mut self, p: Point) -> Option<Rect> {
+        let window = self.screen.window_at(p)?;
+        if key_down(VK_CONTROL) {
+            return Some(window);
+        }
+        let scale = self.screen.monitor_at(p).scale;
+        Some(self.areas.at(&self.screen.image, window, p, scale).unwrap_or(window))
     }
 
     /// Where the mouse is on the frozen screen.
@@ -1565,7 +1608,8 @@ impl Session {
         self.hovered = None;
         self.show_hint = false;
         self.snap_press = None;
-        self.snap = self.screen.window_at(self.cursor());
+        let cursor = self.cursor();
+        self.snap = self.snap_at(cursor);
         self.refresh(window);
     }
 
@@ -2384,6 +2428,43 @@ mod tests {
     /// grey dot blinking off, the microphone listening, the words heard, the question asked, and
     /// the note for a button let go too early:
     /// `SCREENSHOT_PREVIEW=<folder> cargo test -p ainitshot voice_hints_in_pictures -- --ignored`.
+    /// Draws the frozen screen as the overlay does while nothing is selected, the area under the
+    /// mouse lit up and framed, over a screenshot in place of the screen, for points on it: one
+    /// picture for each point, and with Ctrl held, the whole screenshot as its window.
+    /// `SCREENSHOT_AREAS_FILE=<file.png> SCREENSHOT_AREAS_POINTS="x,y x,y" SCREENSHOT_PREVIEW=<folder>
+    /// cargo test -p ainitshot win::overlay::tests::the_area_under_the_mouse_in_pictures -- --exact
+    /// --ignored`.
+    #[test]
+    #[ignore]
+    fn the_area_under_the_mouse_in_pictures() {
+        let file = std::env::var_os("SCREENSHOT_AREAS_FILE").expect("a screenshot");
+        let shot = Image::from_png(&std::fs::read(file).unwrap()).unwrap();
+        let points = std::env::var("SCREENSHOT_AREAS_POINTS").expect("points");
+        let folder = PathBuf::from(std::env::var("SCREENSHOT_PREVIEW").expect("SCREENSHOT_PREVIEW names a folder"));
+        let mut areas = Areas::new(&shot);
+        let whole = shot.bounds();
+        for (n, point) in points.split_whitespace().enumerate() {
+            let (x, y) = point.split_once(',').unwrap();
+            let p = Point::new(x.parse().unwrap(), y.parse().unwrap());
+            let lit = areas.at(&shot, whole, p, 1.0).unwrap_or(whole);
+            let mut buffer = Buffer::new(shot.width, shot.height).unwrap();
+            let mut frame = buffer.frame();
+            draw::background(&mut frame, &shot, Some(lit), whole);
+            draw::window_frame(&mut frame, lit, 1.0);
+            // The mouse, as a small cross.
+            for d in -6..=6 {
+                for (cx, cy) in [(p.x + d, p.y), (p.x, p.y + d)] {
+                    if whole.contains(Point::new(cx, cy)) {
+                        let i = ((cy as u32 * frame.width + cx as u32) * 4) as usize;
+                        frame.pixels[i..i + 4].copy_from_slice(&[0, 0, 255, 255]);
+                    }
+                }
+            }
+            let picture = Image { width: frame.width, height: frame.height, pixels: frame.pixels.to_vec() };
+            std::fs::write(folder.join(format!("area-{}.png", n + 1)), picture.to_png().unwrap()).unwrap();
+        }
+    }
+
     #[test]
     #[ignore]
     fn the_voice_hints_in_pictures() {
