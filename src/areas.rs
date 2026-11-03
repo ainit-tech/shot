@@ -36,6 +36,8 @@ const TIER: f32 = 0.6;
 /// two lines of text are not one yet.
 const PANEL_WIDTH: f32 = 48.0;
 const PANEL_HEIGHT: f32 = 40.0;
+/// A panel on a busy surface is worth one from a smaller height: a message of one line.
+const ISLAND_HEIGHT: f32 = 26.0;
 const BLOCK_WIDTH: f32 = 64.0;
 const BLOCK_HEIGHT: f32 = 56.0;
 /// A band thinner than this at the scale of 100%, and eight times as long, is a strip: a toolbar,
@@ -58,6 +60,14 @@ const LINED_CELLS: usize = 3;
 const ONE_SIZE: f32 = 1.5;
 /// How much the gaps between the rows of a list may differ from one another.
 const LIST: f32 = 0.25;
+/// Panels on a busy surface are looked for in boxes of no more pixels than this, from a pixel
+/// every `SEED` along and down; this much of each side of one is its own, and of what is just
+/// outside it something else.
+const ISLANDS: usize = 4_000_000;
+const SEED: usize = 8;
+const MOSTLY_OWN: f32 = 0.7;
+/// What is around a panel is busy when this much of its neighbouring pixels are apart.
+const BUSY: f32 = 0.015;
 /// A block with no more of its pixels differing from their neighbours, and at least this much of
 /// it of the colour of its ground, is sparse, as text is, rather than dense, as a picture is: even
 /// a smooth picture has colours of its own.
@@ -113,6 +123,17 @@ enum Kind {
     Piece,
     /// A block of content, without the empty space around it.
     Block,
+    /// A panel with rounded corners standing on a busy surface, a picture or a pattern, as a
+    /// message on the wallpaper of a chat: an area from a smaller height than other panels and even
+    /// when it is a strip, a message of one line.
+    Island,
+}
+
+impl Kind {
+    /// Whether the part has a surface of its own around its content.
+    fn panel(self) -> bool {
+        matches!(self, Kind::Panel | Kind::Island)
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -249,7 +270,8 @@ impl Areas {
     }
 
     /// Cuts a part into its parts: along its edges if it has any, or else along its widest gaps;
-    /// without gaps, its content is its only part, if the content is smaller than it. Edges all
+    /// without gaps, its content is its only part, if the content is smaller than it, or else the
+    /// panels standing on it are, if it is a busy surface, as a chat's wallpaper. Edges all
     /// along the part cut it before those that stop short of a band across it, and that band is
     /// cut off before them. Edges that stop short of both ends are those of a box inside it with
     /// margins around it, nearly as wide as it, a slide in the space around it: gaps cut the part
@@ -301,7 +323,10 @@ impl Areas {
                 }
             }
             let content = self.content(image, rect, ground);
-            return content.into_iter().filter(|content| content.rect != rect).collect();
+            if content.is_some_and(|content| content.rect != rect) {
+                return content.into_iter().collect();
+            }
+            return islands(image, rect);
         }
         // The rows of a list or of a table go across it before its columns, however wide the
         // space between the columns: a piece of a column is nothing to take.
@@ -638,6 +663,118 @@ fn empty(image: &Image, rect: Rect, profile: &Profile, ground: [u8; 3]) -> (Vec<
     (rows, columns)
 }
 
+/// The panels standing on a busy surface that leaves no empty space around them, a picture or a
+/// pattern, as the messages of a chat stand on its wallpaper: surfaces of one colour of their own,
+/// filling most of a box with straight sides, the corners rounded at most, and all of a colour
+/// clearly apart from what is around them. The larger first, none over another.
+fn islands(image: &Image, rect: Rect) -> Vec<Part> {
+    let (w, h) = (rect.width() as usize, rect.height() as usize);
+    let (least_w, least_h) = (PANEL_WIDTH as usize, ISLAND_HEIGHT as usize);
+    if w < least_w || h < least_h || w * h > ISLANDS {
+        return Vec::new();
+    }
+    let at = |x: usize, y: usize| color(image, rect.left + x as i32, rect.top + y as i32);
+    // Which island each pixel belongs to, 0 for none yet.
+    let mut label = vec![0u32; w * h];
+    let mut found: Vec<(usize, Part)> = Vec::new();
+    let mut stack = Vec::new();
+    let mut id = 0;
+    for sy in (0..h).step_by(SEED) {
+        for sx in (0..w).step_by(SEED) {
+            if label[sy * w + sx] != 0 {
+                continue;
+            }
+            id += 1;
+            let seed = at(sx, sy);
+            let (mut count, mut left, mut top, mut right, mut bottom) = (0, sx, sy, sx, sy);
+            label[sy * w + sx] = id;
+            stack.push((sx, sy));
+            while let Some((x, y)) = stack.pop() {
+                count += 1;
+                (left, top, right, bottom) = (left.min(x), top.min(y), right.max(x), bottom.max(y));
+                let next = [(x.wrapping_sub(1), y), (x + 1, y), (x, y.wrapping_sub(1)), (x, y + 1)];
+                for (nx, ny) in next {
+                    if nx < w && ny < h && label[ny * w + nx] == 0 && alike(at(nx, ny), seed, 2 * SAME) {
+                        label[ny * w + nx] = id;
+                        stack.push((nx, ny));
+                    }
+                }
+            }
+            let (bw, bh) = (right + 1 - left, bottom + 1 - top);
+            if bw < least_w || bh < least_h || 2 * count < bw * bh || 5 * bw * bh > 4 * w * h {
+                continue;
+            }
+            // Its sides a few pixels in, past rounded corners, are its own nearly all along, and
+            // just outside them is something else.
+            let inset = CORNERS as usize / 2;
+            let (l, t, r, b) = (left + inset, top + inset, right - inset, bottom - inset);
+            let mine = |x: usize, y: usize| label[y * w + x] == id;
+            let apart = |x: usize, y: usize| !alike(at(x, y), seed, 3 * SAME);
+            let share = |points: Vec<(usize, usize)>, test: &dyn Fn(usize, usize) -> bool| {
+                points.iter().filter(|&&(x, y)| test(x, y)).count() as f32 / points.len().max(1) as f32
+            };
+            let sides = [
+                (l..=r).map(|x| (x, t)).collect::<Vec<_>>(),
+                (l..=r).map(|x| (x, b)).collect(),
+                (t..=b).map(|y| (l, y)).collect(),
+                (t..=b).map(|y| (r, y)).collect(),
+            ];
+            if sides.into_iter().any(|side| share(side, &mine) < MOSTLY_OWN) {
+                continue;
+            }
+            let mut around = Vec::new();
+            let (ox, oy) = (left.checked_sub(2), top.checked_sub(2));
+            let (ex, ey) = (Some(right + 2).filter(|&x| x < w), Some(bottom + 2).filter(|&y| y < h));
+            for x in left..=right {
+                around.extend(oy.map(|y| (x, y)));
+                around.extend(ey.map(|y| (x, y)));
+            }
+            for y in top..=bottom {
+                around.extend(ox.map(|x| (x, y)));
+                around.extend(ex.map(|x| (x, y)));
+            }
+            if around.is_empty() || share(around, &apart) < MOSTLY_OWN {
+                continue;
+            }
+            // Whether what is just outside it is busy, a picture or a pattern, with neighbouring
+            // pixels apart all along, rather than a smooth surface, as a panel's.
+            let mut pairs = (0, 0);
+            let mut count_pairs = |points: &mut dyn Iterator<Item = (usize, usize)>| {
+                let points: Vec<(usize, usize)> = points.collect();
+                for pair in points.windows(2) {
+                    pairs.0 += 1;
+                    if !alike(at(pair[0].0, pair[0].1), at(pair[1].0, pair[1].1), SAME) {
+                        pairs.1 += 1;
+                    }
+                }
+            };
+            for y in [oy, ey].into_iter().flatten() {
+                count_pairs(&mut (left..=right).map(|x| (x, y)));
+            }
+            for x in [ox, ex].into_iter().flatten() {
+                count_pairs(&mut (top..=bottom).map(|y| (x, y)));
+            }
+            let busy = pairs.1 as f32 >= BUSY * pairs.0 as f32;
+            // A message has its corners rounded, at least three of them, the tail at the fourth,
+            // on a busy wallpaper: a square one is a panel as any other, as a row lit up in a list,
+            // and so is a rounded button on a smooth panel.
+            let corners = [(left, top), (right, top), (left, bottom), (right, bottom)];
+            let rounded = corners.iter().filter(|&&(x, y)| !mine(x, y)).count() >= 3;
+            let kind = if rounded && busy { Kind::Island } else { Kind::Panel };
+            let rect = Rect::new(rect.left + left as i32, rect.top + top as i32, rect.left + right as i32 + 1, rect.top + bottom as i32 + 1);
+            found.push((count, Part { rect, kind, sparse: false, ground: seed, empty: false }));
+        }
+    }
+    found.sort_by_key(|(count, _)| std::cmp::Reverse(*count));
+    let mut islands: Vec<Part> = Vec::new();
+    for (_, part) in found {
+        if islands.iter().all(|other| other.rect.intersect(part.rect).is_empty()) {
+            islands.push(part);
+        }
+    }
+    islands
+}
+
 /// How far along a row of pixels, or a column, the edge on it begins: at the first of `CORNERS`
 /// differing pixels in a row, past rounded corners and stray pixels. Never, if there are none.
 fn solid(differs: impl Fn(i32) -> bool, along: impl Iterator<Item = i32>) -> u32 {
@@ -737,7 +874,7 @@ fn gaps(blank: &[bool], span: (usize, usize)) -> Vec<(usize, usize)> {
 }
 
 /// The area among the parts around the point, from the window down: the smallest panel or block
-/// worth a screenshot, but nothing inside a strip. A part barely smaller than the one around it
+/// worth a screenshot, but nothing inside a strip, unless it is a message. A part barely smaller than the one around it
 /// is that one, as a box is its inside without its lines; sparse content gives way to the panel
 /// around it when it is most of the panel or the panel is of a moderate size. Nothing if the area
 /// would be the window, or most of it.
@@ -746,19 +883,19 @@ fn choose(path: &[Part], window: Rect, scale: f32) -> Option<Rect> {
     for part in path {
         match levels.last_mut() {
             Some(last) if near(last.rect, part.rect) => {
-                if part.kind == Kind::Panel {
-                    last.kind = Kind::Panel;
+                if part.kind.panel() {
+                    last.kind = part.kind;
                 }
             }
             _ => levels.push(*part),
         }
     }
-    let open =levels.iter().position(|part| strip(part.rect, window, scale)).unwrap_or(levels.len());
+    let open = levels.iter().position(|part| part.kind != Kind::Island && strip(part.rect, window, scale)).unwrap_or(levels.len());
     let levels = &levels[..open];
     let deepest = (1..levels.len()).rev().find(|&i| big(&levels[i], scale))?;
     let mut area = levels[deepest];
     if area.kind == Kind::Block && area.sparse {
-        let around = levels[1..deepest].iter().rev().find(|part| part.kind == Kind::Panel);
+        let around = levels[1..deepest].iter().rev().find(|part| part.kind.panel());
         if let Some(panel) = around
             && (size(area.rect) >= MOSTLY * size(panel.rect) || size(panel.rect) <= MODERATE * size(window))
         {
@@ -796,6 +933,7 @@ fn big(part: &Part, scale: f32) -> bool {
     }
     match part.kind {
         Kind::Panel => w >= PANEL_WIDTH && h >= PANEL_HEIGHT,
+        Kind::Island => w >= PANEL_WIDTH && h >= ISLAND_HEIGHT,
         Kind::Block => w >= BLOCK_WIDTH && h >= BLOCK_HEIGHT,
         Kind::Piece => false,
     }
@@ -924,6 +1062,46 @@ mod tests {
         assert_eq!(sidebar, Rect::new(0, 81, 261, 800));
         // The toolbar is a strip: the window, nothing of its own.
         assert_eq!(at(&mut areas, 600, 50), None);
+    }
+
+    #[test]
+    fn the_messages_of_a_chat_on_a_patterned_wallpaper() {
+        // A wallpaper of little drawings scattered on a green that grows lighter downwards, and on
+        // it white messages with rounded corners: one of three lines, and one of a single line, a
+        // strip.
+        let mut image = canvas(900, 700, [0, 0, 0]);
+        for y in 0..700 {
+            let v = (y / 14) as u8;
+            fill(&mut image, Rect::new(0, y, 900, y + 1), [120 + v, 165 + v, 115 + v]);
+        }
+        for k in 0..2500 {
+            let (x, y) = ((k * 37) % 890, (k * 53) % 690);
+            for d in 0..8 {
+                fill(&mut image, Rect::new(x + d, y + d / 2, x + d + 1, y + d / 2 + 1), [90, 130, 90]);
+            }
+        }
+        let bubble = |image: &mut Image, rect: Rect, lines: i32| {
+            fill(image, rect, [255, 255, 255]);
+            for (cx, cy) in [(rect.left, rect.top), (rect.right - 1, rect.top), (rect.left, rect.bottom - 1), (rect.right - 1, rect.bottom - 1)] {
+                // The corner rounded off: the pixels beyond a quarter of a circle get the wallpaper.
+                for dy in 0..8 {
+                    for dx in 0..8 {
+                        if (8 - dx) * (8 - dx) + (8 - dy) * (8 - dy) > 64 {
+                            let x = if cx == rect.left { cx + dx } else { cx - dx };
+                            let y = if cy == rect.top { cy + dy } else { cy - dy };
+                            fill(image, Rect::new(x, y, x + 1, y + 1), [130, 175, 125]);
+                        }
+                    }
+                }
+            }
+            text(image, Rect::new(rect.left + 12, rect.top + 8, rect.right - 12, rect.top + 8 + lines * 20), 16);
+        };
+        bubble(&mut image, Rect::new(100, 100, 520, 172), 3);
+        bubble(&mut image, Rect::new(100, 200, 420, 234), 1);
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        assert_eq!(at(300, 140), Some(Rect::new(100, 100, 520, 172)));
+        assert_eq!(at(300, 217), Some(Rect::new(100, 200, 420, 234)));
     }
 
     #[test]
