@@ -165,17 +165,31 @@ impl Areas {
         let reach = (CHAIN * scale) as i32;
         let across = |r: Rect| r.width() as f32 >= ACROSS_MOST * window.width() as f32 && (r.height() as f32 / scale) < FRAME;
         let down = |r: Rect| r.height() as f32 >= ACROSS_MOST * window.height() as f32 && (r.width() as f32 / scale) < FRAME;
-        // Where the chains from the top, the bottom, the left and the right have come so far.
-        let mut edges = [(Side::Top, window.top), (Side::Bottom, window.bottom), (Side::Left, window.left), (Side::Right, window.right)];
+        // A column down a side of the window too wide to be a band of its frame is a dock: what is
+        // in it is the dock's, not the frame's.
+        let dock = |r: Rect| r.height() as f32 >= ACROSS_MOST * window.height() as f32 && 2 * r.width() < window.width();
+        // Where the chains from the top, the bottom, the left and the right have come so far, and
+        // whether a dock has ended one.
+        let mut edges = [
+            (Side::Top, window.top, false),
+            (Side::Bottom, window.bottom, false),
+            (Side::Left, window.left, false),
+            (Side::Right, window.right, false),
+        ];
         for (n, pair) in path.windows(2).enumerate() {
             let (outer, inner) = (pair[0], pair[1]);
             let Some(parts) = self.parts.get(&outer.rect) else { break };
-            for (side, edge) in &mut edges {
-                let band = |r: Rect| if matches!(side, Side::Top | Side::Bottom) { across(r) } else { down(r) };
+            for (side, edge, ended) in &mut edges {
+                let sides = matches!(side, Side::Left | Side::Right);
+                let band = |r: Rect| if sides { down(r) } else { across(r) };
                 let mut sorted: Vec<Rect> = parts.iter().map(|part| part.rect).collect();
                 sorted.sort_by_key(|r| side.gap(*r, *edge));
                 for r in sorted {
-                    if side.gap(r, *edge) > reach || !band(r) {
+                    if *ended || side.gap(r, *edge) > reach {
+                        break;
+                    }
+                    if !band(r) {
+                        *ended = sides && dock(r);
                         break;
                     }
                     if r == inner.rect {
@@ -233,7 +247,11 @@ impl Areas {
     }
 
     /// Cuts a part into its parts: along its edges if it has any, or else along its widest gaps;
-    /// without gaps, its content is its only part, if the content is smaller than it.
+    /// without gaps, its content is its only part, if the content is smaller than it. Edges all
+    /// along the part cut it before those that stop short of a band across it, and that band is
+    /// cut off before them. Edges that stop short of both ends are those of a box inside it with
+    /// margins around it, nearly as wide as it, a slide in the space around it: gaps cut the part
+    /// before them.
     fn cut(&self, image: &Image, part: Part) -> Vec<Part> {
         let (rect, ground) = (part.rect, part.ground);
         let (w, h) = (rect.width() as usize, rect.height() as usize);
@@ -241,19 +259,45 @@ impl Areas {
             return Vec::new();
         }
         let profile = self.profile(rect);
-        let rows = edges(&profile.row_edge, &profile.row_detail, w, h);
-        let columns = edges(&profile.column_edge, &profile.column_detail, h, w);
-        if !rows.is_empty() || !columns.is_empty() {
-            let (cuts, across) = if rows.is_empty() { (columns, false) } else { (rows, true) };
+        let rows = self.edges(rect, &profile, true);
+        let columns = self.edges(rect, &profile, false);
+        let (row_blank, column_blank) = empty(image, rect, &profile, ground);
+        // The box's own edges, across it before down it; those that stop short of both its ends
+        // only after its gaps.
+        for (edges, across) in [(&rows, true), (&columns, false)] {
+            let own: Vec<&Edge> = edges.iter().filter(|e| e.ends() != (false, false)).collect();
+            if own.is_empty() {
+                continue;
+            }
+            // Edges that all stop short of an end of the box meet a band across it there, as
+            // panels side by side meet a menu bar over them: the band is cut off first, where
+            // nothing goes on from it into the rest.
+            if own.iter().all(|e| e.short.0 > CORNERS || e.short.1 > CORNERS)
+                && let Some(at) = junction(&profile, &own, across, if across { &column_blank } else { &row_blank })
+            {
+                let piece = |rect: Rect| Part { rect, kind: Kind::Piece, sparse: false, ground, empty: false };
+                let at = at as i32;
+                return if across {
+                    vec![piece(Rect::new(rect.left, rect.top, rect.left + at, rect.bottom)), piece(Rect::new(rect.left + at, rect.top, rect.right, rect.bottom))]
+                } else {
+                    vec![piece(Rect::new(rect.left, rect.top, rect.right, rect.top + at)), piece(Rect::new(rect.left, rect.top + at, rect.right, rect.bottom))]
+                };
+            }
+            let cuts: Vec<usize> = own.iter().map(|e| e.at).collect();
             return self.panels(image, part, &profile, &cuts, across);
         }
-        let (row_blank, column_blank) = empty(image, rect, &profile, ground);
         let (Some(row_span), Some(column_span)) = (span(&row_blank), span(&column_blank)) else { return Vec::new() };
         let row_gaps = gaps(&row_blank, row_span);
         let column_gaps = gaps(&column_blank, column_span);
         let widest = |gaps: &[(usize, usize)]| gaps.iter().map(|(start, end)| end - start).max().unwrap_or(0);
         let (row_widest, column_widest) = (widest(&row_gaps), widest(&column_gaps));
         if row_widest == 0 && column_widest == 0 {
+            for (edges, across) in [(&rows, true), (&columns, false)] {
+                if !edges.is_empty() {
+                    let cuts: Vec<usize> = edges.iter().map(|e| e.at).collect();
+                    return self.panels(image, part, &profile, &cuts, across);
+                }
+            }
             let content = self.content(image, rect, ground);
             return content.into_iter().filter(|content| content.rect != rect).collect();
         }
@@ -305,6 +349,30 @@ impl Areas {
             }
         }
         profile
+    }
+
+    /// The edges across a box: rows that differ from the one before nearly all along it, with
+    /// smooth surfaces on both sides, or columns if not `across`; and how far each stops short of
+    /// the box's start and of its end.
+    fn edges(&self, rect: Rect, profile: &Profile, across: bool) -> Vec<Edge> {
+        let (edge, detail, length, count) = if across {
+            (&profile.row_edge, &profile.row_detail, rect.width(), rect.height())
+        } else {
+            (&profile.column_edge, &profile.column_detail, rect.height(), rect.width())
+        };
+        let along = (EDGE * length as f32) as u32;
+        let smooth = ((SMOOTH * length as f32) as u32).max(CORNERS);
+        (1..count as usize)
+            .filter(|&i| edge[i] >= along && detail[i - 1] <= smooth && detail[i] <= smooth)
+            .map(|i| {
+                let differs = |k: i32| {
+                    let (x, y, bit) =
+                        if across { (rect.left + k, rect.top + i as i32, DOWN) } else { (rect.left + i as i32, rect.top + k, ACROSS) };
+                    self.bits[(y * self.width + x) as usize] & bit != 0
+                };
+                Edge { at: i, short: (solid(differs, 0..length), solid(differs, (0..length).rev())) }
+            })
+            .collect()
     }
 
     /// The parts between the edges across a box, on its ground. A single edge is a step from one
@@ -434,6 +502,20 @@ impl Areas {
     }
 }
 
+/// An edge across a box, or down it: the row or the column where it is, and how far it stops
+/// short of the start of the box and of its end.
+struct Edge {
+    at: usize,
+    short: (u32, u32),
+}
+
+impl Edge {
+    /// Whether the edge comes to the start of the box, and to its end, but for a line's width.
+    fn ends(&self) -> (bool, bool) {
+        (self.short.0 <= LINE as u32, self.short.1 <= LINE as u32)
+    }
+}
+
 /// How the pixels of a box differ: see [`Areas::profile`].
 struct Profile {
     row_detail: Vec<u32>,
@@ -542,12 +624,45 @@ fn empty(image: &Image, rect: Rect, profile: &Profile, ground: [u8; 3]) -> (Vec<
     (rows, columns)
 }
 
-/// Where a box has edges across it: rows that differ from the one before nearly all along the
-/// box, with smooth surfaces on both sides. `length` is how long the rows are, `count` how many.
-fn edges(edge: &[u32], detail: &[u32], length: usize, count: usize) -> Vec<usize> {
-    let along = (EDGE * length as f32) as u32;
-    let smooth = ((SMOOTH * length as f32) as u32).max(CORNERS);
-    (1..count).filter(|&i| edge[i] >= along && detail[i - 1] <= smooth && detail[i] <= smooth).collect()
+/// How far along a row of pixels, or a column, the edge on it begins: at the first of `CORNERS`
+/// differing pixels in a row, past rounded corners and stray pixels. Never, if there are none.
+fn solid(differs: impl Fn(i32) -> bool, along: impl Iterator<Item = i32>) -> u32 {
+    let mut run = 0;
+    for (n, k) in along.enumerate() {
+        run = if differs(k) { run + 1 } else { 0 };
+        if run == CORNERS {
+            return n as u32 + 1 - CORNERS;
+        }
+    }
+    u32::MAX
+}
+
+/// Where a band across a box meets the edges down it that stop short of it, if nothing goes on
+/// from the band into the rest there: the row where the rest begins, or the column, if the edges
+/// are across the box. A line at the start of the rest stays with it: the band is cut off along
+/// the empty space next to the line, if there is any. `blank` tells the empty rows, or columns.
+fn junction(profile: &Profile, edges: &[&Edge], across: bool, blank: &[bool]) -> Option<usize> {
+    let (detail, along) =
+        if across { (&profile.column_detail, profile.row_detail.len()) } else { (&profile.row_detail, profile.column_detail.len()) };
+    let length = detail.len();
+    // A line down the box differs from its sides in every row of the rest.
+    let smooth = ((SMOOTH * along as f32) as u32).max(CORNERS) + 2 * edges.len() as u32;
+    // Where the band ends, and whether it is before that or after.
+    let mut ends: Vec<(usize, bool)> = Vec::new();
+    for edge in edges {
+        if edge.short.0 > CORNERS {
+            ends.push((edge.short.0 as usize, true));
+        }
+        if edge.short.1 > CORNERS {
+            ends.push((length.saturating_sub(edge.short.1 as usize), false));
+        }
+    }
+    ends.sort_unstable();
+    ends.dedup();
+    let (end, before) =
+        ends.into_iter().find(|&(end, _)| end > 0 && end < length && detail[end - 1] <= smooth && detail[end] <= smooth)?;
+    let shifted = (0..=LINE as usize + 1).filter_map(|k| if before { end.checked_sub(k) } else { Some(end + k) });
+    Some(shifted.take_while(|&at| at > 0 && at < length).find(|&at| blank[if before { at - 1 } else { at }]).unwrap_or(end))
 }
 
 /// Which rows of a box have nothing differing along them but stray pixels.
@@ -597,7 +712,7 @@ fn choose(path: &[Part], window: Rect, scale: f32) -> Option<Rect> {
             _ => levels.push(*part),
         }
     }
-    let open = levels.iter().position(|part| strip(part.rect, window, scale)).unwrap_or(levels.len());
+    let open =levels.iter().position(|part| strip(part.rect, window, scale)).unwrap_or(levels.len());
     let levels = &levels[..open];
     let deepest = (1..levels.len()).rev().find(|&i| big(&levels[i], scale))?;
     let mut area = levels[deepest];
@@ -731,13 +846,19 @@ mod tests {
             let (x, y) = point.split_once(',').unwrap();
             let p = Point::new(x.parse().unwrap(), y.parse().unwrap());
             println!("== {p:?}: {:?}", areas.at(&image, whole, p, 1.0));
-            for part in areas.path(&image, whole, p) {
+            let path = areas.path(&image, whole, p);
+            for part in &path {
                 let r = part.rect;
                 let g = part.ground;
                 println!(
                     "   {:?} {}..{} x {}..{} sparse {} ground {:02x}{:02x}{:02x}",
                     part.kind, r.left, r.right, r.top, r.bottom, part.sparse, g[2], g[1], g[0]
                 );
+            }
+            // What the smallest part was cut into, without the point in any of them.
+            for part in areas.parts.get(&path[path.len() - 1].rect).into_iter().flatten() {
+                let r = part.rect;
+                println!("      {:?} {}..{} x {}..{}", part.kind, r.left, r.right, r.top, r.bottom);
             }
         }
     }
