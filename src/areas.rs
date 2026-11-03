@@ -56,9 +56,11 @@ const CHAIN: f32 = 8.0;
 const CELLS: usize = 4;
 const LINED_CELLS: usize = 3;
 const ONE_SIZE: f32 = 1.5;
-/// A block with no more of its pixels differing from their neighbours is sparse, as text is,
-/// rather than dense, as a picture is.
+/// A block with no more of its pixels differing from their neighbours, and at least this much of
+/// it of the colour of its ground, is sparse, as text is, rather than dense, as a picture is: even
+/// a smooth picture has colours of its own.
 const SPARSE: f32 = 0.3;
+const BARE: f32 = 0.5;
 /// Sparse content gives way to the panel around it when it is this much of the panel, as the text
 /// of a card or of a message is, or when the panel is no more than this much of the window, as a
 /// sidebar or a terminal is: a paragraph is an area only in a large panel, such as an article's.
@@ -427,7 +429,8 @@ impl Areas {
         );
         let differing: u32 = profile.row_detail.iter().chain(&profile.column_detail).sum();
         let pixels = 2.0 * content.width() as f32 * content.height() as f32;
-        Some(Part { rect: content, kind: Kind::Block, sparse: (differing as f32) < SPARSE * pixels, ground, empty: false })
+        let sparse = (differing as f32) < SPARSE * pixels && bare(image, content, ground) >= BARE;
+        Some(Part { rect: content, kind: Kind::Block, sparse, ground, empty: false })
     }
 }
 
@@ -498,6 +501,21 @@ fn background(image: &Image, rect: Rect) -> [u8; 3] {
         }
     }
     best.1
+}
+
+/// How much of a box is of the colour of the ground, on a grid over it.
+fn bare(image: &Image, rect: Rect, ground: [u8; 3]) -> f32 {
+    let step = ((size(rect) / 1024.0).sqrt().ceil() as usize).max(1);
+    let (mut all, mut bare) = (0u32, 0u32);
+    for y in (rect.top..rect.bottom).step_by(step) {
+        for x in (rect.left..rect.right).step_by(step) {
+            all += 1;
+            if alike(color(image, x, y), ground, 2 * SAME) {
+                bare += 1;
+            }
+        }
+    }
+    bare as f32 / all.max(1) as f32
 }
 
 /// Which rows of a box are empty, and which columns: nothing differs along them but stray pixels,
@@ -778,6 +796,10 @@ mod tests {
             let name = path.file_name().unwrap().to_string_lossy().into_owned();
             std::fs::write(to.join(&name), picture.to_png().unwrap()).unwrap();
             println!("{name}: {} areas in {seconds:.2} s", found.len());
+            found.sort_by_key(|r| (r.top, r.left, r.bottom, r.right));
+            for r in &found {
+                println!("   {}..{} x {}..{}", r.left, r.right, r.top, r.bottom);
+            }
         }
     }
 
