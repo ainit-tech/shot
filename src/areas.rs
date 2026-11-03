@@ -1,572 +1,1167 @@
-//! Areas of a window: the parts that a screenshot is most often taken of, a picture, a message, a
-//! card, a panel or a paragraph, found in the pixels of the frozen screen. A window is built of
-//! boxes: panels with surfaces of their own and lines between them, and on them blocks of content
-//! with empty space around them. A box is cut along its edges, where one smooth surface meets
-//! another across the whole box, or else along its gaps, the empty bands across it, the widest
-//! first; every part is cut again the same way. The area under the mouse is the smallest part
-//! around it that is big enough to be worth a screenshot: a panel, or the content of one, but
-//! nothing inside a strip, such as a tab of a tab bar or a line of a paragraph.
+//! Areas of a window: the parts that a screenshot is most often taken of, a panel, a table, a
+//! message, a card, a picture or a paragraph, found in the pixels of the frozen screen by filling.
+//! The surface under the mouse is filled with its colour. Thin long bars on it, lines and scroll
+//! bars, are its walls; what it and they wholly surround, text, icons, pictures, cards, is its
+//! furniture; and where it narrows to a passage much narrower than the space on either side, it is
+//! two rooms with a door between them. The area under the mouse is the block of furniture under
+//! it, if that is worth a screenshot, or else the room; on a band across the top or the bottom of
+//! the window, its frame, there is no area. A surface that goes on smoothly past its colour, a
+//! gradient or a wallpaper of little drawings, is filled on the picture smoothed of them. Tables,
+//! found by the rhythm of their rows, and grids, found by their cells, light up whole, whatever
+//! the colours of the cells.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
+use std::rc::Rc;
 
 use crate::geometry::{Point, Rect};
 use crate::image::Image;
 
-/// How much neighbouring pixels may differ in a colour channel and still be one smooth surface,
-/// and how much two surfaces may and still be one.
+/// How much neighbouring pixels may differ in a colour channel and still be one smooth surface.
 const SAME: u8 = 6;
-/// A pixel differs from the one on its left.
+/// How far from the colour of a surface a pixel may be in a channel and still be of it.
+const TOLERANCE: f32 = 12.0;
+/// A pixel differs from a neighbour along its row.
 const ACROSS: u8 = 1;
-/// A pixel differs from the one above it.
+/// A pixel differs from a neighbour along its column.
 const DOWN: u8 = 2;
-/// How much of a box an edge has to run along: all of it but rounded corners or a scroll bar,
-/// not the margins around a box that is nearly as wide as the box around it.
-const EDGE: f32 = 0.97;
-/// How much of a row may differ from its neighbours on a smooth surface beside an edge, and how
-/// many pixels of it at least: the rounded corners at its ends.
-const SMOOTH: f32 = 1.0 / 32.0;
-const CORNERS: u32 = 8;
-/// How much of a row may differ from its neighbours in a gap: stray pixels.
-const STRAY: f32 = 1.0 / 200.0;
-/// Bands no thicker are the lines between parts, not parts.
-const LINE: i32 = 3;
-/// The gaps that cut a box at once are nearly as wide as its widest one.
-const TIER: f32 = 0.6;
-/// The smallest panel worth a screenshot at the scale of 100%, and the smallest block of content:
-/// two lines of text are not one yet.
-const PANEL_WIDTH: f32 = 48.0;
-const PANEL_HEIGHT: f32 = 40.0;
-/// A panel on a busy surface is worth one from a smaller height: a message of one line.
-const ISLAND_HEIGHT: f32 = 26.0;
-const BLOCK_WIDTH: f32 = 64.0;
-const BLOCK_HEIGHT: f32 = 56.0;
-/// A band thinner than this at the scale of 100%, and eight times as long, is a strip: a toolbar,
-/// a tab bar, a line of text.
-const STRIP: f32 = 56.0;
-/// An area this much of the window is the window. The window's frame is the chain of bands across
-/// most of it, each no thicker than this at the scale of 100%, that goes on from its top and from
-/// its bottom, each band no further than `CHAIN` from the one before at the scale of 100%, at any
-/// depth of the window's parts: a title bar, tabs, toolbars, a ribbon, a ruler, a status bar; and
-/// so down its sides.
-const MOST: f32 = 0.9;
+/// A wall runs at least this far and is no thicker than this, at the scale of 100%, as the other
+/// lengths here.
+const WALL_LONG: f32 = 48.0;
+const WALL_THIN: f32 = 12.0;
+/// Two rooms part where the way between them narrows by this share of the narrower one's widest
+/// place, and by this much at least.
+const DOOR: f32 = 0.25;
+const LEAST_DOOR: f32 = 8.0;
+/// The smallest room worth a screenshot, the height of a message of one line on a wallpaper,
+/// which is one too, and the smallest block of furniture worth one: two lines of text are not.
+const PANEL: (f32, f32) = (48.0, 40.0);
+const MESSAGE: f32 = 26.0;
+const BLOCK: (f32, f32) = (64.0, 56.0);
+/// Furniture this close together is one block: letters a word, lines a paragraph.
+const JOIN: f32 = 6.0;
+/// Bands at the top or the bottom of a window thinner than this, and across most of it, are its
+/// frame. A cut across rooms is made no further than this from their ends.
 const FRAME: f32 = 160.0;
 const ACROSS_MOST: f32 = 0.6;
-const CHAIN: f32 = 8.0;
-/// Parts of about one size, this many at least along a box, are the cells of a grid, a table or a
-/// list, columns of days or rows of messages: pieces of it, not boxes of their own. Lines alone
-/// between them make a grid of fewer.
-const CELLS: usize = 4;
-const LINED_CELLS: usize = 3;
-const ONE_SIZE: f32 = 1.5;
-/// How much the gaps between the rows of a list may differ from one another.
-const LIST: f32 = 0.25;
-/// Panels on a busy surface are looked for in boxes of no more pixels than this, from a pixel
-/// every `SEED` along and down; this much of each side of one is its own, and of what is just
-/// outside it something else.
-const ISLANDS: usize = 4_000_000;
-const SEED: usize = 8;
-const MOSTLY_OWN: f32 = 0.7;
-/// What is around a panel is busy when this much of its neighbouring pixels are apart.
-const BUSY: f32 = 0.015;
-/// A block with no more of its pixels differing from their neighbours, and at least this much of
-/// it of the colour of its ground, is sparse, as text is, rather than dense, as a picture is: even
-/// a smooth picture has colours of its own.
+/// How much of the height of the window its frame takes up at the top at most, and at the bottom.
+const FRAME_TOP: f32 = 0.25;
+const FRAME_BOTTOM: f32 = 0.15;
+/// An area this much of the window is the window.
+const MOST: f32 = 0.9;
+/// How far apart neighbours on the smoothed picture may be and be of one surface, and how far
+/// around a pixel it is smoothed from.
+const STEP: u8 = 3;
+const SMOOTHING: f32 = 4.0;
+/// A surface this much of whose border is smooth goes on past its colour: a gradient, if the
+/// smoothed picture fills on from it to `1 / GRADIENT` of its size at least.
+const SOFT: f32 = 0.05;
+const GRADIENT: f32 = 0.5;
+/// A surface is filled from a pixel of a part of it this large at least, in pixels at 100%: not
+/// from the inside of a letter.
+const SEED_LEAST: f32 = 64.0;
+/// A table this much of the width of its rows' background wide is as wide as it.
+const MOST_WIDE: f32 = 0.75;
+/// A lit row across a panel, a selected item of a list, is between these tall.
+const LIT_ROW: (f32, f32) = (12.0, 80.0);
+/// The smallest cell of a grid.
+const CELL: (f32, f32) = (16.0, 12.0);
+/// A block no more of whose box than this is furniture is sparse, as text is.
 const SPARSE: f32 = 0.3;
-const BARE: f32 = 0.5;
-/// Sparse content gives way to the panel around it when it is this much of the panel, as the text
-/// of a card or of a message is, or when the panel is no more than this much of the window, as a
-/// sidebar or a terminal is: a paragraph is an area only in a large panel, such as an article's.
-const MOSTLY: f32 = 0.5;
-const MODERATE: f32 = 0.4;
+/// What is around a box is busy when this much of its neighbouring pixels are apart.
+const BUSY: f32 = 0.015;
+/// How thick a line between things is, and how far things may be off one another by.
+const LINE: f32 = 2.0;
+const SLACK: f32 = 4.0;
+/// Pieces of furniture no larger than this are letters and icons.
+const LETTER: f32 = 40.0;
+/// How many bytes of the surfaces of the colours of a window are kept, and how many windows.
+const TONES: usize = 256 << 20;
+const WINDOWS: usize = 4;
 
-/// A line or a step between the parts of a box: the row where it starts and the row where the
-/// part after it does.
-type Divider = (usize, usize);
-
-/// A side of the window that its frame goes on from.
-#[derive(Clone, Copy)]
-enum Side {
-    Top,
-    Bottom,
-    Left,
-    Right,
-}
-
-impl Side {
-    /// How far a part is from where the chain of bands from this side has come.
-    fn gap(self, rect: Rect, edge: i32) -> i32 {
-        match self {
-            Side::Top => rect.top - edge,
-            Side::Bottom => edge - rect.bottom,
-            Side::Left => rect.left - edge,
-            Side::Right => edge - rect.right,
-        }
-    }
-
-    /// Where a band takes the chain on to.
-    fn on(self, rect: Rect) -> i32 {
-        match self {
-            Side::Top => rect.bottom,
-            Side::Bottom => rect.top,
-            Side::Left => rect.right,
-            Side::Right => rect.left,
-        }
-    }
-}
-
-/// What a part of a box is.
-#[derive(Clone, Copy, Debug, PartialEq)]
-enum Kind {
-    /// A panel: a surface of its own between edges, padding and all, or a box drawn with lines.
-    Panel,
-    /// A piece of the surface of the box around it, between edges: not an area of its own.
-    Piece,
-    /// A block of content, without the empty space around it.
-    Block,
-    /// A panel with rounded corners standing on a busy surface, a picture or a pattern, as a
-    /// message on the wallpaper of a chat: an area from a smaller height than other panels and even
-    /// when it is a strip, a message of one line.
-    Island,
-}
-
-impl Kind {
-    /// Whether the part has a surface of its own around its content.
-    fn panel(self) -> bool {
-        matches!(self, Kind::Panel | Kind::Island)
-    }
-}
-
-#[derive(Clone, Copy, Debug)]
-struct Part {
-    rect: Rect,
-    kind: Kind,
-    /// Whether a block's content is sparse, as text is.
-    sparse: bool,
-    /// The colour of the surface that the part's content is on.
-    ground: [u8; 3],
-    /// Whether nothing is on the part's surface.
-    empty: bool,
-}
+type Color = [f32; 3];
+/// How many parts of a pixel distances are in.
+const UNIT: u32 = 256;
+/// The eighth of its value that a colour is in, in each channel: what surfaces are found by.
+type Tone = [u8; 3];
+/// A surface: its colour's tone and its label among the surfaces of that tone.
+type Surface = (Tone, u32);
 
 /// The areas of the windows of a frozen screen, found as the mouse comes to them.
 pub struct Areas {
     width: i32,
     height: i32,
-    /// For every pixel, whether it differs from its neighbours on the left and above.
-    bits: Vec<u8>,
-    /// The boxes whose pixels have been looked at.
-    looked: Vec<Rect>,
-    /// The parts of every box cut so far.
-    parts: HashMap<Rect, Vec<Part>>,
+    /// The windows filled so far, the last one the mouse was on first.
+    windows: VecDeque<(Rect, u32, Filling)>,
 }
 
 impl Areas {
     pub fn new(image: &Image) -> Self {
-        let (width, height) = (image.width as i32, image.height as i32);
-        Areas { width, height, bits: vec![0; (width * height) as usize], looked: Vec::new(), parts: HashMap::new() }
+        Areas { width: image.width as i32, height: image.height as i32, windows: VecDeque::new() }
     }
 
-    /// The area of the window under the point: the smallest part around it worth a screenshot,
-    /// at the monitor's scale. Nothing if no part of the window is, but the window itself.
+    /// The area of the window under the point, at the monitor's scale. Nothing if no part of the
+    /// window is one, but the window itself.
     pub fn at(&mut self, image: &Image, window: Rect, p: Point, scale: f32) -> Option<Rect> {
         let window = window.intersect(Rect::new(0, 0, self.width, self.height));
         if window.is_empty() || !window.contains(p) {
             return None;
         }
-        self.look(image, window);
-        let path = self.path(image, window, p);
-        // On the window's frame, the area is the window.
-        if self.frame(&path, window, scale) < path.len() {
+        let known = self.windows.iter().position(|(rect, bits, _)| *rect == window && *bits == scale.to_bits());
+        let filling = match known {
+            Some(n) => self.windows.remove(n).unwrap(),
+            None => (window, scale.to_bits(), Filling::new(image, window, scale)),
+        };
+        self.windows.push_front(filling);
+        self.windows.truncate(WINDOWS);
+        let area = self.windows[0].2.area_at(p.x - window.left, p.y - window.top)?;
+        Some(area.offset(window.left, window.top))
+    }
+}
+
+/// The rooms of a surface, over the box of the window that holds them.
+struct Rooms {
+    crop: Rect,
+    /// The room of every pixel of the box, 0 for none.
+    labels: Vec<u32>,
+    furniture: Vec<bool>,
+    /// The box of every room, in the window.
+    boxes: Vec<Rect>,
+    furnished: HashMap<u32, Rc<Furnished>>,
+}
+
+impl Rooms {
+    /// The room at a point of the window, 0 for none.
+    fn at(&self, x: i32, y: i32) -> u32 {
+        if !self.crop.contains(Point::new(x, y)) {
+            return 0;
+        }
+        self.labels[(y - self.crop.top) as usize * self.crop.width() as usize + (x - self.crop.left) as usize]
+    }
+}
+
+/// A room and the blocks of furniture in it.
+struct Furnished {
+    room: Rect,
+    /// The block of every pixel of the room, 0 for none.
+    blocks: Vec<u32>,
+    /// The box of every block, and whether it is sparse, as text is.
+    boxes: HashMap<u32, (Rect, bool)>,
+}
+
+/// A line of text: the height of its middle and its box.
+#[derive(Clone, Copy)]
+struct Line {
+    middle: f32,
+    rect: Rect,
+}
+
+/// A window of the frozen screen and all found in it so far, in its own coordinates.
+struct Filling {
+    w: i32,
+    h: i32,
+    scale: f32,
+    pixels: Vec<[u8; 3]>,
+    /// For every pixel, whether it differs from its neighbours along its row and its column.
+    marks: Vec<u8>,
+    /// The picture smoothed of small drawings, letters and grain, for gradients; the surface on it
+    /// that every pixel is filled to so far, and the size and the box of each.
+    smooth: Vec<[u8; 3]>,
+    chains: Vec<u32>,
+    chain_extents: Vec<(u32, Rect)>,
+    tones: HashMap<Tone, Rc<Parts>>,
+    /// The tones in the order they were found, the oldest to go first.
+    tone_order: VecDeque<Tone>,
+    softness: HashMap<Surface, bool>,
+    gradients: HashMap<Surface, bool>,
+    grids: HashMap<Surface, Option<Rect>>,
+    /// Which of `rooms` every surface and every chain is in.
+    known: HashMap<Surface, usize>,
+    chained: HashMap<u32, usize>,
+    rooms: Vec<Rooms>,
+    tables: Option<Vec<Rect>>,
+}
+
+impl Filling {
+    fn new(image: &Image, window: Rect, scale: f32) -> Self {
+        let (w, h) = (window.width() as usize, window.height() as usize);
+        let mut pixels = Vec::with_capacity(w * h);
+        for y in window.top as usize..window.bottom as usize {
+            let start = (y * image.width as usize + window.left as usize) * 4;
+            pixels.extend(image.pixels[start..start + w * 4].chunks_exact(4).map(|p| [p[0], p[1], p[2]]));
+        }
+        let mut marks = vec![0u8; w * h];
+        for y in 0..h {
+            for x in 0..w {
+                let i = y * w + x;
+                if x + 1 < w && !alike(pixels[i], pixels[i + 1], SAME) {
+                    marks[i] |= ACROSS;
+                    marks[i + 1] |= ACROSS;
+                }
+                if y + 1 < h && !alike(pixels[i], pixels[i + w], SAME) {
+                    marks[i] |= DOWN;
+                    marks[i + w] |= DOWN;
+                }
+            }
+        }
+        Filling {
+            w: w as i32,
+            h: h as i32,
+            scale,
+            pixels,
+            marks,
+            smooth: Vec::new(),
+            chains: Vec::new(),
+            chain_extents: Vec::new(),
+            tones: HashMap::new(),
+            tone_order: VecDeque::new(),
+            softness: HashMap::new(),
+            gradients: HashMap::new(),
+            grids: HashMap::new(),
+            known: HashMap::new(),
+            chained: HashMap::new(),
+            rooms: Vec::new(),
+            tables: None,
+        }
+    }
+
+    /// A length at the scale of 100% at the monitor's scale.
+    fn px(&self, length: f32) -> i32 {
+        (length * self.scale).round() as i32
+    }
+
+    fn bounds(&self) -> Rect {
+        Rect::new(0, 0, self.w, self.h)
+    }
+
+    fn index(&self, x: i32, y: i32) -> usize {
+        (y * self.w + x) as usize
+    }
+
+    /// What lights up under the point: a box, or nothing for the whole window.
+    fn area_at(&mut self, x: i32, y: i32) -> Option<Rect> {
+        if self.tables.is_none() {
+            self.tables = Some(self.find_tables());
+        }
+        // A table lights up whole, whatever the colours of its cells.
+        let p = Point::new(x, y);
+        if let Some(table) = self.tables.iter().flatten().find(|table| table.contains(p)) {
+            return Some(*table);
+        }
+        let (room, block) = self.room_at(x, y)?;
+        // A point on a thin outgrowth of a room, as an address bar on the surface of the panel
+        // under it, is on the window's frame rather than in the room.
+        if !room.contains(p) {
             return None;
         }
-        choose(&path, window, scale)
+        // The window's frame: thin bands across its top or its bottom, a title bar, toolbars, an
+        // address bar, a status bar.
+        let band = room.height() < self.px(FRAME) && room.width() as f32 >= ACROSS_MOST * self.w as f32;
+        if band && (room.bottom as f32 <= FRAME_TOP * self.h as f32 || room.top as f32 >= (1.0 - FRAME_BOTTOM) * self.h as f32) {
+            return None;
+        }
+        let mut area = room;
+        if let Some((block, sparse)) = block
+            && self.big(block, BLOCK)
+            && size(block) <= 0.8 * size(room)
+            && !(sparse && (size(block) >= 0.5 * size(room) || size(room) <= 0.4 * size(self.bounds())))
+        {
+            area = block;
+        }
+        (size(area) < MOST * size(self.bounds())).then(|| self.bordered(area))
     }
 
-    /// Where the path enters the window's frame, if it does: the first part on it that is a band
-    /// of the chain of bands from an edge of the window.
-    fn frame(&self, path: &[Part], window: Rect, scale: f32) -> usize {
-        let reach = (CHAIN * scale) as i32;
-        let across = |r: Rect| r.width() as f32 >= ACROSS_MOST * window.width() as f32 && (r.height() as f32 / scale) < FRAME;
-        let down = |r: Rect| r.height() as f32 >= ACROSS_MOST * window.height() as f32 && (r.width() as f32 / scale) < FRAME;
-        // A column down a side of the window too wide to be a band of its frame is a dock: what is
-        // in it is the dock's, not the frame's.
-        let dock = |r: Rect| r.height() as f32 >= ACROSS_MOST * window.height() as f32 && 2 * r.width() < window.width();
-        // Where the chains from the top, the bottom, the left and the right have come so far, and
-        // whether a dock has ended one.
-        let mut edges = [
-            (Side::Top, window.top, false),
-            (Side::Bottom, window.bottom, false),
-            (Side::Left, window.left, false),
-            (Side::Right, window.right, false),
-        ];
-        for (n, pair) in path.windows(2).enumerate() {
-            let (outer, inner) = (pair[0], pair[1]);
-            let Some(parts) = self.parts.get(&outer.rect) else { break };
-            for (side, edge, ended) in &mut edges {
-                let sides = matches!(side, Side::Left | Side::Right);
-                let band = |r: Rect| if sides { down(r) } else { across(r) };
-                let mut sorted: Vec<Rect> = parts.iter().map(|part| part.rect).collect();
-                sorted.sort_by_key(|r| side.gap(*r, *edge));
-                for r in sorted {
-                    if *ended || side.gap(r, *edge) > reach {
-                        break;
-                    }
-                    if !band(r) {
-                        *ended = sides && dock(r);
-                        break;
-                    }
-                    if r == inner.rect {
-                        return n + 1;
-                    }
-                    *edge = side.on(r);
-                }
-            }
-        }
-        path.len()
+    fn big(&self, rect: Rect, least: (f32, f32)) -> bool {
+        rect.width() >= self.px(least.0) && rect.height() >= self.px(least.1)
     }
 
-    /// The parts around the point, from the window down to the smallest.
-    fn path(&mut self, image: &Image, window: Rect, p: Point) -> Vec<Part> {
-        let ground = background(image, window);
-        let mut path = vec![Part { rect: window, kind: Kind::Panel, sparse: false, ground, empty: false }];
-        while path.len() < 48 {
-            let last = path[path.len() - 1];
-            let inside = self.parts_of(image, last).iter().find(|part| part.rect.contains(p) && part.rect != last.rect);
-            let Some(part) = inside.copied() else { break };
-            path.push(part);
-        }
-        path
-    }
-
-    fn parts_of(&mut self, image: &Image, part: Part) -> &[Part] {
-        if !self.parts.contains_key(&part.rect) {
-            let parts = self.cut(image, part);
-            self.parts.insert(part.rect, parts);
-        }
-        &self.parts[&part.rect]
-    }
-
-    /// Notes where the pixels of the box differ from their neighbours, once.
-    fn look(&mut self, image: &Image, rect: Rect) {
-        if self.looked.iter().any(|looked| looked.intersect(rect) == rect) {
-            return;
-        }
-        let (width, pixels) = (self.width as usize, &image.pixels);
-        let differ = |a: usize, b: usize| (0..3).any(|c| pixels[a + c].abs_diff(pixels[b + c]) > SAME);
-        for y in rect.top as usize..rect.bottom as usize {
-            for x in rect.left as usize..rect.right as usize {
-                let i = (y * width + x) * 4;
-                let mut bits = 0;
-                if x > 0 && differ(i - 4, i) {
-                    bits |= ACROSS;
-                }
-                if y > 0 && differ(i - width * 4, i) {
-                    bits |= DOWN;
-                }
-                self.bits[y * width + x] = bits;
-            }
-        }
-        self.looked.push(rect);
-    }
-
-    /// Cuts a part into its parts: along its edges if it has any, or else along its widest gaps;
-    /// without gaps, its content is its only part, if the content is smaller than it, or else the
-    /// panels standing on it are, if it is a busy surface, as a chat's wallpaper. Edges all
-    /// along the part cut it before those that stop short of a band across it, and that band is
-    /// cut off before them. Edges that stop short of both ends are those of a box inside it with
-    /// margins around it, nearly as wide as it, a slide in the space around it: gaps cut the part
-    /// before them.
-    fn cut(&self, image: &Image, part: Part) -> Vec<Part> {
-        let (rect, ground) = (part.rect, part.ground);
-        let (w, h) = (rect.width() as usize, rect.height() as usize);
-        if w < 8 || h < 8 {
-            return Vec::new();
-        }
-        let profile = self.profile(rect);
-        let rows = self.edges(rect, &profile, true);
-        let columns = self.edges(rect, &profile, false);
-        let (row_blank, column_blank) = empty(image, rect, &profile, ground);
-        // The box's own edges, across it before down it; those that stop short of both its ends
-        // only after its gaps.
-        for (edges, across) in [(&rows, true), (&columns, false)] {
-            let own: Vec<&Edge> = edges.iter().filter(|e| e.ends() != (false, false)).collect();
-            if own.is_empty() {
+    /// The room under the point, worth a screenshot, and the block of furniture under the point
+    /// with whether it is sparse, if there is one.
+    fn room_at(&mut self, x: i32, y: i32) -> Option<(Rect, Option<(Rect, bool)>)> {
+        let (mut px, mut py) = (x, y);
+        for _ in 0..4 {
+            let (colour, seed) = self.surface_at(px, py)?;
+            let surfaces = self.surfaces_of(colour);
+            let label = surfaces.labels[self.index(seed.0, seed.1)];
+            if label == 0 {
+                (px, py) = self.around(Rect::new(seed.0, seed.1, seed.0 + 1, seed.1 + 1), x, y);
                 continue;
             }
-            // Edges that all stop short of an end of the box meet a band across it there, as
-            // panels side by side meet a menu bar over them: the band is cut off first, where
-            // nothing goes on from it into the rest.
-            if own.iter().all(|e| e.short.0 > CORNERS || e.short.1 > CORNERS)
-                && let Some(at) = junction(&profile, &own, across, if across { &column_blank } else { &row_blank })
+            let rooms = self.rooms(colour, seed);
+            let here = self.rooms[rooms].at(x, y);
+            let room_id = if here != 0 { here } else { self.rooms[rooms].at(seed.0, seed.1) };
+            if room_id == 0 {
+                // A surface too thin for a room, a line, a narrow strip: the surface around it.
+                (px, py) = self.around(surfaces.boxes[label as usize], x, y);
+                continue;
+            }
+            // A cell of a grid: the grid, whatever stands in its cells.
+            if let Some(grid) = self.lattice(colour, label) {
+                return Some((grid, None));
+            }
+            let furnished = self.furnished(rooms, room_id);
+            let room = furnished.room;
+            if self.big(room, PANEL) || (self.big(room, (PANEL.0, MESSAGE)) && self.busy_around(room)) {
+                let block = room.contains(Point::new(x, y)).then(|| {
+                    let at = (y - room.top) as usize * room.width() as usize + (x - room.left) as usize;
+                    furnished.boxes.get(&furnished.blocks[at]).copied()
+                });
+                return Some((room, block.flatten()));
+            }
+            // Too small a room, a button, a field, a lit row: the surface around it.
+            (px, py) = self.around(room, x, y);
+        }
+        None
+    }
+
+    /// A point of the surface around a box that the point is on too, as the panel a lit row or a
+    /// field stands in: above the box, below it, to its left or its right.
+    fn around(&mut self, rect: Rect, x: i32, y: i32) -> (i32, i32) {
+        let (mx, my) = ((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+        let out = self.px(3.0);
+        let points = [(mx, rect.top - out), (mx, rect.bottom + out - 1), (rect.left - out, my), (rect.right + out - 1, my)];
+        let inside = points.into_iter().filter(|&(cx, cy)| self.bounds().contains(Point::new(cx, cy)));
+        let points: Vec<(i32, i32)> = inside.collect();
+        for &(cx, cy) in &points {
+            if let Some((colour, seed)) = self.surface_at(cx, cy)
+                && self.surfaces_of(colour).labels[self.index(seed.0, seed.1)] != 0
             {
-                let piece = |rect: Rect| Part { rect, kind: Kind::Piece, sparse: false, ground, empty: false };
-                let at = at as i32;
-                return if across {
-                    vec![piece(Rect::new(rect.left, rect.top, rect.left + at, rect.bottom)), piece(Rect::new(rect.left + at, rect.top, rect.right, rect.bottom))]
-                } else {
-                    vec![piece(Rect::new(rect.left, rect.top, rect.right, rect.top + at)), piece(Rect::new(rect.left, rect.top + at, rect.right, rect.bottom))]
-                };
-            }
-            let cuts: Vec<usize> = own.iter().map(|e| e.at).collect();
-            return self.panels(image, part, &profile, &cuts, across);
-        }
-        let (Some(row_span), Some(column_span)) = (span(&row_blank), span(&column_blank)) else { return Vec::new() };
-        let row_gaps = gaps(&row_blank, row_span);
-        let column_gaps = gaps(&column_blank, column_span);
-        let widest = |gaps: &[(usize, usize)]| gaps.iter().map(|(start, end)| end - start).max().unwrap_or(0);
-        let (row_widest, column_widest) = (widest(&row_gaps), widest(&column_gaps));
-        if row_widest == 0 && column_widest == 0 {
-            for (edges, across) in [(&rows, true), (&columns, false)] {
-                if !edges.is_empty() {
-                    let cuts: Vec<usize> = edges.iter().map(|e| e.at).collect();
-                    return self.panels(image, part, &profile, &cuts, across);
+                let rooms = self.rooms(colour, seed);
+                if self.rooms[rooms].at(x, y) != 0 {
+                    return (cx, cy);
                 }
             }
-            let content = self.content(image, rect, ground);
-            if content.is_some_and(|content| content.rect != rect) {
-                return content.into_iter().collect();
-            }
-            return islands(image, rect);
         }
-        // The rows of a list or of a table go across it before its columns, however wide the
-        // space between the columns: a piece of a column is nothing to take.
-        let (row_list, column_list) = (list(&row_gaps, row_span), list(&column_gaps, column_span));
-        let across = if row_list != column_list { row_list } else { row_widest >= column_widest };
-        let (gaps, span, widest) =
-            if across { (row_gaps, row_span, row_widest) } else { (column_gaps, column_span, column_widest) };
-        let listed = (across && row_list) || (!across && column_list);
-        if listed {
-            // The list itself is a part of the box, with the empty space around it, and its rows
-            // are the parts of the list.
-            let list = Rect::new(rect.left + column_span.0 as i32, rect.top + row_span.0 as i32, rect.left + column_span.1 as i32, rect.top + row_span.1 as i32);
-            if !near(rect, list) {
-                return self.content(image, rect, ground).into_iter().collect();
+        // A stripe of a list across it: the surface over it, which the list is a room of.
+        points.first().copied().unwrap_or(((rect.left - out).max(0), (rect.top - out).max(0)))
+    }
+
+    /// The surfaces of a colour's tone.
+    fn surfaces_of(&mut self, colour: Color) -> Rc<Parts> {
+        let tone = tone_of(colour);
+        if let Some(surfaces) = self.tones.get(&tone) {
+            return surfaces.clone();
+        }
+        // Around the middle of the tone, whichever colour of it comes first.
+        let near = tone.map(|c| std::array::from_fn::<bool, 256, _>(|value| (value as u8).abs_diff(c * 8 + 4) <= TOLERANCE as u8));
+        let mask: Vec<bool> = self.pixels.iter().map(|p| near[0][p[0] as usize] & near[1][p[1] as usize] & near[2][p[2] as usize]).collect();
+        let surfaces = Rc::new(parts(&mask, self.w as usize, false));
+        let kept = (TONES / (4 * self.pixels.len()).max(1)).max(4);
+        while self.tone_order.len() >= kept {
+            if let Some(oldest) = self.tone_order.pop_front() {
+                self.tones.remove(&oldest);
             }
         }
-        let least = if listed { 1 } else { ((widest as f32 * TIER).ceil() as usize).max(1) };
+        self.tone_order.push_back(tone);
+        self.tones.insert(tone, surfaces.clone());
+        surfaces
+    }
+
+    /// The colour of most of the smooth pixels of a box, by colours a little apart, and how many
+    /// smooth pixels there are.
+    fn common(&self, rect: Rect) -> (Option<Color>, usize) {
+        let mut keyed: Vec<(u16, [u8; 3])> = Vec::new();
+        for y in rect.top..rect.bottom {
+            for x in rect.left..rect.right {
+                let i = self.index(x, y);
+                if self.marks[i] == 0 {
+                    let [a, b, c] = self.pixels[i].map(|v| v as u16 / 8);
+                    keyed.push((a * 1024 + b * 32 + c, self.pixels[i]));
+                }
+            }
+        }
+        keyed.sort_unstable_by_key(|(key, _)| *key);
+        let (mut best, mut run_start, mut best_run) = (0, 0, (0, 0));
+        for n in 1..=keyed.len() {
+            if n == keyed.len() || keyed[n].0 != keyed[run_start].0 {
+                if n - run_start > best {
+                    best = n - run_start;
+                    best_run = (run_start, n);
+                }
+                run_start = n;
+            }
+        }
+        if best == 0 {
+            return (None, 0);
+        }
+        let mut sum = [0f32; 3];
+        for (_, pixel) in &keyed[best_run.0..best_run.1] {
+            for c in 0..3 {
+                sum[c] += pixel[c] as f32;
+            }
+        }
+        (Some(sum.map(|s| s / best as f32)), keyed.len())
+    }
+
+    /// The colour of the smooth surface nearest the point, and the box around the point where it
+    /// is found.
+    fn colour_at(&self, x: i32, y: i32) -> Option<(Color, Rect)> {
+        [3.0, 8.0, 16.0, 32.0, 64.0, 128.0].into_iter().find_map(|radius| {
+            let r = self.px(radius);
+            let rect = Rect::new(x - r, y - r, x + r + 1, y + r + 1).intersect(self.bounds());
+            let (colour, count) = self.common(rect);
+            colour.filter(|_| count >= 6).map(|colour| (colour, rect))
+        })
+    }
+
+    /// The colour of the smooth surface nearest the point, and a pixel of it to fill from.
+    fn surface_at(&mut self, x: i32, y: i32) -> Option<(Color, (i32, i32))> {
+        let (colour, rect) = self.colour_at(x, y)?;
+        // Not the inside of a letter, an o or a 0, of the colour of the surface around it.
+        let surfaces = self.surfaces_of(colour);
+        let least = (SEED_LEAST * self.scale * self.scale) as u32;
+        let (mut nearest, mut whole) = (None, None);
+        for py in rect.top..rect.bottom {
+            for px in rect.left..rect.right {
+                let i = self.index(px, py);
+                if self.marks[i] != 0 || !of_colour(self.pixels[i], colour) {
+                    continue;
+                }
+                let distance = (px - x) * (px - x) + (py - y) * (py - y);
+                if nearest.is_none_or(|(d, _)| distance < d) {
+                    nearest = Some((distance, (px, py)));
+                }
+                let label = surfaces.labels[i];
+                if label > 0 && surfaces.sizes[label as usize] >= least && whole.is_none_or(|(d, _)| distance < d) {
+                    whole = Some((distance, (px, py)));
+                }
+            }
+        }
+        whole.or(nearest).map(|(_, seed)| (colour, seed))
+    }
+
+    /// Whether the surface around the seed goes on smoothly past its colour, as a gradient, a
+    /// wallpaper, a picture's grain do: much of its border is smooth.
+    fn soft(&mut self, colour: Color, seed: (i32, i32)) -> bool {
+        let surfaces = self.surfaces_of(colour);
+        let label = surfaces.labels[self.index(seed.0, seed.1)];
+        if label == 0 {
+            return false;
+        }
+        let key = (tone_of(colour), label);
+        if let Some(&soft) = self.softness.get(&key) {
+            return soft;
+        }
+        let rect = surfaces.boxes[label as usize].inflate(1).intersect(self.bounds());
+        let (mut ring, mut smooth) = (0u32, 0u32);
+        for y in rect.top..rect.bottom {
+            for x in rect.left..rect.right {
+                let i = self.index(x, y);
+                if surfaces.labels[i] == label {
+                    continue;
+                }
+                let beside = (-1..=1).any(|dy| {
+                    (-1..=1).any(|dx| {
+                        let (nx, ny) = (x + dx, y + dy);
+                        nx >= 0 && ny >= 0 && nx < self.w && ny < self.h && surfaces.labels[self.index(nx, ny)] == label
+                    })
+                });
+                if beside {
+                    ring += 1;
+                    smooth += (self.marks[i] == 0) as u32;
+                }
+            }
+        }
+        let soft = smooth as f32 >= SOFT * ring.max(1) as f32;
+        self.softness.insert(key, soft);
+        soft
+    }
+
+    /// Whether the surface around the seed is a part of a gradient, a wallpaper, a picture's
+    /// grain: its border smooth, and the smoothed picture filling on from it far past its colour,
+    /// not by the blurred edges of a scaled picture only.
+    fn gradient(&mut self, colour: Color, seed: (i32, i32)) -> bool {
+        let surfaces = self.surfaces_of(colour);
+        let label = surfaces.labels[self.index(seed.0, seed.1)];
+        let key = (tone_of(colour), label);
+        if let Some(&gradient) = self.gradients.get(&key) {
+            return gradient;
+        }
+        let gradient = self.soft(colour, seed) && {
+            let chain = self.chain(seed);
+            surfaces.sizes[label as usize] as f32 <= GRADIENT * self.chain_extents[chain].0 as f32
+        };
+        self.gradients.insert(key, gradient);
+        gradient
+    }
+
+    /// The surface around the seed on the smoothed picture, filled from neighbour to neighbour: a
+    /// wallpaper of drawings on a gradient is one surface. Its number in `chain_extents`.
+    fn chain(&mut self, seed: (i32, i32)) -> usize {
+        if self.smooth.is_empty() {
+            self.smooth = smoothed(&self.pixels, self.w as usize, self.px(SMOOTHING).max(1) as usize);
+            self.chains = vec![0; self.pixels.len()];
+            self.chain_extents = vec![(0, Rect::default())];
+        }
+        let start = self.index(seed.0, seed.1);
+        if self.chains[start] != 0 {
+            return self.chains[start] as usize;
+        }
+        let id = self.chain_extents.len() as u32;
+        let width = self.w as usize;
+        let (mut size, mut extent) = (0u32, Rect::new(seed.0, seed.1, seed.0 + 1, seed.1 + 1));
+        let mut stack = vec![start];
+        self.chains[start] = id;
+        while let Some(i) = stack.pop() {
+            size += 1;
+            let (x, y) = ((i % width) as i32, (i / width) as i32);
+            extent = extent.union(Rect::new(x, y, x + 1, y + 1));
+            let mut visit = |n: usize| {
+                if self.chains[n] == 0 && alike(self.smooth[i], self.smooth[n], STEP) {
+                    self.chains[n] = id;
+                    stack.push(n);
+                }
+            };
+            if x > 0 {
+                visit(i - 1);
+            }
+            if x + 1 < self.w {
+                visit(i + 1);
+            }
+            if y > 0 {
+                visit(i - width);
+            }
+            if y + 1 < self.h {
+                visit(i + width);
+            }
+        }
+        self.chain_extents.push((size, extent));
+        id as usize
+    }
+
+    /// The surfaces of a panel's colour that lit rows across it part, a selected item of a list:
+    /// one above and one below a band of another colour, as wide as they are and no taller than an
+    /// item of two lines, are one surface with the band. The labels joined, and the bands.
+    fn lit_rows(&self, surfaces: &Parts, label: u32) -> (Vec<u32>, Vec<Rect>) {
+        let least = (SEED_LEAST * self.scale * self.scale) as u32;
+        let slack = self.px(SLACK);
+        let (low, high) = (self.px(LIT_ROW.0), self.px(LIT_ROW.1));
+        let (mut joined, mut bands, mut todo) = (vec![label], Vec::new(), vec![label]);
+        while let Some(n) = todo.pop() {
+            let rect = surfaces.boxes[n as usize];
+            for (m, other) in surfaces.boxes.iter().enumerate().skip(1) {
+                let m = m as u32;
+                if (other.left - rect.left).abs() > slack
+                    || (other.right - rect.right).abs() > slack
+                    || surfaces.sizes[m as usize] < least
+                    || joined.contains(&m)
+                {
+                    continue;
+                }
+                let band = if (low..=high).contains(&(other.top - rect.bottom)) {
+                    Rect::new(rect.left, rect.bottom, rect.right, other.top)
+                } else if (low..=high).contains(&(rect.top - other.bottom)) {
+                    Rect::new(rect.left, other.bottom, rect.right, rect.top)
+                } else {
+                    continue;
+                };
+                if self.lit(band) {
+                    joined.push(m);
+                    todo.push(m);
+                    bands.push(band);
+                }
+            }
+        }
+        (joined, bands)
+    }
+
+    /// Whether a band is a lit row: most of it of one colour, the light of the row, whatever
+    /// stands on it.
+    fn lit(&self, band: Rect) -> bool {
+        let Some(colour) = self.common(band).0 else { return false };
+        let mut near = 0;
+        for y in band.top..band.bottom {
+            for x in band.left..band.right {
+                near += of_colour(self.pixels[self.index(x, y)], colour) as usize;
+            }
+        }
+        2 * near >= band.width() as usize * band.height() as usize
+    }
+
+    /// The lit rows across a surface that goes round them, if at all, by a thin margin: bands
+    /// where the surface all but stops across its whole width, between rows where it spans it.
+    /// The surface is `own` over `crop`, within the box `rect`.
+    fn lit_bands(&self, own: &[bool], crop: Rect, rect: Rect) -> Vec<Rect> {
+        let width = crop.width() as usize;
+        let share: Vec<f32> = (rect.top..rect.bottom)
+            .map(|y| {
+                let start = (y - crop.top) as usize * width + (rect.left - crop.left) as usize;
+                let row = &own[start..start + rect.width() as usize];
+                row.iter().filter(|o| **o).count() as f32 / row.len() as f32
+            })
+            .collect();
+        let (low, high) = (self.px(LIT_ROW.0) as usize, self.px(LIT_ROW.1) as usize);
         let mut bands = Vec::new();
-        let mut start = span.0;
-        for &(gap_start, gap_end) in gaps.iter().filter(|(start, end)| end - start >= least) {
-            bands.push((start, gap_start));
-            start = gap_end;
+        let mut i = 1;
+        while i + 1 < share.len() {
+            if share[i] >= 0.05 {
+                i += 1;
+                continue;
+            }
+            let mut j = i;
+            while j < share.len() && share[j] < 0.05 {
+                j += 1;
+            }
+            if (low..=high).contains(&(j - i)) && j < share.len() && share[i - 1] >= 0.9 && share[j] >= 0.9 {
+                let band = Rect::new(rect.left, rect.top + i as i32, rect.right, rect.top + j as i32);
+                if self.lit(band) {
+                    bands.push(band);
+                }
+            }
+            i = j;
         }
-        bands.push((start, span.1));
         bands
-            .into_iter()
-            .filter_map(|(start, end)| {
-                let band = if across {
-                    Rect::new(rect.left, rect.top + start as i32, rect.right, rect.top + end as i32)
-                } else {
-                    Rect::new(rect.left + start as i32, rect.top, rect.left + end as i32, rect.bottom)
-                };
-                self.content(image, band, ground)
-            })
-            .collect()
     }
 
-    /// How the pixels of a box differ, row by row and column by column: inside each row and from
-    /// the row above it, inside each column and from the column on its left.
-    fn profile(&self, rect: Rect) -> Profile {
+    /// The grid a surface is a cell of, as an hour of a calendar's week, a cell of a sheet:
+    /// surfaces of one colour parted by thin lines, as high as the cells beside them in a row and
+    /// as wide as those over and under them in a column, in three rows and two columns at least:
+    /// not the headings of a table's columns over their bodies. The box of the grid, if so.
+    fn lattice(&mut self, colour: Color, label: u32) -> Option<Rect> {
+        let tone = tone_of(colour);
+        if let Some(&grid) = self.grids.get(&(tone, label)) {
+            return grid;
+        }
+        self.grids.insert((tone, label), None);
+        let surfaces = self.surfaces_of(colour);
+        let boxes = &surfaces.boxes;
+        let least = (self.px(CELL.0), self.px(CELL.1));
+        let large = |rect: &Rect| rect.width() >= least.0 && rect.height() >= least.1;
+        if !large(&boxes[label as usize]) {
+            return None;
+        }
+        let (even, apart) = (self.px(LINE + 1.0), self.px(SLACK));
+        let (mut cells, mut todo) = (vec![label], vec![label]);
+        while let Some(n) = todo.pop() {
+            let cell = boxes[n as usize];
+            for (m, other) in boxes.iter().enumerate().skip(1) {
+                let row = (other.top - cell.top).abs() <= even && (other.bottom - cell.bottom).abs() <= even;
+                let column = (other.left - cell.left).abs() <= even && (other.right - cell.right).abs() <= even;
+                let beside = (0..=apart).contains(&(other.left - cell.right)) || (0..=apart).contains(&(cell.left - other.right));
+                let over = (0..=apart).contains(&(other.top - cell.bottom)) || (0..=apart).contains(&(cell.top - other.bottom));
+                if ((row && beside) || (column && over)) && large(other) && !cells.contains(&(m as u32)) {
+                    cells.push(m as u32);
+                    todo.push(m as u32);
+                }
+            }
+        }
+        let distinct = |values: &mut Vec<i32>| {
+            values.sort_unstable();
+            values.dedup();
+            values.len()
+        };
+        let mut columns: Vec<i32> = cells.iter().map(|&n| boxes[n as usize].left / 4).collect();
+        let mut rows: Vec<i32> = cells.iter().map(|&n| boxes[n as usize].top / 4).collect();
+        if cells.len() < 6 || distinct(&mut columns) < 2 || distinct(&mut rows) < 3 {
+            return None;
+        }
+        let grid = cells.iter().fold(Rect::default(), |grid, &n| grid.union(boxes[n as usize]));
+        for &n in &cells {
+            self.grids.insert((tone, n), Some(grid));
+        }
+        Some(grid)
+    }
+
+    /// The rooms of the surface around the seed: their number in `rooms`. The seed is on a surface
+    /// of the colour.
+    fn rooms(&mut self, colour: Color, seed: (i32, i32)) -> usize {
+        let tone = tone_of(colour);
+        let surfaces = self.surfaces_of(colour);
+        let label = surfaces.labels[self.index(seed.0, seed.1)];
+        if let Some(&known) = self.known.get(&(tone, label)) {
+            return known;
+        }
+        let (joined, lit) = self.lit_rows(&surfaces, label);
+        let mut rect = joined.iter().fold(Rect::default(), |rect, &n| rect.union(surfaces.boxes[n as usize]));
+        let mut own = vec![false; rect.width() as usize * rect.height() as usize];
+        for y in rect.top..rect.bottom {
+            for x in rect.left..rect.right {
+                let n = surfaces.labels[self.index(x, y)];
+                own[(y - rect.top) as usize * rect.width() as usize + (x - rect.left) as usize] = n == label || joined.contains(&n);
+            }
+        }
+        // With the thin lines along a lit row's edges, the lines between the items of the list.
+        let line = self.px(LINE);
+        for band in &lit {
+            let band = Rect::new(band.left, band.top - line, band.right, band.bottom + line).intersect(rect);
+            for y in band.top..band.bottom {
+                let start = (y - rect.top) as usize * rect.width() as usize + (band.left - rect.left) as usize;
+                own[start..start + band.width() as usize].fill(true);
+            }
+        }
+        // A surface that goes on smoothly past its colour, a gradient, a wallpaper, a picture's
+        // grain, is taken as the smoothed picture shows it. A surface that ends at edges all
+        // round, a panel, a message, a field, however close in colour to what lies past them, is
+        // taken as it is.
+        let mut chained = None;
+        if self.soft(colour, seed) {
+            let chain = self.chain(seed);
+            let (size, extent) = self.chain_extents[chain];
+            if own.iter().filter(|o| **o).count() as f32 <= GRADIENT * size as f32 {
+                if let Some(&known) = self.chained.get(&(chain as u32)) {
+                    self.known.insert((tone, label), known);
+                    return known;
+                }
+                chained = Some(chain as u32);
+                rect = extent;
+                own = vec![false; rect.width() as usize * rect.height() as usize];
+                for y in rect.top..rect.bottom {
+                    for x in rect.left..rect.right {
+                        let i = self.index(x, y);
+                        own[(y - rect.top) as usize * rect.width() as usize + (x - rect.left) as usize] = self.chains[i] == chain as u32;
+                    }
+                }
+            }
+        }
+        self.rooms.push(self.divide(&own, rect));
+        let number = self.rooms.len() - 1;
+        for n in joined {
+            self.known.insert((tone, n), number);
+        }
+        if let Some(chain) = chained {
+            self.chained.insert(chain, number);
+        }
+        number
+    }
+
+    /// The rooms of a surface, `own` over the box `rect`.
+    fn divide(&self, own: &[bool], rect: Rect) -> Rooms {
+        // What is around the surface, far enough to see the walls along it whole, with the tables
+        // that stand on it.
+        let stands = |table: &Rect| {
+            let common = table.intersect(rect);
+            !common.is_empty() && (common.top..common.bottom).any(|y| {
+                let start = (y - rect.top) as usize * rect.width() as usize + (common.left - rect.left) as usize;
+                own[start..start + common.width() as usize].iter().any(|o| *o)
+            })
+        };
+        let tables: Vec<Rect> = self.tables.iter().flatten().copied().filter(stands).collect();
+        let reach = rect.inflate(self.px(WALL_LONG)).intersect(self.bounds());
+        let crop = tables.iter().fold(reach, |crop, table| crop.union(*table));
+        let (cw, ch) = (crop.width() as usize, crop.height() as usize);
+        let mut inside = vec![false; cw * ch];
+        for y in rect.top..rect.bottom {
+            let from = (y - rect.top) as usize * rect.width() as usize;
+            let to = (y - crop.top) as usize * cw + (rect.left - crop.left) as usize;
+            inside[to..to + rect.width() as usize].copy_from_slice(&own[from..from + rect.width() as usize]);
+        }
+        let own = inside;
+        // A wall is a bar alike all along: a line, a scroll bar; not a line of text.
+        let bars = |bit: u8| -> Vec<bool> {
+            let mut bars = Vec::with_capacity(cw * ch);
+            for (y, row) in own.chunks_exact(cw).enumerate() {
+                let start = self.index(crop.left, crop.top + y as i32);
+                bars.extend(row.iter().zip(&self.marks[start..start + cw]).map(|(own, mark)| !own && mark & bit == 0));
+            }
+            bars
+        };
+        let long = self.px(WALL_LONG) as usize;
+        let thick = self.px(WALL_THIN) as usize + 1;
+        let down = runs(&bars(DOWN), cw, long, false);
+        let across = runs(&bars(ACROSS), cw, long, true);
+        let other: Vec<bool> = own.iter().map(|o| !o).collect();
+        let wide = runs(&other, cw, thick, true);
+        let tall = runs(&other, cw, thick, false);
+        let mut open = vec![false; cw * ch];
+        for i in 0..cw * ch {
+            let wall = (down[i] && !wide[i]) || (across[i] && !tall[i]);
+            open[i] = !own[i] && !wall;
+        }
+        // What the surface and its walls wholly surround is furniture.
+        let holes = parts(&open, cw, false);
+        let outer: Vec<bool> =
+            holes.boxes.iter().map(|hole| hole.left == 0 || hole.top == 0 || hole.right == cw as i32 || hole.bottom == ch as i32).collect();
+        let mut furniture: Vec<bool> = holes.labels.iter().map(|&hole| hole != 0 && !outer[hole as usize]).collect();
+        // A lit row across the surface, a selected item of a list, is furniture of it: the list is
+        // one room, not two parted by the thin margin the surface goes round the row by. A table
+        // is furniture of its room whole, whatever its columns cut the surface into.
+        for band in self.lit_bands(&own, crop, rect).into_iter().chain(tables) {
+            for y in band.top..band.bottom {
+                let start = (y - crop.top) as usize * cw + (band.left - crop.left) as usize;
+                for i in start..start + band.width() as usize {
+                    furniture[i] |= !own[i];
+                }
+            }
+        }
+        let space: Vec<bool> = own.iter().zip(&furniture).map(|(own, furniture)| *own || *furniture).collect();
+        let distance = distances(&space, cw, false);
+        let mut labels = basins(&distance, cw, self.scale * LEAST_DOOR);
+        bands(&mut labels, &furniture, cw, self.px(FRAME), (200.0 * self.scale * self.scale) as u32, self.px(20.0));
+        let count = labels.iter().copied().max().unwrap_or(0);
+        let boxes = measure(&labels, cw, count).into_iter().map(|rect| rect.offset(crop.left, crop.top)).collect();
+        Rooms { crop, labels, furniture, boxes, furnished: HashMap::new() }
+    }
+
+    /// A room's box and its blocks of furniture, once: small pieces, letters and icons, joined
+    /// into words and lines into paragraphs; a large piece, a lit row or a picture, a block of its
+    /// own.
+    fn furnished(&mut self, rooms: usize, room_id: u32) -> Rc<Furnished> {
+        if let Some(furnished) = self.rooms[rooms].furnished.get(&room_id) {
+            return furnished.clone();
+        }
+        let furnished = Rc::new(self.furnish(&self.rooms[rooms], room_id));
+        self.rooms[rooms].furnished.insert(room_id, furnished.clone());
+        furnished
+    }
+
+    fn furnish(&self, rooms: &Rooms, room_id: u32) -> Furnished {
+        let room = self.body(rooms, room_id);
+        let (w, h) = (room.width() as usize, room.height() as usize);
+        let width = rooms.crop.width() as usize;
+        let mut inner = vec![false; w * h];
+        for y in 0..h {
+            let start = (room.top - rooms.crop.top) as usize * width + y * width + (room.left - rooms.crop.left) as usize;
+            for x in 0..w {
+                inner[y * w + x] = rooms.furniture[start + x] && rooms.labels[start + x] == room_id;
+            }
+        }
+        let pieces = parts(&inner, w, true);
+        let letter = self.px(LETTER);
+        let small: Vec<bool> = pieces.boxes.iter().enumerate().map(|(n, b)| n > 0 && b.width() <= letter && b.height() <= letter).collect();
+        let letters: Vec<bool> = pieces.labels.iter().map(|&n| small[n as usize]).collect();
+        let join = self.px(JOIN) as usize;
+        let grown_letters = grown(&letters, w, join, join);
+        let joined: Vec<bool> = (0..w * h).map(|i| grown_letters[i] && (letters[i] || !inner[i])).collect();
+        let Parts { labels: mut blocks, count: words, .. } = parts(&joined, w, true);
+        for i in 0..w * h {
+            if inner[i] && !letters[i] {
+                blocks[i] = pieces.labels[i] + words;
+            }
+        }
+        // How much furniture there is in any box of the room.
+        let mut sums = vec![0u32; (w + 1) * (h + 1)];
+        for y in 0..h {
+            for x in 0..w {
+                let here = inner[y * w + x] as u32;
+                sums[(y + 1) * (w + 1) + x + 1] = here + sums[y * (w + 1) + x + 1] + sums[(y + 1) * (w + 1) + x] - sums[y * (w + 1) + x];
+            }
+        }
+        let mut boxes = HashMap::new();
+        for (n, b) in measure(&blocks, w, words + pieces.count).iter().enumerate().skip(1) {
+            if b.is_empty() {
+                continue;
+            }
+            let sum = |x: i32, y: i32| sums[y as usize * (w + 1) + x as usize] as i64;
+            let filled = sum(b.right, b.bottom) - sum(b.left, b.bottom) - sum(b.right, b.top) + sum(b.left, b.top);
+            if filled != 0 {
+                boxes.insert(n as u32, (b.offset(room.left, room.top), (filled as f32) < SPARSE * size(*b)));
+            }
+        }
+        Furnished { room, blocks, boxes }
+    }
+
+    /// The box of a room without its thin outgrowths: the spaces between the buttons of a toolbar
+    /// on the same surface, a margin along a panel.
+    fn body(&self, rooms: &Rooms, room_id: u32) -> Rect {
+        let rect = rooms.boxes[room_id as usize];
         let (w, h) = (rect.width() as usize, rect.height() as usize);
-        let mut profile = Profile {
-            row_detail: vec![0; h],
-            row_edge: vec![0; h],
-            column_detail: vec![0; w],
-            column_edge: vec![0; w],
-        };
-        for i in 0..h {
-            let start = (rect.top as usize + i) * self.width as usize + rect.left as usize;
-            for (j, bits) in self.bits[start..start + w].iter().enumerate() {
-                if j > 0 && bits & ACROSS != 0 {
-                    profile.row_detail[i] += 1;
-                    profile.column_edge[j] += 1;
-                }
-                if i > 0 && bits & DOWN != 0 {
-                    profile.row_edge[i] += 1;
-                    profile.column_detail[j] += 1;
-                }
+        let width = rooms.crop.width() as usize;
+        let mut mask = vec![false; w * h];
+        for y in 0..h {
+            let start = (rect.top - rooms.crop.top) as usize * width + y * width + (rect.left - rooms.crop.left) as usize;
+            for x in 0..w {
+                mask[y * w + x] = rooms.labels[start + x] == room_id;
             }
         }
-        profile
+        let depth = distances(&mask, w, true);
+        let mut deepest = 0;
+        for (y, row) in depth.chunks_exact(w).enumerate() {
+            for (x, &d) in row.iter().enumerate() {
+                deepest = deepest.max(d.min((x.min(w - 1 - x).min(y).min(h - 1 - y) + 1) as u32 * UNIT));
+            }
+        }
+        let radius = (0.2 * deepest as f32 / UNIT as f32).max(4.0 * self.scale).min(40.0 * self.scale).floor();
+        // What a circle of that radius reaches rolling inside the room, past the sides of its box
+        // too.
+        let mut opened = NOWHERE;
+        for (y, row) in depth.chunks_exact(w).enumerate() {
+            let inside = |d: &u32| *d > radius as u32 * UNIT;
+            if let (Some(first), Some(last)) = (row.iter().position(inside), row.iter().rposition(inside)) {
+                let (left, right) = (opened.left.min(first as i32), opened.right.max(last as i32 + 1));
+                opened = Rect::new(left, opened.top.min(y as i32), right, y as i32 + 1);
+            }
+        }
+        if opened.is_empty() {
+            return rect;
+        }
+        opened.inflate(radius as i32).intersect(Rect::new(0, 0, w as i32, h as i32)).offset(rect.left, rect.top)
     }
 
-    /// The edges across a box: rows that differ from the one before nearly all along it, with
-    /// smooth surfaces on both sides, or columns if not `across`; and how far each stops short of
-    /// the box's start and of its end.
-    fn edges(&self, rect: Rect, profile: &Profile, across: bool) -> Vec<Edge> {
-        let (edge, detail, length, count) = if across {
-            (&profile.row_edge, &profile.row_detail, rect.width(), rect.height())
-        } else {
-            (&profile.column_edge, &profile.column_detail, rect.height(), rect.width())
+    /// Whether just outside a box is busy, a wallpaper or a picture: a message of one line on it
+    /// is an area, lower as it is than a panel.
+    fn busy_around(&self, rect: Rect) -> bool {
+        let out = self.px(3.0);
+        let (mut all, mut apart) = (0u32, 0u32);
+        let mut count = |points: &mut dyn Iterator<Item = (i32, i32)>| {
+            let mut last: Option<[u8; 3]> = None;
+            for (x, y) in points {
+                let pixel = self.pixels[self.index(x, y)];
+                if let Some(last) = last {
+                    all += 1;
+                    apart += !alike(last, pixel, SAME) as u32;
+                }
+                last = Some(pixel);
+            }
         };
-        let along = (EDGE * length as f32) as u32;
-        let smooth = ((SMOOTH * length as f32) as u32).max(CORNERS);
-        (1..count as usize)
-            .filter(|&i| edge[i] >= along && detail[i - 1] <= smooth && detail[i] <= smooth)
-            .map(|i| {
-                let differs = |k: i32| {
-                    let (x, y, bit) =
-                        if across { (rect.left + k, rect.top + i as i32, DOWN) } else { (rect.left + i as i32, rect.top + k, ACROSS) };
-                    self.bits[(y * self.width + x) as usize] & bit != 0
+        if rect.top >= out {
+            count(&mut (rect.left..rect.right).map(|x| (x, rect.top - out)));
+        }
+        if rect.bottom + out <= self.h {
+            count(&mut (rect.left..rect.right).map(|x| (x, rect.bottom + out - 1)));
+        }
+        if rect.left >= out {
+            count(&mut (rect.top..rect.bottom).map(|y| (rect.left - out, y)));
+        }
+        if rect.right + out <= self.w {
+            count(&mut (rect.top..rect.bottom).map(|y| (rect.right + out - 1, y)));
+        }
+        all > 0 && apart as f32 >= BUSY * all as f32
+    }
+
+    /// The box with the line along each of its sides taken in, if the line is its own: thin, of
+    /// another colour than both the box and what is past it, and no longer than the side, as the
+    /// border of a card.
+    fn bordered(&self, area: Rect) -> Rect {
+        let thin = self.px(LINE).max(1);
+        let reach = self.px(SLACK);
+        // The pixel a distance out from a side, 0 for the last one in, at a place along it.
+        let pixel = |side: usize, out: i32, along: i32| {
+            let (x, y) = match side {
+                0 => (area.left - out, along),
+                1 => (area.right - 1 + out, along),
+                2 => (along, area.top - out),
+                _ => (along, area.bottom - 1 + out),
+            };
+            self.bounds().contains(Point::new(x, y)).then(|| self.pixels[self.index(x, y)])
+        };
+        let mut sides = [area.left, area.right, area.top, area.bottom];
+        for (side, edge) in sides.iter_mut().enumerate() {
+            let (start, end) = if side < 2 { (area.top, area.bottom) } else { (area.left, area.right) };
+            for thickness in 1..=thin {
+                let own = (start..end).filter(|&along| {
+                    let (Some(inside), Some(line), Some(last)) = (pixel(side, 0, along), pixel(side, 1, along), pixel(side, thickness, along)) else {
+                        return false;
+                    };
+                    !alike(inside, line, 2 * SAME)
+                        && alike(line, last, SAME)
+                        && pixel(side, thickness + 1, along).is_none_or(|past| !alike(past, last, 2 * SAME))
+                });
+                if (own.count() as f32) < MOST * (end - start) as f32 {
+                    continue;
+                }
+                // A line that goes on past the ends of the side is not the box's own.
+                let goes_on = |along: i32, next: i32| {
+                    matches!((pixel(side, 1, along), pixel(side, 1, next)), (Some(line), Some(past)) if alike(line, past, SAME))
                 };
-                Edge { at: i, short: (solid(differs, 0..length), solid(differs, (0..length).rev())) }
-            })
-            .collect()
-    }
-
-    /// The parts between the edges across a box, on its ground. A single edge is a step from one
-    /// surface to another, and so is a line between two surfaces of different colours; a line with
-    /// the same surface on both sides only divides it. A part beside a step with a surface of its
-    /// own is a panel, padding, border and all; beside a step on the box's ground it is a piece of
-    /// the box. A part between two lines is a box drawn with them, a panel with its lines. Any
-    /// other part is a piece of the box's surface.
-    fn panels(&self, image: &Image, around: Part, profile: &Profile, cuts: &[usize], across: bool) -> Vec<Part> {
-        let (rect, ground) = (around.rect, around.ground);
-        let length = if across { rect.height() } else { rect.width() } as usize;
-        // The lines and the steps between the parts: where they start and where the part after
-        // them does. A line at either end of the box is the box's own.
-        let mut dividers: Vec<Divider> = Vec::new();
-        for &cut in cuts {
-            match dividers.last_mut() {
-                Some(last) if cut - last.1 <= LINE as usize => last.1 = cut,
-                _ => dividers.push((cut, cut)),
-            }
-        }
-        if let Some(first) = dividers.first_mut()
-            && first.0 <= LINE as usize
-        {
-            first.0 = 0;
-        }
-        if let Some(last) = dividers.last_mut()
-            && length - last.1 <= LINE as usize
-        {
-            last.1 = length;
-        }
-        let step = |&(start, end): &Divider| {
-            start > 0 && end < length && (start == end || !same_surface(image, rect, across, start - 1, end))
-        };
-        let band = |start: usize, end: usize| {
-            let (start, end) = (start as i32, end as i32);
-            if across {
-                Rect::new(rect.left, rect.top + start, rect.right, rect.top + end)
-            } else {
-                Rect::new(rect.left + start, rect.top, rect.left + end, rect.bottom)
-            }
-        };
-        // Nothing differs across or along the rows of an empty part, but at its ends.
-        let (detail, edge, along) = if across {
-            (&profile.row_detail, &profile.row_edge, rect.width() as usize)
-        } else {
-            (&profile.column_detail, &profile.column_edge, rect.height() as usize)
-        };
-        let stray = (STRAY * along as f32) as u32;
-        let empty = |start: usize, end: usize| (start..end).all(|i| detail[i] <= stray && (i == start || edge[i] <= stray));
-        // The parts between lines alone, if they are the cells of a grid.
-        let segments: Vec<(Option<Divider>, Option<Divider>)> = (0..=dividers.len())
-            .map(|k| (k.checked_sub(1).map(|k| dividers[k]), dividers.get(k).copied()))
-            .filter(|(before, after)| {
-                let (start, end) = (before.map_or(0, |d| d.1), after.map_or(length, |d| d.0));
-                end as i32 - start as i32 > LINE
-            })
-            .collect();
-        let lengths: Vec<usize> = segments
-            .iter()
-            .map(|(before, after)| after.map_or(length, |d| d.0) - before.map_or(0, |d| d.1))
-            .collect();
-        let mut sorted = lengths.clone();
-        sorted.sort_unstable();
-        let median = sorted.get(sorted.len() / 2).copied().unwrap_or(0) as f32;
-        let cell = |n: usize| {
-            let size = lengths[n] as f32;
-            size <= ONE_SIZE * median && size * ONE_SIZE >= median
-        };
-        let lined = |n: usize| {
-            let (before, after) = segments[n];
-            before.is_some() && after.is_some() && !before.as_ref().is_some_and(step) && !after.as_ref().is_some_and(step)
-        };
-        let cells = (0..segments.len()).filter(|&n| cell(n)).count();
-        let lined_cells = (0..segments.len()).filter(|&n| cell(n) && lined(n)).count();
-        let grid = cells >= CELLS || lined_cells >= LINED_CELLS;
-        let mut parts = Vec::new();
-        for (n, &(before, after)) in segments.iter().enumerate() {
-            let (start, end) = (before.map_or(0, |d| d.1), after.map_or(length, |d| d.0));
-            // The part's surface, on the smooth row beside a divider.
-            let beside = if before.is_some() { start } else { end - 1 };
-            let surface = row_color(image, rect, across, beside);
-            let own = !alike(surface, ground, SAME);
-            let empty = empty(start, end);
-            let part = |rect: Rect, kind: Kind, ground: [u8; 3]| Part { rect, kind, sparse: false, ground, empty };
-            if grid && cell(n) {
-                parts.push(part(band(start, end), Kind::Piece, surface));
-            } else if before.as_ref().is_some_and(step) || after.as_ref().is_some_and(step) {
-                if own {
-                    // A line between two surfaces is the border of the one on the ground.
-                    let from = before.map_or(start, |d| d.0);
-                    let to = after.map_or(end, |d| d.1);
-                    parts.push(part(band(from, to), Kind::Panel, surface));
-                } else {
-                    parts.push(part(band(start, end), Kind::Piece, ground));
+                if !goes_on(start + (end - start) / 2, start - reach) && !goes_on(start + (end - start) / 2, end - 1 + reach) {
+                    *edge += if side % 2 == 0 { -thickness } else { thickness };
                 }
-            } else if let (Some(before), Some(after)) = (before, after) {
-                // The box's own lines all round leave its inside to be cut, the same kind of part;
-                // a cell of a grid is a piece of it.
-                if before.0 == 0 && after.1 == length {
-                    parts.push(Part { rect: band(start, end), ground: surface, empty, ..around });
-                } else {
-                    parts.push(part(band(before.0, after.1), Kind::Panel, surface));
-                }
-            } else {
-                parts.push(part(band(start, end), Kind::Piece, ground));
+                break;
             }
         }
-        parts
+        Rect::new(sides[0], sides[2], sides[1], sides[3])
     }
 
-    /// The block of content in the box, on its ground, without the empty space around it; nothing
-    /// if the box is all empty.
-    fn content(&self, image: &Image, rect: Rect, ground: [u8; 3]) -> Option<Part> {
-        let profile = self.profile(rect);
-        let (row_blank, column_blank) = empty(image, rect, &profile, ground);
-        let (rows, columns) = (span(&row_blank)?, span(&column_blank)?);
-        let content = Rect::new(
-            rect.left + columns.0 as i32,
-            rect.top + rows.0 as i32,
-            rect.left + columns.1 as i32,
-            rect.top + rows.1 as i32,
-        );
-        let differing: u32 = profile.row_detail.iter().chain(&profile.column_detail).sum();
-        let pixels = 2.0 * content.width() as f32 * content.height() as f32;
-        let sparse = (differing as f32) < SPARSE * pixels && bare(image, content, ground) >= BARE;
-        Some(Part { rect: content, kind: Kind::Block, sparse, ground, empty: false })
+    /// The tables of the window, by their rhythm: rows of text with three cells or more each, row
+    /// after row at one step, the cells in columns that begin or end at the same places; the rows
+    /// of its heading over them, whatever their step. The colour of a cell, as a column tinted by
+    /// its values, doesn't count. A table across most of its rows' background is as wide as it.
+    fn find_tables(&mut self) -> Vec<Rect> {
+        let width = self.w as usize;
+        let busy: Vec<bool> = self.marks.iter().map(|&mark| mark != 0).collect();
+        let pieces = parts(&busy, width, true);
+        // A letter, or a word whose letters the smoothing of the font has joined: no taller than
+        // a line of text, however wide.
+        let letter = self.px(LETTER);
+        let small: Vec<bool> = pieces.boxes.iter().enumerate().map(|(n, b)| n > 0 && b.height() <= letter).collect();
+        let letters: Vec<bool> = pieces.labels.iter().map(|&n| small[n as usize]).collect();
+        let words = grown(&letters, width, self.px(JOIN) as usize, 0);
+        let (low, high) = (self.px(6.0), self.px(30.0));
+        let mut found = Vec::new();
+        for rect in parts(&words, width, true).boxes.into_iter().skip(1) {
+            // A line of text, not the grain of a picture pressed small.
+            if rect.height() <= high && rect.height() >= low && rect.width() >= low {
+                found.push(Line { middle: (rect.top + rect.bottom) as f32 / 2.0, rect });
+            }
+        }
+        found.sort_by(|a, b| a.middle.total_cmp(&b.middle).then(a.rect.left.cmp(&b.rect.left)));
+        let close = self.px(LINE + 1.0) as f32;
+        let mut rows: Vec<Vec<Line>> = Vec::new();
+        for line in found {
+            match rows.last_mut() {
+                Some(row) if line.middle - row[row.len() - 1].middle <= close => row.push(line),
+                _ => rows.push(vec![line]),
+            }
+        }
+        // A row ends where another surface comes between its cells: the lines of a list of chats
+        // and of the messages beside it are not one row.
+        let mut segments: Vec<Vec<Line>> = Vec::new();
+        for mut row in rows {
+            // Text on a smooth background: not the drawings of a wallpaper, in rows as its pattern
+            // is.
+            if row.len() >= 3 {
+                row.retain(|line| {
+                    let middle = ((line.rect.left + line.rect.right) / 2, line.middle as i32);
+                    self.surface_at(middle.0, middle.1).is_some_and(|(colour, seed)| !self.gradient(colour, seed))
+                });
+            }
+            if row.len() < 3 {
+                continue;
+            }
+            row.sort_by_key(|line| line.rect.left);
+            let mut part = vec![row[0]];
+            for pair in row.windows(2) {
+                if self.foreign_between(pair[0], pair[1]) {
+                    segments.push(std::mem::take(&mut part));
+                }
+                part.push(pair[1]);
+            }
+            segments.push(part);
+        }
+        segments.retain(|part| part.len() >= 3);
+        segments.sort_by(|a, b| at(a).total_cmp(&at(b)));
+        let slack = self.px(SLACK);
+        let furthest = self.px(80.0) as f32;
+        // Rows after rows at one step, each table on its own track: two tables side by side.
+        let mut tracks: Vec<Vec<Vec<Line>>> = Vec::new();
+        'parts: for part in &segments {
+            for run in &mut tracks {
+                let step = at(part) - at(&run[run.len() - 1]);
+                let first = if run.len() > 1 { at(&run[1]) - at(&run[0]) } else { step };
+                if step > 0.0 && step <= furthest && in_columns(part, &run[run.len() - 1], slack) && (step - first).abs() <= 0.25 * first {
+                    run.push(part.clone());
+                    continue 'parts;
+                }
+            }
+            tracks.push(vec![part.clone()]);
+        }
+        let mut tables = Vec::new();
+        for mut run in tracks {
+            if run.len() < 4 {
+                continue;
+            }
+            let step = (at(&run[run.len() - 1]) - at(&run[0])) / (run.len() - 1) as f32;
+            // The heading over the rows: rows in the same columns just above, a step apart or a
+            // little more, as a heading's line of percentages over the names of the columns; its
+            // names a little off the cells' text, past the lines between the columns of the
+            // heading.
+            for _ in 0..2 {
+                let over = segments.iter().filter(|part| {
+                    let above = at(&run[0]) - at(part);
+                    above > 0.0 && above <= 1.5 * step && in_columns(part, &run[0], 2 * slack)
+                });
+                let Some(part) = over.max_by(|a, b| at(a).total_cmp(&at(b))) else { break };
+                run.insert(0, part.clone());
+            }
+            // Only the columns of most of the rows: not the items of a panel beside the table that
+            // happen to stand at the same height in some of them.
+            let in_column = |line: &Line, row: &Vec<Line>| {
+                row.iter().any(|other| (line.rect.left - other.rect.left).abs() <= slack || (line.rect.right - other.rect.right).abs() <= slack)
+            };
+            let kept: Vec<Line> = run
+                .iter()
+                .flatten()
+                .copied()
+                .filter(|line| 2 * run.iter().filter(|row| in_column(line, row)).count() >= run.len())
+                .collect();
+            if kept.is_empty() {
+                continue;
+            }
+            let third = (step / 3.0) as i32;
+            let top = (run[0].iter().map(|line| line.rect.top).min().unwrap_or(0) - third).max(0);
+            let mut bottom = (run[run.len() - 1].iter().map(|line| line.rect.bottom).max().unwrap_or(0) + third).min(self.h);
+            // Rows that run on past the window's edge, the last of them cut by it.
+            if (self.h - bottom) as f32 <= step {
+                bottom = self.h;
+            }
+            let mut left = (kept.iter().map(|line| line.rect.left).min().unwrap_or(0) - slack).max(0);
+            let mut right = (kept.iter().map(|line| line.rect.right).max().unwrap_or(0) + slack).min(self.w);
+            // How far the rows' background goes, past the text of their first and last cells.
+            let (mut lefts, mut rights) = (Vec::new(), Vec::new());
+            for part in [&run[run.len() / 4], &run[run.len() / 2], &run[3 * run.len() / 4]] {
+                let first = part.iter().min_by_key(|line| line.rect.left).copied().unwrap_or(part[0]);
+                let last = part.iter().rev().max_by_key(|line| line.rect.right).copied().unwrap_or(part[0]);
+                let colours: Vec<Color> = [first, last]
+                    .iter()
+                    .filter_map(|line| self.colour_at((line.rect.left + line.rect.right) / 2, line.middle as i32))
+                    .map(|(colour, _)| colour)
+                    .collect();
+                if !colours.is_empty() {
+                    lefts.push(self.reach(first.middle as i32, first.rect.left, -1, &colours));
+                    rights.push(self.reach(last.middle as i32, last.rect.right, 1, &colours));
+                }
+            }
+            if !lefts.is_empty() {
+                let (reach_left, reach_right) = (median(&mut lefts), median(&mut rights));
+                if (right - left) as f32 >= MOST_WIDE * (reach_right - reach_left) as f32 {
+                    (left, right) = (left.min(reach_left), right.max(reach_right));
+                }
+            }
+            tables.push(Rect::new(left, top, right, bottom));
+        }
+        tables
+    }
+
+    /// Whether another surface comes between two lines of a row, a pane between two panels: more
+    /// than a line's width of a colour that is the background of neither.
+    fn foreign_between(&self, a: Line, b: Line) -> bool {
+        let (x0, x1) = (a.rect.right, b.rect.left);
+        let slack = self.px(SLACK);
+        if x1 - x0 <= slack {
+            return false;
+        }
+        let colour = |line: Line| self.colour_at((line.rect.left + line.rect.right) / 2, line.middle as i32).map(|(colour, _)| colour);
+        let (Some(ca), Some(cb)) = (colour(a), colour(b)) else { return false };
+        let y = ((a.middle + b.middle) / 2.0).round() as i32;
+        let (mut run, mut longest) = (0, 0);
+        for x in x0..x1 {
+            let pixel = self.pixels[self.index(x, y)];
+            run = if !of_colour(pixel, ca) && !of_colour(pixel, cb) { run + 1 } else { 0 };
+            longest = longest.max(run);
+        }
+        longest > slack
+    }
+
+    /// Where the background of a row from a point on ends, past thin lines across it: the
+    /// backgrounds of its cells, a tinted one and the row's own.
+    fn reach(&self, y: i32, mut x: i32, direction: i32, colours: &[Color]) -> i32 {
+        let slack = self.px(SLACK);
+        let mut run = 0;
+        while x + direction >= 0 && x + direction < self.w {
+            x += direction;
+            if colours.iter().all(|&colour| !of_colour(self.pixels[self.index(x, y)], colour)) {
+                run += 1;
+                if run > slack {
+                    return x - direction * (run - 1);
+                }
+            } else {
+                run = 0;
+            }
+        }
+        x
     }
 }
 
-/// An edge across a box, or down it: the row or the column where it is, and how far it stops
-/// short of the start of the box and of its end.
-struct Edge {
-    at: usize,
-    short: (u32, u32),
+/// The height of a row of a table.
+fn at(row: &[Line]) -> f32 {
+    row.iter().map(|line| line.middle).fold(f32::MAX, f32::min)
 }
 
-impl Edge {
-    /// Whether the edge comes to the start of the box, and to its end, but for a line's width.
-    fn ends(&self) -> (bool, bool) {
-        (self.short.0 <= LINE as u32, self.short.1 <= LINE as u32)
-    }
+/// Whether two rows of a table have two cells at least that begin or end at the same places.
+fn in_columns(a: &[Line], b: &[Line], slack: i32) -> bool {
+    let starts = a.iter().filter(|p| b.iter().any(|q| (p.rect.left - q.rect.left).abs() <= slack)).count();
+    let ends = a.iter().filter(|p| b.iter().any(|q| (p.rect.right - q.rect.right).abs() <= slack)).count();
+    starts.max(ends) >= 2
 }
 
-/// How the pixels of a box differ: see [`Areas::profile`].
-struct Profile {
-    row_detail: Vec<u32>,
-    row_edge: Vec<u32>,
-    column_detail: Vec<u32>,
-    column_edge: Vec<u32>,
+/// The value in the middle.
+fn median(values: &mut [i32]) -> i32 {
+    values.sort_unstable();
+    let n = values.len();
+    if n % 2 == 1 { values[n / 2] } else { (values[n / 2 - 1] + values[n / 2]) / 2 }
 }
 
-/// The colour of a pixel.
-fn color(image: &Image, x: i32, y: i32) -> [u8; 3] {
-    let i = ((y as u32 * image.width + x as u32) * 4) as usize;
-    [image.pixels[i], image.pixels[i + 1], image.pixels[i + 2]]
+fn size(rect: Rect) -> f32 {
+    rect.width() as f32 * rect.height() as f32
 }
 
 /// Whether two colours are of one surface, within `by` in every channel.
@@ -574,368 +1169,544 @@ fn alike(a: [u8; 3], b: [u8; 3], by: u8) -> bool {
     a.iter().zip(b).all(|(a, b)| a.abs_diff(b) <= by)
 }
 
-/// The colour of a smooth row of a box, or of a column: the middle of three samples along it.
-fn row_color(image: &Image, rect: Rect, across: bool, index: usize) -> [u8; 3] {
-    let index = index as i32;
-    let samples = [1, 2, 3].map(|k| {
-        if across {
-            color(image, rect.left + rect.width() * k / 4, rect.top + index)
+/// The tone of a colour.
+fn tone_of(colour: Color) -> Tone {
+    colour.map(|c| (c as u32 / 8) as u8)
+}
+
+/// Whether a pixel is of a surface of the colour.
+fn of_colour(pixel: [u8; 3], colour: Color) -> bool {
+    pixel.iter().zip(colour).all(|(p, c)| (*p as f32 - c).abs() <= TOLERANCE)
+}
+
+/// What a label stands for now that others have joined it.
+fn root(parent: &mut [u32], mut n: u32) -> u32 {
+    while parent[n as usize] != n {
+        parent[n as usize] = parent[parent[n as usize] as usize];
+        n = parent[n as usize];
+    }
+    n
+}
+
+/// The connected parts of a mask, numbered from 1 in the order they begin.
+struct Parts {
+    /// The part of every pixel, 0 for none.
+    labels: Vec<u32>,
+    count: u32,
+    /// How many pixels each part has and its box, by its number; nothing for number 0.
+    sizes: Vec<u32>,
+    boxes: Vec<Rect>,
+}
+
+/// A box of nothing, for a number no pixel has.
+const NOWHERE: Rect = Rect::new(1 << 30, 1 << 30, -1 << 30, -1 << 30);
+
+/// The connected parts of a mask of `width` columns, of pixels touching by a side and, if
+/// `diagonal`, by a corner.
+fn parts(mask: &[bool], width: usize, diagonal: bool) -> Parts {
+    let height = mask.len() / width.max(1);
+    let reach = diagonal as usize;
+    // The runs of the mask along its rows: row, start, end and label.
+    let mut found: Vec<(u32, u32, u32, u32)> = Vec::new();
+    let mut parent = vec![0u32];
+    let (mut above, mut above_end) = (0, 0);
+    for y in 0..height {
+        let row = &mask[y * width..y * width + width];
+        let first = found.len();
+        let mut x = 0;
+        while x < width {
+            let Some(start) = row[x..].iter().position(|on| *on) else { break };
+            let start = x + start;
+            let end = row[start..].iter().position(|on| !*on).map_or(width, |n| start + n);
+            let mut here = 0;
+            // The runs of the row above that touch this one.
+            while above < above_end && found[above].2 as usize + reach <= start {
+                above += 1;
+            }
+            for &(_, from, _, label) in &found[above..above_end] {
+                if from as usize >= end + reach {
+                    break;
+                }
+                let other = root(&mut parent, label);
+                if here == 0 {
+                    here = other;
+                } else if other != here {
+                    let (low, high) = (here.min(other), here.max(other));
+                    parent[high as usize] = low;
+                    here = low;
+                }
+            }
+            if here == 0 {
+                here = parent.len() as u32;
+                parent.push(here);
+            }
+            found.push((y as u32, start as u32, end as u32, here));
+            x = end;
+        }
+        (above, above_end) = (first, found.len());
+    }
+    let mut numbers = vec![0u32; parent.len()];
+    let mut count = 0;
+    for n in 1..parent.len() {
+        let top = root(&mut parent, n as u32) as usize;
+        if numbers[top] == 0 {
+            count += 1;
+            numbers[top] = count;
+        }
+        numbers[n] = numbers[top];
+    }
+    let mut labels = vec![0u32; mask.len()];
+    let mut sizes = vec![0u32; count as usize + 1];
+    let mut boxes = vec![NOWHERE; count as usize + 1];
+    for (y, from, to, label) in found {
+        let number = numbers[label as usize];
+        labels[y as usize * width + from as usize..y as usize * width + to as usize].fill(number);
+        sizes[number as usize] += to - from;
+        let rect = &mut boxes[number as usize];
+        (rect.left, rect.top) = (rect.left.min(from as i32), rect.top.min(y as i32));
+        (rect.right, rect.bottom) = (rect.right.max(to as i32), rect.bottom.max(y as i32 + 1));
+    }
+    Parts { labels, count, sizes, boxes }
+}
+
+/// The box of every label, nothing for no label at all.
+fn measure(labels: &[u32], width: usize, count: u32) -> Vec<Rect> {
+    let mut boxes = vec![NOWHERE; count as usize + 1];
+    for (y, row) in labels.chunks_exact(width).enumerate() {
+        let y = y as i32;
+        for (x, &label) in row.iter().enumerate() {
+            if label != 0 {
+                let (x, rect) = (x as i32, &mut boxes[label as usize]);
+                (rect.left, rect.top) = (rect.left.min(x), rect.top.min(y));
+                (rect.right, rect.bottom) = (rect.right.max(x + 1), rect.bottom.max(y + 1));
+            }
+        }
+    }
+    boxes
+}
+
+/// What is left of a mask but runs at least `least` long, along its rows or else down its columns.
+fn runs(mask: &[bool], width: usize, least: usize, along_rows: bool) -> Vec<bool> {
+    let height = mask.len() / width.max(1);
+    let mut kept = vec![false; mask.len()];
+    if along_rows {
+        for (row, out) in mask.chunks_exact(width).zip(kept.chunks_exact_mut(width)) {
+            let mut run = 0;
+            for x in 0..=width {
+                if x < width && row[x] {
+                    run += 1;
+                    continue;
+                }
+                if run >= least {
+                    out[x - run..x].fill(true);
+                }
+                run = 0;
+            }
+        }
+        return kept;
+    }
+    let mut lengths = vec![0usize; width];
+    for y in 0..=height {
+        for (x, length) in lengths.iter_mut().enumerate() {
+            if y < height && mask[y * width + x] {
+                *length += 1;
+                continue;
+            }
+            if *length >= least {
+                for k in y - *length..y {
+                    kept[k * width + x] = true;
+                }
+            }
+            *length = 0;
+        }
+    }
+    kept
+}
+
+/// A mask grown by `across` pixels along its rows and `down` pixels along its columns.
+fn grown(mask: &[bool], width: usize, across: usize, down: usize) -> Vec<bool> {
+    let height = mask.len() / width.max(1);
+    let mut wide = vec![false; mask.len()];
+    for y in 0..height {
+        let row = &mask[y * width..y * width + width];
+        let out = &mut wide[y * width..y * width + width];
+        let mut last = None;
+        for x in 0..width {
+            if row[x] {
+                last = Some(x);
+            }
+            out[x] = last.is_some_and(|last| x - last <= across);
+        }
+        let mut next = None;
+        for x in (0..width).rev() {
+            if row[x] {
+                next = Some(x);
+            }
+            out[x] |= next.is_some_and(|next| next - x <= across);
+        }
+    }
+    if down == 0 {
+        return wide;
+    }
+    let mut tall = vec![false; mask.len()];
+    let mut last = vec![None; width];
+    for y in 0..height {
+        for x in 0..width {
+            if wide[y * width + x] {
+                last[x] = Some(y);
+            }
+            tall[y * width + x] = last[x].is_some_and(|last| y - last <= down);
+        }
+    }
+    let mut next = vec![None; width];
+    for y in (0..height).rev() {
+        for x in 0..width {
+            if wide[y * width + x] {
+                next[x] = Some(y);
+            }
+            tall[y * width + x] |= next[x].is_some_and(|next: usize| next - y <= down);
+        }
+    }
+    tall
+}
+
+/// How far every pixel of a mask is from the nearest pixel outside it, in `UNIT`s to the pixel, by
+/// the steps from pixel to pixel in a close approximation of straight lines. What is past the
+/// sides of the mask is outside it, unless `open`.
+fn distances(mask: &[bool], width: usize, open: bool) -> Vec<u32> {
+    const FAR: u32 = u32::MAX / 2;
+    const STRAIGHT: u32 = UNIT;
+    const DIAGONAL: u32 = UNIT * 14 / 10;
+    const KNIGHT: u32 = UNIT * 21969 / 10000;
+    let height = mask.len() / width.max(1);
+    // Two rows and columns around it.
+    let stride = width + 4;
+    let mut d = vec![if open { FAR } else { 0 }; stride * (height + 4)];
+    for (y, row) in mask.chunks_exact(width).enumerate() {
+        for (cell, &on) in d[(y + 2) * stride + 2..].iter_mut().zip(row) {
+            *cell = if on { FAR } else { 0 };
+        }
+    }
+    // Each pixel from those before it, and then from those after it, row by row.
+    for y in 2..height + 2 {
+        let (done, rest) = d.split_at_mut(y * stride);
+        let (far, near) = done[(y - 2) * stride..].split_at(stride);
+        let row = &mut rest[..stride];
+        let mut last = row[1];
+        for x in 2..width + 2 {
+            if row[x] != 0 {
+                row[x] = row[x]
+                    .min(last + STRAIGHT)
+                    .min(near[x] + STRAIGHT)
+                    .min(near[x - 1].min(near[x + 1]) + DIAGONAL)
+                    .min(near[x - 2].min(near[x + 2]).min(far[x - 1]).min(far[x + 1]) + KNIGHT);
+            }
+            last = row[x];
+        }
+    }
+    for y in (2..height + 2).rev() {
+        let (rest, done) = d.split_at_mut((y + 1) * stride);
+        let (near, far) = done.split_at(stride);
+        let row = &mut rest[y * stride..];
+        let mut last = row[width + 2];
+        for x in (2..width + 2).rev() {
+            if row[x] != 0 {
+                row[x] = row[x]
+                    .min(last + STRAIGHT)
+                    .min(near[x] + STRAIGHT)
+                    .min(near[x - 1].min(near[x + 1]) + DIAGONAL)
+                    .min(near[x - 2].min(near[x + 2]).min(far[x - 1]).min(far[x + 1]) + KNIGHT);
+            }
+            last = row[x];
+        }
+    }
+    let mut out = Vec::with_capacity(mask.len());
+    for y in 0..height {
+        let start = (y + 2) * stride + 2;
+        out.extend_from_slice(&d[start..start + width]);
+    }
+    out
+}
+
+/// The rooms of a space, by its distance from the walls, a label for every pixel: the basins
+/// around its widest places, poured from the widest down, two of them one room unless the way
+/// between them narrows from the narrower one's widest by a door's depth, a quarter of it. A
+/// narrow panel beside a wide list is a room of its own, and the middle of a long room, rippling
+/// by a pixel or dented by a line under a tab, is one. A space too thin for a door is no room.
+fn basins(distance: &[u32], width: usize, least_door: f32) -> Vec<u32> {
+    // The level of every pixel of the space, widest first by quarters of a pixel, 0 for none, with
+    // a row and a column of nothing around them.
+    const FINENESS: u32 = UNIT / 4;
+    const WAITING: u32 = u32::MAX;
+    let widest = distance.iter().copied().max().unwrap_or(0);
+    let top = widest / FINENESS + 1;
+    let height = distance.len() / width.max(1);
+    let stride = width + 2;
+    let mut levels = vec![0u32; stride * (height + 2)];
+    let mut starts = vec![0u32; top as usize + 2];
+    for (y, row) in distance.chunks_exact(width).enumerate() {
+        for (x, &d) in row.iter().enumerate() {
+            if d > 0 {
+                let level = top - d / FINENESS;
+                levels[(y + 1) * stride + x + 1] = level;
+                starts[level as usize + 1] += 1;
+            }
+        }
+    }
+    for n in 1..starts.len() {
+        starts[n] += starts[n - 1];
+    }
+    let mut order = vec![0u32; starts[top as usize + 1] as usize];
+    let mut next = starts.clone();
+    for (i, &level) in levels.iter().enumerate() {
+        if level != 0 {
+            order[next[level as usize] as usize] = i as u32;
+            next[level as usize] += 1;
+        }
+    }
+    let beside = |i: usize| [i - 1, i + 1, i - stride, i + stride];
+    let mut labels = vec![0u32; levels.len()];
+    let (mut parent, mut peak) = (vec![0u32], vec![0f32]);
+    let mut queue = VecDeque::new();
+    let poured = |label: u32| label != 0 && label != WAITING;
+    for here in 1..=top {
+        let pixels = &order[starts[here as usize] as usize..starts[here as usize + 1] as usize];
+        // A level is poured from what is poured already evenly along it, so that two basins share
+        // a long room's middle, all of one level, rather than the first taking it all.
+        for &i in pixels {
+            let i = i as usize;
+            if beside(i).iter().any(|&n| poured(labels[n])) {
+                labels[i] = WAITING;
+                queue.push_back(i);
+            }
+        }
+        while let Some(i) = queue.pop_front() {
+            // The pixel goes with the neighbour nearest the widest place of its own.
+            let nearest = beside(i).into_iter().filter(|&n| poured(labels[n])).min_by_key(|&n| levels[n]);
+            let Some(nearest) = nearest else { continue };
+            let first = labels[nearest];
+            let own = root(&mut parent, first);
+            let width_here = (top - here) as f32 / 4.0;
+            for n in beside(i) {
+                if poured(labels[n]) {
+                    if labels[n] == first || labels[n] == own {
+                        continue;
+                    }
+                    let other = root(&mut parent, labels[n]);
+                    let narrower = peak[own as usize].min(peak[other as usize]);
+                    if other != own && narrower - width_here < least_door.max(DOOR * narrower) {
+                        peak[own as usize] = peak[own as usize].max(peak[other as usize]);
+                        parent[other as usize] = own;
+                    }
+                } else if labels[n] == 0 && levels[n] == here {
+                    labels[n] = WAITING;
+                    queue.push_back(n);
+                }
+            }
+            labels[i] = own;
+        }
+        // What is left of the level is widest places of their own.
+        for &i in pixels {
+            let i = i as usize;
+            if labels[i] != 0 {
+                continue;
+            }
+            let new = parent.len() as u32;
+            parent.push(new);
+            peak.push((top - here) as f32 / 4.0);
+            labels[i] = new;
+            queue.push_back(i);
+            while let Some(i) = queue.pop_front() {
+                for n in beside(i) {
+                    if labels[n] == 0 && levels[n] == here {
+                        labels[n] = new;
+                        queue.push_back(n);
+                    }
+                }
+            }
+        }
+    }
+    let mut numbers = vec![0u32; parent.len()];
+    let mut count = 0;
+    for n in 1..parent.len() {
+        let top = root(&mut parent, n as u32) as usize;
+        if numbers[top] == 0 && peak[top] >= least_door {
+            count += 1;
+            numbers[top] = count;
+        }
+    }
+    let mut rooms = Vec::with_capacity(distance.len());
+    for y in 0..height {
+        for &label in &labels[(y + 1) * stride + 1..(y + 1) * stride + 1 + width] {
+            rooms.push(if label != 0 { numbers[root(&mut parent, label) as usize] } else { 0 });
+        }
+    }
+    rooms
+}
+
+/// A band across rooms side by side is a room of its own, cut off along the side of what stands on
+/// it: what lies in two rooms at once, as an address field over a navigation pane and a list, is a
+/// part of neither, and they begin under it; and the wide top or bottom of a room shaped as a T,
+/// as a menu bar over panels, is cut off from its stem, those of rooms side by side at the same
+/// heights into one band: toolbars over the margins on either side of a page. `frame` is how far
+/// from their ends rooms are cut, `least` the pixels of what cuts them, `wider` how much wider
+/// than its stem a T's top is, a quarter of the stem besides.
+fn bands(labels: &mut [u32], furniture: &[bool], width: usize, frame: i32, least: u32, wider: i32) {
+    let height = labels.len() / width.max(1);
+    let mut count = labels.iter().copied().max().unwrap_or(0);
+    let pieces = parts(furniture, width, true);
+    let mut rooms = measure(labels, width, count);
+    for piece in 1..=pieces.count {
+        let (size, rect) = (pieces.sizes[piece as usize], pieces.boxes[piece as usize]);
+        if size < least {
+            continue;
+        }
+        let mut shares: HashMap<u32, u32> = HashMap::new();
+        for y in rect.top as usize..rect.bottom as usize {
+            for x in rect.left as usize..rect.right as usize {
+                let i = y * width + x;
+                if pieces.labels[i] == piece && labels[i] != 0 {
+                    *shares.entry(labels[i]).or_default() += 1;
+                }
+            }
+        }
+        let under: Vec<u32> = shares.iter().filter(|(_, share)| **share as f32 >= 0.15 * size as f32).map(|(room, _)| *room).collect();
+        if under.len() < 2 {
+            continue;
+        }
+        let top = under.iter().map(|&room| rooms[room as usize].top).min().unwrap_or(0);
+        let bottom = under.iter().map(|&room| rooms[room as usize].bottom).max().unwrap_or(0);
+        let (from, to) = if rect.top - top <= frame {
+            (0, rect.bottom as usize)
+        } else if bottom - rect.bottom <= frame {
+            (rect.top as usize, height)
         } else {
-            color(image, rect.left + index, rect.top + rect.height() * k / 4)
+            continue;
+        };
+        count += 1;
+        for label in &mut labels[from * width..to * width] {
+            if under.contains(label) {
+                *label = count;
+            }
+        }
+        rooms = measure(labels, width, count);
+    }
+    // The wide top or bottom of a room shaped as a T.
+    let mut cut: Vec<(i32, i32, u32)> = Vec::new();
+    let rooms_cut = count;
+    for room in 1..=rooms_cut {
+        let rect = rooms[room as usize];
+        if rect.is_empty() {
+            continue;
+        }
+        let row = |labels: &[u32], y: i32| {
+            let start = y as usize * width + rect.left as usize;
+            let cells = &labels[start..start + rect.width() as usize];
+            let first = cells.iter().position(|&l| l == room);
+            let last = cells.iter().rposition(|&l| l == room);
+            first.zip(last).map_or(0, |(first, last)| (last + 1 - first) as i32)
+        };
+        let widths: Vec<i32> = (rect.top..rect.bottom).map(|y| row(labels, y)).collect();
+        let mut filled: Vec<i32> = widths.iter().copied().filter(|&w| w > 0).collect();
+        filled.sort_unstable();
+        let n = filled.len();
+        let stem = if n % 2 == 1 { filled[n / 2] as f32 } else { (filled[n / 2 - 1] + filled[n / 2]) as f32 / 2.0 };
+        let wide = |w: i32| w as f32 >= 1.25 * stem + wider as f32;
+        let from_top = widths.iter().take_while(|&&w| wide(w)).count() as i32;
+        let from_bottom = widths.iter().rev().take_while(|&&w| wide(w)).count() as i32;
+        let thin = |band: i32| band > 0 && band <= frame && 2 * band < rect.height();
+        let cuts = [(thin(from_top), rect.top, rect.top + from_top), (thin(from_bottom), rect.bottom - from_bottom, rect.bottom)];
+        for (low, high) in cuts.into_iter().filter(|cut| cut.0).map(|cut| (cut.1, cut.2)) {
+            // What is beside the band, if it is cut off already.
+            let mut beside = None;
+            for y in low..high {
+                let start = y as usize * width;
+                for x in 0..width {
+                    if labels[start + x] == room {
+                        let around = [(x > 0).then(|| labels[start + x - 1]), (x + 1 < width).then(|| labels[start + x + 1])];
+                        for other in around.into_iter().flatten() {
+                            if cut.iter().any(|&(top, bottom, band)| band == other && (top - low).abs() <= 2 && (bottom - high).abs() <= 2) {
+                                beside = Some(other);
+                            }
+                        }
+                    }
+                }
+            }
+            let band = beside.unwrap_or_else(|| {
+                count += 1;
+                cut.push((low, high, count));
+                count
+            });
+            for label in &mut labels[low as usize * width..high as usize * width] {
+                if *label == room {
+                    *label = band;
+                }
+            }
+        }
+    }
+}
+
+/// The picture with every channel of every pixel the median of those of the pixels `radius` around
+/// it, the pixels at its sides repeated past them: small drawings, letters and grain go.
+fn smoothed(pixels: &[[u8; 3]], width: usize, radius: usize) -> Vec<[u8; 3]> {
+    let height = pixels.len() / width.max(1);
+    let mut smooth = vec![[0u8; 3]; pixels.len()];
+    let threads = std::thread::available_parallelism().map_or(1, |n| n.get());
+    let rows = height.div_ceil(threads).max(1);
+    std::thread::scope(|scope| {
+        for (n, strip) in smooth.chunks_mut(rows * width).enumerate() {
+            scope.spawn(move || {
+                for (k, row) in strip.chunks_mut(width).enumerate() {
+                    smooth_row(pixels, width, n * rows + k, radius, row);
+                }
+            });
         }
     });
-    let mut middle = [0u8; 3];
-    for (c, channel) in middle.iter_mut().enumerate() {
-        let mut values = samples.map(|s| s[c]);
-        values.sort_unstable();
-        *channel = values[1];
-    }
-    middle
+    smooth
 }
 
-/// Whether two rows of a box, or two columns, are of the same surfaces, pixel by pixel for the
-/// most part: the two sides of a line that only divides one surface.
-fn same_surface(image: &Image, rect: Rect, across: bool, a: usize, b: usize) -> bool {
-    let (a, b) = (a as i32, b as i32);
-    let pairs: Vec<([u8; 3], [u8; 3])> = if across {
-        (rect.left..rect.right).map(|x| (color(image, x, rect.top + a), color(image, x, rect.top + b))).collect()
-    } else {
-        (rect.top..rect.bottom).map(|y| (color(image, rect.left + a, y), color(image, rect.left + b, y))).collect()
-    };
-    let same = pairs.iter().filter(|(a, b)| alike(*a, *b, SAME)).count();
-    2 * same >= pairs.len()
-}
-
-/// The colour of most of a box: of the most pixels on a grid over it, by colours a little apart.
-fn background(image: &Image, rect: Rect) -> [u8; 3] {
-    let step = ((size(rect) / 4096.0).sqrt().ceil() as usize).max(1);
-    let mut counts = vec![0u16; 1 << 15];
-    let mut best = (0u16, [0u8; 3]);
-    for y in (rect.top..rect.bottom).step_by(step) {
-        for x in (rect.left..rect.right).step_by(step) {
-            let c = color(image, x, y);
-            let bucket = (c[0] as usize >> 3) << 10 | (c[1] as usize >> 3) << 5 | c[2] as usize >> 3;
-            counts[bucket] = counts[bucket].saturating_add(1);
-            if counts[bucket] > best.0 {
-                best = (counts[bucket], c);
+/// A row of the smoothed picture, keeping how many of the pixels around each pixel have each value
+/// from one pixel to the next.
+fn smooth_row(pixels: &[[u8; 3]], width: usize, y: usize, radius: usize, row: &mut [[u8; 3]]) {
+    let height = pixels.len() / width;
+    let r = radius as isize;
+    let rows: Vec<usize> = (-r..=r).map(|k| (y as isize + k).clamp(0, height as isize - 1) as usize).collect();
+    let column = |x: isize| x.clamp(0, width as isize - 1) as usize;
+    let half = (rows.len() * rows.len() / 2) as u32;
+    let mut counts = [[0u32; 256]; 3];
+    for &ry in &rows {
+        for k in -r..=r {
+            let pixel = pixels[ry * width + column(k)];
+            for c in 0..3 {
+                counts[c][pixel[c] as usize] += 1;
             }
         }
     }
-    best.1
-}
-
-/// How much of a box is of the colour of the ground, on a grid over it.
-fn bare(image: &Image, rect: Rect, ground: [u8; 3]) -> f32 {
-    let step = ((size(rect) / 1024.0).sqrt().ceil() as usize).max(1);
-    let (mut all, mut bare) = (0u32, 0u32);
-    for y in (rect.top..rect.bottom).step_by(step) {
-        for x in (rect.left..rect.right).step_by(step) {
-            all += 1;
-            if alike(color(image, x, y), ground, 2 * SAME) {
-                bare += 1;
-            }
-        }
-    }
-    bare as f32 / all.max(1) as f32
-}
-
-/// Which rows of a box are empty, and which columns: nothing differs along them but stray pixels,
-/// and they are of the colour of the ground the content is on all along, the empty space around
-/// it rather than a line, a band of a colour of its own or the side of a panel.
-fn empty(image: &Image, rect: Rect, profile: &Profile, ground: [u8; 3]) -> (Vec<bool>, Vec<bool>) {
-    let (w, h) = (rect.width(), rect.height());
-    let rows = blank(&profile.row_detail, w as usize)
-        .into_iter()
-        .enumerate()
-        .map(|(i, blank)| {
-            let y = rect.top + i as i32;
-            blank && (1..8).all(|k| alike(color(image, rect.left + w * k / 8, y), ground, 2 * SAME))
-        })
-        .collect();
-    let columns = blank(&profile.column_detail, h as usize)
-        .into_iter()
-        .enumerate()
-        .map(|(j, blank)| {
-            let x = rect.left + j as i32;
-            blank && (1..8).all(|k| alike(color(image, x, rect.top + h * k / 8), ground, 2 * SAME))
-        })
-        .collect();
-    (rows, columns)
-}
-
-/// The panels standing on a busy surface that leaves no empty space around them, a picture or a
-/// pattern, as the messages of a chat stand on its wallpaper: surfaces of one colour of their own,
-/// filling most of a box with straight sides, the corners rounded at most, and all of a colour
-/// clearly apart from what is around them. The larger first, none over another.
-fn islands(image: &Image, rect: Rect) -> Vec<Part> {
-    let (w, h) = (rect.width() as usize, rect.height() as usize);
-    let (least_w, least_h) = (PANEL_WIDTH as usize, ISLAND_HEIGHT as usize);
-    if w < least_w || h < least_h || w * h > ISLANDS {
-        return Vec::new();
-    }
-    let at = |x: usize, y: usize| color(image, rect.left + x as i32, rect.top + y as i32);
-    // Which island each pixel belongs to, 0 for none yet.
-    let mut label = vec![0u32; w * h];
-    let mut found: Vec<(usize, Part)> = Vec::new();
-    let mut stack = Vec::new();
-    let mut id = 0;
-    for sy in (0..h).step_by(SEED) {
-        for sx in (0..w).step_by(SEED) {
-            if label[sy * w + sx] != 0 {
-                continue;
-            }
-            id += 1;
-            let seed = at(sx, sy);
-            let (mut count, mut left, mut top, mut right, mut bottom) = (0, sx, sy, sx, sy);
-            label[sy * w + sx] = id;
-            stack.push((sx, sy));
-            while let Some((x, y)) = stack.pop() {
-                count += 1;
-                (left, top, right, bottom) = (left.min(x), top.min(y), right.max(x), bottom.max(y));
-                let next = [(x.wrapping_sub(1), y), (x + 1, y), (x, y.wrapping_sub(1)), (x, y + 1)];
-                for (nx, ny) in next {
-                    if nx < w && ny < h && label[ny * w + nx] == 0 && alike(at(nx, ny), seed, 2 * SAME) {
-                        label[ny * w + nx] = id;
-                        stack.push((nx, ny));
-                    }
+    let (mut median, mut below) = ([0usize; 3], [0u32; 3]);
+    for x in 0..width {
+        if x > 0 {
+            for &ry in &rows {
+                let gone = pixels[ry * width + column(x as isize - 1 - r)];
+                let come = pixels[ry * width + column(x as isize + r)];
+                for c in 0..3 {
+                    counts[c][gone[c] as usize] -= 1;
+                    below[c] -= ((gone[c] as usize) < median[c]) as u32;
+                    counts[c][come[c] as usize] += 1;
+                    below[c] += ((come[c] as usize) < median[c]) as u32;
                 }
             }
-            let (bw, bh) = (right + 1 - left, bottom + 1 - top);
-            if bw < least_w || bh < least_h || 2 * count < bw * bh || 5 * bw * bh > 4 * w * h {
-                continue;
-            }
-            // Its sides a few pixels in, past rounded corners, are its own nearly all along, and
-            // just outside them is something else.
-            let inset = CORNERS as usize / 2;
-            let (l, t, r, b) = (left + inset, top + inset, right - inset, bottom - inset);
-            let mine = |x: usize, y: usize| label[y * w + x] == id;
-            let apart = |x: usize, y: usize| !alike(at(x, y), seed, 3 * SAME);
-            let share = |points: Vec<(usize, usize)>, test: &dyn Fn(usize, usize) -> bool| {
-                points.iter().filter(|&&(x, y)| test(x, y)).count() as f32 / points.len().max(1) as f32
-            };
-            let sides = [
-                (l..=r).map(|x| (x, t)).collect::<Vec<_>>(),
-                (l..=r).map(|x| (x, b)).collect(),
-                (t..=b).map(|y| (l, y)).collect(),
-                (t..=b).map(|y| (r, y)).collect(),
-            ];
-            if sides.into_iter().any(|side| share(side, &mine) < MOSTLY_OWN) {
-                continue;
-            }
-            let mut around = Vec::new();
-            let (ox, oy) = (left.checked_sub(2), top.checked_sub(2));
-            let (ex, ey) = (Some(right + 2).filter(|&x| x < w), Some(bottom + 2).filter(|&y| y < h));
-            for x in left..=right {
-                around.extend(oy.map(|y| (x, y)));
-                around.extend(ey.map(|y| (x, y)));
-            }
-            for y in top..=bottom {
-                around.extend(ox.map(|x| (x, y)));
-                around.extend(ex.map(|x| (x, y)));
-            }
-            if around.is_empty() || share(around, &apart) < MOSTLY_OWN {
-                continue;
-            }
-            // Whether what is just outside it is busy, a picture or a pattern, with neighbouring
-            // pixels apart all along, rather than a smooth surface, as a panel's.
-            let mut pairs = (0, 0);
-            let mut count_pairs = |points: &mut dyn Iterator<Item = (usize, usize)>| {
-                let points: Vec<(usize, usize)> = points.collect();
-                for pair in points.windows(2) {
-                    pairs.0 += 1;
-                    if !alike(at(pair[0].0, pair[0].1), at(pair[1].0, pair[1].1), SAME) {
-                        pairs.1 += 1;
-                    }
-                }
-            };
-            for y in [oy, ey].into_iter().flatten() {
-                count_pairs(&mut (left..=right).map(|x| (x, y)));
-            }
-            for x in [ox, ex].into_iter().flatten() {
-                count_pairs(&mut (top..=bottom).map(|y| (x, y)));
-            }
-            let busy = pairs.1 as f32 >= BUSY * pairs.0 as f32;
-            // A message has its corners rounded, at least three of them, the tail at the fourth,
-            // on a busy wallpaper: a square one is a panel as any other, as a row lit up in a list,
-            // and so is a rounded button on a smooth panel.
-            let corners = [(left, top), (right, top), (left, bottom), (right, bottom)];
-            let rounded = corners.iter().filter(|&&(x, y)| !mine(x, y)).count() >= 3;
-            let kind = if rounded && busy { Kind::Island } else { Kind::Panel };
-            let rect = Rect::new(rect.left + left as i32, rect.top + top as i32, rect.left + right as i32 + 1, rect.top + bottom as i32 + 1);
-            found.push((count, Part { rect, kind, sparse: false, ground: seed, empty: false }));
         }
-    }
-    found.sort_by_key(|(count, _)| std::cmp::Reverse(*count));
-    let mut islands: Vec<Part> = Vec::new();
-    for (_, part) in found {
-        if islands.iter().all(|other| other.rect.intersect(part.rect).is_empty()) {
-            islands.push(part);
-        }
-    }
-    islands
-}
-
-/// How far along a row of pixels, or a column, the edge on it begins: at the first of `CORNERS`
-/// differing pixels in a row, past rounded corners and stray pixels. Never, if there are none.
-fn solid(differs: impl Fn(i32) -> bool, along: impl Iterator<Item = i32>) -> u32 {
-    let mut run = 0;
-    for (n, k) in along.enumerate() {
-        run = if differs(k) { run + 1 } else { 0 };
-        if run == CORNERS {
-            return n as u32 + 1 - CORNERS;
-        }
-    }
-    u32::MAX
-}
-
-/// Where a band across a box meets the edges down it that stop short of it, if nothing goes on
-/// from the band into the rest there: the row where the rest begins, or the column, if the edges
-/// are across the box. A line at the start of the rest stays with it: the band is cut off along
-/// the empty space next to the line, if there is any. `blank` tells the empty rows, or columns.
-fn junction(profile: &Profile, edges: &[&Edge], across: bool, blank: &[bool]) -> Option<usize> {
-    let (detail, along) =
-        if across { (&profile.column_detail, profile.row_detail.len()) } else { (&profile.row_detail, profile.column_detail.len()) };
-    let length = detail.len();
-    // A line down the box differs from its sides in every row of the rest.
-    let smooth = ((SMOOTH * along as f32) as u32).max(CORNERS) + 2 * edges.len() as u32;
-    // Where the band ends, and whether it is before that or after.
-    let mut ends: Vec<(usize, bool)> = Vec::new();
-    for edge in edges {
-        if edge.short.0 > CORNERS {
-            ends.push((edge.short.0 as usize, true));
-        }
-        if edge.short.1 > CORNERS {
-            ends.push((length.saturating_sub(edge.short.1 as usize), false));
-        }
-    }
-    ends.sort_unstable();
-    ends.dedup();
-    let (end, before) =
-        ends.into_iter().find(|&(end, _)| end > 0 && end < length && detail[end - 1] <= smooth && detail[end] <= smooth)?;
-    let shifted = (0..=LINE as usize + 1).filter_map(|k| if before { end.checked_sub(k) } else { Some(end + k) });
-    Some(shifted.take_while(|&at| at > 0 && at < length).find(|&at| blank[if before { at - 1 } else { at }]).unwrap_or(end))
-}
-
-/// Which rows of a box have nothing differing along them but stray pixels.
-fn blank(detail: &[u32], length: usize) -> Vec<bool> {
-    let stray = (STRAY * length as f32) as u32;
-    detail.iter().map(|&d| d <= stray).collect()
-}
-
-/// From the first row with something in it to just after the last; nothing if all are empty.
-fn span(blank: &[bool]) -> Option<(usize, usize)> {
-    let first = blank.iter().position(|b| !b)?;
-    let last = blank.iter().rposition(|b| !b)?;
-    Some((first, last + 1))
-}
-
-/// Whether the gaps across a box, inside the span of its content, are those between the rows of a
-/// list or a table: `CELLS` rows at least, most of about one size, with gaps of about one width
-/// between them, some narrower, as where a row is lit up, but none much wider, as between the
-/// paragraphs of a text.
-fn list(gaps: &[(usize, usize)], span: (usize, usize)) -> bool {
-    if gaps.len() + 1 < CELLS {
-        return false;
-    }
-    let mostly = |mut sizes: Vec<usize>, by: f32| {
-        sizes.sort_unstable();
-        let median = sizes[sizes.len() / 2] as f32;
-        let alike = sizes.iter().filter(|&&size| (size as f32 - median).abs() <= by * median).count();
-        (4 * alike >= 3 * sizes.len(), sizes[sizes.len() - 1] as f32 <= ONE_SIZE * median)
-    };
-    let widths: Vec<usize> = gaps.iter().map(|(start, end)| end - start).collect();
-    let mut rows = Vec::new();
-    let mut start = span.0;
-    for &(gap_start, gap_end) in gaps {
-        rows.push(gap_start - start);
-        start = gap_end;
-    }
-    rows.push(span.1 - start);
-    let (gaps_alike, none_wider) = mostly(widths, LIST);
-    let (rows_alike, _) = mostly(rows, ONE_SIZE - 1.0);
-    gaps_alike && none_wider && rows_alike
-}
-
-/// The runs of empty rows inside the span, as (start, end).
-fn gaps(blank: &[bool], span: (usize, usize)) -> Vec<(usize, usize)> {
-    let mut gaps = Vec::new();
-    let mut start = None;
-    for (i, &empty) in blank.iter().enumerate().take(span.1).skip(span.0) {
-        match (empty, start) {
-            (true, None) => start = Some(i),
-            (false, Some(s)) => {
-                gaps.push((s, i));
-                start = None;
+        for c in 0..3 {
+            while below[c] > half {
+                median[c] -= 1;
+                below[c] -= counts[c][median[c]];
             }
-            _ => {}
-        }
-    }
-    gaps
-}
-
-/// The area among the parts around the point, from the window down: the smallest panel or block
-/// worth a screenshot, but nothing inside a strip, unless it is a message. A part barely smaller than the one around it
-/// is that one, as a box is its inside without its lines; sparse content gives way to the panel
-/// around it when it is most of the panel or the panel is of a moderate size. Nothing if the area
-/// would be the window, or most of it.
-fn choose(path: &[Part], window: Rect, scale: f32) -> Option<Rect> {
-    let mut levels: Vec<Part> = Vec::new();
-    for part in path {
-        match levels.last_mut() {
-            Some(last) if near(last.rect, part.rect) => {
-                if part.kind.panel() {
-                    last.kind = part.kind;
-                }
+            while below[c] + counts[c][median[c]] <= half {
+                below[c] += counts[c][median[c]];
+                median[c] += 1;
             }
-            _ => levels.push(*part),
+            row[x][c] = median[c] as u8;
         }
-    }
-    let open = levels.iter().position(|part| part.kind != Kind::Island && strip(part.rect, window, scale)).unwrap_or(levels.len());
-    let levels = &levels[..open];
-    let deepest = (1..levels.len()).rev().find(|&i| big(&levels[i], scale))?;
-    let mut area = levels[deepest];
-    if area.kind == Kind::Block && area.sparse {
-        let around = levels[1..deepest].iter().rev().find(|part| part.kind.panel());
-        if let Some(panel) = around
-            && (size(area.rect) >= MOSTLY * size(panel.rect) || size(panel.rect) <= MODERATE * size(window))
-        {
-            area = *panel;
-        }
-    }
-    (size(area.rect) < MOST * size(window)).then_some(area.rect)
-}
-
-/// Whether a part is barely smaller than the one around it, by lines at most on every side.
-fn near(outer: Rect, inner: Rect) -> bool {
-    let close = LINE + 1;
-    inner.left - outer.left <= close
-        && inner.top - outer.top <= close
-        && outer.right - inner.right <= close
-        && outer.bottom - inner.bottom <= close
-}
-
-fn size(rect: Rect) -> f32 {
-    rect.width() as f32 * rect.height() as f32
-}
-
-/// Whether a part is a thin band at the monitor's scale: a toolbar, a tab bar, a line of text.
-fn strip(rect: Rect, _window: Rect, scale: f32) -> bool {
-    let (w, h) = (rect.width() as f32 / scale, rect.height() as f32 / scale);
-    (h < STRIP && w >= 8.0 * h) || (w < STRIP && h >= 8.0 * w)
-}
-
-/// Whether a part is big enough to be an area at the monitor's scale; an empty part, or a piece of
-/// a surface, never is one of its own.
-fn big(part: &Part, scale: f32) -> bool {
-    let (w, h) = (part.rect.width() as f32 / scale, part.rect.height() as f32 / scale);
-    if part.empty {
-        return false;
-    }
-    match part.kind {
-        Kind::Panel => w >= PANEL_WIDTH && h >= PANEL_HEIGHT,
-        Kind::Island => w >= PANEL_WIDTH && h >= ISLAND_HEIGHT,
-        Kind::Block => w >= BLOCK_WIDTH && h >= BLOCK_HEIGHT,
-        Kind::Piece => false,
     }
 }
 
@@ -1013,36 +1784,22 @@ mod tests {
         image
     }
 
-    /// Prints the parts around points of a screenshot, from the window down, and the area chosen:
-    /// `SCREENSHOT_AREAS_FILE=<file.png> SCREENSHOT_AREAS_POINTS="x,y x,y" cargo test -p ainitshot
-    /// areas::tests::the_parts_around_points -- --exact --ignored --nocapture`.
+    /// Prints the areas at points of a screenshot: `SCREENSHOT_AREAS_FILE=<file.png>
+    /// SCREENSHOT_AREAS_POINTS="x,y x,y" cargo test -p ainitshot areas::tests::the_areas_at_points
+    /// -- --exact --ignored --nocapture`.
     #[test]
     #[ignore]
-    fn the_parts_around_points() {
+    fn the_areas_at_points() {
         let file = std::env::var_os("SCREENSHOT_AREAS_FILE").expect("a screenshot");
         let image = Image::from_png(&std::fs::read(file).unwrap()).unwrap();
         let points = std::env::var("SCREENSHOT_AREAS_POINTS").expect("points");
         let mut areas = Areas::new(&image);
-        let whole = image.bounds();
-        areas.look(&image, whole);
         for point in points.split_whitespace() {
             let (x, y) = point.split_once(',').unwrap();
             let p = Point::new(x.parse().unwrap(), y.parse().unwrap());
-            println!("== {p:?}: {:?}", areas.at(&image, whole, p, 1.0));
-            let path = areas.path(&image, whole, p);
-            for part in &path {
-                let r = part.rect;
-                let g = part.ground;
-                println!(
-                    "   {:?} {}..{} x {}..{} sparse {} ground {:02x}{:02x}{:02x}",
-                    part.kind, r.left, r.right, r.top, r.bottom, part.sparse, g[2], g[1], g[0]
-                );
-            }
-            // What the smallest part was cut into, without the point in any of them.
-            for part in areas.parts.get(&path[path.len() - 1].rect).into_iter().flatten() {
-                let r = part.rect;
-                println!("      {:?} {}..{} x {}..{}", part.kind, r.left, r.right, r.top, r.bottom);
-            }
+            let started = std::time::Instant::now();
+            let area = areas.at(&image, image.bounds(), p, 1.0);
+            println!("{p:?}: {area:?} in {:.1} ms", started.elapsed().as_secs_f32() * 1000.0);
         }
     }
 
@@ -1056,11 +1813,11 @@ mod tests {
         assert_eq!(at(&mut areas, 500, 600), Some(Rect::new(300, 490, 700, 760)));
         assert_eq!(at(&mut areas, 900, 600), Some(Rect::new(740, 490, 1150, 760)));
         let paragraph = at(&mut areas, 700, 200).expect("no paragraph");
-        assert!(paragraph.top >= 165 && paragraph.bottom <= 315 && paragraph.left >= 295, "{paragraph:?}");
+        assert!(paragraph.top >= 160 && paragraph.bottom <= 320 && paragraph.left >= 290, "{paragraph:?}");
         // The sidebar takes in the line on its side, its own border.
         let sidebar = at(&mut areas, 100, 600).expect("no sidebar");
         assert_eq!(sidebar, Rect::new(0, 81, 261, 800));
-        // The toolbar is a strip: the window, nothing of its own.
+        // The toolbar is a band of the window's frame: the window, nothing of its own.
         assert_eq!(at(&mut areas, 600, 50), None);
     }
 
@@ -1102,6 +1859,8 @@ mod tests {
         let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
         assert_eq!(at(300, 140), Some(Rect::new(100, 100, 520, 172)));
         assert_eq!(at(300, 217), Some(Rect::new(100, 200, 420, 234)));
+        // The wallpaper around them is one surface, the top of it and the bottom alike.
+        assert_eq!(at(700, 40), at(700, 660));
     }
 
     #[test]
@@ -1120,11 +1879,175 @@ mod tests {
         assert!(area.left <= 100 && area.right >= 640 && area.top <= 103 && area.bottom >= 380, "{area:?}");
     }
 
-    /// Draws the areas that the mouse would find all over screenshots of windows, each in a
-    /// colour of its own over the screenshot dimmed, into pictures to look at. The screenshots are
-    /// PNG files in `SCREENSHOT_AREAS`, the pictures go into `SCREENSHOT_PREVIEW`, both folders,
-    /// and `SCREENSHOT_SCALE` is the scale they were taken at, 1 by default:
-    /// `SCREENSHOT_AREAS=<folder> SCREENSHOT_PREVIEW=<folder> cargo test -p ainitshot
+    #[test]
+    fn a_column_tinted_by_its_values_does_not_cut_a_table() {
+        // A table on white over a part of the window, with a heading, a line between the columns
+        // of the heading, and two columns of cells tinted by their values, some of them a lot.
+        let mut image = canvas(1100, 700, [255, 255, 255]);
+        fill(&mut image, Rect::new(0, 0, 50, 700), [235, 235, 235]);
+        for (left, right) in [(70, 200), (300, 380), (420, 500), (540, 620), (660, 760)] {
+            text(&mut image, Rect::new(left, 60, right, 76), 16);
+        }
+        for x in [280, 400, 520, 640] {
+            fill(&mut image, Rect::new(x, 50, x + 1, 90), [225, 225, 225]);
+        }
+        for row in 0..18 {
+            let y = 90 + row * 28;
+            let tint = |image: &mut Image, left, right, dark: bool| {
+                fill(image, Rect::new(left, y, right, y + 28), if dark { [120, 170, 240] } else { [205, 230, 250] });
+            };
+            tint(&mut image, 281, 400, row % 5 == 1);
+            tint(&mut image, 401, 520, row % 4 == 2);
+            for (left, right) in [(70, 200), (300, 380), (420, 500), (540, 620), (660, 760)] {
+                text(&mut image, Rect::new(left, y + 6, right, y + 22), 16);
+            }
+        }
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let table = at(130, 300).expect("no table");
+        assert!(table.left <= 70 && table.right >= 760 && table.top <= 60 && table.bottom >= 590, "{table:?}");
+        assert_eq!(at(340, 320), Some(table));
+        assert_eq!(at(460, 124), Some(table));
+    }
+
+    #[test]
+    fn a_selected_row_does_not_cut_a_list() {
+        // A grey list down the side of a window, each item a line of text, one of them lit all
+        // across the list and another with a line of light in it: the surface above the lit row
+        // and the one below it are one room.
+        let mut image = canvas(1000, 700, [255, 255, 255]);
+        fill(&mut image, Rect::new(0, 0, 300, 700), [45, 45, 48]);
+        fill(&mut image, Rect::new(300, 0, 301, 700), [90, 90, 90]);
+        fill(&mut image, Rect::new(0, 300, 300, 332), [10, 80, 150]);
+        for row in 0..20 {
+            text(&mut image, Rect::new(30, 40 + row * 32 + 8, 220, 40 + row * 32 + 24), 16);
+        }
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let list = at(250, 100).expect("no list");
+        assert_eq!(at(250, 600), Some(list));
+        assert!(list.top <= 8 && list.bottom >= 690 && list.width() >= 298, "{list:?}");
+    }
+
+    #[test]
+    fn the_cells_of_a_grid_light_up_as_the_grid() {
+        // A week of a calendar: cells parted by lines, too large not to be rooms each.
+        let mut image = canvas(1200, 800, [255, 255, 255]);
+        fill(&mut image, Rect::new(0, 0, 200, 800), [240, 240, 240]);
+        for column in 0..=6 {
+            fill(&mut image, Rect::new(240 + column * 150, 60, 241 + column * 150, 741), [220, 220, 220]);
+        }
+        for row in 0..=8 {
+            fill(&mut image, Rect::new(240, 60 + row * 85, 1141, 61 + row * 85), [220, 220, 220]);
+        }
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let grid = at(320, 100).expect("no grid");
+        assert!(grid.left <= 241 && grid.right >= 1140 && grid.top <= 61 && grid.bottom >= 740, "{grid:?}");
+        assert_eq!(at(1000, 700), Some(grid));
+    }
+
+    #[test]
+    fn a_gradient_is_one_surface() {
+        // A slide of a gradient across its whole height, on grey, beside a sidebar.
+        let mut image = canvas(1200, 800, [230, 230, 230]);
+        fill(&mut image, Rect::new(0, 0, 240, 800), [245, 245, 245]);
+        fill(&mut image, Rect::new(240, 0, 241, 800), [200, 200, 200]);
+        for y in 100..700 {
+            let v = ((y - 100) / 4) as u8;
+            fill(&mut image, Rect::new(320, y, 1120, y + 1), [40 + v, 60 + v, 200 - v / 2]);
+        }
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let slide = at(700, 150).expect("no slide");
+        assert_eq!(slide, Rect::new(320, 100, 1120, 700));
+        assert_eq!(at(700, 650), Some(slide));
+    }
+
+    #[test]
+    fn a_narrow_panel_beside_a_wide_room_is_a_room_of_its_own() {
+        // A line parts a panel a sixth of the window wide from the wide room beside it, but for
+        // a way round its end.
+        let mut image = canvas(1200, 800, [255, 255, 255]);
+        fill(&mut image, Rect::new(200, 0, 201, 740), [200, 200, 200]);
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let (panel, room) = (at(100, 300).expect("no panel"), at(800, 300).expect("no room"));
+        assert!(panel.right <= 210 && room.left >= 190, "{panel:?} {room:?}");
+    }
+
+    #[test]
+    fn the_middle_of_a_long_room_is_one_room() {
+        // A terminal under a tab with a line under it: the line dents the middle of the room but
+        // doesn't part it.
+        let mut image = canvas(1600, 900, [245, 245, 245]);
+        fill(&mut image, Rect::new(200, 300, 1600, 900), [30, 30, 30]);
+        fill(&mut image, Rect::new(200, 300, 1600, 301), [80, 80, 80]);
+        fill(&mut image, Rect::new(700, 340, 780, 342), [0, 120, 215]);
+        text(&mut image, Rect::new(240, 400, 640, 800), 16);
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        let room = at(1200, 600).expect("no room");
+        assert!(room.left <= 201 && room.right == 1600 && room.top <= 302 && room.bottom == 900, "{room:?}");
+        assert_eq!(at(300, 850), Some(room));
+    }
+
+    #[test]
+    fn the_cuts_of_filling() {
+        // Labels go by parts, in the order they begin, and diagonals only when they are asked for.
+        #[rustfmt::skip]
+        let mask = [
+            true,  false, true,
+            false, true,  true,
+        ];
+        assert_eq!(parts(&mask, 3, false).labels, vec![1, 0, 2, 0, 2, 2]);
+        assert_eq!(parts(&mask, 3, true).labels, vec![1, 0, 1, 0, 1, 1]);
+        assert_eq!(parts(&mask, 3, false).boxes[2], Rect::new(1, 0, 3, 2));
+        assert_eq!(parts(&mask, 3, false).sizes[2], 3);
+        // Only runs long enough are left.
+        let row = [true, true, false, true, true, true];
+        assert_eq!(runs(&row, 6, 3, true), vec![false, false, false, true, true, true]);
+        assert_eq!(runs(&row, 3, 2, false), vec![true, true, false, true, true, false]);
+        // A mask grows sideways only, if so asked.
+        let dot = [false, false, true, false, false];
+        assert_eq!(grown(&dot, 5, 1, 0), vec![false, true, true, true, false]);
+        // The distance from the sides of a mask, past its sides too.
+        assert_eq!(distances(&[true; 5], 5, false), vec![UNIT; 5]);
+        assert_eq!(distances(&[true; 25], 5, false)[12], 3 * UNIT);
+        assert_eq!(distances(&[true, true, false, true], 2, true)[1], UNIT * 14 / 10);
+        // The median of what is around a pixel takes a stray pixel away.
+        let mut pixels = vec![[10u8; 3]; 25 * 25];
+        pixels[12 * 25 + 12] = [200, 200, 200];
+        assert_eq!(smoothed(&pixels, 25, 2), vec![[10u8; 3]; 25 * 25]);
+    }
+
+    #[test]
+    fn two_basins_part_by_the_width_of_the_narrower() {
+        // A wide room and a narrow one with a way a pixel wide between them: the distance is
+        // 8 wide across the narrower one, a door's depth over the way, and no less.
+        let (w, h) = (120usize, 40usize);
+        let mut mask = vec![false; w * h];
+        for y in 0..h {
+            for x in 0..w {
+                mask[y * w + x] = (x < 24 && y < 30) || x >= 28 || y == 15;
+            }
+        }
+        let distance = distances(&mask, w, false);
+        let labels = basins(&distance, w, LEAST_DOOR);
+        assert_ne!(labels[15 * w + 8], labels[15 * w + 80]);
+        // Not by a dent in the middle of one room.
+        let mut mask = vec![true; w * h];
+        mask[3 * w + 60] = false;
+        let labels = basins(&distances(&mask, w, false), w, LEAST_DOOR);
+        assert_eq!(labels[20 * w + 8], labels[20 * w + 110]);
+    }
+
+    /// Draws the areas that the mouse would find all over screenshots of windows into pictures to
+    /// look at, the screenshot dimmed, every place of the mouse tinted in the colour of the frame
+    /// that lights up there, and writes the area at every place into a text file beside each
+    /// picture. The screenshots are PNG files in `SCREENSHOT_AREAS`, the pictures go into
+    /// `SCREENSHOT_PREVIEW`, both folders, and `SCREENSHOT_SCALE` is the scale they were taken at,
+    /// 1 by default: `SCREENSHOT_AREAS=<folder> SCREENSHOT_PREVIEW=<folder> cargo test -p ainitshot
     /// areas::tests::the_areas_of_screenshots_in_pictures -- --exact --ignored --nocapture`.
     #[test]
     #[ignore]
@@ -1141,33 +2064,43 @@ mod tests {
             let mut areas = Areas::new(&image);
             let whole = image.bounds();
             let step = (24.0 * scale) as usize;
-            let mut found: Vec<Rect> = Vec::new();
+            let (mut found, mut places, mut slowest): (Vec<Rect>, Vec<(i32, i32, usize)>, f32) = (Vec::new(), Vec::new(), 0.0);
             for y in (step / 2..image.height as usize).step_by(step) {
                 for x in (step / 2..image.width as usize).step_by(step) {
-                    if let Some(area) = areas.at(&image, whole, Point::new(x as i32, y as i32), scale)
-                        && !found.contains(&area)
-                    {
-                        found.push(area);
+                    let (x, y) = (x as i32, y as i32);
+                    let point = std::time::Instant::now();
+                    let area = areas.at(&image, whole, Point::new(x, y), scale);
+                    slowest = slowest.max(point.elapsed().as_secs_f32());
+                    if let Some(area) = area {
+                        if !found.contains(&area) {
+                            found.push(area);
+                        }
+                        places.push((x, y, found.iter().position(|a| *a == area).unwrap()));
                     }
                 }
             }
             let seconds = started.elapsed().as_secs_f32();
-            let picture = picture(&image, &found);
+            let picture = picture(&image, &found, &places, step as i32);
             let name = path.file_name().unwrap().to_string_lossy().into_owned();
             std::fs::write(to.join(&name), picture.to_png().unwrap()).unwrap();
-            println!("{name}: {} areas in {seconds:.2} s", found.len());
-            found.sort_by_key(|r| (r.top, r.left, r.bottom, r.right));
-            for r in &found {
-                println!("   {}..{} x {}..{}", r.left, r.right, r.top, r.bottom);
-            }
+            let lines: Vec<String> = places
+                .iter()
+                .map(|&(x, y, n)| {
+                    let r = found[n];
+                    format!("{x} {y} {} {} {} {}\n", r.left, r.top, r.right, r.bottom)
+                })
+                .collect();
+            std::fs::write(to.join(&name).with_extension("txt"), lines.concat()).unwrap();
+            println!("{name}: {} areas in {seconds:.2} s, the slowest place {:.0} ms", found.len(), slowest * 1000.0);
         }
     }
 
-    /// The screenshot dimmed, with every area outlined and lightly filled in a colour of its own.
-    fn picture(image: &Image, areas: &[Rect]) -> Image {
-        const COLORS: [[u8; 3]; 8] = [
-            [230, 25, 75], [60, 180, 75], [0, 130, 200], [245, 130, 48],
-            [145, 30, 180], [70, 240, 240], [240, 50, 230], [210, 245, 60],
+    /// The screenshot dimmed, the places of the mouse tinted and the frames of the areas drawn, of
+    /// those lit from the most places last.
+    fn picture(image: &Image, areas: &[Rect], places: &[(i32, i32, usize)], step: i32) -> Image {
+        const COLORS: [[u8; 3]; 12] = [
+            [230, 25, 75], [60, 180, 75], [0, 130, 200], [245, 130, 48], [145, 30, 180], [70, 240, 240],
+            [240, 50, 230], [210, 245, 60], [250, 190, 212], [0, 128, 128], [220, 190, 255], [170, 110, 40],
         ];
         let mut picture = image.clone();
         for pixel in picture.pixels.chunks_exact_mut(4) {
@@ -1176,20 +2109,34 @@ mod tests {
             }
         }
         let bounds = picture.bounds();
-        for (n, area) in areas.iter().enumerate() {
-            let color = COLORS[n % COLORS.len()];
-            let tint = |picture: &mut Image, x: i32, y: i32, share: u16| {
-                let i = ((y as u32 * picture.width + x as u32) * 4) as usize;
-                for (channel, c) in picture.pixels[i..i + 3].iter_mut().zip(color) {
-                    *channel = ((*channel as u16 * (100 - share) + c as u16 * share) / 100) as u8;
+        let tint = |picture: &mut Image, rect: Rect, color: [u8; 3], share: u16| {
+            let rect = rect.intersect(bounds);
+            for y in rect.top..rect.bottom {
+                for x in rect.left..rect.right {
+                    let i = ((y as u32 * picture.width + x as u32) * 4) as usize;
+                    for (channel, c) in picture.pixels[i..i + 3].iter_mut().zip(color) {
+                        *channel = ((*channel as u16 * (100 - share) + c as u16 * share) / 100) as u8;
+                    }
                 }
-            };
-            let area = area.intersect(bounds);
-            for y in area.top..area.bottom {
-                for x in area.left..area.right {
-                    let edge = x < area.left + 2 || x >= area.right - 2 || y < area.top + 2 || y >= area.bottom - 2;
-                    tint(&mut picture, x, y, if edge { 100 } else { 12 });
-                }
+            }
+        };
+        let mut counts = vec![0; areas.len()];
+        for &(x, y, n) in places {
+            counts[n] += 1;
+            let place = Rect::new(x - step / 2, y - step / 2, x + step / 2, y + step / 2);
+            tint(&mut picture, place, COLORS[n % COLORS.len()], 27);
+        }
+        let mut order: Vec<usize> = (0..areas.len()).collect();
+        order.sort_by_key(|&n| counts[n]);
+        for n in order {
+            let (r, color) = (areas[n], COLORS[n % COLORS.len()]);
+            for side in [
+                Rect::new(r.left, r.top, r.right, r.top + 3),
+                Rect::new(r.left, r.bottom - 3, r.right, r.bottom),
+                Rect::new(r.left, r.top, r.left + 3, r.bottom),
+                Rect::new(r.right - 3, r.top, r.right, r.bottom),
+            ] {
+                tint(&mut picture, side, color, 100);
             }
         }
         picture
