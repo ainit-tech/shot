@@ -19,10 +19,11 @@ Un logiciel de capture d’écran pour Windows, gratuit et open source. Une touc
 - **Crayon magique** — <kbd>M</kbd>. Entourez grossièrement quelque chose, vous obtenez un ovale ou un rectangle net.
 - **Et tous les outils de dessin habituels :** crayon, pinceau, ligne, flèche, rectangle, rectangle plein et texte, chacun sur sa propre touche. Tout ce qui est dessiné peut ensuite être déplacé, remodelé ou réécrit, et <kbd>Ctrl</kbd>+<kbd>Z</kbd> annule n’importe quelle modification.
 - **Copier ou enregistrer** — <kbd>Ctrl</kbd>+<kbd>C</kbd> met la capture dans le presse-papiers, <kbd>Ctrl</kbd>+<kbd>S</kbd> l’enregistre en fichier PNG dans Images\Captures d’écran.
+- **Enregistrer l’écran** — <kbd>Ctrl</kbd>+<kbd>R</kbd>. Ce qui est sélectionné continue de vivre dans un cadre : les clics se voient comme un anneau, le micro tient en un bouton, et une fenêtre coupe l’enregistrement et en fait un GIF ou une vidéo.
 
 ## Votre capture reste la vôtre
 
-- **Sur votre ordinateur :** le dessin, le masquage et la copie du texte. Ils n’envoient rien nulle part. Le modèle de masquage, environ 950 Mo, se télécharge une seule fois, tout seul, en arrière-plan ; en attendant, le masquage trouve tout sauf les noms, adresses, dates et liens.
+- **Sur votre ordinateur :** le dessin, le masquage, la copie du texte et l’enregistrement de l’écran. Ils n’envoient rien nulle part. Le modèle de masquage, environ 950 Mo, se télécharge une seule fois, tout seul, en arrière-plan ; en attendant, le masquage trouve tout sauf les noms, adresses, dates et liens.
 - **Vers Google, seulement quand vous le demandez :** la capture part vers le Mode IA de Google ou Google Images uniquement avec <kbd>G</kbd>, <kbd>T</kbd> ou <kbd>I</kbd>, dans la propre fenêtre du programme, comme depuis un navigateur. Si vous demandez à voix haute, votre voix part aussi vers la reconnaissance vocale de Google ; le micro n’est allumé que tant que la touche est maintenue. Pour répondre aussitôt, le programme garde le Mode IA chargé dans sa fenêtre cachée ; votre capture n’y arrive que lorsque vous demandez.
 - **Ni compte ni cloud à nous.** Vous connecter à Google dans la fenêtre du programme reste votre choix : Google vous demande alors moins souvent si vous êtes un robot, et le Mode IA garde vos conversations. Le seul serveur à nous que le programme contacte est shot.ainit.tech, pour les mises à jour, qui arrivent signées.
 

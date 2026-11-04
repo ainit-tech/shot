@@ -1,12 +1,12 @@
 ---
-status: draft
+status: accepted
 date: 2026-11-04
 topic: product
 ---
 
 # Recording the screen
 
-Tried: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, a switch of the microphone, pause and stop. Clicks show in the recording as a ring going out. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save. Both put the file into the one folder the settings show, where screenshots go too.
+Decided: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, a switch of the microphone, pause and stop. Clicks show in the recording as a ring going out. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save. Both put the file into the one folder the settings show, where screenshots go too.
 
 ## Question
 
