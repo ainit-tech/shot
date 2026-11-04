@@ -90,6 +90,9 @@ const HELD_TICK: u32 = 100;
 const NOTE_TIME: u32 = 3000;
 /// The most of the words heard that the frozen screen shows, in letters: the last ones.
 const WORDS_SHOWN: usize = 60;
+/// Whether a click takes the area of the window under the mouse rather than the window. Off until
+/// the areas are found well enough (decision 16): the code stays, with its tests.
+const AREAS: bool = false;
 /// How long the ring with the line width stays after the wheel turns, in milliseconds.
 const RING_TIME: u32 = 700;
 /// A selection smaller than this both ways, in pixels, was a click: it selects the window under it.
@@ -159,8 +162,8 @@ struct Session {
     picked: Option<usize>,
     /// An annotation being moved or reshaped with the mouse.
     grabbed: Option<Grab>,
-    /// While nothing is selected, what a click selects under the mouse: the area of the window
-    /// there, a picture, a message, a panel, or with Ctrl held the window itself.
+    /// While nothing is selected, what a click selects under the mouse: the window there, or the
+    /// area of it, if areas are on.
     snap: Option<Rect>,
     /// What was under the mouse where a new selection began, selected if the mouse doesn't move
     /// before it is let go.
@@ -1426,11 +1429,12 @@ impl Session {
         })
     }
 
-    /// What a click selects at the point while nothing is selected: the area of the window under
-    /// it, or the whole window with Ctrl held or where the window has no area there.
+    /// What a click selects at the point while nothing is selected: the window under it; with
+    /// areas on, the area of the window under it, or the whole window with Ctrl held or where the
+    /// window has no area there.
     fn snap_at(&mut self, p: Point) -> Option<Rect> {
         let window = self.screen.window_at(p)?;
-        if key_down(VK_CONTROL) {
+        if !AREAS || key_down(VK_CONTROL) {
             return Some(window);
         }
         let scale = self.screen.monitor_at(p).scale;

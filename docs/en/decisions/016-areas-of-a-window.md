@@ -1,12 +1,14 @@
 ---
-status: accepted
+status: draft
 date: 2026-11-03
 topic: product
 ---
 
 # Areas of a window
 
-Decided: while nothing is selected, the frozen screen lights up the area of the window under the mouse, a panel, a table, a message, a card, a picture or a paragraph, and a click without dragging selects it; with Ctrl held, the whole window lights up instead. The program finds the areas in the pixels of the frozen screen itself, by filling the surface under the mouse.
+Switched off on November 4, 2026: the frozen screen lights up the window under the mouse again, and a click takes it. The parts found by the pixels of a window, as this page tells, didn't satisfy the author; a neural network of our own, trained on windows, is what to try next. The code stays in the program, switched off, with its tests.
+
+Tried: while nothing is selected, the frozen screen lights up the area of the window under the mouse, a panel, a table, a message, a card, a picture or a paragraph, and a click without dragging selects it; with Ctrl held, the whole window lights up instead. The program finds the areas in the pixels of the frozen screen itself, by filling the surface under the mouse.
 
 ## Question
 

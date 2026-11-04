@@ -413,7 +413,7 @@
     "ui.pause": "Pausar",
     "ui.chapters": "Capítulos",
     "scenes.freeze.title": "Una tecla para una captura",
-    "scenes.freeze.caption": "{hotkey} congela la pantalla. Un clic toma la imagen, el mensaje o el panel bajo el ratón; Ctrl y un clic, la ventana entera; arrastrando, cualquier parte. Pulsa {hotkey} otra vez para elegir de nuevo.",
+    "scenes.freeze.caption": "{hotkey} congela la pantalla. Haz clic en una ventana para tomarla entera o arrastra sobre la parte que necesites. Pulsa {hotkey} otra vez para elegir de nuevo.",
     "scenes.magic.title": "Lápiz mágico",
     "scenes.magic.caption": "Rodea algo sin cuidado y obtén un óvalo o un rectángulo limpios.",
     "scenes.cover.title": "Rectángulo relleno",

@@ -2,7 +2,7 @@
 
 # ainitShot
 
-A free, open-source screenshot program for Windows. A key freezes the screen: a click takes the picture, message or panel under the mouse, Ctrl and a click the whole window, and a drag any part; draw on it, mask what is private, and copy it or its text, save it, or ask Google's AI about it.
+A free, open-source screenshot program for Windows. A key freezes the screen: take a window or a part of it, draw on it, mask what is private, and copy it or its text, save it, or ask Google's AI about it.
 
 **[Download for Windows](https://shot.ainit.tech/get)** · [Site](https://shot.ainit.tech) · [Documentation](docs/README.md)
 

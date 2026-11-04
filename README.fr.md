@@ -2,7 +2,7 @@
 
 # ainitShot
 
-Un logiciel de capture d’écran pour Windows, gratuit et open source. Une touche fige l’écran : un clic prend l’image, le message ou le panneau sous la souris, Ctrl et un clic la fenêtre entière, et il suffit de faire glisser la souris pour prendre n’importe quelle partie ; dessinez dessus, masquez ce qui est privé, puis copiez la capture ou son texte, enregistrez-la ou interrogez l’IA de Google à son sujet.
+Un logiciel de capture d’écran pour Windows, gratuit et open source. Une touche fige l’écran : prenez une fenêtre ou n’importe quelle partie de l’écran, dessinez dessus, masquez ce qui est privé, puis copiez la capture ou son texte, enregistrez-la ou interrogez l’IA de Google à son sujet.
 
 **[Télécharger pour Windows](https://shot.ainit.tech/fr/get)** · [Site](https://shot.ainit.tech/fr) · [Documentation (en anglais)](docs/en/README.md)
 

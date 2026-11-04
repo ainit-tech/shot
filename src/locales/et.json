@@ -414,7 +414,7 @@
     "ui.pause": "Paus",
     "ui.chapters": "Peatükid",
     "scenes.freeze.title": "Kuvatõmmis ühe klahviga",
-    "scenes.freeze.caption": "{hotkey} külmutab ekraani. Klõps võtab hiire all oleva pildi, sõnumi või paneeli, Ctrl ja klõps terve akna ning lohistamine mis tahes osa. Vajutage uuesti {hotkey}, et valida otsast peale.",
+    "scenes.freeze.caption": "{hotkey} külmutab ekraani. Klõpsake akent, et võtta see tervikuna, või lohistage üle vajaliku osa. Vajutage uuesti {hotkey}, et valida otsast peale.",
     "scenes.magic.title": "Võlupliiats",
     "scenes.magic.caption": "Tõmmake millelegi umbkaudne ring ümber ja saate korraliku ovaali või ristküliku.",
     "scenes.cover.title": "Täidetud ristkülik",

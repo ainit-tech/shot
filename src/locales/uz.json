@@ -414,7 +414,7 @@
     "ui.pause": "Pauza",
     "ui.chapters": "Boblar",
     "scenes.freeze.title": "Skrinshot — bitta klavish bilan",
-    "scenes.freeze.caption": "{hotkey} ekranni muzlatadi. Bosish sichqoncha ostidagi rasm, xabar yoki panelni oladi, Ctrl bilan bosish — butun oynani, sudrash esa istalgan qismni. Qaytadan tanlash uchun {hotkey} tugmasini yana bir bor bosing.",
+    "scenes.freeze.caption": "{hotkey} ekranni muzlatadi. Oynani butunlay olish uchun uni bosing yoki kerakli qismni sichqoncha bilan belgilang. Qaytadan tanlash uchun {hotkey} tugmasini yana bir bor bosing.",
     "scenes.magic.title": "Sehrli qalam",
     "scenes.magic.caption": "Biror narsani taxminan aylantirib chizing — tekis oval yoki toʻrtburchak chiqadi.",
     "scenes.cover.title": "Boʻyalgan toʻrtburchak",
