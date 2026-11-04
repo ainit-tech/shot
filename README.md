@@ -19,10 +19,11 @@ A free, open-source screenshot program for Windows. A key freezes the screen: ta
 - **Magic pencil** — <kbd>M</kbd>. Circle something roughly, and get a neat oval or rectangle.
 - **And all the usual drawing tools:** pencil, brush, line, arrow, rectangle, filled rectangle and text, each on its own key. Anything drawn can be moved, reshaped or rewritten afterwards, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes any change.
 - **Copy or save** — <kbd>Ctrl</kbd>+<kbd>C</kbd> puts the screenshot into the clipboard, <kbd>Ctrl</kbd>+<kbd>S</kbd> saves it as a PNG file in Pictures\Screenshots.
+- **Record the screen** — <kbd>Ctrl</kbd>+<kbd>R</kbd>. What is selected goes on living inside a frame: clicks show as a ring, the microphone is one button, and a window cuts the recording and makes it a GIF or a video.
 
 ## Your screenshot stays yours
 
-- **On your computer:** drawing, masking and copying the text. They send nothing anywhere. The masking model, about 950 MB, downloads once by itself in the background; until it is there, masking finds everything but names, addresses, dates and links.
+- **On your computer:** drawing, masking, copying the text and recording. They send nothing anywhere. The masking model, about 950 MB, downloads once by itself in the background; until it is there, masking finds everything but names, addresses, dates and links.
 - **To Google, only when you ask:** the screenshot goes to Google's AI Mode or Google Images only from <kbd>G</kbd>, <kbd>T</kbd> or <kbd>I</kbd>, in the program's own window, as from a browser. Asked aloud, your voice goes to Google's speech recognition too; the microphone is on only while the key is held. To answer at once, the program keeps AI Mode loaded in its hidden window; your screenshot goes there only when you ask.
 - **No accounts and no cloud of ours.** Signing in to Google in the program's window is up to you: Google then asks less often whether you're a robot, and AI Mode keeps your conversations. The only server of ours the program talks to is shot.ainit.tech, for updates, which come signed.
 

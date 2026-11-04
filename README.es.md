@@ -19,10 +19,11 @@ Un programa de capturas de pantalla para Windows, gratuito y de código abierto.
 - **Lápiz mágico** — <kbd>M</kbd>. Rodea algo sin cuidado y obtén un óvalo o un rectángulo limpios.
 - **Y todas las herramientas de dibujo de siempre:** lápiz, pincel, línea, flecha, rectángulo, rectángulo relleno y texto, cada una con su propia tecla. Todo lo dibujado se puede mover, cambiar de forma o reescribir después, y <kbd>Ctrl</kbd>+<kbd>Z</kbd> deshace cualquier cambio.
 - **Copia o guarda** — <kbd>Ctrl</kbd>+<kbd>C</kbd> pone la captura en el portapapeles, <kbd>Ctrl</kbd>+<kbd>S</kbd> la guarda como archivo PNG en Imágenes\Capturas de pantalla.
+- **Graba la pantalla** — <kbd>Ctrl</kbd>+<kbd>R</kbd>. Lo seleccionado sigue vivo dentro de un marco: los clics se ven como un anillo, el micrófono es un solo botón, y una ventana recorta la grabación y la convierte en un GIF o un vídeo.
 
 ## Tu captura sigue siendo tuya
 
-- **En tu ordenador:** dibujar, ocultar los datos y copiar el texto. No envían nada a ninguna parte. El modelo para ocultar los datos, de unos 950 MB, se descarga una sola vez, por sí solo y en segundo plano; mientras tanto, se encuentra todo menos nombres, direcciones, fechas y enlaces.
+- **En tu ordenador:** dibujar, ocultar los datos, copiar el texto y grabar. No envían nada a ninguna parte. El modelo para ocultar los datos, de unos 950 MB, se descarga una sola vez, por sí solo y en segundo plano; mientras tanto, se encuentra todo menos nombres, direcciones, fechas y enlaces.
 - **A Google, solo cuando lo pides:** la captura va al Modo IA de Google o a Google Imágenes solo con <kbd>G</kbd>, <kbd>T</kbd> o <kbd>I</kbd>, en la propia ventana del programa, como desde un navegador. Si preguntas en voz alta, tu voz va también al reconocimiento de voz de Google; el micrófono solo está encendido mientras mantienes pulsada la tecla. Para responder al instante, el programa tiene el Modo IA ya cargado en su ventana oculta; tu captura solo llega allí cuando preguntas.
 - **Sin cuentas y sin nube nuestra.** Iniciar sesión en Google en la ventana del programa es cosa tuya: así Google pregunta menos a menudo si eres un robot, y el Modo IA guarda tus conversaciones. El único servidor nuestro con el que habla el programa es shot.ainit.tech, para las actualizaciones, que llegan firmadas.
 
