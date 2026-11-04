@@ -166,7 +166,10 @@
     "Recording saved": "Տեսագրությունը պահվեց",
     "Recording saved and copied": "Տեսագրությունը պահվեց և պատճենվեց",
     "Pause": "Դադար",
-    "Save the recording?": "Պահե՞լ տեսագրությունը"
+    "Save the recording?": "Պահե՞լ տեսագրությունը",
+    "Turn the microphone on": "Միացնել խոսափողը",
+    "Turn the microphone off": "Անջատել խոսափողը",
+    "The microphone isn't available": "Խոսափողը հասանելի չէ"
   },
   "settings": {
     "settings": "Կարգավորումներ",
@@ -420,7 +423,9 @@
     "play": "Նվագարկել",
     "pause": "Դադար",
     "kilobytes": "ԿԲ",
-    "megabytes": "ՄԲ"
+    "megabytes": "ՄԲ",
+    "soundOn": "Միացնել ձայնը",
+    "soundOff": "Անջատել ձայնը"
   },
   "installer": {
     "installTitle": "ainitShot {version}-ի տեղադրում",

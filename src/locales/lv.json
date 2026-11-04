@@ -166,7 +166,10 @@
     "Recording saved": "Ieraksts saglabāts",
     "Recording saved and copied": "Ieraksts saglabāts un nokopēts",
     "Pause": "Pauze",
-    "Save the recording?": "Vai saglabāt ierakstu?"
+    "Save the recording?": "Vai saglabāt ierakstu?",
+    "Turn the microphone on": "Ieslēgt mikrofonu",
+    "Turn the microphone off": "Izslēgt mikrofonu",
+    "The microphone isn't available": "Mikrofons nav pieejams"
   },
   "settings": {
     "settings": "Iestatījumi",
@@ -420,7 +423,9 @@
     "play": "Atskaņot",
     "pause": "Pauze",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Ieslēgt skaņu",
+    "soundOff": "Izslēgt skaņu"
   },
   "installer": {
     "installTitle": "Instalēt ainitShot {version}",

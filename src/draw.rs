@@ -15,6 +15,7 @@ use tiny_skia::{
 use crate::annotation::{Annotation, Coverage, Label, Shape, Tool, arrow_head, shadow};
 use crate::color::Rgba;
 use crate::geometry::{Point, PointF, Rect};
+use crate::clicks::Mark;
 use crate::icons::{self, Part};
 use crate::image::Image;
 use crate::settings::Icon;
@@ -56,6 +57,10 @@ const BUTTON_RADIUS: f32 = 6.0;
 const ICON: f32 = 20.0;
 /// How far from an edge of the selection the mouse still takes it.
 const EDGE_REACH: f32 = 6.0;
+/// The widths of a click's ring and of the pale line under it, and how much a click's dot covers.
+const RING_LINE: f32 = 2.0;
+const RING_HALO: f32 = 4.0;
+const CLICK_DOT: f32 = 0.34;
 
 /// The picture the overlay is composed in, the same size as the frozen screen.
 pub struct Frame<'a> {
@@ -507,6 +512,8 @@ pub struct ToolbarLook<'a> {
     pub can_undo: bool,
     /// Whether a recording can be paused: not before it has begun.
     pub can_pause: bool,
+    /// How loud a recording's microphone hears, from 0 to 1, while it is on.
+    pub voice: Option<f32>,
     /// The query button whose screenshot is being sent; the other buttons wait meanwhile.
     pub busy: Option<usize>,
     /// Whether the busy button's microphone listens to a question asked aloud: the button is red,
@@ -581,6 +588,8 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
             Button::CopyText => icons::TEXT_COPY,
             Button::Save => icons::SAVE,
             Button::Record => icons::RECORD,
+            Button::Microphone if look.voice.is_some() => icons::MICROPHONE,
+            Button::Microphone => icons::MICROPHONE_OFF,
             Button::Pause => icons::PAUSE,
             Button::Resume => icons::RESUME,
             Button::Stop => icons::STOP,
@@ -611,8 +620,31 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
         {
             progress(&mut pixmap, rect, coming, scale);
         }
+        // How loud the microphone hears.
+        if button == Button::Microphone
+            && let Some(level) = look.voice
+        {
+            progress(&mut pixmap, rect, level, scale);
+        }
     }
     letters
+}
+
+/// The mark of a click on a picture of a recording: a soft dot, or a thin ring with a pale line
+/// under it, which keeps it seen on a ground of its own colour.
+pub fn click_mark(frame: &mut Frame, mark: &Mark, scale: f32) {
+    let Some(mut pixmap) = frame.pixmap() else { return };
+    let Some(circle) = PathBuilder::from_circle(mark.x, mark.y, mark.radius) else { return };
+    let [red, green, blue, _] = ACCENT;
+    let alpha = |share: f32| (share * mark.strength.clamp(0.0, 1.0) * 255.0) as u8;
+    let place = Transform::identity();
+    if mark.ring {
+        let line = |width: f32| Stroke { width: width * scale, ..Stroke::default() };
+        pixmap.stroke_path(&circle, &solid([255, 255, 255, alpha(0.6)]), &line(RING_HALO), place, None);
+        pixmap.stroke_path(&circle, &solid([red, green, blue, alpha(1.0)]), &line(RING_LINE), place, None);
+    } else {
+        pixmap.fill_path(&circle, &solid([red, green, blue, alpha(CLICK_DOT)]), FillRule::Winding, place, None);
+    }
 }
 
 /// A thin line along the bottom of a button, filled as far as something has come.

@@ -166,7 +166,10 @@
     "Recording saved": "Posnetek je shranjen",
     "Recording saved and copied": "Posnetek je shranjen in kopiran",
     "Pause": "Premor",
-    "Save the recording?": "Želite shraniti posnetek?"
+    "Save the recording?": "Želite shraniti posnetek?",
+    "Turn the microphone on": "Vklopi mikrofon",
+    "Turn the microphone off": "Izklopi mikrofon",
+    "The microphone isn't available": "Mikrofon ni na voljo"
   },
   "settings": {
     "settings": "Nastavitve",
@@ -420,7 +423,9 @@
     "play": "Predvajaj",
     "pause": "Premor",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Vklopi zvok",
+    "soundOff": "Izklopi zvok"
   },
   "installer": {
     "installTitle": "Namestitev programa ainitShot {version}",

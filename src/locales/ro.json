@@ -166,7 +166,10 @@
     "Recording saved": "Înregistrarea a fost salvată",
     "Recording saved and copied": "Înregistrarea a fost salvată și copiată",
     "Pause": "Pauză",
-    "Save the recording?": "Salvați înregistrarea?"
+    "Save the recording?": "Salvați înregistrarea?",
+    "Turn the microphone on": "Porniți microfonul",
+    "Turn the microphone off": "Opriți microfonul",
+    "The microphone isn't available": "Microfonul nu este disponibil"
   },
   "settings": {
     "settings": "Setări",
@@ -420,7 +423,9 @@
     "play": "Redare",
     "pause": "Pauză",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Porniți sunetul",
+    "soundOff": "Opriți sunetul"
   },
   "installer": {
     "installTitle": "Instalarea ainitShot {version}",

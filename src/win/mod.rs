@@ -27,7 +27,8 @@ mod recorded;
 mod shell;
 mod tray;
 mod update;
-mod video;
+pub(crate) mod video;
+mod voice;
 
 use std::io;
 

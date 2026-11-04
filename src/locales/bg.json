@@ -166,7 +166,10 @@
     "Recording saved": "Записът е запазен",
     "Recording saved and copied": "Записът е запазен и копиран",
     "Pause": "Пауза",
-    "Save the recording?": "Да се запази ли записът?"
+    "Save the recording?": "Да се запази ли записът?",
+    "Turn the microphone on": "Включване на микрофона",
+    "Turn the microphone off": "Изключване на микрофона",
+    "The microphone isn't available": "Микрофонът не е достъпен"
   },
   "settings": {
     "settings": "Настройки",
@@ -420,7 +423,9 @@
     "play": "Пускане",
     "pause": "Пауза",
     "kilobytes": "КБ",
-    "megabytes": "МБ"
+    "megabytes": "МБ",
+    "soundOn": "Включване на звука",
+    "soundOff": "Изключване на звука"
   },
   "installer": {
     "installTitle": "Инсталиране на ainitShot {version}",

@@ -166,7 +166,10 @@
     "Recording saved": "录制内容已保存",
     "Recording saved and copied": "录制内容已保存并复制",
     "Pause": "暂停",
-    "Save the recording?": "保存录制内容吗？"
+    "Save the recording?": "保存录制内容吗？",
+    "Turn the microphone on": "打开麦克风",
+    "Turn the microphone off": "关闭麦克风",
+    "The microphone isn't available": "麦克风不可用"
   },
   "settings": {
     "settings": "设置",
@@ -420,7 +423,9 @@
     "play": "播放",
     "pause": "暂停",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "打开声音",
+    "soundOff": "关闭声音"
   },
   "installer": {
     "installTitle": "安装 ainitShot {version}",

@@ -1,24 +1,29 @@
 //! Video files through Media Foundation, a part of Windows: nothing of it is built into the
-//! program. A recording goes frame by frame into an MP4 file of H.264, on the graphics card where
-//! it can; for a GIF or a shorter video the file is read back frame by frame. Its libraries are
+//! program. A recording goes frame by frame into an MP4 file of H.264; for a GIF or a shorter video
+//! the file is read back frame by frame. It is the encoder of Windows that writes it, not the
+//! graphics card's: on a screen it is as fast and as good, with files half as large or less, and
+//! NVIDIA's crashes the program now and then as it is let go. Its libraries are
 //! looked for when first needed: the N editions of Windows come without them, and the program
 //! has to start there all the same.
 
 use std::ffi::c_void;
+use std::fs::File;
+use std::io::{Read, Seek, SeekFrom};
 use std::path::Path;
 use std::ptr::null_mut;
 use std::sync::OnceLock;
 
 use windows::Win32::Foundation::E_NOTIMPL;
 use windows::Win32::Media::MediaFoundation::{
-    IMFAttributes, IMFMediaBuffer, IMFMediaType, IMFSample, IMFSinkWriter, IMFSourceReader, MF_MT_AVG_BITRATE,
-    MF_MT_DEFAULT_STRIDE, MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE, MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE,
-    MF_MT_MINIMUM_DISPLAY_APERTURE, MF_MT_PIXEL_ASPECT_RATIO, MF_MT_SUBTYPE, MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS,
-    MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED,
-    MF_SOURCE_READERF_ENDOFSTREAM, MF_VERSION, MFMediaType_Video, MFSTARTUP_FULL, MFVideoArea, MFVideoFormat_H264,
+    IMFAttributes, IMFMediaBuffer, IMFMediaType, IMFSample, IMFSinkWriter, IMFSourceReader, MF_MT_ALL_SAMPLES_INDEPENDENT,
+    MF_MT_AUDIO_AVG_BYTES_PER_SECOND, MF_MT_AUDIO_BITS_PER_SAMPLE, MF_MT_AUDIO_BLOCK_ALIGNMENT, MF_MT_AUDIO_NUM_CHANNELS,
+    MF_MT_AUDIO_SAMPLES_PER_SECOND, MF_MT_AVG_BITRATE, MF_MT_DEFAULT_STRIDE, MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE, MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE,
+    MF_MT_MINIMUM_DISPLAY_APERTURE, MF_MT_PIXEL_ASPECT_RATIO, MF_MT_SUBTYPE,
+    MF_SOURCE_READER_ALL_STREAMS, MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED,
+    MF_SOURCE_READERF_ENDOFSTREAM, MF_VERSION, MFAudioFormat_AAC, MFAudioFormat_PCM, MFMediaType_Audio, MFMediaType_Video, MFSTARTUP_FULL, MFVideoArea, MFVideoFormat_H264,
     MFVideoFormat_RGB32, MFVideoInterlace_Progressive,
 };
-use windows_core::{HRESULT, HSTRING, Interface, PCWSTR, Result};
+use windows_core::{GUID, HRESULT, HSTRING, Interface, PCWSTR, Result};
 use windows_sys::Win32::Foundation::HMODULE;
 use windows_sys::Win32::System::LibraryLoader::{GetProcAddress, LOAD_LIBRARY_SEARCH_SYSTEM32, LoadLibraryExW};
 use windows_sys::w;
@@ -29,6 +34,13 @@ use crate::text::tr;
 /// of a microsecond each, a second has.
 pub const FRAMES: u32 = 30;
 pub const SECOND: i64 = 10_000_000;
+/// The microphone's sound: this many samples a second, of 16 bits, in one channel.
+pub const VOICE_RATE: u32 = 48_000;
+/// The bytes a second of packed sound, 96 kbit/s, plenty for a voice.
+const VOICE_PACKED: u32 = 12_000;
+/// How much sound goes in at a time, in bytes, and how far it runs ahead of the picture in a file.
+const VOICE_PART: usize = VOICE_RATE as usize / 5;
+const VOICE_AHEAD: i64 = SECOND / 5;
 /// The bits of video for a pixel of a frame: a screen is mostly still, and sharp text needs them
 /// where it moves.
 const BITS: f32 = 0.2;
@@ -99,6 +111,125 @@ fn attributes(count: u32) -> Result<IMFAttributes> {
     unsafe { made(|place| (foundation.attributes)(place, count)) }
 }
 
+/// Adds a stream of AAC to a file, into which the microphone's samples go.
+unsafe fn add_voice(sink: &IMFSinkWriter) -> Result<u32> {
+    let foundation = foundation()?;
+    let kind = |subtype: &GUID, bytes: u32| -> Result<IMFMediaType> {
+        unsafe {
+            let kind: IMFMediaType = made(|place| (foundation.media_type)(place))?;
+            kind.SetGUID(&MF_MT_MAJOR_TYPE, &MFMediaType_Audio)?;
+            kind.SetGUID(&MF_MT_SUBTYPE, subtype)?;
+            kind.SetUINT32(&MF_MT_AUDIO_BITS_PER_SAMPLE, 16)?;
+            kind.SetUINT32(&MF_MT_AUDIO_SAMPLES_PER_SECOND, VOICE_RATE)?;
+            kind.SetUINT32(&MF_MT_AUDIO_NUM_CHANNELS, 1)?;
+            kind.SetUINT32(&MF_MT_AUDIO_AVG_BYTES_PER_SECOND, bytes)?;
+            Ok(kind)
+        }
+    };
+    unsafe {
+        let stream = sink.AddStream(&kind(&MFAudioFormat_AAC, VOICE_PACKED)?)?;
+        let input = kind(&MFAudioFormat_PCM, VOICE_RATE * 2)?;
+        input.SetUINT32(&MF_MT_AUDIO_BLOCK_ALIGNMENT, 2)?;
+        input.SetUINT32(&MF_MT_ALL_SAMPLES_INDEPENDENT, 1)?;
+        sink.SetInputMediaType(stream, &input, None)?;
+        Ok(stream)
+    }
+}
+
+/// A sample of bytes for a file, at a time.
+unsafe fn sample_of(bytes: &[u8], time: i64, length: i64) -> Result<IMFSample> {
+    let foundation = foundation()?;
+    unsafe {
+        let buffer: IMFMediaBuffer = made(|place| (foundation.memory_buffer)(bytes.len() as u32, place))?;
+        let mut target = null_mut();
+        buffer.Lock(&mut target, None, None)?;
+        std::ptr::copy_nonoverlapping(bytes.as_ptr(), target, bytes.len());
+        buffer.Unlock()?;
+        buffer.SetCurrentLength(bytes.len() as u32)?;
+        let sample: IMFSample = made(|place| (foundation.sample)(place))?;
+        sample.AddBuffer(&buffer)?;
+        sample.SetSampleTime(time)?;
+        sample.SetSampleDuration(length)?;
+        Ok(sample)
+    }
+}
+
+/// The microphone's file going into a video, from a time in it and up to another.
+pub struct Voice {
+    file: File,
+    /// The stream it goes into.
+    stream: u32,
+    /// The time of the file that the video's start stands for, the time in the file reached, and
+    /// where it ends.
+    start: i64,
+    time: i64,
+    end: i64,
+}
+
+impl Voice {
+    fn open(path: &Path, stream: u32, start: i64, end: i64) -> Result<Voice> {
+        let mut file = File::open(path).map_err(|_| windows_core::Error::empty())?;
+        let byte = |time: i64| (time * VOICE_RATE as i64 / SECOND) as u64 * 2;
+        file.seek(SeekFrom::Start(byte(start))).map_err(|_| windows_core::Error::empty())?;
+        Ok(Voice { file, stream, start, time: start, end })
+    }
+
+    /// Writes what comes before `until` in the video's time.
+    unsafe fn write_until(&mut self, sink: &IMFSinkWriter, until: i64) -> Result<()> {
+        let mut part = vec![0u8; VOICE_PART];
+        let last = (until + self.start).min(self.end);
+        while self.time < last {
+            let mut read = 0;
+            while read < part.len() {
+                match self.file.read(&mut part[read..]) {
+                    Ok(0) | Err(_) => break,
+                    Ok(count) => read += count,
+                }
+            }
+            read &= !1;
+            if read == 0 {
+                self.end = self.time;
+                return Ok(());
+            }
+            let length = (read / 2) as i64 * SECOND / VOICE_RATE as i64;
+            unsafe { sink.WriteSample(self.stream, &sample_of(&part[..read], self.time - self.start, length)?)? };
+            self.time += length;
+        }
+        Ok(())
+    }
+}
+
+/// A video with sound from one without it and the microphone's file: the picture goes across as
+/// it is, which takes no time, and only the sound is packed.
+pub fn mix(picture: &Path, voice: &Path, target: &Path) -> Result<()> {
+    let foundation = foundation()?;
+    unsafe {
+        let path = HSTRING::from(picture);
+        let reader: IMFSourceReader = made(|place| (foundation.source_reader)(PCWSTR(path.as_ptr()), null_mut(), place))?;
+        reader.SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS.0 as u32, false)?;
+        reader.SetStreamSelection(STREAM, true)?;
+        let native = reader.GetNativeMediaType(STREAM, 0)?;
+        let path = HSTRING::from(target);
+        let sink: IMFSinkWriter = made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), null_mut(), place))?;
+        let video = sink.AddStream(&native)?;
+        let stream = add_voice(&sink)?;
+        let mut voice = Voice::open(voice, stream, 0, i64::MAX)?;
+        sink.BeginWriting()?;
+        loop {
+            let (mut flags, mut sample) = (0u32, None);
+            reader.ReadSample(STREAM, 0, None, Some(&mut flags), None, Some(&mut sample))?;
+            if flags & MF_SOURCE_READERF_ENDOFSTREAM.0 as u32 != 0 {
+                break;
+            }
+            let Some(sample) = sample else { continue };
+            voice.write_until(&sink, sample.GetSampleTime()? + VOICE_AHEAD)?;
+            sink.WriteSample(video, &sample)?;
+        }
+        voice.write_until(&sink, i64::MAX / 2)?;
+        sink.Finalize()
+    }
+}
+
 fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
     let foundation = foundation()?;
     unsafe {
@@ -115,18 +246,17 @@ pub struct Writer {
     stream: u32,
     width: usize,
     height: usize,
+    voice: Option<Voice>,
 }
 
 impl Writer {
-    /// A new file of frames of this size, both of which H.264 wants even.
-    pub fn create(path: &Path, width: u32, height: u32) -> Result<Writer> {
+    /// A new file of frames of this size, both of which H.264 wants even, with the part of the
+    /// microphone's file between two times, if there is one.
+    pub fn create(path: &Path, width: u32, height: u32, voice: Option<(&Path, i64, i64)>) -> Result<Writer> {
         let foundation = foundation()?;
         unsafe {
-            let settings = attributes(1)?;
-            settings.SetUINT32(&MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1)?;
             let path = HSTRING::from(path);
-            let sink: IMFSinkWriter =
-                made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), settings.as_raw(), place))?;
+            let sink: IMFSinkWriter = made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), null_mut(), place))?;
             let frame = |kind: &IMFMediaType| -> Result<()> {
                 kind.SetUINT32(&MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive.0 as u32)?;
                 kind.SetUINT64(&MF_MT_FRAME_SIZE, pair(width, height))?;
@@ -143,8 +273,12 @@ impl Writer {
             // Positive: the rows come from the top.
             input.SetUINT32(&MF_MT_DEFAULT_STRIDE, width * 4)?;
             sink.SetInputMediaType(stream, &input, None)?;
+            let voice = match voice {
+                Some((path, start, end)) => Some(Voice::open(path, add_voice(&sink)?, start, end)?),
+                None => None,
+            };
             sink.BeginWriting()?;
-            Ok(Writer { sink, stream, width: width as usize, height: height as usize })
+            Ok(Writer { sink, stream, width: width as usize, height: height as usize, voice })
         }
     }
 
@@ -168,13 +302,22 @@ impl Writer {
             sample.AddBuffer(&buffer)?;
             sample.SetSampleTime(time)?;
             sample.SetSampleDuration(length)?;
-            self.sink.WriteSample(self.stream, &sample)
+            self.sink.WriteSample(self.stream, &sample)?;
+            match &mut self.voice {
+                Some(voice) => voice.write_until(&self.sink, time + VOICE_AHEAD),
+                None => Ok(()),
+            }
         }
     }
 
     /// Ends the file.
-    pub fn finish(self) -> Result<()> {
-        unsafe { self.sink.Finalize() }
+    pub fn finish(mut self) -> Result<()> {
+        unsafe {
+            if let Some(voice) = &mut self.voice {
+                voice.write_until(&self.sink, i64::MAX / 2)?;
+            }
+            self.sink.Finalize()
+        }
     }
 }
 
@@ -201,6 +344,9 @@ impl Reader {
             settings.SetUINT32(&MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, 1)?;
             let path = HSTRING::from(path);
             let reader: IMFSourceReader = made(|place| (foundation.source_reader)(PCWSTR(path.as_ptr()), settings.as_raw(), place))?;
+            // Sound that nobody takes would hold the picture up.
+            reader.SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS.0 as u32, false)?;
+            reader.SetStreamSelection(STREAM, true)?;
             let wanted = video_type(&MFVideoFormat_RGB32)?;
             reader.SetCurrentMediaType(STREAM, None, &wanted)?;
             let mut made = Reader { reader, width: 0, height: 0, rows: 0, stride: 0 };
@@ -285,10 +431,107 @@ mod tests {
         pixels
     }
 
+    /// The sound of a file: how many seconds of it there are, and how loud it is at its loudest.
+    fn heard(path: &Path) -> (f64, i32) {
+        use windows::Win32::Media::MediaFoundation::MF_SOURCE_READER_FIRST_AUDIO_STREAM;
+        let audio = MF_SOURCE_READER_FIRST_AUDIO_STREAM.0 as u32;
+        let foundation = foundation().unwrap();
+        unsafe {
+            let wide = HSTRING::from(path);
+            let reader: IMFSourceReader = made(|place| (foundation.source_reader)(PCWSTR(wide.as_ptr()), null_mut(), place)).unwrap();
+            reader.SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS.0 as u32, false).unwrap();
+            reader.SetStreamSelection(audio, true).unwrap();
+            let wanted: IMFMediaType = made(|place| (foundation.media_type)(place)).unwrap();
+            wanted.SetGUID(&MF_MT_MAJOR_TYPE, &MFMediaType_Audio).unwrap();
+            wanted.SetGUID(&MF_MT_SUBTYPE, &MFAudioFormat_PCM).unwrap();
+            reader.SetCurrentMediaType(audio, None, &wanted).unwrap();
+            let (mut count, mut peak) = (0usize, 0i32);
+            loop {
+                let (mut flags, mut sample) = (0u32, None);
+                reader.ReadSample(audio, 0, None, Some(&mut flags), None, Some(&mut sample)).unwrap();
+                if flags & MF_SOURCE_READERF_ENDOFSTREAM.0 as u32 != 0 {
+                    break;
+                }
+                let Some(sample) = sample else { continue };
+                let buffer = sample.ConvertToContiguousBuffer().unwrap();
+                let (mut bytes, mut length) = (null_mut(), 0u32);
+                buffer.Lock(&mut bytes, None, Some(&mut length)).unwrap();
+                let samples = std::slice::from_raw_parts(bytes.cast::<i16>(), length as usize / 2);
+                count += samples.len();
+                peak = samples.iter().fold(peak, |peak, &sample| peak.max((sample as i32).abs()));
+                buffer.Unlock().unwrap();
+            }
+            (count as f64 / VOICE_RATE as f64, peak)
+        }
+    }
+
+    /// A tone in the microphone's form, in a file.
+    fn tone(path: &Path, seconds: f64, loudness: f64) {
+        let count = (seconds * VOICE_RATE as f64) as usize;
+        let bytes: Vec<u8> = (0..count)
+            .flat_map(|n| {
+                let phase = n as f64 / VOICE_RATE as f64 * 440.0 * std::f64::consts::TAU;
+                ((phase.sin() * loudness) as i16).to_le_bytes()
+            })
+            .collect();
+        std::fs::write(path, bytes).unwrap();
+    }
+
+    /// The picture goes across untouched and the sound joins it; a shorter video takes its part.
+    #[test]
+    fn the_voice_joins_the_picture() {
+        unsafe { CoInitializeEx(None, COINIT_MULTITHREADED).ok().unwrap() };
+        let (width, height) = (642usize, 362usize);
+        let folder = std::env::temp_dir().join(format!("ainitshot-voice-video-{}", std::process::id()));
+        std::fs::create_dir_all(&folder).unwrap();
+        let (picture, voice) = (folder.join("picture.mp4"), folder.join("voice.pcm"));
+        let mut writer = Writer::create(&picture, width as u32, height as u32, None).unwrap();
+        let length = SECOND / FRAMES as i64;
+        for n in 0..90 {
+            writer.write(&frame(width, height, n), width * 4, n as i64 * length, length).unwrap();
+        }
+        writer.finish().unwrap();
+        tone(&voice, 3.0, 8000.0);
+
+        let mixed = folder.join("mixed.mp4");
+        mix(&picture, &voice, &mixed).unwrap();
+        let (seconds, peak) = heard(&mixed);
+        assert!((2.8..3.3).contains(&seconds), "{seconds}");
+        assert!((6000..11000).contains(&peak), "{peak}");
+        // The picture is all there, and the right way up.
+        let mut reader = Reader::open(&mixed).unwrap();
+        let (mut count, mut last) = (0, 0);
+        while let Some((time, pixels)) = reader.next_frame().unwrap() {
+            count += 1;
+            last = time;
+            let corner = &pixels[(8 * width + 8) * 4..(8 * width + 8) * 4 + 3];
+            assert!(corner[2] > 200 && corner[0] < 60, "{corner:?}");
+        }
+        assert!(count >= 88, "{count} frames");
+        assert!(last > 2 * SECOND);
+        drop(reader);
+
+        // From the first second to the second one: a second of picture and of sound.
+        let cut = folder.join("cut.mp4");
+        let mut reader = Reader::open(&mixed).unwrap();
+        let mut writer = Writer::create(&cut, width as u32, height as u32, Some((&voice, SECOND, 2 * SECOND))).unwrap();
+        while let Some((time, pixels)) = reader.next_frame().unwrap() {
+            if (SECOND..2 * SECOND).contains(&time) {
+                writer.write(&pixels, width * 4, time - SECOND, length).unwrap();
+            }
+        }
+        writer.finish().unwrap();
+        drop(reader);
+        let (seconds, peak) = heard(&cut);
+        assert!((0.8..1.3).contains(&seconds), "{seconds}");
+        assert!((6000..11000).contains(&peak), "{peak}");
+        std::fs::remove_dir_all(&folder).unwrap();
+    }
+
     /// Writes frames of a size into a file and reads them back.
     fn read_back(folder: &Path, width: usize, height: usize, frames: usize) {
         let path = folder.join(format!("{width}x{height}.mp4"));
-        let mut writer = Writer::create(&path, width as u32, height as u32).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
         let length = SECOND / FRAMES as i64;
         for n in 0..frames {
             writer.write(&frame(width, height, n), width * 4, n as i64 * length, length).unwrap();

@@ -166,7 +166,10 @@
     "Recording saved": "ریکارڈنگ محفوظ ہو گئی",
     "Recording saved and copied": "ریکارڈنگ محفوظ اور کاپی ہو گئی",
     "Pause": "روکیں",
-    "Save the recording?": "ریکارڈنگ محفوظ کریں؟"
+    "Save the recording?": "ریکارڈنگ محفوظ کریں؟",
+    "Turn the microphone on": "مائیکروفون آن کریں",
+    "Turn the microphone off": "مائیکروفون بند کریں",
+    "The microphone isn't available": "مائیکروفون دستیاب نہیں"
   },
   "settings": {
     "settings": "ترتیبات",
@@ -420,7 +423,9 @@
     "play": "چلائیں",
     "pause": "روکیں",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "آواز آن کریں",
+    "soundOff": "آواز بند کریں"
   },
   "installer": {
     "installTitle": "ainitShot {version} انسٹال کریں",

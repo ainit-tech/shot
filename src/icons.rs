@@ -64,6 +64,13 @@ pub const RECORD: &[Part] = &[
     Part::Dot(10.0, 10.0, 3.5),
 ];
 
+const MICROPHONE_BODY: &str = "M 10 3 C 11.4 3 12.5 4.1 12.5 5.5 V 9.5 C 12.5 10.9 11.4 12 10 12 C 8.6 12 7.5 10.9 7.5 9.5 V 5.5 C 7.5 4.1 8.6 3 10 3 Z";
+const MICROPHONE_STAND: &str = "M 5 9.5 C 5 12.3 7.2 14.5 10 14.5 C 12.8 14.5 15 12.3 15 9.5 M 10 14.5 V 17";
+
+pub const MICROPHONE: &[Part] = &[Part::Line(MICROPHONE_BODY), Part::Line(MICROPHONE_STAND)];
+
+pub const MICROPHONE_OFF: &[Part] = &[Part::Line(MICROPHONE_BODY), Part::Line(MICROPHONE_STAND), Part::Line("M 3.5 3 L 16.5 17")];
+
 pub const PAUSE: &[Part] = &[Part::Fill("M 6 4.5 H 8.5 V 15.5 H 6 Z M 11.5 4.5 H 14 V 15.5 H 11.5 Z")];
 
 pub const RESUME: &[Part] = &[Part::Fill("M 6.5 4.5 L 15.5 10 L 6.5 15.5 Z")];
@@ -135,7 +142,7 @@ mod tests {
     fn every_icon_reads() {
         let icons = [
             PENCIL, BRUSH, LINE_TOOL, ARROW, RECTANGLE, FILLED_RECTANGLE, MAGIC_PENCIL, MASK, UNDO, COPY, SAVE, CLOSE,
-            IMAGES, QUESTION, RECORD, PAUSE, RESUME, STOP,
+            IMAGES, QUESTION, RECORD, MICROPHONE, MICROPHONE_OFF, PAUSE, RESUME, STOP,
         ];
         for icon in icons {
             for part in icon {

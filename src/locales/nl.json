@@ -166,7 +166,10 @@
     "Recording saved": "Opname opgeslagen",
     "Recording saved and copied": "Opname opgeslagen en gekopieerd",
     "Pause": "Pauzeren",
-    "Save the recording?": "Opname opslaan?"
+    "Save the recording?": "Opname opslaan?",
+    "Turn the microphone on": "Microfoon inschakelen",
+    "Turn the microphone off": "Microfoon uitschakelen",
+    "The microphone isn't available": "De microfoon is niet beschikbaar"
   },
   "settings": {
     "settings": "Instellingen",
@@ -420,7 +423,9 @@
     "play": "Afspelen",
     "pause": "Pauzeren",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Geluid inschakelen",
+    "soundOff": "Geluid uitschakelen"
   },
   "installer": {
     "installTitle": "ainitShot {version} installeren",

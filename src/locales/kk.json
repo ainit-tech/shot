@@ -166,7 +166,10 @@
     "Recording saved": "Жазба сақталды",
     "Recording saved and copied": "Жазба сақталды және көшірілді",
     "Pause": "Кідірту",
-    "Save the recording?": "Жазба сақталсын ба?"
+    "Save the recording?": "Жазба сақталсын ба?",
+    "Turn the microphone on": "Микрофонды қосу",
+    "Turn the microphone off": "Микрофонды өшіру",
+    "The microphone isn't available": "Микрофон қолжетімсіз"
   },
   "settings": {
     "settings": "Параметрлер",
@@ -420,7 +423,9 @@
     "play": "Ойнату",
     "pause": "Кідірту",
     "kilobytes": "КБ",
-    "megabytes": "МБ"
+    "megabytes": "МБ",
+    "soundOn": "Дыбысты қосу",
+    "soundOff": "Дыбысты өшіру"
   },
   "installer": {
     "installTitle": "ainitShot {version} орнату",

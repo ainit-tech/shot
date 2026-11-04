@@ -166,7 +166,10 @@
     "Recording saved": "Rakaman disimpan",
     "Recording saved and copied": "Rakaman disimpan dan disalin",
     "Pause": "Jeda",
-    "Save the recording?": "Simpan rakaman?"
+    "Save the recording?": "Simpan rakaman?",
+    "Turn the microphone on": "Hidupkan mikrofon",
+    "Turn the microphone off": "Matikan mikrofon",
+    "The microphone isn't available": "Mikrofon tidak tersedia"
   },
   "settings": {
     "settings": "Tetapan",
@@ -420,7 +423,9 @@
     "play": "Main",
     "pause": "Jeda",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Hidupkan bunyi",
+    "soundOff": "Matikan bunyi"
   },
   "installer": {
     "installTitle": "Pasang ainitShot {version}",

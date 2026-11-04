@@ -166,7 +166,10 @@
     "Recording saved": "Yozuv saqlandi",
     "Recording saved and copied": "Yozuv saqlandi va nusxalandi",
     "Pause": "Pauza",
-    "Save the recording?": "Yozuv saqlansinmi?"
+    "Save the recording?": "Yozuv saqlansinmi?",
+    "Turn the microphone on": "Mikrofonni yoqish",
+    "Turn the microphone off": "Mikrofonni oʻchirish",
+    "The microphone isn't available": "Mikrofon mavjud emas"
   },
   "settings": {
     "settings": "Sozlamalar",
@@ -420,7 +423,9 @@
     "play": "Ijro etish",
     "pause": "Pauza",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Ovozni yoqish",
+    "soundOff": "Ovozni oʻchirish"
   },
   "installer": {
     "installTitle": "ainitShot {version} oʻrnatish",

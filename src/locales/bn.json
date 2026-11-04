@@ -166,7 +166,10 @@
     "Recording saved": "রেকর্ডিং সেভ হয়েছে",
     "Recording saved and copied": "রেকর্ডিং সেভ ও কপি হয়েছে",
     "Pause": "থামান",
-    "Save the recording?": "রেকর্ডিং সেভ করবেন?"
+    "Save the recording?": "রেকর্ডিং সেভ করবেন?",
+    "Turn the microphone on": "মাইক্রোফোন চালু করুন",
+    "Turn the microphone off": "মাইক্রোফোন বন্ধ করুন",
+    "The microphone isn't available": "মাইক্রোফোন পাওয়া যাচ্ছে না"
   },
   "settings": {
     "settings": "সেটিংস",
@@ -420,7 +423,9 @@
     "play": "চালান",
     "pause": "থামান",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "শব্দ চালু করুন",
+    "soundOff": "শব্দ বন্ধ করুন"
   },
   "installer": {
     "installTitle": "ainitShot {version} ইনস্টল",

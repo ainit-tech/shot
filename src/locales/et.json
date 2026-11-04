@@ -166,7 +166,10 @@
     "Recording saved": "Lindistus salvestatud",
     "Recording saved and copied": "Lindistus salvestatud ja kopeeritud",
     "Pause": "Paus",
-    "Save the recording?": "Kas salvestada lindistus?"
+    "Save the recording?": "Kas salvestada lindistus?",
+    "Turn the microphone on": "Lülita mikrofon sisse",
+    "Turn the microphone off": "Lülita mikrofon välja",
+    "The microphone isn't available": "Mikrofon pole saadaval"
   },
   "settings": {
     "settings": "Sätted",
@@ -420,7 +423,9 @@
     "play": "Esita",
     "pause": "Paus",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Lülita heli sisse",
+    "soundOff": "Lülita heli välja"
   },
   "installer": {
     "installTitle": "ainitShot {version} paigaldamine",

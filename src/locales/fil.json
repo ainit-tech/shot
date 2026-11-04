@@ -166,7 +166,10 @@
     "Recording saved": "Na-save ang recording",
     "Recording saved and copied": "Na-save at nakopya ang recording",
     "Pause": "I-pause",
-    "Save the recording?": "I-save ang recording?"
+    "Save the recording?": "I-save ang recording?",
+    "Turn the microphone on": "I-on ang mikropono",
+    "Turn the microphone off": "I-off ang mikropono",
+    "The microphone isn't available": "Hindi available ang mikropono"
   },
   "settings": {
     "settings": "Mga Setting",
@@ -420,7 +423,9 @@
     "play": "I-play",
     "pause": "I-pause",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "I-on ang tunog",
+    "soundOff": "I-off ang tunog"
   },
   "installer": {
     "installTitle": "I-install ang ainitShot {version}",

@@ -44,6 +44,8 @@ button.accent { border-color: transparent; background: var(--accent); color: #ff
 button.accent:hover { background: var(--accent-hover); }
 .play { width: 32px; padding: 0; display: flex; align-items: center; justify-content: center; }
 .play svg { width: 20px; height: 20px; fill: currentColor; }
+.play .wave { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.hidden { display: none; }
 .length { min-width: 42px; font-variant-numeric: tabular-nums; }
 .format { display: flex; }
 .format button { padding: 0 12px; border-radius: 0; background: transparent; color: var(--muted); }
@@ -68,6 +70,7 @@ button.accent:hover { background: var(--accent-hover); }
 </div>
 <div class="bar">
   <button class="play" id="play"><svg viewBox="0 0 20 20"><path id="play-icon"/></svg></button>
+  <button class="play hidden" id="sound"><svg viewBox="0 0 20 20"><path d="M 3.5 7.5 H 6.5 L 10.5 4.5 V 15.5 L 6.5 12.5 H 3.5 Z"/><path class="wave" id="sound-icon"/></svg></button>
   <span class="length" id="length"></span>
   <div class="format" role="radiogroup">
     <button role="radio" data-format="gif">GIF</button>
@@ -84,15 +87,17 @@ button.accent:hover { background: var(--accent-hover); }
 // the GIF or the video of what is kept, each time it changes, and tells the size it has come to.
 const TEXT = {
   video: "Video", copy: "Copy", save: "Save", preparing: "Preparing…", play: "Play", pause: "Pause",
-  kilobytes: "KB", megabytes: "MB",
+  kilobytes: "KB", megabytes: "MB", soundOn: "Turn the sound on", soundOff: "Turn the sound off",
 };
 const PLAY = "M 6.5 4.5 L 15.5 10 L 6.5 15.5 Z";
 const PAUSE = "M 6 4.5 H 8.5 V 15.5 H 6 Z M 11.5 4.5 H 14 V 15.5 H 11.5 Z";
+const LOUD = "M 13 7.5 C 14 8.5 14 11.5 13 12.5 M 15 5.5 C 17 7.5 17 12.5 15 14.5";
+const QUIET = "M 13 8 L 17 12 M 17 8 L 13 12";
 // The shortest piece that can be kept, in seconds.
 const SHORTEST = 0.2;
 const element = id => document.getElementById(id);
-const [video, track, kept, playhead, fromHandle, toHandle, play, length, about] =
-  ["video", "track", "kept", "playhead", "from", "to", "play", "length", "about"].map(element);
+const [video, track, kept, playhead, fromHandle, toHandle, play, sound, length, about] =
+  ["video", "track", "kept", "playhead", "from", "to", "play", "sound", "length", "about"].map(element);
 const send = message => window.chrome && window.chrome.webview && window.chrome.webview.postMessage(JSON.stringify(message));
 
 let speech = {};
@@ -131,6 +136,11 @@ function draw() {
 function showPlaying() {
   element("play-icon").setAttribute("d", video.paused ? PLAY : PAUSE);
   play.title = say(video.paused ? "play" : "pause");
+}
+
+function showSound() {
+  element("sound-icon").setAttribute("d", video.muted ? QUIET : LOUD);
+  sound.title = say(video.muted ? "soundOn" : "soundOff");
 }
 
 function showFormat() {
@@ -196,6 +206,10 @@ for (const part of [fromHandle, toHandle, track]) {
 
 const toggle = () => (video.paused ? video.play() : video.pause());
 play.addEventListener("click", toggle);
+sound.addEventListener("click", () => {
+  video.muted = !video.muted;
+  showSound();
+});
 video.addEventListener("click", toggle);
 video.addEventListener("play", showPlaying);
 video.addEventListener("pause", showPlaying);
@@ -228,7 +242,16 @@ window.chrome.webview.addEventListener("message", ({ data }) => {
     showFormat();
     showPlaying();
     about.title = data.details;
+    sound.classList.toggle("hidden", !data.sound);
+    video.muted = !data.sound;
+    showSound();
     video.src = data.url;
+    // A page may be refused to start with sound: it goes on quietly then.
+    video.play().catch(() => {
+      video.muted = true;
+      showSound();
+      video.play();
+    });
     prepare();
     draw();
     requestAnimationFrame(follow);

@@ -166,7 +166,10 @@
     "Recording saved": "Įrašas išsaugotas",
     "Recording saved and copied": "Įrašas išsaugotas ir nukopijuotas",
     "Pause": "Pristabdyti",
-    "Save the recording?": "Išsaugoti įrašą?"
+    "Save the recording?": "Išsaugoti įrašą?",
+    "Turn the microphone on": "Įjungti mikrofoną",
+    "Turn the microphone off": "Išjungti mikrofoną",
+    "The microphone isn't available": "Mikrofonas nepasiekiamas"
   },
   "settings": {
     "settings": "Nustatymai",
@@ -420,7 +423,9 @@
     "play": "Leisti",
     "pause": "Pristabdyti",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Įjungti garsą",
+    "soundOff": "Išjungti garsą"
   },
   "installer": {
     "installTitle": "Įdiegti „ainitShot“ {version}",

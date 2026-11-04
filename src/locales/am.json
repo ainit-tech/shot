@@ -166,7 +166,10 @@
     "Recording saved": "ቀረጻው ተቀምጧል",
     "Recording saved and copied": "ቀረጻው ተቀምጧል እና ተቀድቷል",
     "Pause": "ለአፍታ አቁም",
-    "Save the recording?": "ቀረጻውን ላስቀምጥ?"
+    "Save the recording?": "ቀረጻውን ላስቀምጥ?",
+    "Turn the microphone on": "ማይክሮፎኑን አብራ",
+    "Turn the microphone off": "ማይክሮፎኑን አጥፋ",
+    "The microphone isn't available": "ማይክሮፎኑ አይገኝም"
   },
   "settings": {
     "settings": "ቅንብሮች",
@@ -420,7 +423,9 @@
     "play": "አጫውት",
     "pause": "ለአፍታ አቁም",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "ድምፁን አብራ",
+    "soundOff": "ድምፁን አጥፋ"
   },
   "installer": {
     "installTitle": "ainitShot {version} መጫን",

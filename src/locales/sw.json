@@ -166,7 +166,10 @@
     "Recording saved": "Rekodi imehifadhiwa",
     "Recording saved and copied": "Rekodi imehifadhiwa na kunakiliwa",
     "Pause": "Sitisha",
-    "Save the recording?": "Hifadhi rekodi?"
+    "Save the recording?": "Hifadhi rekodi?",
+    "Turn the microphone on": "Washa maikrofoni",
+    "Turn the microphone off": "Zima maikrofoni",
+    "The microphone isn't available": "Maikrofoni haipatikani"
   },
   "settings": {
     "settings": "Mipangilio",
@@ -420,7 +423,9 @@
     "play": "Cheza",
     "pause": "Sitisha",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Washa sauti",
+    "soundOff": "Zima sauti"
   },
   "installer": {
     "installTitle": "Sakinisha ainitShot {version}",

@@ -59,7 +59,7 @@ const LEAST_WIDTH: i32 = 620;
 const CONTROLS: i32 = 96;
 /// How much of the monitor's work area the window takes at most.
 const MOST_OF_MONITOR: f32 = 0.75;
-/// A recording up to this long comes as a GIF at first, a longer one as a video.
+/// A recording up to this long comes as a GIF at first, a longer one or one with sound as a video.
 const GIF_SECONDS: f64 = 15.0;
 /// The frames a second and the width of a GIF: more only makes it much larger.
 const GIF_FRAMES: i64 = 15;
@@ -312,7 +312,9 @@ fn first_look() -> Value {
             "type": "init",
             "url": format!("https://{HOST}/{name}"),
             "seconds": recorded.seconds,
-            "format": if recorded.seconds <= GIF_SECONDS { "gif" } else { "video" },
+            // A GIF has no sound.
+            "format": if recorded.seconds <= GIF_SECONDS && recorded.voice.is_none() { "gif" } else { "video" },
+            "sound": recorded.voice.is_some(),
             "details": format!("{} fps · {}", rate.round(), recorded.way),
             "language": language.code(),
             "rightToLeft": language.right_to_left(),
@@ -342,9 +344,10 @@ fn prepare(format: Format, from: f64, to: f64) {
         window.failed = None;
         let source = window.recorded.path.clone();
         let target = source.with_file_name(format!("{number}.{}", format.extension()));
-        Some((window.window as isize, window.number.clone(), number, source, target, window.recorded.seconds))
+        let voice = window.recorded.voice.clone();
+        Some((window.window as isize, window.number.clone(), number, source, target, window.recorded.seconds, voice))
     });
-    let Some((target_window, counter, number, source, target, seconds)) = started else { return };
+    let Some((target_window, counter, number, source, target, seconds, voice)) = started else { return };
     let whole = from <= WHOLE && to >= seconds - WHOLE;
     thread::spawn(move || {
         unsafe { CoInitializeEx(None, COINIT_MULTITHREADED).ok() }.ok();
@@ -353,7 +356,7 @@ fn prepare(format: Format, from: f64, to: f64) {
         let outcome = match format {
             Format::Gif => job.make_gif(&source, &target, range),
             Format::Video if whole => job.copy(&source, &target),
-            Format::Video => job.cut(&source, &target, range),
+            Format::Video => job.cut(&source, voice.as_deref(), &target, range),
         };
         let outcome = outcome.map(|size| {
             size.map(|size| Made { bytes: fs::metadata(&target).map_or(0, |file| file.len()), path: target.clone(), format, size })
@@ -398,11 +401,12 @@ impl Job {
         Ok(Some((reader.width, reader.height)))
     }
 
-    /// A shorter video: what is kept goes through the encoder again.
-    fn cut(&self, source: &Path, target: &Path, (from, to): (i64, i64)) -> Outcome {
+    /// A shorter video: what is kept goes through the encoder again, with its part of the sound.
+    fn cut(&self, source: &Path, voice: Option<&Path>, target: &Path, (from, to): (i64, i64)) -> Outcome {
         let mut reader = Reader::open(source).map_err(|error| error.to_string())?;
         let (width, height) = (reader.width, reader.height);
-        let mut writer = Writer::create(target, width as u32, height as u32).map_err(|error| error.to_string())?;
+        let voice = voice.map(|path| (path, from, to));
+        let mut writer = Writer::create(target, width as u32, height as u32, voice).map_err(|error| error.to_string())?;
         let length = SECOND / FRAMES as i64;
         while let Some((time, pixels)) = reader.next_frame().map_err(|error| error.to_string())? {
             if self.given_up() {
@@ -759,7 +763,7 @@ mod tests {
     fn recording(folder: &Path) -> Recorded {
         let (width, height) = (640usize, 360usize);
         let path = folder.join("recording.mp4");
-        let mut writer = Writer::create(&path, width as u32, height as u32).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
         let length = SECOND / FRAMES as i64;
         for n in 0..90usize {
             let mut pixels = vec![240u8; width * height * 4];
@@ -781,7 +785,7 @@ mod tests {
             writer.write(&pixels, width * 4, n as i64 * length, length).unwrap();
         }
         writer.finish().unwrap();
-        Recorded { path, width: width as u32, height: height as u32, seconds: 3.0, frames: 90, way: "made by the test" }
+        Recorded { path, width: width as u32, height: height as u32, seconds: 3.0, frames: 90, way: "made by the test", voice: None }
     }
 
     /// How long a picture of a real screen takes to become a video and a GIF: two seconds of it
@@ -801,21 +805,36 @@ mod tests {
         fs::create_dir_all(&folder).unwrap();
         let path = folder.join("recording.mp4");
         let start = Instant::now();
-        let mut writer = Writer::create(&path, width as u32, height as u32).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
         let length = SECOND / FRAMES as i64;
         let count = 5 * FRAMES as usize;
-        for n in 0..count {
+        let shown = |n: usize| {
             let top = (n * 200 / 60).min(200) as i32;
-            let shown = picture.crop(Rect::new(0, top, width as i32, top + height as i32));
-            let mut pixels = shown.pixels;
+            let mut pixels = picture.crop(Rect::new(0, top, width as i32, top + height as i32)).pixels;
             let (x, y) = (100 + n * 7, 100 + n * 3);
             for row in y..y + 16 {
                 pixels[(row * width + x) * 4..(row * width + x + 12) * 4].fill(0);
             }
-            writer.write(&pixels, width * 4, n as i64 * length, length).unwrap();
+            pixels
+        };
+        for n in 0..count {
+            writer.write(&shown(n), width * 4, n as i64 * length, length).unwrap();
         }
         writer.finish().unwrap();
         let encoded = start.elapsed();
+        // How near to what went in the frames come out, in decibels: one going up, one nearly still.
+        let mut reader = Reader::open(&path).unwrap();
+        let (mut n, mut quality) = (0, Vec::new());
+        while let Some((_, pixels)) = reader.next_frame().unwrap() {
+            if n == 30 || n == 100 {
+                let source = shown(n);
+                let sum: f64 = pixels.iter().zip(&source).enumerate().filter(|(at, _)| at % 4 != 3).map(|(_, (&a, &b))| (a as f64 - b as f64).powi(2)).sum();
+                quality.push((10.0 * (255.0f64 * 255.0 / (sum / (pixels.len() as f64 * 0.75))).log10()).round());
+            }
+            n += 1;
+        }
+        drop(reader);
+        eprintln!("{n} frames read back, at {quality:?} dB");
         let job = Job { window: null_mut(), counter: Arc::new(AtomicU64::new(1)), number: 1 };
         let start = Instant::now();
         let target = folder.join("out.gif");
@@ -823,7 +842,7 @@ mod tests {
         let made = start.elapsed();
         let start = Instant::now();
         let cut = folder.join("cut.mp4");
-        job.cut(&path, &cut, (SECOND, 4 * SECOND)).unwrap().unwrap();
+        job.cut(&path, None, &cut, (SECOND, 4 * SECOND)).unwrap().unwrap();
         let bytes = |path: &Path| fs::metadata(path).unwrap().len() / 1024;
         eprintln!(
             "{width}x{height}: {count} frames written in {encoded:?}, {} KB; a GIF {size:?} in {made:?}, {} KB; a cut of 3 s in {:?}, {} KB",
@@ -836,6 +855,48 @@ mod tests {
             fs::copy(&target, Path::new(&keep).join("speed.gif")).unwrap();
         }
         fs::remove_dir_all(&folder).unwrap();
+    }
+
+    /// A recording with sound, so quiet that nobody hears it: the page plays it with sound, offers
+    /// to turn it off, begins as a video, and a part of it keeps its sound. It starts WebView2:
+    /// `LOCALAPPDATA=<folder> cargo test -p ainitshot a_recording_with_sound -- --ignored`.
+    #[test]
+    #[ignore]
+    fn a_recording_with_sound_plays_and_is_cut() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        let folder = std::env::temp_dir().join(format!("recorded-sound-{}", std::process::id()));
+        fs::create_dir_all(&folder).unwrap();
+        let mut recorded = recording(&folder);
+        let voice = folder.join("voice.pcm");
+        let quiet: Vec<u8> = (0..3 * 48_000).flat_map(|n: i32| (if n % 100 < 50 { 2i16 } else { -2i16 }).to_le_bytes()).collect();
+        fs::write(&voice, quiet).unwrap();
+        let mixed = folder.join("mixed.mp4");
+        crate::win::video::mix(&recorded.path, &voice, &mixed).unwrap();
+        fs::rename(&mixed, &recorded.path).unwrap();
+        recorded.voice = Some(voice);
+        open(recorded);
+        let shown = pump_until(30, || controller().is_some() && evaluate("seconds > 0 && video.readyState >= 2") == "true");
+        pump_until(2, || false);
+        let state = evaluate("[video.muted, video.paused, sound.className, format, sound.title].join(' ')");
+        let about = "about.textContent";
+        let made_after = |script: &str| {
+            evaluate(script);
+            pump_until(1, || false);
+            pump_until(30, || evaluate(about).contains('·'));
+            evaluate(about)
+        };
+        let whole = made_after("0");
+        let part = made_after("to = 1.5; draw(); prepare(); 0");
+        evaluate("sound.click()");
+        let quieted = evaluate("[video.muted, sound.title].join(' ')");
+        close();
+        browser::close();
+        pump_until(1, || false);
+        eprintln!("{state} / {whole} / {part} / {quieted}");
+        assert!(shown, "the page shows no recording");
+        assert!(state.starts_with("\"false false play video"), "{state}");
+        assert!(whole.contains("640×360") && part.contains("640×360"), "{whole} {part}");
+        assert!(quieted.starts_with("\"true"), "{quieted}");
     }
 
     /// Opens the window on a recording made here: the page plays it and seeks in it, a GIF of it

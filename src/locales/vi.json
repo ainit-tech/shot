@@ -166,7 +166,10 @@
     "Recording saved": "Đã lưu bản quay",
     "Recording saved and copied": "Đã lưu và sao chép bản quay",
     "Pause": "Tạm dừng",
-    "Save the recording?": "Lưu bản quay?"
+    "Save the recording?": "Lưu bản quay?",
+    "Turn the microphone on": "Bật micrô",
+    "Turn the microphone off": "Tắt micrô",
+    "The microphone isn't available": "Không dùng được micrô"
   },
   "settings": {
     "settings": "Cài đặt",
@@ -420,7 +423,9 @@
     "play": "Phát",
     "pause": "Tạm dừng",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Bật âm thanh",
+    "soundOff": "Tắt âm thanh"
   },
   "installer": {
     "installTitle": "Cài đặt ainitShot {version}",

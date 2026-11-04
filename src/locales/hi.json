@@ -166,7 +166,10 @@
     "Recording saved": "रिकॉर्डिंग सेव हो गई",
     "Recording saved and copied": "रिकॉर्डिंग सेव और कॉपी हो गई",
     "Pause": "रोकें",
-    "Save the recording?": "रिकॉर्डिंग सेव करें?"
+    "Save the recording?": "रिकॉर्डिंग सेव करें?",
+    "Turn the microphone on": "माइक्रोफ़ोन चालू करें",
+    "Turn the microphone off": "माइक्रोफ़ोन बंद करें",
+    "The microphone isn't available": "माइक्रोफ़ोन उपलब्ध नहीं है"
   },
   "settings": {
     "settings": "सेटिंग्स",
@@ -420,7 +423,9 @@
     "play": "चलाएँ",
     "pause": "रोकें",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "आवाज़ चालू करें",
+    "soundOff": "आवाज़ बंद करें"
   },
   "installer": {
     "installTitle": "ainitShot {version} इंस्टॉल करें",

@@ -166,7 +166,10 @@
     "Recording saved": "ضبط ذخیره شد",
     "Recording saved and copied": "ضبط ذخیره و کپی شد",
     "Pause": "مکث",
-    "Save the recording?": "ضبط ذخیره شود؟"
+    "Save the recording?": "ضبط ذخیره شود؟",
+    "Turn the microphone on": "روشن کردن میکروفون",
+    "Turn the microphone off": "خاموش کردن میکروفون",
+    "The microphone isn't available": "میکروفون در دسترس نیست"
   },
   "settings": {
     "settings": "تنظیمات",
@@ -420,7 +423,9 @@
     "play": "پخش",
     "pause": "مکث",
     "kilobytes": "کیلوبایت",
-    "megabytes": "مگابایت"
+    "megabytes": "مگابایت",
+    "soundOn": "روشن کردن صدا",
+    "soundOff": "خاموش کردن صدا"
   },
   "installer": {
     "installTitle": "نصب ainitShot {version}",

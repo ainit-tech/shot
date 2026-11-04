@@ -10,6 +10,7 @@ mod annotation;
 mod areas;
 mod card;
 mod chime;
+mod clicks;
 mod color;
 mod draw;
 mod geometry;

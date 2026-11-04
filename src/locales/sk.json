@@ -166,7 +166,10 @@
     "Recording saved": "Nahrávka je uložená",
     "Recording saved and copied": "Nahrávka je uložená a skopírovaná",
     "Pause": "Pozastaviť",
-    "Save the recording?": "Uložiť nahrávku?"
+    "Save the recording?": "Uložiť nahrávku?",
+    "Turn the microphone on": "Zapnúť mikrofón",
+    "Turn the microphone off": "Vypnúť mikrofón",
+    "The microphone isn't available": "Mikrofón nie je dostupný"
   },
   "settings": {
     "settings": "Nastavenia",
@@ -420,7 +423,9 @@
     "play": "Prehrať",
     "pause": "Pozastaviť",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Zapnúť zvuk",
+    "soundOff": "Vypnúť zvuk"
   },
   "installer": {
     "installTitle": "Inštalácia ainitShot {version}",

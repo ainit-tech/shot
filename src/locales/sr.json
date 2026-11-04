@@ -166,7 +166,10 @@
     "Recording saved": "Снимак је сачуван",
     "Recording saved and copied": "Снимак је сачуван и копиран",
     "Pause": "Пауза",
-    "Save the recording?": "Сачувати снимак?"
+    "Save the recording?": "Сачувати снимак?",
+    "Turn the microphone on": "Укључи микрофон",
+    "Turn the microphone off": "Искључи микрофон",
+    "The microphone isn't available": "Микрофон није доступан"
   },
   "settings": {
     "settings": "Подешавања",
@@ -420,7 +423,9 @@
     "play": "Пусти",
     "pause": "Пауза",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Укључи звук",
+    "soundOff": "Искључи звук"
   },
   "installer": {
     "installTitle": "Инсталација програма ainitShot {version}",

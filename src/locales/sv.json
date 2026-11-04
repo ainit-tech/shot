@@ -166,7 +166,10 @@
     "Recording saved": "Inspelningen har sparats",
     "Recording saved and copied": "Inspelningen har sparats och kopierats",
     "Pause": "Pausa",
-    "Save the recording?": "Vill du spara inspelningen?"
+    "Save the recording?": "Vill du spara inspelningen?",
+    "Turn the microphone on": "Slå på mikrofonen",
+    "Turn the microphone off": "Stäng av mikrofonen",
+    "The microphone isn't available": "Mikrofonen är inte tillgänglig"
   },
   "settings": {
     "settings": "Inställningar",
@@ -420,7 +423,9 @@
     "play": "Spela upp",
     "pause": "Pausa",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Slå på ljudet",
+    "soundOff": "Stäng av ljudet"
   },
   "installer": {
     "installTitle": "Installera ainitShot {version}",

@@ -3,7 +3,7 @@
 //! large screens. Where it can't, across two monitors, on a monitor turned on its side or in a
 //! remote session, GDI takes the picture, as the frozen screen does: it is slower, and the
 //! mouse may flicker while it reads the screen. The mouse pointer is not in the picture either
-//! way, so it is drawn over it here.
+//! way, so it is drawn over it here, on the marks of its clicks.
 
 use std::io;
 use std::ptr::null_mut;
@@ -25,16 +25,18 @@ use windows::Win32::Graphics::Dxgi::{
 };
 use windows_core::Interface;
 use windows_sys::Win32::Foundation::POINT;
+use windows_sys::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_LBUTTON, VK_RBUTTON};
 use windows_sys::Win32::Graphics::Gdi::{
     BitBlt, CAPTUREBLT, DeleteObject, GetDC, HALFTONE, ReleaseDC, SRCCOPY, SetBrushOrgEx, SetStretchBltMode, StretchBlt,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    CURSOR_SHOWING, CURSORINFO, DI_NORMAL, DrawIconEx, GetCursorInfo, GetIconInfo, HCURSOR, ICONINFO,
+    CURSOR_SHOWING, CURSORINFO, DI_NORMAL, DrawIconEx, GetCursorInfo, GetCursorPos, GetIconInfo, HCURSOR, ICONINFO,
 };
 
 use super::gdi::Buffer;
-use crate::draw::Frame;
-use crate::geometry::Rect;
+use crate::clicks::Clicks;
+use crate::draw::{self, Frame};
+use crate::geometry::{Point, Rect};
 
 /// How long to wait for the first picture of a monitor, and how often to ask for it again while
 /// another desktop has taken over: a password prompt of Windows.
@@ -50,12 +52,17 @@ pub struct Grab {
     card: Option<Card>,
     /// The pointer drawn last and its hot spot.
     pointer: Option<(HCURSOR, POINT)>,
+    clicks: Clicks,
+    /// The panel of the recording: a click on it is not a part of what is shown.
+    panel: Rect,
+    /// The scale of the screen in the picture.
+    scale: f32,
 }
 
 impl Grab {
     /// Sees `area` of the desktop as a picture of `size`, smaller than the area if the area is
-    /// too large for a video.
-    pub fn new(area: Rect, size: (u32, u32)) -> io::Result<Grab> {
+    /// too large for a video; `scale` is that of the screen, and `panel` where the panel is.
+    pub fn new(area: Rect, size: (u32, u32), scale: f32, panel: Rect) -> io::Result<Grab> {
         let buffer = Buffer::new(size.0, size.1)?;
         let same_size = (area.width() as u32, area.height() as u32) == size;
         let card = same_size.then(|| Card::new(area)).and_then(|card| match card {
@@ -65,7 +72,16 @@ impl Grab {
                 None
             }
         });
-        Ok(Grab { area, buffer, card, pointer: None })
+        let scale = scale * size.0 as f32 / area.width().max(1) as f32;
+        Ok(Grab { area, buffer, card, pointer: None, clicks: Clicks::default(), panel, scale })
+    }
+
+    /// Forgets the clicks before the recording.
+    pub fn forget_clicks(&self) {
+        unsafe {
+            GetAsyncKeyState(VK_LBUTTON as i32);
+            GetAsyncKeyState(VK_RBUTTON as i32);
+        }
     }
 
     /// The way the screen is seen, for what is reported of a recording.
@@ -73,8 +89,9 @@ impl Grab {
         if self.card.is_some() { "the graphics card" } else { "GDI" }
     }
 
-    /// The picture of this moment: four bytes a pixel, rows from the top.
-    pub fn take(&mut self) -> io::Result<Frame<'_>> {
+    /// The picture of this moment, `time` into the recording: four bytes a pixel, rows from the
+    /// top.
+    pub fn take(&mut self, time: Duration) -> io::Result<Frame<'_>> {
         let taken = match &mut self.card {
             Some(card) => card.take(&mut self.buffer).map_err(io::Error::other),
             None => self.read_screen(),
@@ -87,8 +104,36 @@ impl Grab {
             eprintln!("The graphics card stopped handing the screen over: {problem}");
             self.read_screen()?;
         }
+        self.mark_clicks(time);
         self.draw_pointer();
         Ok(self.buffer.frame())
+    }
+
+    /// Where a point of the desktop is in the picture. Across a picture smaller than the area,
+    /// the mouse goes as much slower.
+    fn in_picture(&mut self, point: POINT) -> (f32, f32) {
+        let frame = self.buffer.frame();
+        let across = |at: i32, start: i32, length: i32, size: u32| (at - start) as f32 * size as f32 / length.max(1) as f32;
+        (across(point.x, self.area.left, self.area.width(), frame.width), across(point.y, self.area.top, self.area.height(), frame.height))
+    }
+
+    /// Looks at the mouse's buttons, and draws the marks of its clicks over the picture.
+    fn mark_clicks(&mut self, time: Duration) {
+        let mut mouse = POINT::default();
+        let buttons = unsafe {
+            GetCursorPos(&mut mouse);
+            GetAsyncKeyState(VK_LBUTTON as i32) as u16 | GetAsyncKeyState(VK_RBUTTON as i32) as u16
+        };
+        let free = !self.panel.contains(Point::new(mouse.x, mouse.y));
+        let (pressed, down) = (buttons & 1 != 0 && free, buttons & 0x8000 != 0 && free);
+        let at = self.in_picture(mouse);
+        let seconds = time.as_secs_f32();
+        self.clicks.update(seconds, at, pressed, down);
+        let marks = self.clicks.marks(seconds, self.scale);
+        let mut frame = self.buffer.frame();
+        for mark in &marks {
+            draw::click_mark(&mut frame, mark, self.scale);
+        }
     }
 
     fn read_screen(&mut self) -> io::Result<()> {
@@ -128,15 +173,8 @@ impl Grab {
                 spot
             }
         };
-        let (width, height) = {
-            let frame = self.buffer.frame();
-            (frame.width as i64, frame.height as i64)
-        };
-        // Across a picture smaller than the area, the pointer goes as much slower.
-        let across = |at: i32, start: i32, length: i32, size: i64| ((at - start) as i64 * size / length.max(1) as i64) as i32;
-        let x = across(info.ptScreenPos.x, self.area.left, self.area.width(), width) - spot.x;
-        let y = across(info.ptScreenPos.y, self.area.top, self.area.height(), height) - spot.y;
-        unsafe { DrawIconEx(self.buffer.dc(), x, y, info.hCursor, 0, 0, 0, null_mut(), DI_NORMAL) };
+        let (x, y) = self.in_picture(info.ptScreenPos);
+        unsafe { DrawIconEx(self.buffer.dc(), x as i32 - spot.x, y as i32 - spot.y, info.hCursor, 0, 0, 0, null_mut(), DI_NORMAL) };
     }
 }
 

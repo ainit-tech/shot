@@ -166,7 +166,10 @@
     "Recording saved": "録画を保存しました",
     "Recording saved and copied": "録画を保存してコピーしました",
     "Pause": "一時停止",
-    "Save the recording?": "録画を保存しますか？"
+    "Save the recording?": "録画を保存しますか？",
+    "Turn the microphone on": "マイクをオンにする",
+    "Turn the microphone off": "マイクをオフにする",
+    "The microphone isn't available": "マイクを使用できません"
   },
   "settings": {
     "settings": "設定",
@@ -420,7 +423,9 @@
     "play": "再生",
     "pause": "一時停止",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "音声をオンにする",
+    "soundOff": "音声をオフにする"
   },
   "installer": {
     "installTitle": "ainitShot {version} のインストール",

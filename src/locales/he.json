@@ -166,7 +166,10 @@
     "Recording saved": "ההקלטה נשמרה",
     "Recording saved and copied": "ההקלטה נשמרה והועתקה",
     "Pause": "השהיה",
-    "Save the recording?": "לשמור את ההקלטה?"
+    "Save the recording?": "לשמור את ההקלטה?",
+    "Turn the microphone on": "הפעלת המיקרופון",
+    "Turn the microphone off": "כיבוי המיקרופון",
+    "The microphone isn't available": "המיקרופון אינו זמין"
   },
   "settings": {
     "settings": "הגדרות",
@@ -420,7 +423,9 @@
     "play": "הפעלה",
     "pause": "השהיה",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "הפעלת הצליל",
+    "soundOff": "השתקת הצליל"
   },
   "installer": {
     "installTitle": "התקנת ainitShot {version}",

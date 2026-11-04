@@ -166,7 +166,10 @@
     "Recording saved": "Opptaket er lagret",
     "Recording saved and copied": "Opptaket er lagret og kopiert",
     "Pause": "Pause",
-    "Save the recording?": "Vil du lagre opptaket?"
+    "Save the recording?": "Vil du lagre opptaket?",
+    "Turn the microphone on": "Slå på mikrofonen",
+    "Turn the microphone off": "Slå av mikrofonen",
+    "The microphone isn't available": "Mikrofonen er ikke tilgjengelig"
   },
   "settings": {
     "settings": "Innstillinger",
@@ -420,7 +423,9 @@
     "play": "Spill av",
     "pause": "Pause",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Slå på lyden",
+    "soundOff": "Slå av lyden"
   },
   "installer": {
     "installTitle": "Installer ainitShot {version}",

@@ -166,7 +166,10 @@
     "Recording saved": "녹화를 저장했습니다",
     "Recording saved and copied": "녹화를 저장하고 복사했습니다",
     "Pause": "일시 정지",
-    "Save the recording?": "녹화를 저장할까요?"
+    "Save the recording?": "녹화를 저장할까요?",
+    "Turn the microphone on": "마이크 켜기",
+    "Turn the microphone off": "마이크 끄기",
+    "The microphone isn't available": "마이크를 사용할 수 없습니다"
   },
   "settings": {
     "settings": "설정",
@@ -420,7 +423,9 @@
     "play": "재생",
     "pause": "일시 정지",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "소리 켜기",
+    "soundOff": "소리 끄기"
   },
   "installer": {
     "installTitle": "ainitShot {version} 설치",

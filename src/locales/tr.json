@@ -166,7 +166,10 @@
     "Recording saved": "Kayıt kaydedildi",
     "Recording saved and copied": "Kayıt kaydedildi ve kopyalandı",
     "Pause": "Duraklat",
-    "Save the recording?": "Kayıt kaydedilsin mi?"
+    "Save the recording?": "Kayıt kaydedilsin mi?",
+    "Turn the microphone on": "Mikrofonu aç",
+    "Turn the microphone off": "Mikrofonu kapat",
+    "The microphone isn't available": "Mikrofon kullanılamıyor"
   },
   "settings": {
     "settings": "Ayarlar",
@@ -420,7 +423,9 @@
     "play": "Oynat",
     "pause": "Duraklat",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Sesi aç",
+    "soundOff": "Sesi kapat"
   },
   "installer": {
     "installTitle": "ainitShot {version} kurulumu",

@@ -166,7 +166,10 @@
     "Recording saved": "บันทึกวิดีโอแล้ว",
     "Recording saved and copied": "บันทึกวิดีโอและคัดลอกแล้ว",
     "Pause": "หยุดชั่วคราว",
-    "Save the recording?": "บันทึกวิดีโอนี้ไหม"
+    "Save the recording?": "บันทึกวิดีโอนี้ไหม",
+    "Turn the microphone on": "เปิดไมโครโฟน",
+    "Turn the microphone off": "ปิดไมโครโฟน",
+    "The microphone isn't available": "ใช้ไมโครโฟนไม่ได้"
   },
   "settings": {
     "settings": "การตั้งค่า",
@@ -420,7 +423,9 @@
     "play": "เล่น",
     "pause": "หยุดชั่วคราว",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "เปิดเสียง",
+    "soundOff": "ปิดเสียง"
   },
   "installer": {
     "installTitle": "ติดตั้ง ainitShot {version}",

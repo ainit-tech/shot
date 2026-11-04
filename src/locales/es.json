@@ -166,7 +166,10 @@
     "Recording saved": "Grabación guardada",
     "Recording saved and copied": "Grabación guardada y copiada",
     "Pause": "Pausar",
-    "Save the recording?": "¿Guardar la grabación?"
+    "Save the recording?": "¿Guardar la grabación?",
+    "Turn the microphone on": "Activar el micrófono",
+    "Turn the microphone off": "Desactivar el micrófono",
+    "The microphone isn't available": "El micrófono no está disponible"
   },
   "settings": {
     "settings": "Ajustes",
@@ -420,7 +423,9 @@
     "play": "Reproducir",
     "pause": "Pausar",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Activar el sonido",
+    "soundOff": "Desactivar el sonido"
   },
   "installer": {
     "installTitle": "Instalar ainitShot {version}",

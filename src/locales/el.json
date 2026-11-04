@@ -166,7 +166,10 @@
     "Recording saved": "Η εγγραφή αποθηκεύτηκε",
     "Recording saved and copied": "Η εγγραφή αποθηκεύτηκε και αντιγράφηκε",
     "Pause": "Παύση",
-    "Save the recording?": "Να αποθηκευτεί η εγγραφή;"
+    "Save the recording?": "Να αποθηκευτεί η εγγραφή;",
+    "Turn the microphone on": "Ενεργοποίηση μικροφώνου",
+    "Turn the microphone off": "Απενεργοποίηση μικροφώνου",
+    "The microphone isn't available": "Το μικρόφωνο δεν είναι διαθέσιμο"
   },
   "settings": {
     "settings": "Ρυθμίσεις",
@@ -420,7 +423,9 @@
     "play": "Αναπαραγωγή",
     "pause": "Παύση",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Ενεργοποίηση ήχου",
+    "soundOff": "Απενεργοποίηση ήχου"
   },
   "installer": {
     "installTitle": "Εγκατάσταση του ainitShot {version}",

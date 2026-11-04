@@ -69,7 +69,7 @@ The mouse shows what it would do: a hand over a handle, a cross of arrows over a
 | Copy | Ctrl+C, Enter | Puts the screenshot into the clipboard |
 | Copy text | Ctrl+Shift+C | Reads the text in the screenshot with the text recognition built into Windows, on the computer, and puts it into the clipboard ([decision](decisions/010-copying-text-with-windows.md)) |
 | Save | Ctrl+S | Saves the screenshot to a PNG file in the folder from the settings and puts it into the clipboard too; Ctrl+Shift+S asks where |
-| Record | Ctrl+R | Records what is selected: the screen goes on living inside a frame, and the result is a GIF or a video ([decision](decisions/017-recording-the-screen.md)) |
+| Record | Ctrl+R | Records what is selected: the screen goes on living inside a frame, clicks show in the recording, the microphone is a switch on the way, and the result is a GIF or a video ([decision](decisions/017-recording-the-screen.md)) |
 | Ask Google | G | A query to Google's AI mode: who or what is in the picture; the conversation comes out next to the selection, to ask further; held, it asks one's own question aloud |
 | Translate | T | A query to Google's AI mode: translate the text in the picture; the translation alone shows in a card next to the selection |
 | Search by image in Google | I | An image search in Google: the picture alone, to find where it comes from and where else it is; the exact matches, the pages with this very picture, come out next to the selection |

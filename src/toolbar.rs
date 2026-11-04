@@ -26,6 +26,7 @@ pub enum Button {
     Query(usize),
     Close,
     // The panel of a recording.
+    Microphone,
     Pause,
     Resume,
     Stop,
@@ -122,7 +123,7 @@ impl Toolbar {
     /// The panel of a recording, in a window of its own: `room` pixels for the time and then its
     /// buttons.
     pub fn recording(room: i32, paused: bool, scale: f32) -> Toolbar {
-        let group = vec![if paused { Button::Resume } else { Button::Pause }, Button::Stop];
+        let group = vec![Button::Microphone, if paused { Button::Resume } else { Button::Pause }, Button::Stop];
         let rect = Rect::new(0, 0, room + length(std::slice::from_ref(&group), scale), thickness(scale));
         let inner = Rect::new(room, rect.top, rect.right, rect.bottom);
         Toolbar { rect, ..Toolbar::place(&[group], inner, false, scale, Side::Bottom, rect) }
@@ -402,11 +403,12 @@ mod tests {
     fn the_buttons_of_a_recording_change_with_it() {
         let going = Toolbar::recording(80, false, 1.0);
         let paused = Toolbar::recording(80, true, 1.0);
-        assert_eq!(going.hit(Point::new(100, 20)), Some(Button::Pause));
-        assert_eq!(paused.hit(Point::new(100, 20)), Some(Button::Resume));
-        assert_eq!(going.hit(Point::new(130, 20)), Some(Button::Stop));
+        assert_eq!(going.hit(Point::new(100, 20)), Some(Button::Microphone));
+        assert_eq!(going.hit(Point::new(130, 20)), Some(Button::Pause));
+        assert_eq!(paused.hit(Point::new(130, 20)), Some(Button::Resume));
+        assert_eq!(going.hit(Point::new(160, 20)), Some(Button::Stop));
         assert_eq!(going.hit(Point::new(30, 20)), None);
-        assert_eq!(going.rect.width(), 80 + 4 + 32 + 32 + 4);
+        assert_eq!(going.rect.width(), 80 + 4 + 32 + 32 + 32 + 4);
     }
 
     #[test]

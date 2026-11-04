@@ -166,7 +166,10 @@
     "Recording saved": "Regjistrimi u ruajt",
     "Recording saved and copied": "Regjistrimi u ruajt dhe u kopjua",
     "Pause": "Pauzë",
-    "Save the recording?": "Të ruhet regjistrimi?"
+    "Save the recording?": "Të ruhet regjistrimi?",
+    "Turn the microphone on": "Ndiz mikrofonin",
+    "Turn the microphone off": "Fik mikrofonin",
+    "The microphone isn't available": "Mikrofoni nuk është i disponueshëm"
   },
   "settings": {
     "settings": "Cilësimet",
@@ -420,7 +423,9 @@
     "play": "Luaj",
     "pause": "Pauzë",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Ndiz zërin",
+    "soundOff": "Fik zërin"
   },
   "installer": {
     "installTitle": "Instalo ainitShot {version}",

@@ -166,7 +166,10 @@
     "Recording saved": "ရိုက်ကူးထားသည်ကို သိမ်းပြီးပါပြီ",
     "Recording saved and copied": "ရိုက်ကူးထားသည်ကို သိမ်းပြီး ကူးယူပြီးပါပြီ",
     "Pause": "ခဏရပ်ရန်",
-    "Save the recording?": "ရိုက်ကူးထားသည်ကို သိမ်းမလား။"
+    "Save the recording?": "ရိုက်ကူးထားသည်ကို သိမ်းမလား။",
+    "Turn the microphone on": "မိုက်ခရိုဖုန်း ဖွင့်ရန်",
+    "Turn the microphone off": "မိုက်ခရိုဖုန်း ပိတ်ရန်",
+    "The microphone isn't available": "မိုက်ခရိုဖုန်း အသုံးမပြုနိုင်ပါ"
   },
   "settings": {
     "settings": "ဆက်တင်များ",
@@ -420,7 +423,9 @@
     "play": "ဖွင့်ရန်",
     "pause": "ခဏရပ်ရန်",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "အသံ ဖွင့်ရန်",
+    "soundOff": "အသံ ပိတ်ရန်"
   },
   "installer": {
     "installTitle": "ainitShot {version} ကို တပ်ဆင်ရန်",

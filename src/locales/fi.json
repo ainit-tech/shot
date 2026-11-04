@@ -166,7 +166,10 @@
     "Recording saved": "Nauhoitus tallennettu",
     "Recording saved and copied": "Nauhoitus tallennettu ja kopioitu",
     "Pause": "Tauko",
-    "Save the recording?": "Tallennetaanko nauhoitus?"
+    "Save the recording?": "Tallennetaanko nauhoitus?",
+    "Turn the microphone on": "Laita mikrofoni päälle",
+    "Turn the microphone off": "Laita mikrofoni pois",
+    "The microphone isn't available": "Mikrofoni ei ole käytettävissä"
   },
   "settings": {
     "settings": "Asetukset",
@@ -420,7 +423,9 @@
     "play": "Toista",
     "pause": "Tauko",
     "kilobytes": "kt",
-    "megabytes": "Mt"
+    "megabytes": "Mt",
+    "soundOn": "Laita ääni päälle",
+    "soundOff": "Laita ääni pois"
   },
   "installer": {
     "installTitle": "Asenna ainitShot {version}",

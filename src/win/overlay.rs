@@ -867,7 +867,7 @@ impl Overlay {
             Button::Record => self.record(),
             Button::Query(i) => self.query(i),
             Button::Close => self.close(),
-            Button::Pause | Button::Resume | Button::Stop => {}
+            Button::Microphone | Button::Pause | Button::Resume | Button::Stop => {}
         }
     }
 
@@ -1888,7 +1888,7 @@ impl Session {
                 }
             }
             Button::Close => tr("Close · Esc").into(),
-            Button::Pause | Button::Resume | Button::Stop => String::new(),
+            Button::Microphone | Button::Pause | Button::Resume | Button::Stop => String::new(),
         }
     }
 
@@ -2028,6 +2028,7 @@ impl Session {
             width: self.width,
             can_undo: !self.history.is_empty(),
             can_pause: false,
+            voice: None,
             busy: self.sending.as_ref().map(|s| s.button).or(self.listening.as_ref().map(|l| l.button)),
             listening: self.listening.as_ref().is_some_and(|l| l.on && (!l.released || l.words.is_empty())),
             queries: &queries,
@@ -2363,6 +2364,7 @@ mod tests {
             width: 4.0,
             can_undo: true,
             can_pause: false,
+            voice: None,
             busy: None,
             listening: false,
             queries: &queries,

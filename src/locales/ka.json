@@ -166,7 +166,10 @@
     "Recording saved": "ჩანაწერი შენახულია",
     "Recording saved and copied": "ჩანაწერი შენახულია და დაკოპირებულია",
     "Pause": "პაუზა",
-    "Save the recording?": "შევინახო ჩანაწერი?"
+    "Save the recording?": "შევინახო ჩანაწერი?",
+    "Turn the microphone on": "მიკროფონის ჩართვა",
+    "Turn the microphone off": "მიკროფონის გამორთვა",
+    "The microphone isn't available": "მიკროფონი მიუწვდომელია"
   },
   "settings": {
     "settings": "პარამეტრები",
@@ -420,7 +423,9 @@
     "play": "დაკვრა",
     "pause": "პაუზა",
     "kilobytes": "კბ",
-    "megabytes": "მბ"
+    "megabytes": "მბ",
+    "soundOn": "ხმის ჩართვა",
+    "soundOff": "ხმის გამორთვა"
   },
   "installer": {
     "installTitle": "ainitShot {version}-ის ინსტალაცია",

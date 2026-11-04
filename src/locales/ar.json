@@ -166,7 +166,10 @@
     "Recording saved": "تم حفظ التسجيل",
     "Recording saved and copied": "تم حفظ التسجيل ونسخه",
     "Pause": "إيقاف مؤقت",
-    "Save the recording?": "هل تريد حفظ التسجيل؟"
+    "Save the recording?": "هل تريد حفظ التسجيل؟",
+    "Turn the microphone on": "تشغيل الميكروفون",
+    "Turn the microphone off": "إيقاف الميكروفون",
+    "The microphone isn't available": "الميكروفون غير متاح"
   },
   "settings": {
     "settings": "الإعدادات",
@@ -420,7 +423,9 @@
     "play": "تشغيل",
     "pause": "إيقاف مؤقت",
     "kilobytes": "كيلوبايت",
-    "megabytes": "ميغابايت"
+    "megabytes": "ميغابايت",
+    "soundOn": "تشغيل الصوت",
+    "soundOff": "كتم الصوت"
   },
   "installer": {
     "installTitle": "تثبيت ainitShot {version}",

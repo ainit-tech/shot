@@ -166,7 +166,10 @@
     "Recording saved": "Felvétel mentve",
     "Recording saved and copied": "Felvétel mentve és másolva",
     "Pause": "Szünet",
-    "Save the recording?": "Menti a felvételt?"
+    "Save the recording?": "Menti a felvételt?",
+    "Turn the microphone on": "Mikrofon bekapcsolása",
+    "Turn the microphone off": "Mikrofon kikapcsolása",
+    "The microphone isn't available": "A mikrofon nem érhető el"
   },
   "settings": {
     "settings": "Beállítások",
@@ -420,7 +423,9 @@
     "play": "Lejátszás",
     "pause": "Szünet",
     "kilobytes": "KB",
-    "megabytes": "MB"
+    "megabytes": "MB",
+    "soundOn": "Hang bekapcsolása",
+    "soundOff": "Hang kikapcsolása"
   },
   "installer": {
     "installTitle": "Az ainitShot {version} telepítése",
