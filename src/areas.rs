@@ -8,7 +8,10 @@
 //! the window, its frame, there is no area. A surface that goes on smoothly past its colour, a
 //! gradient or a wallpaper of little drawings, is filled on the picture smoothed of them. Tables,
 //! found by the rhythm of their rows, and grids, found by their cells, light up whole, whatever
-//! the colours of the cells.
+//! the colours of the cells, and so do pictures. What stands on a surface is read as a page is:
+//! things one under another that begin at the same place are a stack, a column or a card; a stack
+//! is cut into articles along the lines across it; stacks side by side are a group. The mouse on an
+//! article lights it up, the mouse between two of them what they are both in.
 
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
@@ -67,6 +70,29 @@ const LIT_ROW: (f32, f32) = (12.0, 80.0);
 const CELL: (f32, f32) = (16.0, 12.0);
 /// A block no more of whose box than this is furniture is sparse, as text is.
 const SPARSE: f32 = 0.3;
+/// Sparse content gives way to the room around it when it is this much of the room, as the text
+/// of a card, or when the room is no more than this much of the window, as a sidebar: a paragraph
+/// is an area only in a large room, as an article's.
+const MOSTLY: f32 = 0.5;
+const MODERATE: f32 = 0.4;
+/// A busy part of a window this much of whose box is busy is a picture, if it is no more than this
+/// much of the window.
+const DENSE: f32 = 0.25;
+const PICTURE_MOST: f32 = 0.5;
+/// Things one under another no further apart than this make a stack, and stacks side by side no
+/// further apart than this a group.
+const STACK_GAP: f32 = 40.0;
+const GROUP_GAP: f32 = 40.0;
+/// How long a line is that parts the articles of a stack, and how much of what it is may stop short
+/// of the stack's right side.
+const RULE_LONG: f32 = 100.0;
+const RULE_SHORT: f32 = 60.0;
+/// The mouse this near a block, outside it, is at the block; near two, between them.
+const NEAR: f32 = 24.0;
+/// The space left around the text of a block that lights up.
+const MARGIN: f32 = 4.0;
+/// A surface of this many pixels is too large to be another one of the same box and about the size.
+const LARGE: u32 = 10_000;
 /// What is around a box is busy when this much of its neighbouring pixels are apart.
 const BUSY: f32 = 0.015;
 /// How thick a line between things is, and how far things may be off one another by.
@@ -120,6 +146,8 @@ impl Areas {
 
 /// The rooms of a surface, over the box of the window that holds them.
 struct Rooms {
+    /// The box and the size of the surface.
+    surface: (Rect, u32),
     crop: Rect,
     /// The room of every pixel of the box, 0 for none.
     labels: Vec<u32>,
@@ -127,6 +155,7 @@ struct Rooms {
     /// The box of every room, in the window.
     boxes: Vec<Rect>,
     furnished: HashMap<u32, Rc<Furnished>>,
+    layout: Layout,
 }
 
 impl Rooms {
@@ -146,6 +175,93 @@ struct Furnished {
     blocks: Vec<u32>,
     /// The box of every block, and whether it is sparse, as text is.
     boxes: HashMap<u32, (Rect, bool)>,
+}
+
+/// A thing standing on a surface, a line of text or a picture: what stacks are made of.
+#[derive(Clone, Copy)]
+struct Thing {
+    rect: Rect,
+    picture: bool,
+}
+
+/// A part of a stack between the lines across it, or a stack that has none.
+struct Article {
+    rect: Rect,
+    pictured: bool,
+}
+
+/// Things one under another that begin at the same place: a column, a card.
+struct Stack {
+    rect: Rect,
+    articles: Vec<Article>,
+    pictured: bool,
+}
+
+/// Stacks side by side, three columns, a row of cards; or a stack alone.
+struct Group {
+    rect: Rect,
+    stacks: Vec<Stack>,
+}
+
+impl Group {
+    /// Whether a stack is arranged as a page is, not plain lines of text one under another, which
+    /// are paragraphs rather than an article.
+    fn arranged(&self, stack: &Stack) -> bool {
+        self.stacks.len() > 1 || stack.articles.len() > 1 || stack.pictured
+    }
+
+    fn pictured(&self) -> bool {
+        self.stacks.iter().any(|stack| stack.pictured)
+    }
+}
+
+/// What stands on a surface, as it is read.
+#[derive(Default)]
+struct Layout {
+    groups: Vec<Group>,
+}
+
+impl Layout {
+    /// What lights up with the mouse at a point: an article it is on or near; what two of them
+    /// are both in, if it is between them; the group, if it is in the group's empty space. With
+    /// whether a picture is in it.
+    fn at(&self, p: Point, near: i32) -> Option<(Rect, bool)> {
+        let away = |r: Rect| (r.left - p.x).max(p.x + 1 - r.right).max(r.top - p.y).max(p.y + 1 - r.bottom).max(0);
+        let mut around: Vec<(&Group, &Stack, &Article)> = Vec::new();
+        for group in &self.groups {
+            for stack in group.stacks.iter().filter(|stack| group.arranged(stack)) {
+                for article in &stack.articles {
+                    match away(article.rect) {
+                        0 => return Some((article.rect, article.pictured)),
+                        distance if distance <= near => around.push((group, stack, article)),
+                        _ => {}
+                    }
+                }
+            }
+        }
+        let Some(&(group, stack, article)) = around.first() else {
+            let inside = self.groups.iter().find(|group| group.stacks.len() > 1 && group.rect.contains(p))?;
+            return Some((inside.rect, inside.pictured()));
+        };
+        if around.len() == 1 {
+            Some((article.rect, article.pictured))
+        } else if around.iter().all(|(_, other, _)| std::ptr::eq(*other, stack)) {
+            Some((stack.rect, stack.pictured))
+        } else if around.iter().all(|(other, _, _)| std::ptr::eq(*other, group)) {
+            Some((group.rect, group.pictured()))
+        } else {
+            None
+        }
+    }
+}
+
+/// The room under a point, worth a screenshot.
+struct Found {
+    room: Rect,
+    /// The block of furniture under the point, with whether it is sparse.
+    block: Option<(Rect, bool)>,
+    /// The surface it is on, by its number in `rooms`; none for a grid.
+    rooms: Option<usize>,
 }
 
 /// A line of text: the height of its middle and its box.
@@ -179,6 +295,7 @@ struct Filling {
     chained: HashMap<u32, usize>,
     rooms: Vec<Rooms>,
     tables: Option<Vec<Rect>>,
+    pictures: Vec<Rect>,
 }
 
 impl Filling {
@@ -221,6 +338,7 @@ impl Filling {
             chained: HashMap::new(),
             rooms: Vec::new(),
             tables: None,
+            pictures: Vec::new(),
         }
     }
 
@@ -247,36 +365,49 @@ impl Filling {
         if let Some(table) = self.tables.iter().flatten().find(|table| table.contains(p)) {
             return Some(*table);
         }
-        let (room, block) = self.room_at(x, y)?;
-        // A point on a thin outgrowth of a room, as an address bar on the surface of the panel
-        // under it, is on the window's frame rather than in the room.
-        if !room.contains(p) {
-            return None;
+        // So does a picture, whatever is in it.
+        if let Some(picture) = self.pictures.iter().find(|picture| picture.contains(p)) {
+            return Some(*picture);
         }
+        let Found { room, block, rooms } = self.room_at(x, y)?;
         // The window's frame: thin bands across its top or its bottom, a title bar, toolbars, an
         // address bar, a status bar.
         let band = room.height() < self.px(FRAME) && room.width() as f32 >= ACROSS_MOST * self.w as f32;
         if band && (room.bottom as f32 <= FRAME_TOP * self.h as f32 || room.top as f32 >= (1.0 - FRAME_BOTTOM) * self.h as f32) {
             return None;
         }
+        // What stands on the surface, as the mouse comes to it: text gives way to a room it fills,
+        // or to a small room, as a card, a sidebar.
+        let window = size(self.bounds());
+        if let Some(rooms) = rooms
+            && let Some((block, pictured)) = self.rooms[rooms].layout.at(p, self.px(NEAR))
+            && (pictured || (size(block) < MOSTLY * size(room) && size(room) > MODERATE * window))
+            && size(block) < MOST * window
+        {
+            return Some(block.inflate(self.px(MARGIN)).intersect(self.bounds()));
+        }
+        // A point on a thin outgrowth of a room, as an address bar on the surface of the panel
+        // under it, is on the window's frame rather than in the room.
+        if !room.contains(p) {
+            return None;
+        }
         let mut area = room;
         if let Some((block, sparse)) = block
             && self.big(block, BLOCK)
             && size(block) <= 0.8 * size(room)
-            && !(sparse && (size(block) >= 0.5 * size(room) || size(room) <= 0.4 * size(self.bounds())))
+            && !(sparse && (size(block) >= MOSTLY * size(room) || size(room) <= MODERATE * window))
         {
             area = block;
         }
-        (size(area) < MOST * size(self.bounds())).then(|| self.bordered(area))
+        (size(area) < MOST * window).then(|| self.bordered(area))
     }
 
     fn big(&self, rect: Rect, least: (f32, f32)) -> bool {
         rect.width() >= self.px(least.0) && rect.height() >= self.px(least.1)
     }
 
-    /// The room under the point, worth a screenshot, and the block of furniture under the point
-    /// with whether it is sparse, if there is one.
-    fn room_at(&mut self, x: i32, y: i32) -> Option<(Rect, Option<(Rect, bool)>)> {
+    /// The room under the point, worth a screenshot.
+    fn room_at(&mut self, x: i32, y: i32) -> Option<Found> {
         let (mut px, mut py) = (x, y);
         for _ in 0..4 {
             let (colour, seed) = self.surface_at(px, py)?;
@@ -296,7 +427,7 @@ impl Filling {
             }
             // A cell of a grid: the grid, whatever stands in its cells.
             if let Some(grid) = self.lattice(colour, label) {
-                return Some((grid, None));
+                return Some(Found { room: grid, block: None, rooms: None });
             }
             let furnished = self.furnished(rooms, room_id);
             let room = furnished.room;
@@ -305,7 +436,7 @@ impl Filling {
                     let at = (y - room.top) as usize * room.width() as usize + (x - room.left) as usize;
                     furnished.boxes.get(&furnished.blocks[at]).copied()
                 });
-                return Some((room, block.flatten()));
+                return Some(Found { room, block: block.flatten(), rooms: Some(rooms) });
             }
             // Too small a room, a button, a field, a lit row: the surface around it.
             (px, py) = self.around(room, x, y);
@@ -670,6 +801,17 @@ impl Filling {
         if let Some(&known) = self.known.get(&(tone, label)) {
             return known;
         }
+        // A large surface found again by a colour of a neighbouring tone, near text, is the same
+        // surface: what lights up on it doesn't change from a point to the next.
+        let found = (surfaces.boxes[label as usize], surfaces.sizes[label as usize]);
+        let again = self.rooms.iter().position(|rooms| {
+            let (rect, size) = rooms.surface;
+            rect == found.0 && size >= LARGE && size.abs_diff(found.1) <= size / 50
+        });
+        if let Some(known) = again {
+            self.known.insert((tone, label), known);
+            return known;
+        }
         let (joined, lit) = self.lit_rows(&surfaces, label);
         let mut rect = joined.iter().fold(Rect::default(), |rect, &n| rect.union(surfaces.boxes[n as usize]));
         let mut own = vec![false; rect.width() as usize * rect.height() as usize];
@@ -712,7 +854,9 @@ impl Filling {
                 }
             }
         }
-        self.rooms.push(self.divide(&own, rect));
+        let mut rooms = self.divide(&own, rect, chained.is_none());
+        rooms.surface = found;
+        self.rooms.push(rooms);
         let number = self.rooms.len() - 1;
         for n in joined {
             self.known.insert((tone, n), number);
@@ -723,8 +867,9 @@ impl Filling {
         number
     }
 
-    /// The rooms of a surface, `own` over the box `rect`.
-    fn divide(&self, own: &[bool], rect: Rect) -> Rooms {
+    /// The rooms of a surface, `own` over the box `rect`, and what stands on it, if it is `plain`:
+    /// the little drawings of a wallpaper don't stand in columns.
+    fn divide(&self, own: &[bool], rect: Rect, plain: bool) -> Rooms {
         // What is around the surface, far enough to see the walls along it whole, with the tables
         // that stand on it.
         let stands = |table: &Rect| {
@@ -743,6 +888,13 @@ impl Filling {
             let from = (y - rect.top) as usize * rect.width() as usize;
             let to = (y - crop.top) as usize * cw + (rect.left - crop.left) as usize;
             inside[to..to + rect.width() as usize].copy_from_slice(&own[from..from + rect.width() as usize]);
+        }
+        // A picture is whole: the surface doesn't go in at a dark side of it.
+        for common in self.pictures.iter().map(|picture| picture.intersect(crop)).filter(|common| !common.is_empty()) {
+            for y in common.top..common.bottom {
+                let start = (y - crop.top) as usize * cw + (common.left - crop.left) as usize;
+                inside[start..start + common.width() as usize].fill(false);
+            }
         }
         let own = inside;
         // A wall is a bar alike all along: a line, a scroll bar; not a line of text.
@@ -782,13 +934,156 @@ impl Filling {
                 }
             }
         }
+        // The lines between the articles of a stack part the articles, not the room.
+        let lines: Vec<bool> = across.iter().zip(&tall).map(|(across, tall)| *across && !tall).collect();
+        let (layout, rules) = if plain { self.arrange(&furniture, &lines, crop) } else { (Layout::default(), Vec::new()) };
+        for rule in rules {
+            for y in rule.top..rule.bottom {
+                let start = (y - crop.top) as usize * cw + (rule.left - crop.left) as usize;
+                for i in start..start + rule.width() as usize {
+                    furniture[i] |= !own[i];
+                }
+            }
+        }
         let space: Vec<bool> = own.iter().zip(&furniture).map(|(own, furniture)| *own || *furniture).collect();
         let distance = distances(&space, cw, false);
         let mut labels = basins(&distance, cw, self.scale * LEAST_DOOR);
         bands(&mut labels, &furniture, cw, self.px(FRAME), (200.0 * self.scale * self.scale) as u32, self.px(20.0));
         let count = labels.iter().copied().max().unwrap_or(0);
         let boxes = measure(&labels, cw, count).into_iter().map(|rect| rect.offset(crop.left, crop.top)).collect();
-        Rooms { crop, labels, furniture, boxes, furnished: HashMap::new() }
+        Rooms { surface: (rect, 0), crop, labels, furniture, boxes, furnished: HashMap::new(), layout }
+    }
+
+    /// What stands on a surface, from its furniture over `crop` and the thin lines across it: the
+    /// groups of stacks, and the lines that part the articles of a stack.
+    fn arrange(&self, furniture: &[bool], lines: &[bool], crop: Rect) -> (Layout, Vec<Rect>) {
+        let cw = crop.width() as usize;
+        let pieces = parts(furniture, cw, true);
+        let solid: Vec<bool> = pieces
+            .boxes
+            .iter()
+            .zip(&pieces.sizes)
+            .enumerate()
+            .map(|(n, (rect, filled))| n > 0 && self.big(*rect, BLOCK) && 2.0 * *filled as f32 >= size(*rect))
+            .collect();
+        let picture = |rect: &Rect| Thing { rect: rect.offset(crop.left, crop.top), picture: true };
+        let mut things: Vec<Thing> = pieces.boxes.iter().zip(&solid).filter(|(_, solid)| **solid).map(|(rect, _)| picture(rect)).collect();
+        // The rest, letters and icons, joined into lines of text.
+        let small: Vec<bool> = pieces.labels.iter().map(|&n| n != 0 && !solid[n as usize]).collect();
+        let join = self.px(JOIN);
+        let shortest = self.px(12.0);
+        for rect in parts(&grown(&small, cw, join as usize, 0), cw, true).boxes.into_iter().skip(1) {
+            if rect.width() - 2 * join >= shortest {
+                let rect = Rect::new(rect.left + join, rect.top, rect.right - join, rect.bottom);
+                things.push(Thing { rect: rect.offset(crop.left, crop.top), picture: false });
+            }
+        }
+        things.sort_by_key(|thing| (thing.rect.top, thing.rect.left));
+        // The lines across a stack, as long as it is wide, begin where it begins.
+        let (short, long) = (self.px(RULE_SHORT), self.px(RULE_LONG));
+        let (thin, slack) = (self.px(LINE + 1.0), self.px(2.0 * SLACK));
+        let all_rules: Vec<Rect> = parts(lines, cw, false)
+            .boxes
+            .into_iter()
+            .skip(1)
+            .filter(|rule| rule.width() >= long && rule.height() <= thin)
+            .map(|rule| rule.offset(crop.left, crop.top))
+            .collect();
+        // Things one under another that begin at the same place: what is under a picture and
+        // begins where it begins is its text, however far the next column is. A line as wide as
+        // the stack between two of them keeps them in it across a wider gap, and any other line
+        // ends it: a line under a whole section.
+        let (even, far, low) = (self.px(LINE + 1.0), self.px(STACK_GAP), self.px(LINE));
+        let reach = |pile: &[Thing], below: Rect| {
+            let above = pile[pile.len() - 1].rect;
+            let right = pile.iter().map(|thing| thing.rect.right).max().unwrap_or(0);
+            let between = all_rules.iter().find(|rule| {
+                rule.top >= above.bottom - low && rule.bottom <= below.top + low && rule.left < above.right && rule.right > above.left
+            });
+            match between {
+                Some(rule) if (rule.right - right).abs() > short => -1,
+                Some(_) => 2 * far,
+                None => far,
+            }
+        };
+        let mut piles: Vec<Vec<Thing>> = Vec::new();
+        for thing in things {
+            let beside = piles.iter_mut().filter(|pile| {
+                let last = pile[pile.len() - 1].rect;
+                let gap = thing.rect.top - last.bottom;
+                // A band far wider than a column, that happens to begin where it does, is not of it.
+                let widest = pile.iter().map(|other| other.rect.width()).max().unwrap_or(0);
+                (thing.rect.left - pile[0].rect.left).abs() <= even
+                    && (-low..=reach(pile, thing.rect)).contains(&gap)
+                    && !(thing.picture && 2 * thing.rect.width() > 3 * widest)
+            });
+            match beside.max_by_key(|pile| pile[pile.len() - 1].rect.bottom) {
+                Some(pile) => pile.push(thing),
+                None => piles.push(vec![thing]),
+            }
+        }
+        let bound = |pile: &[Thing]| pile.iter().fold(Rect::default(), |rect, thing| rect.union(thing.rect));
+        piles.retain(|pile| pile.len() >= 2 && self.big(bound(pile), (PANEL.0, PANEL.1)));
+        // Stacks side by side, each with the next, make a group.
+        let apart = self.px(GROUP_GAP);
+        let side_by_side = |a: Rect, b: Rect| {
+            let gap = (b.left - a.right).max(a.left - b.right);
+            let over = a.bottom.min(b.bottom) - a.top.max(b.top);
+            (0..=apart).contains(&gap) && 2 * over >= a.height().min(b.height())
+        };
+        let mut sets: Vec<Vec<Vec<Thing>>> = Vec::new();
+        for pile in piles {
+            let rect = bound(&pile);
+            let (touching, rest): (Vec<_>, Vec<_>) =
+                std::mem::take(&mut sets).into_iter().partition(|set: &Vec<Vec<Thing>>| set.iter().any(|other| side_by_side(rect, bound(other))));
+            sets = rest;
+            let mut set = vec![pile];
+            set.extend(touching.into_iter().flatten());
+            sets.push(set);
+        }
+        let (mut groups, mut rules) = (Vec::new(), Vec::new());
+        for mut set in sets {
+            // What stands over all the others is the heading of them all, not of its own stack.
+            let mut headings = Rect::default();
+            if set.len() > 1 {
+                let tops: Vec<i32> = set.iter().map(|pile| bound(pile).top).collect();
+                for (n, pile) in set.iter_mut().enumerate() {
+                    let others = tops.iter().enumerate().filter(|(k, _)| *k != n).map(|(_, top)| *top).min().unwrap_or(0);
+                    while pile.len() > 2 && pile[0].rect.bottom <= others {
+                        headings = headings.union(pile.remove(0).rect);
+                    }
+                }
+            }
+            let mut stacks = Vec::new();
+            for pile in set {
+                let rect = bound(&pile);
+                let pictures = pile.iter().filter(|thing| thing.picture).count();
+                let mut articles: Vec<Article> = Vec::new();
+                let mut start = 0;
+                for n in 1..=pile.len() {
+                    let parted = n == pile.len() || {
+                        let (above, below) = (pile[n - 1].rect, pile[n].rect);
+                        let rule = all_rules.iter().find(|rule| {
+                            rule.top >= above.bottom - low
+                                && rule.bottom <= below.top + low
+                                && (rule.left - rect.left).abs() <= slack
+                                && (rule.right - rect.right).abs() <= short
+                        });
+                        rules.extend(rule.copied());
+                        rule.is_some() || (pictures > 1 && pile[n].picture)
+                    };
+                    if parted {
+                        let part = &pile[start..n];
+                        articles.push(Article { rect: bound(part), pictured: part.iter().any(|thing| thing.picture) });
+                        start = n;
+                    }
+                }
+                stacks.push(Stack { rect, articles, pictured: pictures > 0 });
+            }
+            let rect = stacks.iter().fold(headings, |rect, stack| rect.union(stack.rect));
+            groups.push(Group { rect, stacks });
+        }
+        (Layout { groups }, rules)
     }
 
     /// A room's box and its blocks of furniture, once: small pieces, letters and icons, joined
@@ -969,6 +1264,7 @@ impl Filling {
         let width = self.w as usize;
         let busy: Vec<bool> = self.marks.iter().map(|&mark| mark != 0).collect();
         let pieces = parts(&busy, width, true);
+        self.pictures = self.find_pictures(&pieces);
         // A letter, or a word whose letters the smoothing of the font has joined: no taller than
         // a line of text, however wide.
         let letter = self.px(LETTER);
@@ -1099,6 +1395,30 @@ impl Filling {
             tables.push(Rect::new(left, top, right, bottom));
         }
         tables
+    }
+
+    /// The pictures of the window: busy parts of it, its pieces of pixels apart from their
+    /// neighbours, as large as a block at least and busy all over, not most of the window. A
+    /// smooth picture isn't one: it is a surface, or a block of furniture on one.
+    fn find_pictures(&self, pieces: &Parts) -> Vec<Rect> {
+        let most = PICTURE_MOST * size(self.bounds());
+        let mut found: Vec<Rect> = pieces
+            .boxes
+            .iter()
+            .zip(&pieces.sizes)
+            .skip(1)
+            .filter(|(rect, busy)| self.big(**rect, BLOCK) && size(**rect) <= most && **busy as f32 >= DENSE * size(**rect))
+            // The pixels just outside its edges differ from those of its edges too.
+            .map(|(rect, _)| rect.inflate(-1))
+            .collect();
+        found.sort_by_key(|rect| std::cmp::Reverse(rect.width() * rect.height()));
+        let mut pictures: Vec<Rect> = Vec::new();
+        for rect in found {
+            if pictures.iter().all(|picture| picture.intersect(rect) != rect) {
+                pictures.push(rect);
+            }
+        }
+        pictures
     }
 
     /// Whether another surface comes between two lines of a row, a pane between two panels: more
@@ -1990,6 +2310,74 @@ mod tests {
         let room = at(1200, 600).expect("no room");
         assert!(room.left <= 201 && room.right == 1600 && room.top <= 302 && room.bottom == 900, "{room:?}");
         assert_eq!(at(300, 850), Some(room));
+    }
+
+    /// A page on a dark surface: three columns of articles, a picture and text under it, the
+    /// articles of a column parted by a line, and a row of cards under a long line.
+    fn page() -> Image {
+        let mut image = canvas(1400, 1100, [20, 22, 24]);
+        let article = |image: &mut Image, left: i32, top: i32, width: i32, picture: i32| {
+            photo(image, Rect::new(left, top, left + width, top + picture));
+            text(image, Rect::new(left, top + picture + 14, left + width, top + picture + 54), 16);
+            text(image, Rect::new(left, top + picture + 74, left + width - 30, top + picture + 114), 16);
+        };
+        article(&mut image, 100, 100, 300, 160);
+        fill(&mut image, Rect::new(100, 390, 400, 391), [60, 62, 64]);
+        article(&mut image, 100, 408, 300, 160);
+        article(&mut image, 416, 100, 560, 300);
+        article(&mut image, 992, 100, 300, 120);
+        fill(&mut image, Rect::new(992, 350, 1292, 351), [60, 62, 64]);
+        article(&mut image, 992, 368, 300, 120);
+        fill(&mut image, Rect::new(100, 720, 1292, 721), [60, 62, 64]);
+        for card in 0..5 {
+            let left = 100 + card * 240;
+            photo(&mut image, Rect::new(left, 760, left + 224, 900));
+            text(&mut image, Rect::new(left, 910, left + 224, 950), 16);
+            text(&mut image, Rect::new(left, 960, left + 150, 980), 16);
+        }
+        image
+    }
+
+    #[test]
+    fn what_lights_up_depends_on_where_the_mouse_is() {
+        let image = page();
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        // On a picture, the picture.
+        assert_eq!(at(250, 180), Some(Rect::new(100, 100, 400, 260)));
+        // On the text under it, the article: the picture and the text, and not the one under it.
+        let article = at(250, 300).expect("no article");
+        assert!(article.left <= 100 && article.top <= 100 && article.right >= 390 && article.bottom <= 392, "{article:?}");
+        // Between two articles of a column, the column.
+        let column = at(250, 388).expect("no column");
+        assert!(column.top <= 100 && column.bottom >= 670 && column.left <= 100 && column.right <= 410, "{column:?}");
+        // On a card under its picture, the card.
+        let card = at(200, 930).expect("no card");
+        assert!(card.left <= 100 && card.right >= 320 && card.right <= 334 && card.top <= 760 && card.bottom >= 975, "{card:?}");
+        // Between two cards, the row of them.
+        let row = at(332, 880).expect("no row");
+        assert!(row.left <= 100 && row.right >= 1270 && row.top <= 760 && row.bottom >= 975, "{row:?}");
+        // Between two columns, all three.
+        let columns = at(408, 300).expect("no columns");
+        assert!(columns.left <= 100 && columns.right >= 1280 && columns.top <= 100 && columns.bottom >= 670, "{columns:?}");
+    }
+
+    #[test]
+    fn the_surface_does_not_go_into_a_dark_side_of_a_picture() {
+        // A picture on a dark surface, its bottom half as dark as the surface but for its grain.
+        let mut image = canvas(1200, 800, [20, 22, 24]);
+        for y in 200..500 {
+            for x in 300..900 {
+                let grain = ((x * 37 + y * 91) % 97) as u8;
+                let color = if y < 350 { [120 + grain, 90 + grain, 60 + grain] } else { [16 + grain / 8, 18 + grain / 8, 20 + grain / 8] };
+                fill(&mut image, Rect::new(x, y, x + 1, y + 1), color);
+            }
+        }
+        text(&mut image, Rect::new(300, 520, 800, 600), 16);
+        let mut areas = Areas::new(&image);
+        let mut at = |x, y| areas.at(&image, image.bounds(), Point::new(x, y), 1.0);
+        assert_eq!(at(600, 450), Some(Rect::new(300, 200, 900, 500)));
+        assert_eq!(at(600, 250), Some(Rect::new(300, 200, 900, 500)));
     }
 
     #[test]
