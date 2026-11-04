@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofoni ei ollut vielä päällä: pidä painiketta painettuna, kunnes punainen piste syttyy.",
     "The microphone didn't turn on.": "Mikrofoni ei mennyt päälle.",
     "The question asked aloud didn't go.": "Ääneen esitettyä kysymystä ei lähetetty.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: merkki puhua."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: merkki puhua.",
+    "Record a video or a GIF · Ctrl+R": "Nauhoita video tai GIF · Ctrl+R",
+    "Go on recording": "Jatka nauhoitusta",
+    "Stop": "Lopeta",
+    "The recording didn't start": "Nauhoitus ei alkanut",
+    "The recording stopped": "Nauhoitus keskeytyi",
+    "The recording didn't open": "Nauhoitusta ei voitu avata",
+    "Recording": "Nauhoitus",
+    "This edition of Windows has no Media Feature Pack": "Tässä Windows-versiossa ei ole Media Feature Packia",
+    "Recording saved": "Nauhoitus tallennettu",
+    "Recording saved and copied": "Nauhoitus tallennettu ja kopioitu",
+    "Pause": "Tauko"
   },
   "settings": {
     "settings": "Asetukset",
@@ -399,6 +410,16 @@
     "tip": "Vinkki: kokeile {keys}: kuvakaappaus pelkällä vasemmalla kädellä, kun oikea pysyy hiirellä.",
     "use": "Käytä",
     "next": "Seuraava"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopioi",
+    "save": "Tallenna",
+    "preparing": "Valmistellaan…",
+    "play": "Toista",
+    "pause": "Tauko",
+    "kilobytes": "kt",
+    "megabytes": "Mt"
   },
   "installer": {
     "installTitle": "Asenna ainitShot {version}",

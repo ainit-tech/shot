@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "마이크가 아직 켜지지 않았습니다. 빨간 점이 켜질 때까지 버튼을 누르고 있으세요.",
     "The microphone didn't turn on.": "마이크가 켜지지 않았습니다.",
     "The question asked aloud didn't go.": "음성 질문을 보내지 못했습니다.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 마이크가 음성 질문을 듣기 시작할 때 나는 짧은 소리: 말하라는 신호입니다."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 마이크가 음성 질문을 듣기 시작할 때 나는 짧은 소리: 말하라는 신호입니다.",
+    "Record a video or a GIF · Ctrl+R": "동영상 또는 GIF 녹화 · Ctrl+R",
+    "Go on recording": "녹화 계속",
+    "Stop": "중지",
+    "The recording didn't start": "녹화가 시작되지 않았습니다",
+    "The recording stopped": "녹화가 중지되었습니다",
+    "The recording didn't open": "녹화를 열지 못했습니다",
+    "Recording": "녹화",
+    "This edition of Windows has no Media Feature Pack": "이 Windows 에디션에는 Media Feature Pack이 없습니다",
+    "Recording saved": "녹화를 저장했습니다",
+    "Recording saved and copied": "녹화를 저장하고 복사했습니다",
+    "Pause": "일시 정지"
   },
   "settings": {
     "settings": "설정",
@@ -399,6 +410,16 @@
     "tip": "팁: {keys}을(를) 써 보세요. 왼손만으로 스크린샷을 찍고 오른손은 마우스에 그대로 둘 수 있습니다.",
     "use": "사용",
     "next": "다음"
+  },
+  "recorded": {
+    "video": "동영상",
+    "copy": "복사",
+    "save": "저장",
+    "preparing": "준비 중…",
+    "play": "재생",
+    "pause": "일시 정지",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} 설치",

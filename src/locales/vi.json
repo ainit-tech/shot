@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Micrô chưa bật: giữ nút cho đến khi chấm đỏ sáng lên.",
     "The microphone didn't turn on.": "Micrô không bật.",
     "The question asked aloud didn't go.": "Câu hỏi bằng giọng nói chưa được gửi.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Một âm thanh ngắn khi micrô bắt đầu nghe câu hỏi bằng giọng nói: tín hiệu để nói."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Một âm thanh ngắn khi micrô bắt đầu nghe câu hỏi bằng giọng nói: tín hiệu để nói.",
+    "Record a video or a GIF · Ctrl+R": "Quay video hoặc GIF · Ctrl+R",
+    "Go on recording": "Tiếp tục quay",
+    "Stop": "Dừng",
+    "The recording didn't start": "Không bắt đầu quay được",
+    "The recording stopped": "Đã dừng quay",
+    "The recording didn't open": "Không mở được bản quay",
+    "Recording": "Bản quay",
+    "This edition of Windows has no Media Feature Pack": "Phiên bản Windows này không có Media Feature Pack",
+    "Recording saved": "Đã lưu bản quay",
+    "Recording saved and copied": "Đã lưu và sao chép bản quay",
+    "Pause": "Tạm dừng"
   },
   "settings": {
     "settings": "Cài đặt",
@@ -399,6 +410,16 @@
     "tip": "Mẹo: thử {keys}: chụp màn hình chỉ bằng tay trái, còn tay phải vẫn để trên chuột.",
     "use": "Dùng",
     "next": "Tiếp"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Sao chép",
+    "save": "Lưu",
+    "preparing": "Đang chuẩn bị…",
+    "play": "Phát",
+    "pause": "Tạm dừng",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Cài đặt ainitShot {version}",

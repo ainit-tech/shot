@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "ማይክሮፎኑ ገና አልበራም፦ ቀዩ ነጥብ እስኪበራ ድረስ አዝራሩን ተጭነው ይያዙ።",
     "The microphone didn't turn on.": "ማይክሮፎኑ አልበራም።",
     "The question asked aloud didn't go.": "በድምፅ የተጠየቀው ጥያቄ አልተላከም።",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ለመናገር ምልክት።"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ለመናገር ምልክት።",
+    "Record a video or a GIF · Ctrl+R": "ቪዲዮ ወይም GIF ቅረጽ · Ctrl+R",
+    "Go on recording": "ቀረጻውን ቀጥል",
+    "Stop": "አቁም",
+    "The recording didn't start": "ቀረጻው አልጀመረም",
+    "The recording stopped": "ቀረጻው ቆሟል",
+    "The recording didn't open": "ቀረጻው አልተከፈተም",
+    "Recording": "ቀረጻ",
+    "This edition of Windows has no Media Feature Pack": "ይህ የWindows እትም Media Feature Pack የለውም",
+    "Recording saved": "ቀረጻው ተቀምጧል",
+    "Recording saved and copied": "ቀረጻው ተቀምጧል እና ተቀድቷል",
+    "Pause": "ለአፍታ አቁም"
   },
   "settings": {
     "settings": "ቅንብሮች",
@@ -399,6 +410,16 @@
     "tip": "ጠቃሚ ምክር: {keys}ን ይሞክሩ: በግራ እጅ ብቻ ቅጽበታዊ ገጽ እይታ፣ ቀኝ እጅ ግን በመዳፊቱ ላይ ይቆያል።",
     "use": "ተጠቀም",
     "next": "ቀጣይ"
+  },
+  "recorded": {
+    "video": "ቪዲዮ",
+    "copy": "ቅዳ",
+    "save": "አስቀምጥ",
+    "preparing": "በመዘጋጀት ላይ…",
+    "play": "አጫውት",
+    "pause": "ለአፍታ አቁም",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} መጫን",

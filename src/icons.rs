@@ -59,6 +59,17 @@ pub const SAVE: &[Part] = &[Part::Line(
     "M 10 3.5 V 12.5 M 6.5 9 L 10 12.5 L 13.5 9 M 4 13.5 V 15 C 4 15.8 4.7 16.5 5.5 16.5 H 14.5 C 15.3 16.5 16 15.8 16 15 V 13.5",
 )];
 
+pub const RECORD: &[Part] = &[
+    Part::Line("M 10 3 C 13.9 3 17 6.1 17 10 C 17 13.9 13.9 17 10 17 C 6.1 17 3 13.9 3 10 C 3 6.1 6.1 3 10 3 Z"),
+    Part::Dot(10.0, 10.0, 3.5),
+];
+
+pub const PAUSE: &[Part] = &[Part::Fill("M 6 4.5 H 8.5 V 15.5 H 6 Z M 11.5 4.5 H 14 V 15.5 H 11.5 Z")];
+
+pub const RESUME: &[Part] = &[Part::Fill("M 6.5 4.5 L 15.5 10 L 6.5 15.5 Z")];
+
+pub const STOP: &[Part] = &[Part::Fill("M 6 5 H 14 C 14.7 5 15 5.3 15 6 V 14 C 15 14.7 14.7 15 14 15 H 6 C 5.3 15 5 14.7 5 14 V 6 C 5 5.3 5.3 5 6 5 Z")];
+
 pub const CLOSE: &[Part] = &[Part::Line("M 5.5 5.5 L 14.5 14.5 M 14.5 5.5 L 5.5 14.5")];
 
 pub const TEXT: &[Part] = &[Part::Line("M 4.5 6 V 4 H 15.5 V 6 M 10 4 V 16 M 7.5 16 H 12.5")];
@@ -124,7 +135,7 @@ mod tests {
     fn every_icon_reads() {
         let icons = [
             PENCIL, BRUSH, LINE_TOOL, ARROW, RECTANGLE, FILLED_RECTANGLE, MAGIC_PENCIL, MASK, UNDO, COPY, SAVE, CLOSE,
-            IMAGES, QUESTION,
+            IMAGES, QUESTION, RECORD, PAUSE, RESUME, STOP,
         ];
         for icon in icons {
             for part in icon {

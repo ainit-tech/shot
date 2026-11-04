@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "মাইক্রোফোন তখনও চালু হয়নি: লাল বিন্দু জ্বলে না ওঠা পর্যন্ত বোতামটি চেপে ধরে রাখুন।",
     "The microphone didn't turn on.": "মাইক্রোফোন চালু হয়নি।",
     "The question asked aloud didn't go.": "মুখে বলা প্রশ্নটি পাঠানো হয়নি।",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: বলার সংকেত।"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: বলার সংকেত।",
+    "Record a video or a GIF · Ctrl+R": "ভিডিও বা GIF রেকর্ড করুন · Ctrl+R",
+    "Go on recording": "রেকর্ডিং চালিয়ে যান",
+    "Stop": "শেষ করুন",
+    "The recording didn't start": "রেকর্ডিং শুরু হয়নি",
+    "The recording stopped": "রেকর্ডিং থেমে গেছে",
+    "The recording didn't open": "রেকর্ডিং খোলেনি",
+    "Recording": "রেকর্ডিং",
+    "This edition of Windows has no Media Feature Pack": "Windows-এর এই সংস্করণে Media Feature Pack নেই",
+    "Recording saved": "রেকর্ডিং সেভ হয়েছে",
+    "Recording saved and copied": "রেকর্ডিং সেভ ও কপি হয়েছে",
+    "Pause": "থামান"
   },
   "settings": {
     "settings": "সেটিংস",
@@ -399,6 +410,16 @@
     "tip": "পরামর্শ: {keys} চেষ্টা করুন: শুধু বাঁ হাতে স্ক্রিনশট, আর ডান হাত থাকে মাউসে।",
     "use": "ব্যবহার করুন",
     "next": "পরবর্তী"
+  },
+  "recorded": {
+    "video": "ভিডিও",
+    "copy": "কপি করুন",
+    "save": "সেভ করুন",
+    "preparing": "প্রস্তুত হচ্ছে…",
+    "play": "চালান",
+    "pause": "থামান",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} ইনস্টল",

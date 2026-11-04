@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "De microfoon stond nog niet aan: houd de knop ingedrukt tot de rode stip oplicht.",
     "The microphone didn't turn on.": "De microfoon ging niet aan.",
     "The question asked aloud didn't go.": "De gesproken vraag is niet verstuurd.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: het teken om te praten."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: het teken om te praten.",
+    "Record a video or a GIF · Ctrl+R": "Video of GIF opnemen · Ctrl+R",
+    "Go on recording": "Opname hervatten",
+    "Stop": "Stoppen",
+    "The recording didn't start": "De opname is niet gestart",
+    "The recording stopped": "De opname is gestopt",
+    "The recording didn't open": "De opname is niet geopend",
+    "Recording": "Opname",
+    "This edition of Windows has no Media Feature Pack": "Deze editie van Windows heeft geen Media Feature Pack",
+    "Recording saved": "Opname opgeslagen",
+    "Recording saved and copied": "Opname opgeslagen en gekopieerd",
+    "Pause": "Pauzeren"
   },
   "settings": {
     "settings": "Instellingen",
@@ -399,6 +410,16 @@
     "tip": "Tip: probeer {keys}: een schermafbeelding met alleen je linkerhand, terwijl je rechterhand op de muis blijft.",
     "use": "Gebruiken",
     "next": "Volgende"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopiëren",
+    "save": "Opslaan",
+    "preparing": "Voorbereiden…",
+    "play": "Afspelen",
+    "pause": "Pauzeren",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} installeren",

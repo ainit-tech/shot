@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofoni nuk ishte ndezur ende: mbaj shtypur butonin derisa të ndizet pika e kuqe.",
     "The microphone didn't turn on.": "Mikrofoni nuk u ndez.",
     "The question asked aloud didn't go.": "Pyetja me zë nuk u dërgua.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: shenja për të folur."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: shenja për të folur.",
+    "Record a video or a GIF · Ctrl+R": "Regjistro video ose GIF · Ctrl+R",
+    "Go on recording": "Vazhdo regjistrimin",
+    "Stop": "Ndalo",
+    "The recording didn't start": "Regjistrimi nuk filloi",
+    "The recording stopped": "Regjistrimi u ndërpre",
+    "The recording didn't open": "Regjistrimi nuk u hap",
+    "Recording": "Regjistrim",
+    "This edition of Windows has no Media Feature Pack": "Ky botim i Windows nuk ka Media Feature Pack",
+    "Recording saved": "Regjistrimi u ruajt",
+    "Recording saved and copied": "Regjistrimi u ruajt dhe u kopjua",
+    "Pause": "Pauzë"
   },
   "settings": {
     "settings": "Cilësimet",
@@ -399,6 +410,16 @@
     "tip": "Këshillë: provo {keys}: pamje ekrani vetëm me dorën e majtë, ndërsa e djathta mbetet te miu.",
     "use": "Përdor",
     "next": "Para"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopjo",
+    "save": "Ruaj",
+    "preparing": "Po përgatitet…",
+    "play": "Luaj",
+    "pause": "Pauzë",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Instalo ainitShot {version}",

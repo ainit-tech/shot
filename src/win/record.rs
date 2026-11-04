@@ -1,0 +1,671 @@
+//! Recording what is selected (decision 17). The button on the panel of actions closes the frozen
+//! screen, and the screen goes on living inside a thin frame. After a count of three the
+//! recording runs on a thread of its own, into an MP4 file, with a small panel in place of the
+//! panel of actions: the time, pause and stop. The hotkey stops it too. What is recorded then goes
+//! to the window of the result, where it is cut and becomes a GIF or a video. The frame and the
+//! panel stay out of the picture: Windows leaves them out of what is read of the screen.
+
+use std::cell::RefCell;
+use std::path::{Path, PathBuf};
+use std::ptr::{null, null_mut};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::thread;
+use std::time::{Duration, Instant};
+
+use windows::Win32::System::Com::{COINIT_MULTITHREADED, CoInitializeEx};
+use windows_sys::Win32::Foundation::{HWND, LPARAM, LRESULT, RECT, WPARAM};
+use windows_sys::Win32::Graphics::Dwm::{DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND, DwmSetWindowAttribute};
+use windows_sys::Win32::Graphics::Gdi::{
+    BeginPaint, BitBlt, CombineRgn, CreateRectRgn, CreateSolidBrush, DeleteObject, EndPaint, FillRect, InvalidateRect, PAINTSTRUCT,
+    RGN_DIFF, SRCCOPY, SetWindowRgn,
+};
+use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
+use windows_sys::Win32::UI::Controls::WM_MOUSELEAVE;
+use windows_sys::Win32::UI::Input::KeyboardAndMouse::{TME_LEAVE, TRACKMOUSEEVENT, TrackMouseEvent};
+use windows_sys::Win32::UI::WindowsAndMessaging::{
+    CreateWindowExW, DefWindowProcW, DestroyWindow, GetClientRect, IDC_ARROW, LWA_ALPHA, LoadCursorW, MA_NOACTIVATE, PostMessageW,
+    RegisterClassExW, SW_HIDE, SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOZORDER, SetLayeredWindowAttributes, SetTimer,
+    SetWindowDisplayAffinity, SetWindowPos, ShowWindow, WDA_EXCLUDEFROMCAPTURE, WINDOW_EX_STYLE, WM_APP, WM_ERASEBKGND, WM_LBUTTONUP,
+    WM_MOUSEACTIVATE, WM_MOUSEMOVE, WM_PAINT, WM_TIMER, WNDCLASSEXW, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST,
+    WS_EX_TRANSPARENT, WS_POPUP,
+};
+use windows_sys::core::PCWSTR;
+use windows_sys::w;
+
+use super::gdi::{self, Buffer, Font};
+use super::grab::Grab;
+use super::video::{FRAMES, SECOND, Writer};
+use super::{QUIET, app, last_error, out_of_sight, recorded, shell};
+use crate::color::Rgba;
+use crate::draw::{self, ToolbarLook};
+use crate::geometry::{Point, Rect};
+use crate::settings::Icon;
+use crate::text::tr;
+use crate::toolbar::{Button, Toolbar};
+
+/// What the thread of a recording tells the program's hidden window when it ends.
+pub const MESSAGE: u32 = WM_APP + 13;
+
+const FRAME_CLASS: PCWSTR = w!("ainitShot.recording.frame");
+const PANEL_CLASS: PCWSTR = w!("ainitShot.recording.panel");
+const HINT_CLASS: PCWSTR = w!("ainitShot.recording.hint");
+/// The seconds of the count before a recording, for the mouse to get where it should.
+const COUNT: u64 = 3;
+/// How often the panel is looked at, in milliseconds.
+const TICK: u32 = 100;
+const TICK_TIMER: usize = 1;
+/// The size a video can have: more than H.264 does everywhere is made smaller. At the other end,
+/// an area too small for a video grows.
+const MOST: (f32, f32) = (4096.0, 2304.0);
+const LEAST: i32 = 32;
+/// The sizes on the panel at the scale of 100%: the width of the frame, the size of the time and
+/// where the dot and the time stand; the time is followed by a gap before the buttons.
+const FRAME_WIDTH: f32 = 2.0;
+const TIME_SIZE: f32 = 14.0;
+const DOT_CENTRE: f32 = 16.0;
+const DOT_RADIUS: f32 = 5.0;
+const TIME_LEFT: f32 = 29.0;
+const TIME_GAP: f32 = 6.0;
+const HINT_SIZE: f32 = 12.0;
+const HINT_PADDING: (f32, f32) = (9.0, 5.0);
+const HINT_GAP: f32 = 6.0;
+/// The colours of the frame and of the dot: red while recording, grey otherwise, as the
+/// microphone's.
+const RECORDING: Rgba = draw::MIC_LISTENING;
+const WAITING: Rgba = draw::MIC_WAITING;
+/// The panel's colour, under what is drawn on it, and that of a hint.
+const PANEL: Rgba = [32, 32, 32, 255];
+
+/// How long what is recorded stays in the temporary folder, for what has been copied to be pasted.
+const KEPT: Duration = Duration::from_secs(24 * 60 * 60);
+
+thread_local! {
+    static ACTIVE: RefCell<Option<Recording>> = const { RefCell::new(None) };
+    static REGISTERED: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// What the program and the thread of a recording say to each other.
+#[derive(Default)]
+struct Shared {
+    /// The count is over.
+    begun: AtomicBool,
+    /// The recording is to end.
+    stopped: AtomicBool,
+    paused: AtomicBool,
+    /// How much has been recorded, in milliseconds.
+    time: AtomicU64,
+}
+
+/// A recording, finished.
+pub struct Recorded {
+    /// The MP4 file, in a folder of its own that the result may use.
+    pub path: PathBuf,
+    pub width: u32,
+    pub height: u32,
+    /// Its length in seconds, and how many frames it has in them.
+    pub seconds: f64,
+    pub frames: u64,
+    /// The way the screen was seen.
+    pub way: &'static str,
+}
+
+/// What the thread of a recording comes back with: nothing, if it was stopped before it began.
+struct Ending {
+    shared: Arc<Shared>,
+    outcome: Result<Option<Recorded>, String>,
+}
+
+/// The windows of a recording going on.
+struct Recording {
+    frame: HWND,
+    panel: HWND,
+    hint: HWND,
+    shared: Arc<Shared>,
+    /// When the count began.
+    begins: Instant,
+    /// The panel's own place on the desktop, the monitor it is on and its scale.
+    place: Rect,
+    monitor: Rect,
+    scale: f32,
+    /// Its picture, and the picture of the hint with its text.
+    buffer: Buffer,
+    font: Font,
+    hint_font: Font,
+    hint_text: Vec<u16>,
+    room: i32,
+    hovered: Option<Button>,
+    /// What the panel last showed, not to draw it again for nothing.
+    shown: Option<(String, bool, Option<Button>)>,
+}
+
+/// The size of the panel of a recording.
+pub fn panel_size(scale: f32) -> (i32, i32) {
+    let bar = Toolbar::recording(room(scale), false, scale);
+    (bar.rect.width(), bar.rect.height())
+}
+
+/// The room before the buttons of the panel, for the dot and the time.
+fn room(scale: f32) -> i32 {
+    let width = Buffer::new(1, 1).ok().zip(Font::new(px(TIME_SIZE, scale), true).ok()).map_or(0, |(buffer, font)| {
+        let longest: Vec<u16> = "00:00".encode_utf16().collect();
+        gdi::text_size(buffer.dc(), &font, &longest).0
+    });
+    px(TIME_LEFT, scale) + width + px(TIME_GAP, scale)
+}
+
+fn px(size: f32, scale: f32) -> i32 {
+    (size * scale).round() as i32
+}
+
+/// Whether a recording is going on, its count included.
+pub fn active() -> bool {
+    ACTIVE.with(|cell| cell.try_borrow().map_or(true, |active| active.is_some()))
+}
+
+/// Starts a recording of `area` of the desktop, with its panel at `panel` on `monitor`.
+pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
+    if active() {
+        return;
+    }
+    shell::remove_recordings(KEPT);
+    let path = match shell::new_recording() {
+        Ok(path) => path,
+        Err(error) => return app::notify(not_started(), &error.to_string()),
+    };
+    let (area, size) = fitted(area);
+    let shared = Arc::new(Shared::default());
+    let recording = match Recording::create(area, panel, monitor, scale, shared.clone()) {
+        Ok(recording) => recording,
+        Err(error) => return app::notify(not_started(), &error.to_string()),
+    };
+    ACTIVE.with(|cell| *cell.borrow_mut() = Some(recording));
+    let target = app::main_window() as isize;
+    thread::spawn(move || {
+        unsafe { CoInitializeEx(None, COINIT_MULTITHREADED).ok() }.ok();
+        let outcome = capture(&shared, area, size, &path);
+        // Nothing has come of it: its folder goes.
+        if !matches!(outcome, Ok(Some(_)))
+            && let Some(folder) = path.parent()
+        {
+            let _ = std::fs::remove_dir_all(folder);
+        }
+        let ending = Box::into_raw(Box::new(Ending { shared, outcome }));
+        if unsafe { PostMessageW(target as HWND, MESSAGE, 0, ending as isize) } == 0 {
+            drop(unsafe { Box::from_raw(ending) });
+        }
+    });
+}
+
+fn not_started() -> &'static str {
+    tr("The recording didn't start")
+}
+
+/// What a video of the area can be: its size even, as H.264 wants, and neither too small nor too
+/// large. The area changes with the size, unless the picture has to be made smaller.
+fn fitted(area: Rect) -> (Rect, (u32, u32)) {
+    let (width, height) = (area.width().max(LEAST), area.height().max(LEAST));
+    let shrink = (MOST.0 / width as f32).min(MOST.1 / height as f32);
+    if shrink < 1.0 {
+        let even = |length: i32| ((length as f32 * shrink) as u32 & !1).max(2);
+        return (area, (even(width), even(height)));
+    }
+    let (width, height) = (width & !1, height & !1);
+    (Rect::new(area.left, area.top, area.left + width, area.top + height), (width as u32, height as u32))
+}
+
+/// The thread of a recording: the file is made during the count, for the first frame to come as
+/// soon as it ends, and then frames go into it at their rate, or as fast as they come. When
+/// something goes wrong halfway, what has been recorded is still kept.
+fn capture(shared: &Shared, area: Rect, size: (u32, u32), path: &Path) -> Result<Option<Recorded>, String> {
+    let mut grab = Grab::new(area, size).map_err(|error| error.to_string())?;
+    let mut writer = Writer::create(path, size.0, size.1).map_err(|error| error.to_string())?;
+    while !shared.begun.load(Ordering::Relaxed) {
+        if shared.stopped.load(Ordering::Relaxed) {
+            return Ok(None);
+        }
+        thread::sleep(Duration::from_millis(10));
+    }
+    let way = grab.way();
+    let step = Duration::from_secs(1) / FRAMES;
+    let length = SECOND / FRAMES as i64;
+    let (start, mut paused) = (Instant::now(), Duration::ZERO);
+    let (mut frames, mut next) = (0u64, start);
+    let mut problem = None;
+    while !shared.stopped.load(Ordering::Relaxed) {
+        if shared.paused.load(Ordering::Relaxed) {
+            let since = Instant::now();
+            while shared.paused.load(Ordering::Relaxed) && !shared.stopped.load(Ordering::Relaxed) {
+                thread::sleep(Duration::from_millis(15));
+            }
+            paused += since.elapsed();
+            next = Instant::now();
+            continue;
+        }
+        let now = Instant::now();
+        if now < next {
+            thread::sleep(next - now);
+        }
+        let time = start.elapsed().saturating_sub(paused);
+        let picture = match grab.take() {
+            Ok(picture) => picture,
+            Err(error) => {
+                problem = Some(error.to_string());
+                break;
+            }
+        };
+        let stride = picture.width as usize * 4;
+        if let Err(error) = writer.write(picture.pixels, stride, (time.as_nanos() / 100) as i64, length) {
+            problem = Some(error.to_string());
+            break;
+        }
+        frames += 1;
+        shared.time.store(time.as_millis() as u64, Ordering::Relaxed);
+        // A frame that is late doesn't hurry the next ones.
+        next = (next + step).max(now);
+    }
+    let seconds = start.elapsed().saturating_sub(paused).as_secs_f64();
+    let finished = writer.finish().map_err(|error| error.to_string());
+    match (frames, finished, problem) {
+        (0, _, Some(problem)) | (_, Err(problem), _) => Err(problem),
+        (0, Ok(()), None) => Ok(None),
+        (_, Ok(()), _) => Ok(Some(Recorded { path: path.to_path_buf(), width: size.0, height: size.1, seconds, frames, way })),
+    }
+}
+
+/// The hotkey, or a click on the icon: a recording going on stops, and nothing else happens.
+pub fn stop() -> bool {
+    let Some(recording) = ACTIVE.with(|cell| cell.try_borrow_mut().ok()?.take()) else { return false };
+    recording.shared.stopped.store(true, Ordering::Relaxed);
+    recording.close();
+    true
+}
+
+/// A recording has ended.
+pub fn heard(ending: LPARAM) {
+    let ending = unsafe { Box::from_raw(ending as *mut Ending) };
+    // If it ended by itself, its windows go now.
+    let own = ACTIVE.with(|cell| cell.try_borrow().is_ok_and(|active| active.as_ref().is_some_and(|r| Arc::ptr_eq(&r.shared, &ending.shared))));
+    if own {
+        stop();
+    }
+    match ending.outcome {
+        Ok(Some(recorded)) => recorded::open(recorded),
+        Ok(None) => {}
+        Err(problem) => app::notify(tr("The recording stopped"), &problem),
+    }
+}
+
+impl Recording {
+    fn create(area: Rect, place: Rect, monitor: Rect, scale: f32, shared: Arc<Shared>) -> std::io::Result<Recording> {
+        register();
+        let thin = px(FRAME_WIDTH, scale).max(1);
+        let outer = Rect::new(area.left - thin, area.top - thin, area.right + thin, area.bottom + thin);
+        // The frame and the hint are never in the way of the mouse.
+        let through = WS_EX_LAYERED | WS_EX_TRANSPARENT;
+        let frame = window(FRAME_CLASS, outer, through)?;
+        let panel = window(PANEL_CLASS, place, 0)?;
+        let hint = window(HINT_CLASS, Rect::new(place.left, place.top, place.left + 1, place.top + 1), through)?;
+        unsafe {
+            // Only the line around the area is the window: everything inside stays under the mouse.
+            let (whole, inner) = (CreateRectRgn(0, 0, outer.width(), outer.height()), CreateRectRgn(thin, thin, thin + area.width(), thin + area.height()));
+            CombineRgn(whole, whole, inner, RGN_DIFF);
+            DeleteObject(inner);
+            if SetWindowRgn(frame, whole, 0) == 0 {
+                DeleteObject(whole);
+            }
+            for window in [frame, hint] {
+                SetLayeredWindowAttributes(window, 0, 255, LWA_ALPHA);
+            }
+            for window in [frame, panel, hint] {
+                SetWindowDisplayAffinity(window, WDA_EXCLUDEFROMCAPTURE);
+            }
+            let round = DWMWCP_ROUND;
+            for window in [panel, hint] {
+                DwmSetWindowAttribute(window, DWMWA_WINDOW_CORNER_PREFERENCE as u32, (&raw const round).cast(), size_of_val(&round) as u32);
+            }
+            ShowWindow(frame, SW_SHOWNOACTIVATE);
+            ShowWindow(panel, SW_SHOWNOACTIVATE);
+            SetTimer(panel, TICK_TIMER, TICK, None);
+        }
+        Ok(Recording {
+            frame,
+            panel,
+            hint,
+            shared,
+            begins: Instant::now(),
+            place,
+            monitor,
+            scale,
+            buffer: Buffer::new(place.width() as u32, place.height() as u32)?,
+            font: Font::new(px(TIME_SIZE, scale), true)?,
+            hint_font: Font::new(px(HINT_SIZE, scale), false)?,
+            hint_text: Vec::new(),
+            room: room(scale),
+            hovered: None,
+            shown: None,
+        })
+    }
+
+    fn close(self) {
+        unsafe {
+            DestroyWindow(self.hint);
+            DestroyWindow(self.panel);
+            DestroyWindow(self.frame);
+        }
+    }
+
+    /// The count still left, in whole seconds, while it lasts.
+    fn counting(&self) -> Option<u64> {
+        let gone = self.begins.elapsed().as_secs();
+        (!self.shared.begun.load(Ordering::Relaxed) && gone < COUNT).then_some(COUNT - gone)
+    }
+
+    fn paused(&self) -> bool {
+        self.shared.paused.load(Ordering::Relaxed)
+    }
+
+    /// What the panel says: the count, or the time.
+    fn text(&self) -> String {
+        match self.counting() {
+            Some(left) => left.to_string(),
+            None => {
+                let seconds = self.shared.time.load(Ordering::Relaxed) / 1000;
+                format!("{:02}:{:02}", seconds / 60, seconds % 60)
+            }
+        }
+    }
+
+    fn bar(&self) -> Toolbar {
+        Toolbar::recording(self.room, self.paused(), self.scale)
+    }
+
+    /// A tick: the count ends when its time comes, and the panel shows what has changed.
+    fn tick(&mut self) {
+        if self.counting().is_none() && !self.shared.begun.swap(true, Ordering::Relaxed) {
+            unsafe { InvalidateRect(self.frame, null(), 0) };
+        }
+        let now = (self.text(), self.paused(), self.hovered);
+        if self.shown.as_ref() != Some(&now) {
+            unsafe { InvalidateRect(self.panel, null(), 0) };
+        }
+    }
+
+    fn colour(&self) -> Rgba {
+        if self.shared.begun.load(Ordering::Relaxed) && !self.paused() { RECORDING } else { WAITING }
+    }
+
+    fn paint_panel(&mut self) {
+        let text = self.text();
+        self.shown = Some((text.clone(), self.paused(), self.hovered));
+        let bar = self.bar();
+        let (colour, counting) = (self.colour(), self.counting().is_some());
+        compose(&mut self.buffer, &self.font, &bar, &text, colour, counting, self.hovered);
+        let mut paint = PAINTSTRUCT::default();
+        unsafe {
+            let dc = BeginPaint(self.panel, &mut paint);
+            BitBlt(dc, 0, 0, bar.rect.width(), bar.rect.height(), self.buffer.dc(), 0, 0, SRCCOPY);
+            EndPaint(self.panel, &paint);
+        }
+    }
+
+    fn paint_frame(&self) {
+        let mut paint = PAINTSTRUCT::default();
+        let mut client = RECT::default();
+        let [red, green, blue, _] = self.colour();
+        unsafe {
+            let dc = BeginPaint(self.frame, &mut paint);
+            GetClientRect(self.frame, &mut client);
+            let brush = CreateSolidBrush(red as u32 | (green as u32) << 8 | (blue as u32) << 16);
+            FillRect(dc, &client, brush);
+            DeleteObject(brush);
+            EndPaint(self.frame, &paint);
+        }
+    }
+
+    fn paint_hint(&self) {
+        let mut paint = PAINTSTRUCT::default();
+        let mut client = RECT::default();
+        let [red, green, blue, _] = PANEL;
+        unsafe {
+            let dc = BeginPaint(self.hint, &mut paint);
+            GetClientRect(self.hint, &mut client);
+            let brush = CreateSolidBrush(red as u32 | (green as u32) << 8 | (blue as u32) << 16);
+            FillRect(dc, &client, brush);
+            DeleteObject(brush);
+            let (x, y) = (px(HINT_PADDING.0, self.scale), px(HINT_PADDING.1, self.scale));
+            gdi::draw_text(dc, &self.hint_font, &self.hint_text, x, y, draw::TEXT);
+            EndPaint(self.hint, &paint);
+        }
+    }
+
+    /// The mouse has moved over the panel, or left it.
+    fn hover(&mut self, button: Option<Button>) {
+        if self.hovered == button {
+            return;
+        }
+        self.hovered = button;
+        unsafe { InvalidateRect(self.panel, null(), 0) };
+        let Some(button) = button else {
+            unsafe { ShowWindow(self.hint, SW_HIDE) };
+            return;
+        };
+        if button == Button::Pause && self.counting().is_some() {
+            unsafe { ShowWindow(self.hint, SW_HIDE) };
+            return;
+        }
+        self.hint_text = hint_of(button).encode_utf16().collect();
+        let size = gdi::text_size(self.buffer.dc(), &self.hint_font, &self.hint_text);
+        let (padding, gap) = ((px(HINT_PADDING.0, self.scale), px(HINT_PADDING.1, self.scale)), px(HINT_GAP, self.scale));
+        let (width, height) = (size.0 + 2 * padding.0, size.1 + 2 * padding.1);
+        let anchor = self.bar().button(button).unwrap_or_default().offset(self.place.left, self.place.top);
+        let left = (anchor.left + anchor.width() / 2 - width / 2).min(self.monitor.right - width).max(self.monitor.left);
+        let above = self.place.top - gap - height;
+        let top = if above >= self.monitor.top { above } else { self.place.bottom + gap };
+        unsafe {
+            SetWindowPos(self.hint, null_mut(), left, top, width, height, SWP_NOACTIVATE | SWP_NOZORDER);
+            InvalidateRect(self.hint, null(), 0);
+            ShowWindow(self.hint, SW_SHOWNOACTIVATE);
+        }
+    }
+
+    /// A click on the panel.
+    fn click(&mut self, button: Option<Button>) -> bool {
+        match button {
+            Some(Button::Pause) if self.counting().is_none() => self.shared.paused.store(true, Ordering::Relaxed),
+            Some(Button::Resume) => self.shared.paused.store(false, Ordering::Relaxed),
+            Some(Button::Stop) => return true,
+            _ => return false,
+        }
+        unsafe {
+            InvalidateRect(self.frame, null(), 0);
+            InvalidateRect(self.panel, null(), 0);
+            ShowWindow(self.hint, SW_HIDE);
+        }
+        // The button under the mouse has changed.
+        self.hovered = None;
+        false
+    }
+}
+
+/// Draws the panel of a recording: the dot, what it says, and the buttons.
+fn compose(buffer: &mut Buffer, font: &Font, bar: &Toolbar, text: &str, colour: Rgba, counting: bool, hovered: Option<Button>) {
+    let scale = bar.scale;
+    {
+        let mut frame = buffer.frame();
+        let [red, green, blue, alpha] = PANEL;
+        frame.pixels.chunks_exact_mut(4).for_each(|pixel| pixel.copy_from_slice(&[blue, green, red, alpha]));
+        let queries: [Icon; 0] = [];
+        let look = ToolbarLook {
+            tool: None,
+            hovered,
+            color: PANEL,
+            width: 0.0,
+            can_undo: false,
+            can_pause: !counting,
+            busy: None,
+            listening: false,
+            queries: &queries,
+            coming: None,
+        };
+        draw::toolbar(&mut frame, bar, &look);
+        let middle = bar.rect.height() as f32 / 2.0;
+        draw::mic_dot(&mut frame, (DOT_CENTRE * scale, middle), DOT_RADIUS * scale, colour);
+    }
+    let words: Vec<u16> = text.encode_utf16().collect();
+    let height = gdi::text_size(buffer.dc(), font, &words).1;
+    gdi::draw_text(buffer.dc(), font, &words, px(TIME_LEFT, scale), (bar.rect.height() - height) / 2, draw::TEXT);
+}
+
+/// What a button of the panel does.
+fn hint_of(button: Button) -> String {
+    match button {
+        Button::Pause => tr("Pause").into(),
+        Button::Resume => tr("Go on recording").into(),
+        _ => format!("{} · {}", tr("Stop"), app::settings().hotkey),
+    }
+}
+
+fn window(class: PCWSTR, place: Rect, extra: WINDOW_EX_STYLE) -> std::io::Result<HWND> {
+    let place = RECT { left: place.left, top: place.top, right: place.right, bottom: place.bottom };
+    let place = if QUIET { out_of_sight(place) } else { place };
+    let style = WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE | extra;
+    let (width, height) = (place.right - place.left, place.bottom - place.top);
+    let made = unsafe {
+        CreateWindowExW(style, class, null(), WS_POPUP, place.left, place.top, width, height, null_mut(), null_mut(), GetModuleHandleW(null()), null())
+    };
+    if made.is_null() { Err(last_error()) } else { Ok(made) }
+}
+
+fn register() {
+    if REGISTERED.replace(true) {
+        return;
+    }
+    for (class, procedure) in [
+        (FRAME_CLASS, frame_proc as unsafe extern "system" fn(HWND, u32, WPARAM, LPARAM) -> LRESULT),
+        (PANEL_CLASS, panel_proc),
+        (HINT_CLASS, hint_proc),
+    ] {
+        let class = WNDCLASSEXW {
+            cbSize: size_of::<WNDCLASSEXW>() as u32,
+            lpfnWndProc: Some(procedure),
+            hInstance: unsafe { GetModuleHandleW(null()) },
+            hCursor: unsafe { LoadCursorW(null_mut(), IDC_ARROW) },
+            lpszClassName: class,
+            ..Default::default()
+        };
+        unsafe { RegisterClassExW(&class) };
+    }
+}
+
+/// Does something with the recording going on. Windows calls the procedures again from inside
+/// some of the calls made here: such nested messages find nothing to do.
+fn with<T>(work: impl FnOnce(&mut Recording) -> T) -> Option<T> {
+    ACTIVE.with(|cell| cell.try_borrow_mut().ok()?.as_mut().map(work))
+}
+
+fn point(lparam: LPARAM) -> Point {
+    Point::new((lparam & 0xFFFF) as i16 as i32, ((lparam >> 16) & 0xFFFF) as i16 as i32)
+}
+
+unsafe extern "system" fn frame_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    match message {
+        WM_PAINT if with(|recording| recording.paint_frame()).is_some() => 0,
+        WM_ERASEBKGND => 1,
+        _ => unsafe { DefWindowProcW(window, message, wparam, lparam) },
+    }
+}
+
+unsafe extern "system" fn hint_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    match message {
+        WM_PAINT if with(|recording| recording.paint_hint()).is_some() => 0,
+        WM_ERASEBKGND => 1,
+        _ => unsafe { DefWindowProcW(window, message, wparam, lparam) },
+    }
+}
+
+unsafe extern "system" fn panel_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    match message {
+        WM_PAINT if with(Recording::paint_panel).is_some() => 0,
+        WM_ERASEBKGND => 1,
+        WM_TIMER => {
+            with(Recording::tick);
+            0
+        }
+        WM_MOUSEACTIVATE => MA_NOACTIVATE as LRESULT,
+        WM_MOUSEMOVE => {
+            let mut track = TRACKMOUSEEVENT {
+                cbSize: size_of::<TRACKMOUSEEVENT>() as u32,
+                dwFlags: TME_LEAVE,
+                hwndTrack: window,
+                dwHoverTime: 0,
+            };
+            unsafe { TrackMouseEvent(&mut track) };
+            with(|recording| {
+                let button = recording.bar().hit(point(lparam));
+                recording.hover(button);
+            });
+            0
+        }
+        WM_MOUSELEAVE => {
+            with(|recording| recording.hover(None));
+            0
+        }
+        WM_LBUTTONUP => {
+            let stopping = with(|recording| {
+                let button = recording.bar().hit(point(lparam));
+                recording.click(button)
+            });
+            if stopping == Some(true) {
+                stop();
+            }
+            0
+        }
+        _ => unsafe { DefWindowProcW(window, message, wparam, lparam) },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::image::Image;
+
+    #[test]
+    fn a_video_has_a_size_it_can_have() {
+        // An odd size loses a row, and the area with it.
+        let (area, size) = fitted(Rect::new(100, 200, 741, 563));
+        assert_eq!((area, size), (Rect::new(100, 200, 740, 562), (640, 362)));
+        // What is too small grows.
+        assert_eq!(fitted(Rect::new(0, 0, 5, 5)).1, (32, 32));
+        // What is too large stays whole, and is made smaller.
+        let wide = Rect::new(0, 0, 7680, 2160);
+        let (area, (width, height)) = fitted(wide);
+        assert_eq!(area, wide);
+        assert_eq!((width % 2, height % 2), (0, 0));
+        assert!(width <= 4096 && height <= 2304 && (width as f32 / height as f32 - 7680.0 / 2160.0).abs() < 0.01);
+    }
+
+    /// The panel as it counts, as it records with the mouse on Stop, and as it waits. With
+    /// `SCREENSHOT_PREVIEW=<folder>` the pictures stay there.
+    #[test]
+    fn the_panel_of_a_recording_shows_what_goes_on() {
+        for (name, scale, text, colour, paused, counting, hovered) in [
+            ("count", 1.0, "3", WAITING, false, true, None),
+            ("going", 1.0, "01:27", RECORDING, false, false, Some(Button::Stop)),
+            ("paused", 1.5, "12:04", WAITING, true, false, Some(Button::Resume)),
+        ] {
+            let bar = Toolbar::recording(room(scale), paused, scale);
+            assert!(bar.rect.width() > bar.rect.height() * 2, "{}", bar.rect.width());
+            let (width, height) = (bar.rect.width() as u32, bar.rect.height() as u32);
+            let mut buffer = Buffer::new(width, height).unwrap();
+            let font = Font::new(px(TIME_SIZE, scale), true).unwrap();
+            compose(&mut buffer, &font, &bar, text, colour, counting, hovered);
+            // The buttons stand after the room for the time, in the panel.
+            assert!(bar.buttons.iter().all(|(_, rect)| rect.left >= room(scale) && rect.right <= bar.rect.right));
+            if let Some(folder) = std::env::var_os("SCREENSHOT_PREVIEW") {
+                let picture = Image { width, height, pixels: buffer.frame().pixels.to_vec() };
+                std::fs::write(std::path::Path::new(&folder).join(format!("panel-{name}.png")), picture.to_png().unwrap()).unwrap();
+            }
+        }
+    }
+}

@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Միկրոֆոնը դեռ միացված չէր՝ պահեք կոճակը սեղմած, մինչև կարմիր կետը վառվի։",
     "The microphone didn't turn on.": "Միկրոֆոնը չմիացավ։",
     "The question asked aloud didn't go.": "Բարձրաձայն տրված հարցը չուղարկվեց։",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսելու նշան։"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսելու նշան։",
+    "Record a video or a GIF · Ctrl+R": "Տեսագրել վիդեո կամ GIF · Ctrl+R",
+    "Go on recording": "Շարունակել տեսագրումը",
+    "Stop": "Կանգնեցնել",
+    "The recording didn't start": "Տեսագրումը չսկսվեց",
+    "The recording stopped": "Տեսագրումը կանգ առավ",
+    "The recording didn't open": "Տեսագրությունը չբացվեց",
+    "Recording": "Տեսագրություն",
+    "This edition of Windows has no Media Feature Pack": "Windows-ի այս տարբերակում Media Feature Pack չկա",
+    "Recording saved": "Տեսագրությունը պահվեց",
+    "Recording saved and copied": "Տեսագրությունը պահվեց և պատճենվեց",
+    "Pause": "Դադար"
   },
   "settings": {
     "settings": "Կարգավորումներ",
@@ -399,6 +410,16 @@
     "tip": "Խորհուրդ. փորձեք {keys}՝ սքրինշոթ միայն ձախ ձեռքով, իսկ աջը մնում է մկնիկի վրա։",
     "use": "Օգտագործել",
     "next": "Հաջորդը"
+  },
+  "recorded": {
+    "video": "Վիդեո",
+    "copy": "Պատճենել",
+    "save": "Պահել",
+    "preparing": "Պատրաստվում է…",
+    "play": "Նվագարկել",
+    "pause": "Դադար",
+    "kilobytes": "ԿԲ",
+    "megabytes": "ՄԲ"
   },
   "installer": {
     "installTitle": "ainitShot {version}-ի տեղադրում",

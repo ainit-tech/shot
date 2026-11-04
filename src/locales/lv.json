@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofons vēl nebija ieslēgts: turiet pogu, līdz iedegas sarkanais punkts.",
     "The microphone didn't turn on.": "Mikrofons neieslēdzās.",
     "The question asked aloud didn't go.": "Balsī uzdotais jautājums netika nosūtīts.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: zīme runāt."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: zīme runāt.",
+    "Record a video or a GIF · Ctrl+R": "Ierakstīt video vai GIF · Ctrl+R",
+    "Go on recording": "Turpināt ierakstīšanu",
+    "Stop": "Apturēt",
+    "The recording didn't start": "Ierakstīšana nesākās",
+    "The recording stopped": "Ierakstīšana apstājās",
+    "The recording didn't open": "Ierakstu neizdevās atvērt",
+    "Recording": "Ieraksts",
+    "This edition of Windows has no Media Feature Pack": "Šajā Windows izdevumā nav Media Feature Pack",
+    "Recording saved": "Ieraksts saglabāts",
+    "Recording saved and copied": "Ieraksts saglabāts un nokopēts",
+    "Pause": "Pauze"
   },
   "settings": {
     "settings": "Iestatījumi",
@@ -399,6 +410,16 @@
     "tip": "Padoms: izmēģiniet {keys}: ekrānuzņēmums tikai ar kreiso roku, kamēr labā paliek uz peles.",
     "use": "Izmantot",
     "next": "Tālāk"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopēt",
+    "save": "Saglabāt",
+    "preparing": "Sagatavo…",
+    "play": "Atskaņot",
+    "pause": "Pauze",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Instalēt ainitShot {version}",

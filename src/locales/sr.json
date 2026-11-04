@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Микрофон још није био укључен: држите дугме док се не упали црвена тачка.",
     "The microphone didn't turn on.": "Микрофон се није укључио.",
     "The question asked aloud didn't go.": "Гласовно питање није послато.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Кратак звук када микрофон почне да слуша гласовно питање: знак да говорите."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Кратак звук када микрофон почне да слуша гласовно питање: знак да говорите.",
+    "Record a video or a GIF · Ctrl+R": "Сними видео или GIF · Ctrl+R",
+    "Go on recording": "Настави снимање",
+    "Stop": "Заустави",
+    "The recording didn't start": "Снимање није почело",
+    "The recording stopped": "Снимање је стало",
+    "The recording didn't open": "Снимак се није отворио",
+    "Recording": "Снимак",
+    "This edition of Windows has no Media Feature Pack": "Ово издање Windows-а нема Media Feature Pack",
+    "Recording saved": "Снимак је сачуван",
+    "Recording saved and copied": "Снимак је сачуван и копиран",
+    "Pause": "Пауза"
   },
   "settings": {
     "settings": "Подешавања",
@@ -399,6 +410,16 @@
     "tip": "Савет: пробајте {keys}: снимак само левом руком, док десна остаје на мишу.",
     "use": "Користи",
     "next": "Даље"
+  },
+  "recorded": {
+    "video": "Видео",
+    "copy": "Копирај",
+    "save": "Сачувај",
+    "preparing": "Припрема се…",
+    "play": "Пусти",
+    "pause": "Пауза",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Инсталација програма ainitShot {version}",

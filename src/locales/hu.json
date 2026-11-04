@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "A mikrofon még nem kapcsolt be: tartsd lenyomva a gombot, amíg a piros pont ki nem gyullad.",
     "The microphone didn't turn on.": "A mikrofon nem kapcsolt be.",
     "The question asked aloud didn't go.": "A hangosan feltett kérdés nem ment el.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: jel, hogy beszélhetsz."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: jel, hogy beszélhetsz.",
+    "Record a video or a GIF · Ctrl+R": "Videó vagy GIF rögzítése · Ctrl+R",
+    "Go on recording": "Felvétel folytatása",
+    "Stop": "Leállítás",
+    "The recording didn't start": "A felvétel nem indult el",
+    "The recording stopped": "A felvétel leállt",
+    "The recording didn't open": "A felvételt nem sikerült megnyitni",
+    "Recording": "Felvétel",
+    "This edition of Windows has no Media Feature Pack": "A Windows ezen kiadásában nincs Media Feature Pack",
+    "Recording saved": "Felvétel mentve",
+    "Recording saved and copied": "Felvétel mentve és másolva",
+    "Pause": "Szünet"
   },
   "settings": {
     "settings": "Beállítások",
@@ -399,6 +410,16 @@
     "tip": "Tipp: próbáld ki ezt a kombinációt: {keys}. Képernyőkép csak bal kézzel, a jobb kezed közben az egéren marad.",
     "use": "Használom",
     "next": "Tovább"
+  },
+  "recorded": {
+    "video": "Videó",
+    "copy": "Másolás",
+    "save": "Mentés",
+    "preparing": "Előkészítés…",
+    "play": "Lejátszás",
+    "pause": "Szünet",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Az ainitShot {version} telepítése",

@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon henüz açılmamıştı: kırmızı nokta yanana kadar düğmeyi basılı tutun.",
     "The microphone didn't turn on.": "Mikrofon açılmadı.",
     "The question asked aloud didn't go.": "Sesli soru gönderilmedi.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon sesli soruyu dinlemeye başladığında kısa bir ses: konuşma işareti."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon sesli soruyu dinlemeye başladığında kısa bir ses: konuşma işareti.",
+    "Record a video or a GIF · Ctrl+R": "Video veya GIF kaydet · Ctrl+R",
+    "Go on recording": "Kayda devam et",
+    "Stop": "Durdur",
+    "The recording didn't start": "Kayıt başlamadı",
+    "The recording stopped": "Kayıt durdu",
+    "The recording didn't open": "Kayıt açılmadı",
+    "Recording": "Kayıt",
+    "This edition of Windows has no Media Feature Pack": "Bu Windows sürümünde Media Feature Pack yok",
+    "Recording saved": "Kayıt kaydedildi",
+    "Recording saved and copied": "Kayıt kaydedildi ve kopyalandı",
+    "Pause": "Duraklat"
   },
   "settings": {
     "settings": "Ayarlar",
@@ -399,6 +410,16 @@
     "tip": "İpucu: {keys} deneyin: yalnızca sol elle ekran görüntüsü, sağ el ise farede kalır.",
     "use": "Kullan",
     "next": "İleri"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopyala",
+    "save": "Kaydet",
+    "preparing": "Hazırlanıyor…",
+    "play": "Oynat",
+    "pause": "Duraklat",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} kurulumu",

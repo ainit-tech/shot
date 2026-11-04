@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonas dar nebuvo įjungtas: laikykite mygtuką, kol užsidegs raudonas taškas.",
     "The microphone didn't turn on.": "Mikrofonas neįsijungė.",
     "The question asked aloud didn't go.": "Balsu užduotas klausimas neišsiųstas.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Trumpas garsas, kai mikrofonas pradeda klausytis balsu užduodamo klausimo: ženklas kalbėti."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Trumpas garsas, kai mikrofonas pradeda klausytis balsu užduodamo klausimo: ženklas kalbėti.",
+    "Record a video or a GIF · Ctrl+R": "Įrašyti vaizdo įrašą arba GIF · Ctrl+R",
+    "Go on recording": "Tęsti įrašymą",
+    "Stop": "Stabdyti",
+    "The recording didn't start": "Įrašymas neprasidėjo",
+    "The recording stopped": "Įrašymas sustojo",
+    "The recording didn't open": "Įrašo nepavyko atidaryti",
+    "Recording": "Įrašas",
+    "This edition of Windows has no Media Feature Pack": "Šiame „Windows“ leidime nėra „Media Feature Pack“",
+    "Recording saved": "Įrašas išsaugotas",
+    "Recording saved and copied": "Įrašas išsaugotas ir nukopijuotas",
+    "Pause": "Pristabdyti"
   },
   "settings": {
     "settings": "Nustatymai",
@@ -399,6 +410,16 @@
     "tip": "Patarimas: išbandykite {keys}: ekrano kopija vien kaire ranka, o dešinė lieka ant pelės.",
     "use": "Naudoti",
     "next": "Toliau"
+  },
+  "recorded": {
+    "video": "Vaizdo įrašas",
+    "copy": "Kopijuoti",
+    "save": "Įrašyti",
+    "preparing": "Ruošiama…",
+    "play": "Leisti",
+    "pause": "Pristabdyti",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Įdiegti „ainitShot“ {version}",

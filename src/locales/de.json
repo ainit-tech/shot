@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Das Mikrofon war noch nicht an: Halten Sie die Schaltfläche gedrückt, bis der rote Punkt leuchtet.",
     "The microphone didn't turn on.": "Das Mikrofon hat sich nicht eingeschaltet.",
     "The question asked aloud didn't go.": "Die gesprochene Frage wurde nicht gesendet.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: das Zeichen zum Sprechen."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: das Zeichen zum Sprechen.",
+    "Record a video or a GIF · Ctrl+R": "Video oder GIF aufnehmen · Strg+R",
+    "Go on recording": "Aufnahme fortsetzen",
+    "Stop": "Beenden",
+    "The recording didn't start": "Die Aufnahme ist nicht gestartet",
+    "The recording stopped": "Die Aufnahme ist abgebrochen",
+    "The recording didn't open": "Die Aufnahme wurde nicht geöffnet",
+    "Recording": "Aufnahme",
+    "This edition of Windows has no Media Feature Pack": "Diese Windows-Edition hat kein Media Feature Pack",
+    "Recording saved": "Aufnahme gespeichert",
+    "Recording saved and copied": "Aufnahme gespeichert und kopiert",
+    "Pause": "Pause"
   },
   "settings": {
     "settings": "Einstellungen",
@@ -399,6 +410,16 @@
     "tip": "Tipp: Probieren Sie {keys}: ein Screenshot nur mit der linken Hand, während die rechte auf der Maus bleibt.",
     "use": "Übernehmen",
     "next": "Weiter"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopieren",
+    "save": "Speichern",
+    "preparing": "Wird vorbereitet…",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} installieren",

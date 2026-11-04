@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Мікрофон ще не ввімкнувся: тримайте кнопку, доки не засвітиться червона крапка.",
     "The microphone didn't turn on.": "Мікрофон не ввімкнувся.",
     "The question asked aloud didn't go.": "Питання голосом не надіслано.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, коли мікрофон починає слухати питання голосом: знак, що можна говорити."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, коли мікрофон починає слухати питання голосом: знак, що можна говорити.",
+    "Record a video or a GIF · Ctrl+R": "Записати відео або GIF · Ctrl+R",
+    "Go on recording": "Продовжити запис",
+    "Stop": "Зупинити",
+    "The recording didn't start": "Запис не почався",
+    "The recording stopped": "Запис зупинився",
+    "The recording didn't open": "Запис не відкрився",
+    "Recording": "Запис",
+    "This edition of Windows has no Media Feature Pack": "У цьому випуску Windows немає Media Feature Pack",
+    "Recording saved": "Запис збережено",
+    "Recording saved and copied": "Запис збережено і скопійовано",
+    "Pause": "Пауза"
   },
   "settings": {
     "settings": "Налаштування",
@@ -399,6 +410,16 @@
     "tip": "Порада: спробуйте {keys} — знімок однією лівою рукою, а права лишається на миші.",
     "use": "Використати",
     "next": "Далі"
+  },
+  "recorded": {
+    "video": "Відео",
+    "copy": "Копіювати",
+    "save": "Зберегти",
+    "preparing": "Готується…",
+    "play": "Відтворити",
+    "pause": "Пауза",
+    "kilobytes": "КБ",
+    "megabytes": "МБ"
   },
   "installer": {
     "installTitle": "Встановлення ainitShot {version}",

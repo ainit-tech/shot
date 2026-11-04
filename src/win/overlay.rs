@@ -23,7 +23,7 @@ use windows_sys::Win32::UI::Input::Ime::{
 };
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::{
     GetAsyncKeyState, GetKeyState, ReleaseCapture, SetCapture, VK_A, VK_BACK, VK_C, VK_CONTROL, VK_DELETE, VK_END,
-    VK_ESCAPE, VK_HOME, VK_LBUTTON, VK_LEFT, VK_M, VK_RBUTTON, VK_RETURN, VK_RIGHT, VK_S, VK_SHIFT, VK_V, VK_Y, VK_Z,
+    VK_ESCAPE, VK_HOME, VK_LBUTTON, VK_LEFT, VK_M, VK_R, VK_RBUTTON, VK_RETURN, VK_RIGHT, VK_S, VK_SHIFT, VK_V, VK_Y, VK_Z,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
     CS_DBLCLKS, CreateWindowExW, DefWindowProcW, GetCursorPos, GetSystemMetrics, HTCLIENT, HWND_TOPMOST, IDC_APPSTARTING,
@@ -39,7 +39,7 @@ use windows_sys::w;
 use super::capture::{self, Screen};
 use super::gdi::{self, Buffer, Font};
 use super::browser::{self, Heard};
-use super::{app, card, clipboard, last_error, masking, models, ocr, shell};
+use super::{app, card, clipboard, last_error, masking, models, ocr, record, shell};
 use crate::annotation::{self, Annotation, Draft, Grip, History, Label, Shape, Tool};
 use crate::areas::Areas;
 use crate::color::Rgba;
@@ -430,6 +430,7 @@ enum Action {
     /// Saving where the user says, whatever the settings.
     SaveAs,
     Mask,
+    Record,
     Undo,
     Redo,
     SelectMonitor,
@@ -792,6 +793,7 @@ impl Overlay {
             VK_S if ctrl && shift => Action::SaveAs,
             VK_S if ctrl => Action::Save,
             VK_M if ctrl => Action::Mask,
+            VK_R if ctrl => Action::Record,
             VK_Z if ctrl && shift => Action::Redo,
             VK_Z if ctrl => Action::Undo,
             VK_Y if ctrl => Action::Redo,
@@ -830,6 +832,7 @@ impl Overlay {
             Action::Save => self.save(false),
             Action::SaveAs => self.save(true),
             Action::Mask => self.mask(),
+            Action::Record => self.record(),
             Action::Undo => self.change_history(History::undo),
             Action::Redo => self.change_history(History::redo),
             Action::SelectMonitor => self.select_monitor(),
@@ -862,8 +865,10 @@ impl Overlay {
             Button::Copy => self.copy(),
             Button::CopyText => self.copy_text(),
             Button::Save => self.save(false),
+            Button::Record => self.record(),
             Button::Query(i) => self.query(i),
             Button::Close => self.close(),
+            Button::Pause | Button::Resume | Button::Stop => {}
         }
     }
 
@@ -1060,7 +1065,7 @@ impl Overlay {
         let name = shell::file_name(&save.name);
         let ask = ask || save.ask;
         let path = if ask {
-            match shell::ask_where_to_save(window, &folder, &name) {
+            match shell::ask_where_to_save(window, &folder, &name, "png") {
                 Some(path) => path,
                 None => return,
             }
@@ -1069,7 +1074,7 @@ impl Overlay {
                 app::notify(cannot_save(), &format!("{}: {error}", folder.display()));
                 return;
             }
-            shell::new_path(&folder, &name)
+            shell::new_path(&folder, &name, "png")
         };
         match picture.to_png().and_then(|png| fs::write(&path, png).map_err(|e| e.to_string())) {
             Ok(()) => {
@@ -1085,6 +1090,20 @@ impl Overlay {
             }
             Err(error) => app::notify(cannot_save(), &format!("{}: {error}", path.display())),
         }
+    }
+
+    /// Starts a recording of what is selected: the overlay goes, and with it what is drawn on the
+    /// frozen screen, and the panel of the recording comes in place of the panel of actions.
+    fn record(&mut self) {
+        let Some(session) = &self.session else { return };
+        let (Some(selection), Some((_, actions))) = (session.selection.rect(), session.panels()) else { return };
+        let Some(button) = actions.button(Button::Record) else { return };
+        let origin = session.screen.origin;
+        let monitor = session.screen.monitor_at(button.top_left()).rect.offset(origin.x, origin.y);
+        let panel = actions.instead(button, record::panel_size(actions.scale)).offset(origin.x, origin.y);
+        let (area, scale) = (selection.offset(origin.x, origin.y), actions.scale);
+        self.close();
+        record::start(area, panel, monitor, scale);
     }
 
     /// A button for a conversation is pressed: let go at once, it asks the question of the
@@ -1864,6 +1883,7 @@ impl Session {
                 true => tr("Save · Ctrl+S").into(),
                 false => tr("Save · Ctrl+S · choose where · Ctrl+Shift+S").into(),
             },
+            Button::Record => tr("Record a video or a GIF · Ctrl+R").into(),
             Button::Query(i) => {
                 let button = &self.settings.buttons[i];
                 match button.key() {
@@ -1872,6 +1892,7 @@ impl Session {
                 }
             }
             Button::Close => tr("Close · Esc").into(),
+            Button::Pause | Button::Resume | Button::Stop => String::new(),
         }
     }
 
@@ -2010,6 +2031,7 @@ impl Session {
             color: self.colors[self.color],
             width: self.width,
             can_undo: !self.history.is_empty(),
+            can_pause: false,
             busy: self.sending.as_ref().map(|s| s.button).or(self.listening.as_ref().map(|l| l.button)),
             listening: self.listening.as_ref().is_some_and(|l| l.on && (!l.released || l.words.is_empty())),
             queries: &queries,
@@ -2342,6 +2364,7 @@ mod tests {
             color: red,
             width: 4.0,
             can_undo: true,
+            can_pause: false,
             busy: None,
             listening: false,
             queries: &queries,

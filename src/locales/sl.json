@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon še ni bil vklopljen: držite gumb, dokler ne zasveti rdeča pika.",
     "The microphone didn't turn on.": "Mikrofon se ni vklopil.",
     "The question asked aloud didn't go.": "Glasovno vprašanje ni bilo poslano.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Kratek zvok, ko mikrofon začne poslušati glasovno vprašanje: znak, da lahko govorite."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Kratek zvok, ko mikrofon začne poslušati glasovno vprašanje: znak, da lahko govorite.",
+    "Record a video or a GIF · Ctrl+R": "Posnemi videoposnetek ali GIF · Ctrl+R",
+    "Go on recording": "Nadaljuj snemanje",
+    "Stop": "Ustavi",
+    "The recording didn't start": "Snemanje se ni začelo",
+    "The recording stopped": "Snemanje se je ustavilo",
+    "The recording didn't open": "Posnetka ni bilo mogoče odpreti",
+    "Recording": "Posnetek",
+    "This edition of Windows has no Media Feature Pack": "Ta izdaja sistema Windows nima paketa Media Feature Pack",
+    "Recording saved": "Posnetek je shranjen",
+    "Recording saved and copied": "Posnetek je shranjen in kopiran",
+    "Pause": "Premor"
   },
   "settings": {
     "settings": "Nastavitve",
@@ -399,6 +410,16 @@
     "tip": "Nasvet: poskusite {keys}: posnetek samo z levo roko, desna pa ostane na miški.",
     "use": "Uporabi",
     "next": "Naprej"
+  },
+  "recorded": {
+    "video": "Videoposnetek",
+    "copy": "Kopiraj",
+    "save": "Shrani",
+    "preparing": "Pripravljanje …",
+    "play": "Predvajaj",
+    "pause": "Premor",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Namestitev programa ainitShot {version}",

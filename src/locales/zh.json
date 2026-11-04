@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "麦克风还没打开：按住按钮，直到红点亮起。",
     "The microphone didn't turn on.": "麦克风没有打开。",
     "The question asked aloud didn't go.": "语音提问没有发出。",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 麦克风开始聆听语音提问时发出的短促声音：提示可以说话了。"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 麦克风开始聆听语音提问时发出的短促声音：提示可以说话了。",
+    "Record a video or a GIF · Ctrl+R": "录制视频或 GIF · Ctrl+R",
+    "Go on recording": "继续录制",
+    "Stop": "停止",
+    "The recording didn't start": "录制未能开始",
+    "The recording stopped": "录制已停止",
+    "The recording didn't open": "录制内容未能打开",
+    "Recording": "录制",
+    "This edition of Windows has no Media Feature Pack": "此 Windows 版本没有 Media Feature Pack",
+    "Recording saved": "录制内容已保存",
+    "Recording saved and copied": "录制内容已保存并复制",
+    "Pause": "暂停"
   },
   "settings": {
     "settings": "设置",
@@ -399,6 +410,16 @@
     "tip": "提示：试试 {keys}——只用左手就能截图，右手可以一直放在鼠标上。",
     "use": "使用",
     "next": "下一步"
+  },
+  "recorded": {
+    "video": "视频",
+    "copy": "复制",
+    "save": "保存",
+    "preparing": "正在准备…",
+    "play": "播放",
+    "pause": "暂停",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "安装 ainitShot {version}",

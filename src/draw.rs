@@ -505,6 +505,8 @@ pub struct ToolbarLook<'a> {
     /// The line width at 100%, shown by the size of the colour's dot.
     pub width: f32,
     pub can_undo: bool,
+    /// Whether a recording can be paused: not before it has begun.
+    pub can_pause: bool,
     /// The query button whose screenshot is being sent; the other buttons wait meanwhile.
     pub busy: Option<usize>,
     /// Whether the busy button's microphone listens to a question asked aloud: the button is red,
@@ -542,7 +544,7 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
             Button::Query(i) => look.busy == Some(i),
             _ => false,
         };
-        let enabled = look.busy.is_none() && (button != Button::Undo || look.can_undo);
+        let enabled = look.busy.is_none() && (button != Button::Undo || look.can_undo) && (button != Button::Pause || look.can_pause);
         let inset = (2.0 * scale).round();
         let back = rounded_rect(
             rect.left as f32 + inset,
@@ -578,6 +580,10 @@ pub fn toolbar(frame: &mut Frame, bar: &Toolbar, look: &ToolbarLook) -> Vec<Text
             Button::Copy => icons::COPY,
             Button::CopyText => icons::TEXT_COPY,
             Button::Save => icons::SAVE,
+            Button::Record => icons::RECORD,
+            Button::Pause => icons::PAUSE,
+            Button::Resume => icons::RESUME,
+            Button::Stop => icons::STOP,
             Button::Close => icons::CLOSE,
             Button::Query(i) => {
                 let shown = match look.queries.get(i).copied().unwrap_or(Icon::Images) {

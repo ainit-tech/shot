@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Microfonul nu era încă pornit: țineți apăsat butonul până se aprinde punctul roșu.",
     "The microphone didn't turn on.": "Microfonul nu a pornit.",
     "The question asked aloud didn't go.": "Întrebarea pusă cu voce tare nu a plecat.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: semnalul să vorbiți."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: semnalul să vorbiți.",
+    "Record a video or a GIF · Ctrl+R": "Înregistrați un videoclip sau un GIF · Ctrl+R",
+    "Go on recording": "Continuați înregistrarea",
+    "Stop": "Opriți",
+    "The recording didn't start": "Înregistrarea nu a pornit",
+    "The recording stopped": "Înregistrarea s-a oprit",
+    "The recording didn't open": "Înregistrarea nu s-a deschis",
+    "Recording": "Înregistrare",
+    "This edition of Windows has no Media Feature Pack": "Această ediție de Windows nu are Media Feature Pack",
+    "Recording saved": "Înregistrarea a fost salvată",
+    "Recording saved and copied": "Înregistrarea a fost salvată și copiată",
+    "Pause": "Pauză"
   },
   "settings": {
     "settings": "Setări",
@@ -399,6 +410,16 @@
     "tip": "Sfat: încercați {keys}: o captură doar cu mâna stângă, în timp ce dreapta rămâne pe mouse.",
     "use": "Folosiți",
     "next": "Înainte"
+  },
+  "recorded": {
+    "video": "Videoclip",
+    "copy": "Copiați",
+    "save": "Salvați",
+    "preparing": "Se pregătește…",
+    "play": "Redare",
+    "pause": "Pauză",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Instalarea ainitShot {version}",

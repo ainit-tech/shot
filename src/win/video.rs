@@ -1,19 +1,29 @@
 //! Video files through Media Foundation, a part of Windows: nothing of it is built into the
 //! program. A recording goes frame by frame into an MP4 file of H.264, on the graphics card where
-//! it can; for a GIF or a shorter video the file is read back frame by frame.
+//! it can; for a GIF or a shorter video the file is read back frame by frame. Its libraries are
+//! looked for when first needed: the N editions of Windows come without them, and the program
+//! has to start there all the same.
 
+use std::ffi::c_void;
 use std::path::Path;
-use std::sync::Once;
+use std::ptr::null_mut;
+use std::sync::OnceLock;
 
+use windows::Win32::Foundation::E_NOTIMPL;
 use windows::Win32::Media::MediaFoundation::{
-    IMFAttributes, IMFMediaType, IMFSample, IMFSinkWriter, IMFSourceReader, MF_MT_AVG_BITRATE, MF_MT_DEFAULT_STRIDE,
-    MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE, MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE, MF_MT_MINIMUM_DISPLAY_APERTURE, MF_MT_PIXEL_ASPECT_RATIO, MF_MT_SUBTYPE,
-    MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-    MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED, MF_SOURCE_READERF_ENDOFSTREAM, MF_VERSION, MFCreateAttributes, MFCreateMediaType, MFCreateMemoryBuffer, MFCreateSample,
-    MFCreateSinkWriterFromURL, MFCreateSourceReaderFromURL, MFMediaType_Video, MFSTARTUP_FULL, MFStartup, MFVideoFormat_H264,
-    MFVideoArea, MFVideoFormat_RGB32, MFVideoInterlace_Progressive,
+    IMFAttributes, IMFMediaBuffer, IMFMediaType, IMFSample, IMFSinkWriter, IMFSourceReader, MF_MT_AVG_BITRATE,
+    MF_MT_DEFAULT_STRIDE, MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE, MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE,
+    MF_MT_MINIMUM_DISPLAY_APERTURE, MF_MT_PIXEL_ASPECT_RATIO, MF_MT_SUBTYPE, MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS,
+    MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READERF_CURRENTMEDIATYPECHANGED,
+    MF_SOURCE_READERF_ENDOFSTREAM, MF_VERSION, MFMediaType_Video, MFSTARTUP_FULL, MFVideoArea, MFVideoFormat_H264,
+    MFVideoFormat_RGB32, MFVideoInterlace_Progressive,
 };
-use windows_core::{HSTRING, Result};
+use windows_core::{HRESULT, HSTRING, Interface, PCWSTR, Result};
+use windows_sys::Win32::Foundation::HMODULE;
+use windows_sys::Win32::System::LibraryLoader::{GetProcAddress, LOAD_LIBRARY_SEARCH_SYSTEM32, LoadLibraryExW};
+use windows_sys::w;
+
+use crate::text::tr;
 
 /// The frames a second of a recording, and how many of Media Foundation's units of time, a tenth
 /// of a microsecond each, a second has.
@@ -26,12 +36,57 @@ const BITS: f32 = 0.2;
 const LEAST_RATE: f32 = 1_000_000.0;
 const MOST_RATE: f32 = 40_000_000.0;
 
-/// Starts Media Foundation for the program, once; it stays for as long as the program.
-fn start() -> Result<()> {
-    static START: Once = Once::new();
-    let mut started = Ok(());
-    START.call_once(|| started = unsafe { MFStartup(MF_VERSION, MFSTARTUP_FULL) });
-    started
+/// Where a function of Media Foundation puts what it makes.
+type Made = *mut *mut c_void;
+
+/// The functions of Media Foundation, once found.
+struct Foundation {
+    attributes: unsafe extern "system" fn(Made, u32) -> HRESULT,
+    media_type: unsafe extern "system" fn(Made) -> HRESULT,
+    memory_buffer: unsafe extern "system" fn(u32, Made) -> HRESULT,
+    sample: unsafe extern "system" fn(Made) -> HRESULT,
+    sink_writer: unsafe extern "system" fn(PCWSTR, *mut c_void, *mut c_void, Made) -> HRESULT,
+    source_reader: unsafe extern "system" fn(PCWSTR, *mut c_void, Made) -> HRESULT,
+}
+
+/// A function of a library, by its name with a zero at the end.
+unsafe fn function<F: Copy>(library: HMODULE, name: &str) -> Option<F> {
+    let found = unsafe { GetProcAddress(library, name.as_ptr()) }?;
+    Some(unsafe { std::mem::transmute_copy(&found) })
+}
+
+/// Finds Media Foundation and starts it for the program, once: it stays for as long as the
+/// program.
+fn foundation() -> Result<&'static Foundation> {
+    static FOUNDATION: OnceLock<Option<Foundation>> = OnceLock::new();
+    let found = FOUNDATION.get_or_init(|| unsafe {
+        let platform = LoadLibraryExW(w!("mfplat.dll"), null_mut(), LOAD_LIBRARY_SEARCH_SYSTEM32);
+        let files = LoadLibraryExW(w!("mfreadwrite.dll"), null_mut(), LOAD_LIBRARY_SEARCH_SYSTEM32);
+        if platform.is_null() || files.is_null() {
+            return None;
+        }
+        let start: unsafe extern "system" fn(u32, u32) -> HRESULT = function(platform, "MFStartup\0")?;
+        start(MF_VERSION, MFSTARTUP_FULL).ok().ok()?;
+        Some(Foundation {
+            attributes: function(platform, "MFCreateAttributes\0")?,
+            media_type: function(platform, "MFCreateMediaType\0")?,
+            memory_buffer: function(platform, "MFCreateMemoryBuffer\0")?,
+            sample: function(platform, "MFCreateSample\0")?,
+            sink_writer: function(files, "MFCreateSinkWriterFromURL\0")?,
+            source_reader: function(files, "MFCreateSourceReaderFromURL\0")?,
+        })
+    });
+    found.as_ref().ok_or_else(|| windows_core::Error::new(E_NOTIMPL, tr("This edition of Windows has no Media Feature Pack")))
+}
+
+/// What a function of Media Foundation makes.
+unsafe fn made<T: Interface>(make: impl FnOnce(Made) -> HRESULT) -> Result<T> {
+    let mut made = null_mut();
+    make(&mut made).ok()?;
+    if made.is_null() {
+        return Err(windows_core::Error::empty());
+    }
+    Ok(unsafe { T::from_raw(made) })
 }
 
 /// Two numbers as Media Foundation keeps them in one: a size or a fraction.
@@ -40,14 +95,14 @@ fn pair(high: u32, low: u32) -> u64 {
 }
 
 fn attributes(count: u32) -> Result<IMFAttributes> {
-    let mut made = None;
-    unsafe { MFCreateAttributes(&mut made, count)? };
-    made.ok_or_else(windows_core::Error::empty)
+    let foundation = foundation()?;
+    unsafe { made(|place| (foundation.attributes)(place, count)) }
 }
 
 fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
+    let foundation = foundation()?;
     unsafe {
-        let kind = MFCreateMediaType()?;
+        let kind: IMFMediaType = made(|place| (foundation.media_type)(place))?;
         kind.SetGUID(&MF_MT_MAJOR_TYPE, &MFMediaType_Video)?;
         kind.SetGUID(&MF_MT_SUBTYPE, subtype)?;
         Ok(kind)
@@ -65,11 +120,13 @@ pub struct Writer {
 impl Writer {
     /// A new file of frames of this size, both of which H.264 wants even.
     pub fn create(path: &Path, width: u32, height: u32) -> Result<Writer> {
-        start()?;
+        let foundation = foundation()?;
         unsafe {
             let settings = attributes(1)?;
             settings.SetUINT32(&MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1)?;
-            let sink = MFCreateSinkWriterFromURL(&HSTRING::from(path), None, &settings)?;
+            let path = HSTRING::from(path);
+            let sink: IMFSinkWriter =
+                made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), settings.as_raw(), place))?;
             let frame = |kind: &IMFMediaType| -> Result<()> {
                 kind.SetUINT32(&MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive.0 as u32)?;
                 kind.SetUINT64(&MF_MT_FRAME_SIZE, pair(width, height))?;
@@ -97,8 +154,9 @@ impl Writer {
     pub fn write(&mut self, pixels: &[u8], stride: usize, time: i64, length: i64) -> Result<()> {
         let row = self.width * 4;
         let size = (row * self.height) as u32;
+        let foundation = foundation()?;
         unsafe {
-            let buffer = MFCreateMemoryBuffer(size)?;
+            let buffer: IMFMediaBuffer = made(|place| (foundation.memory_buffer)(size, place))?;
             let mut target = std::ptr::null_mut();
             buffer.Lock(&mut target, None, None)?;
             for (y, line) in pixels.chunks(stride).take(self.height).enumerate() {
@@ -106,7 +164,7 @@ impl Writer {
             }
             buffer.Unlock()?;
             buffer.SetCurrentLength(size)?;
-            let sample: IMFSample = MFCreateSample()?;
+            let sample: IMFSample = made(|place| (foundation.sample)(place))?;
             sample.AddBuffer(&buffer)?;
             sample.SetSampleTime(time)?;
             sample.SetSampleDuration(length)?;
@@ -136,11 +194,13 @@ const STREAM: u32 = MF_SOURCE_READER_FIRST_VIDEO_STREAM.0 as u32;
 
 impl Reader {
     pub fn open(path: &Path) -> Result<Reader> {
-        start()?;
+        let foundation = foundation()?;
         unsafe {
             let settings = attributes(1)?;
-            settings.SetUINT32(&MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, 1)?;
-            let reader = MFCreateSourceReaderFromURL(&HSTRING::from(path), &settings)?;
+            // The plain conversion takes 36 ms for a frame of 1920 by 1080, this one 9.
+            settings.SetUINT32(&MF_SOURCE_READER_ENABLE_ADVANCED_VIDEO_PROCESSING, 1)?;
+            let path = HSTRING::from(path);
+            let reader: IMFSourceReader = made(|place| (foundation.source_reader)(PCWSTR(path.as_ptr()), settings.as_raw(), place))?;
             let wanted = video_type(&MFVideoFormat_RGB32)?;
             reader.SetCurrentMediaType(STREAM, None, &wanted)?;
             let mut made = Reader { reader, width: 0, height: 0, rows: 0, stride: 0 };

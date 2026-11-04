@@ -169,20 +169,40 @@ fn channel(bin: usize, c: usize) -> usize {
     bin >> (10 - 5 * c) & 31
 }
 
-/// The colours of a frame, and the colour of every bin: boxes of bins are cut in two across their
-/// widest channel, at the middle of their pixels, the largest box first.
+/// Bins that will have one colour, until they are cut in two.
+struct Group {
+    bins: Vec<usize>,
+    /// The channel they are the most apart in.
+    across: usize,
+    /// How much cutting them is worth: how many pixels they have, by how far apart they are.
+    weight: u64,
+}
+
+impl Group {
+    fn new(list: Vec<usize>, bins: &[Bin]) -> Group {
+        let spread = |c: usize| {
+            let (mut low, mut high) = (usize::MAX, 0);
+            for &n in &list {
+                let value = channel(n, c);
+                (low, high) = (low.min(value), high.max(value));
+            }
+            high.saturating_sub(low)
+        };
+        let widths = [spread(0), spread(1), spread(2)];
+        let across = (0..3).max_by_key(|&c| widths[c]).unwrap_or(0);
+        let count: u64 = list.iter().map(|&n| bins[n].count as u64).sum();
+        Group { bins: list, across, weight: count * widths[across] as u64 }
+    }
+}
+
+/// The colours of a frame, and the colour of every bin: groups of bins are cut in two across their
+/// widest channel, at the middle of their pixels, the largest group first.
 fn colours(bins: &[Bin]) -> (Vec<[u8; 3]>, Vec<u8>) {
     let used: Vec<usize> = (0..bins.len()).filter(|&n| bins[n].count > 0).collect();
-    let mut boxes = vec![used];
-    while boxes.len() < COLOURS {
-        let weight = |list: &Vec<usize>| {
-            let count: u64 = list.iter().map(|&n| bins[n].count as u64).sum();
-            let width = (0..3).map(|c| spread(list, c)).max().unwrap_or(0) as u64;
-            count * width
-        };
-        let Some(largest) = (0..boxes.len()).filter(|&n| boxes[n].len() > 1).max_by_key(|&n| weight(&boxes[n])) else { break };
-        let mut list = boxes.swap_remove(largest);
-        let across = (0..3).max_by_key(|&c| spread(&list, c)).unwrap_or(0);
+    let mut groups = vec![Group::new(used, bins)];
+    while groups.len() < COLOURS {
+        let Some(largest) = (0..groups.len()).filter(|&n| groups[n].bins.len() > 1).max_by_key(|&n| groups[n].weight) else { break };
+        let Group { bins: mut list, across, .. } = groups.swap_remove(largest);
         list.sort_unstable_by_key(|&n| channel(n, across));
         let half: u64 = list.iter().map(|&n| bins[n].count as u64).sum::<u64>() / 2;
         let mut passed = 0;
@@ -195,29 +215,23 @@ fn colours(bins: &[Bin]) -> (Vec<[u8; 3]>, Vec<u8>) {
             }
         }
         let rest = list.split_off(cut);
-        boxes.push(list);
-        boxes.push(rest);
+        groups.push(Group::new(list, bins));
+        groups.push(Group::new(rest, bins));
     }
     let mut map = vec![0u8; bins.len()];
-    let mut palette = Vec::with_capacity(boxes.len());
-    for list in &boxes {
+    let mut palette = Vec::with_capacity(groups.len());
+    for group in &groups {
         let (mut count, mut sum) = (0u64, [0u64; 3]);
-        for &n in list {
+        for &n in &group.bins {
             count += bins[n].count as u64;
-            for c in 0..3 {
-                sum[c] += bins[n].sum[c] as u64;
+            for (sum, &part) in sum.iter_mut().zip(&bins[n].sum) {
+                *sum += part as u64;
             }
             map[n] = palette.len() as u8;
         }
         palette.push(sum.map(|s| (s / count.max(1)) as u8));
     }
     (palette, map)
-}
-
-/// How far apart the bins of a box are in a channel.
-fn spread(list: &[usize], c: usize) -> usize {
-    let values = list.iter().map(|&n| channel(n, c));
-    values.clone().max().unwrap_or(0) - values.min().unwrap_or(0)
 }
 
 /// Packs the indices with LZW into blocks of 255 bytes at most.

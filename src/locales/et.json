@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon polnud veel sees: hoidke nuppu all, kuni punane täpp süttib.",
     "The microphone didn't turn on.": "Mikrofon ei läinud sisse.",
     "The question asked aloud didn't go.": "Häälega esitatud küsimust ei saadetud.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: märk, et võib rääkida."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: märk, et võib rääkida.",
+    "Record a video or a GIF · Ctrl+R": "Lindista video või GIF · Ctrl+R",
+    "Go on recording": "Jätka lindistamist",
+    "Stop": "Lõpeta",
+    "The recording didn't start": "Lindistamine ei alanud",
+    "The recording stopped": "Lindistamine katkes",
+    "The recording didn't open": "Lindistust ei saanud avada",
+    "Recording": "Lindistus",
+    "This edition of Windows has no Media Feature Pack": "Selles Windowsi väljaandes pole Media Feature Packi",
+    "Recording saved": "Lindistus salvestatud",
+    "Recording saved and copied": "Lindistus salvestatud ja kopeeritud",
+    "Pause": "Paus"
   },
   "settings": {
     "settings": "Sätted",
@@ -399,6 +410,16 @@
     "tip": "Nõuanne: proovige {keys}: kuvatõmmis ainult vasaku käega, samal ajal kui parem jääb hiirele.",
     "use": "Kasuta",
     "next": "Edasi"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopeeri",
+    "save": "Salvesta",
+    "preparing": "Valmistan ette…",
+    "play": "Esita",
+    "pause": "Paus",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} paigaldamine",

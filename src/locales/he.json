@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "המיקרופון עוד לא הופעל: החזיקו את הכפתור עד שהנקודה האדומה תידלק.",
     "The microphone didn't turn on.": "המיקרופון לא הופעל.",
     "The question asked aloud didn't go.": "השאלה בקול לא נשלחה.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: הסימן לדבר."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: הסימן לדבר.",
+    "Record a video or a GIF · Ctrl+R": "הקלטת וידאו או GIF · Ctrl+R",
+    "Go on recording": "המשך הקלטה",
+    "Stop": "עצירה",
+    "The recording didn't start": "ההקלטה לא התחילה",
+    "The recording stopped": "ההקלטה נעצרה",
+    "The recording didn't open": "ההקלטה לא נפתחה",
+    "Recording": "הקלטה",
+    "This edition of Windows has no Media Feature Pack": "במהדורה זו של Windows אין Media Feature Pack",
+    "Recording saved": "ההקלטה נשמרה",
+    "Recording saved and copied": "ההקלטה נשמרה והועתקה",
+    "Pause": "השהיה"
   },
   "settings": {
     "settings": "הגדרות",
@@ -399,6 +410,16 @@
     "tip": "טיפ: נסו את {keys}: צילום מסך ביד שמאל בלבד, בזמן שיד ימין נשארת על העכבר.",
     "use": "שימוש",
     "next": "הבא"
+  },
+  "recorded": {
+    "video": "וידאו",
+    "copy": "העתקה",
+    "save": "שמירה",
+    "preparing": "בהכנה…",
+    "play": "הפעלה",
+    "pause": "השהיה",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "התקנת ainitShot {version}",

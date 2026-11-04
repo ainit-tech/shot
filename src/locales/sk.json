@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofón ešte nebol zapnutý: držte tlačidlo, kým sa nerozsvieti červená bodka.",
     "The microphone didn't turn on.": "Mikrofón sa nezapol.",
     "The question asked aloud didn't go.": "Otázka položená hlasom sa neodoslala.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: znamenie, že môžete hovoriť."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: znamenie, že môžete hovoriť.",
+    "Record a video or a GIF · Ctrl+R": "Nahrať video alebo GIF · Ctrl+R",
+    "Go on recording": "Pokračovať v nahrávaní",
+    "Stop": "Zastaviť",
+    "The recording didn't start": "Nahrávanie sa nespustilo",
+    "The recording stopped": "Nahrávanie sa zastavilo",
+    "The recording didn't open": "Nahrávku sa nepodarilo otvoriť",
+    "Recording": "Nahrávka",
+    "This edition of Windows has no Media Feature Pack": "Toto vydanie Windowsu nemá Media Feature Pack",
+    "Recording saved": "Nahrávka je uložená",
+    "Recording saved and copied": "Nahrávka je uložená a skopírovaná",
+    "Pause": "Pozastaviť"
   },
   "settings": {
     "settings": "Nastavenia",
@@ -399,6 +410,16 @@
     "tip": "Tip: skúste {keys}: snímka len ľavou rukou, kým pravá zostáva na myši.",
     "use": "Použiť",
     "next": "Ďalej"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopírovať",
+    "save": "Uložiť",
+    "preparing": "Pripravuje sa…",
+    "play": "Prehrať",
+    "pause": "Pozastaviť",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Inštalácia ainitShot {version}",

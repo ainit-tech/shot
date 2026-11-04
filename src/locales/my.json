@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "မိုက်ခရိုဖုန်း မပွင့်သေးပါ- အနီရောင်အစက် လင်းလာသည်အထိ ခလုတ်ကို ဖိထားပါ။",
     "The microphone didn't turn on.": "မိုက်ခရိုဖုန်း မပွင့်ပါ။",
     "The question asked aloud didn't go.": "အသံဖြင့်မေးသော မေးခွန်း မပို့ရပါ။",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- စကားပြောရန် အချက်ပြ။"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- စကားပြောရန် အချက်ပြ။",
+    "Record a video or a GIF · Ctrl+R": "ဗီဒီယို သို့မဟုတ် GIF ရိုက်ကူးရန် · Ctrl+R",
+    "Go on recording": "ဆက်လက်ရိုက်ကူးရန်",
+    "Stop": "ရပ်ရန်",
+    "The recording didn't start": "ရိုက်ကူးမှု မစတင်ပါ",
+    "The recording stopped": "ရိုက်ကူးမှု ရပ်သွားပါပြီ",
+    "The recording didn't open": "ရိုက်ကူးထားသည်ကို ဖွင့်၍မရပါ",
+    "Recording": "ရိုက်ကူးမှု",
+    "This edition of Windows has no Media Feature Pack": "ဤ Windows ထုတ်ဝေမှုတွင် Media Feature Pack မပါပါ",
+    "Recording saved": "ရိုက်ကူးထားသည်ကို သိမ်းပြီးပါပြီ",
+    "Recording saved and copied": "ရိုက်ကူးထားသည်ကို သိမ်းပြီး ကူးယူပြီးပါပြီ",
+    "Pause": "ခဏရပ်ရန်"
   },
   "settings": {
     "settings": "ဆက်တင်များ",
@@ -399,6 +410,16 @@
     "tip": "အကြံပြုချက်: {keys} ကို စမ်းကြည့်ပါ: ဘယ်လက်တစ်ဖက်တည်းဖြင့် ဖန်သားပြင်ဓာတ်ပုံ ရိုက်နိုင်ပြီး ညာလက်က မောက်စ်ပေါ်တွင် ရှိနေမည်။",
     "use": "အသုံးပြုရန်",
     "next": "ရှေ့သို့"
+  },
+  "recorded": {
+    "video": "ဗီဒီယို",
+    "copy": "မိတ္တူကူးရန်",
+    "save": "သိမ်းရန်",
+    "preparing": "ပြင်ဆင်နေသည်…",
+    "play": "ဖွင့်ရန်",
+    "pause": "ခဏရပ်ရန်",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} ကို တပ်ဆင်ရန်",

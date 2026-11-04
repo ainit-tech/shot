@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon hələ yanmamışdı: qırmızı nöqtə yanana qədər düyməni basılı saxlayın.",
     "The microphone didn't turn on.": "Mikrofon yanmadı.",
     "The question asked aloud didn't go.": "Səsli sual göndərilmədi.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon səsli sualı dinləməyə başlayanda qısa səs: danışmaq üçün işarə."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon səsli sualı dinləməyə başlayanda qısa səs: danışmaq üçün işarə.",
+    "Record a video or a GIF · Ctrl+R": "Video və ya GIF qeydə al · Ctrl+R",
+    "Go on recording": "Qeydə almağa davam et",
+    "Stop": "Dayandır",
+    "The recording didn't start": "Qeyd başlamadı",
+    "The recording stopped": "Qeyd dayandı",
+    "The recording didn't open": "Qeyd açılmadı",
+    "Recording": "Qeyd",
+    "This edition of Windows has no Media Feature Pack": "Windows-un bu buraxılışında Media Feature Pack yoxdur",
+    "Recording saved": "Qeyd yadda saxlanıldı",
+    "Recording saved and copied": "Qeyd yadda saxlanıldı və kopyalandı",
+    "Pause": "Fasilə"
   },
   "settings": {
     "settings": "Ayarlar",
@@ -399,6 +410,16 @@
     "tip": "Məsləhət: {keys} birləşməsini sınayın: ekran şəkli yalnız sol əllə, sağ əl isə siçanın üstündə qalır.",
     "use": "İstifadə et",
     "next": "Növbəti"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopyala",
+    "save": "Yadda saxla",
+    "preparing": "Hazırlanır…",
+    "play": "Oynat",
+    "pause": "Fasilə",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} quraşdırılması",

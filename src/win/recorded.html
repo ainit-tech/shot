@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<title>ainitShot</title>
+<style>
+:root {
+  --bg: #1c1c1c;
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #ededed;
+  --muted: #a8a8a8;
+  --accent: #2f6feb;
+  --accent-hover: #4380f3;
+  --trim: #f2c14e;
+  font: 14px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { display: flex; flex-direction: column; overflow: hidden; user-select: none; cursor: default; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid #79a6ff; outline-offset: 2px; }
+.stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #111; }
+video { display: block; max-width: 100%; max-height: 100%; }
+.timeline { flex: none; height: 44px; padding: 10px 18px 6px; touch-action: none; }
+.track { position: relative; height: 100%; border-radius: 5px; background: rgba(255, 255, 255, 0.1); }
+.kept { position: absolute; top: 0; bottom: 0; background: rgba(242, 193, 78, 0.16); border-top: 2px solid var(--trim); border-bottom: 2px solid var(--trim); }
+.handle {
+  position: absolute; top: -3px; bottom: -3px; width: 12px; margin-left: -6px;
+  border-radius: 4px; background: var(--trim); cursor: ew-resize;
+}
+.handle::after { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; border-radius: 1px; background: rgba(0, 0, 0, 0.45); }
+.playhead { position: absolute; top: -1px; bottom: -1px; width: 2px; margin-left: -1px; background: #fff; pointer-events: none; }
+.bar { flex: none; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px 8px; }
+button {
+  height: 32px; padding: 0 16px;
+  border: 1px solid var(--line-strong); border-radius: 6px;
+  background: #383838; color: var(--text); font: inherit; cursor: default;
+}
+button:hover { background: #404040; }
+button.accent { border-color: transparent; background: var(--accent); color: #fff; }
+button.accent:hover { background: var(--accent-hover); }
+.play { width: 32px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.play svg { width: 20px; height: 20px; fill: currentColor; }
+.length { min-width: 42px; font-variant-numeric: tabular-nums; }
+.format { display: flex; }
+.format button { padding: 0 12px; border-radius: 0; background: transparent; color: var(--muted); }
+.format button:first-child { border-radius: 6px 0 0 6px; }
+.format button:last-child { border-radius: 0 6px 6px 0; margin-inline-start: -1px; }
+.format button:hover { color: var(--text); }
+.format button[aria-checked="true"] { background: #383838; color: var(--text); }
+.about { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.about.wrong { color: #ff8a80; }
+.spacer { flex: 1; }
+</style>
+</head>
+<body>
+<div class="stage"><video id="video" muted loop autoplay playsinline></video></div>
+<div class="timeline" dir="ltr">
+  <div class="track" id="track">
+    <div class="kept" id="kept"></div>
+    <div class="playhead" id="playhead"></div>
+    <div class="handle" id="from" role="slider" tabindex="0"></div>
+    <div class="handle" id="to" role="slider" tabindex="0"></div>
+  </div>
+</div>
+<div class="bar">
+  <button class="play" id="play"><svg viewBox="0 0 20 20"><path id="play-icon"/></svg></button>
+  <span class="length" id="length"></span>
+  <div class="format" role="radiogroup">
+    <button role="radio" data-format="gif">GIF</button>
+    <button role="radio" data-format="video" data-t="video"></button>
+  </div>
+  <span class="about" id="about"></span>
+  <span class="spacer"></span>
+  <button id="copy" title="Ctrl+C" data-t="copy"></button>
+  <button class="accent" id="save" title="Ctrl+S" data-t="save"></button>
+</div>
+<script>
+"use strict";
+// The page shows a recording going round and lets it be cut with two handles; the program makes
+// the GIF or the video of what is kept, each time it changes, and tells the size it has come to.
+const TEXT = {
+  video: "Video", copy: "Copy", save: "Save", preparing: "Preparing…", play: "Play", pause: "Pause",
+  kilobytes: "KB", megabytes: "MB",
+};
+const PLAY = "M 6.5 4.5 L 15.5 10 L 6.5 15.5 Z";
+const PAUSE = "M 6 4.5 H 8.5 V 15.5 H 6 Z M 11.5 4.5 H 14 V 15.5 H 11.5 Z";
+// The shortest piece that can be kept, in seconds.
+const SHORTEST = 0.2;
+const element = id => document.getElementById(id);
+const [video, track, kept, playhead, fromHandle, toHandle, play, length, about] =
+  ["video", "track", "kept", "playhead", "from", "to", "play", "length", "about"].map(element);
+const send = message => window.chrome && window.chrome.webview && window.chrome.webview.postMessage(JSON.stringify(message));
+
+let speech = {};
+const say = key => (speech.texts && speech.texts[key]) || TEXT[key];
+let seconds = 0, from = 0, to = 0, format = "gif";
+let dragging = null;
+
+function speak() {
+  document.documentElement.lang = speech.language;
+  document.documentElement.dir = speech.rightToLeft ? "rtl" : "ltr";
+  for (const item of document.querySelectorAll("[data-t]")) item.textContent = say(item.dataset.t);
+}
+
+const clock = time => {
+  const whole = Math.round(time * 10) / 10;
+  const minutes = Math.floor(whole / 60);
+  const rest = (whole - minutes * 60).toFixed(1);
+  return `${minutes}:${rest.padStart(4, "0")}`;
+};
+
+const bytes = count => {
+  const [size, unit] = count / 1024 < 1000 ? [count / 1024, "kilobytes"] : [count / 1048576, "megabytes"];
+  return `${size < 10 ? size.toFixed(1) : Math.round(size)} ${say(unit)}`;
+};
+
+function draw() {
+  const at = value => `${seconds ? value / seconds * 100 : 0}%`;
+  fromHandle.style.left = at(from);
+  toHandle.style.left = at(to);
+  kept.style.left = at(from);
+  kept.style.width = `${seconds ? (to - from) / seconds * 100 : 0}%`;
+  length.textContent = clock(to - from);
+  playhead.style.left = at(Math.min(video.currentTime || 0, seconds));
+}
+
+function showPlaying() {
+  element("play-icon").setAttribute("d", video.paused ? PLAY : PAUSE);
+  play.title = say(video.paused ? "play" : "pause");
+}
+
+function showFormat() {
+  for (const button of document.querySelectorAll("[data-format]")) {
+    button.setAttribute("aria-checked", button.dataset.format === format ? "true" : "false");
+  }
+}
+
+// What is kept or the format has changed: the program makes it anew.
+function prepare() {
+  about.classList.remove("wrong");
+  about.textContent = say("preparing");
+  send({ type: "prepare", format, from, to });
+}
+
+// The recording goes round inside what is kept.
+function follow() {
+  if (!dragging && !video.paused && (video.currentTime >= to || video.currentTime < from)) video.currentTime = from;
+  draw();
+  requestAnimationFrame(follow);
+}
+
+const timeAt = event => {
+  const box = track.getBoundingClientRect();
+  return Math.min(Math.max((event.clientX - box.left) / box.width, 0), 1) * seconds;
+};
+
+function drag(event) {
+  const time = timeAt(event);
+  if (dragging === "from") from = Math.min(time, to - SHORTEST);
+  else if (dragging === "to") to = Math.max(time, from + SHORTEST);
+  from = Math.max(from, 0);
+  to = Math.min(to, seconds);
+  // While a handle moves the picture shows what it stands at.
+  video.currentTime = dragging === "seek" ? time : dragging === "from" ? from : to;
+  draw();
+}
+
+function press(what, event) {
+  dragging = what;
+  video.pause();
+  event.target.setPointerCapture(event.pointerId);
+  drag(event);
+  event.stopPropagation();
+}
+
+function release(event) {
+  if (!dragging) return;
+  const moved = dragging !== "seek";
+  dragging = null;
+  video.currentTime = Math.min(Math.max(timeAt(event), from), to - 0.01);
+  video.play();
+  if (moved) prepare();
+}
+
+fromHandle.addEventListener("pointerdown", event => press("from", event));
+toHandle.addEventListener("pointerdown", event => press("to", event));
+track.addEventListener("pointerdown", event => press("seek", event));
+for (const part of [fromHandle, toHandle, track]) {
+  part.addEventListener("pointermove", event => { if (dragging) drag(event); });
+  part.addEventListener("pointerup", release);
+}
+
+const toggle = () => (video.paused ? video.play() : video.pause());
+play.addEventListener("click", toggle);
+video.addEventListener("click", toggle);
+video.addEventListener("play", showPlaying);
+video.addEventListener("pause", showPlaying);
+for (const button of document.querySelectorAll("[data-format]")) {
+  button.addEventListener("click", () => {
+    if (format === button.dataset.format) return;
+    format = button.dataset.format;
+    showFormat();
+    prepare();
+  });
+}
+element("copy").addEventListener("click", () => send({ type: "copy" }));
+element("save").addEventListener("click", () => send({ type: "save" }));
+document.addEventListener("keydown", event => {
+  if (event.ctrlKey && event.code === "KeyC") send({ type: "copy" });
+  else if (event.ctrlKey && event.code === "KeyS") send({ type: "save" });
+  else if (event.code === "Space" && event.target === document.body) toggle();
+  else return;
+  event.preventDefault();
+});
+document.addEventListener("contextmenu", event => event.preventDefault());
+
+window.chrome.webview.addEventListener("message", ({ data }) => {
+  if (data.type === "init") {
+    speech = data;
+    speak();
+    ({ seconds, format } = data);
+    from = 0;
+    to = seconds;
+    showFormat();
+    showPlaying();
+    about.title = data.details;
+    video.src = data.url;
+    prepare();
+    draw();
+    requestAnimationFrame(follow);
+  } else if (data.type === "progress") {
+    about.textContent = `${say("preparing")} ${data.percent}%`;
+  } else if (data.type === "prepared") {
+    about.textContent = `${bytes(data.bytes)} · ${data.size}`;
+  } else if (data.type === "failed") {
+    about.classList.add("wrong");
+    about.textContent = data.problem;
+  }
+});
+send({ type: "ready" });
+</script>
+</body>
+</html>

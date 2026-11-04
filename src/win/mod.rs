@@ -10,6 +10,7 @@ mod capture;
 mod card;
 mod clipboard;
 mod gdi;
+mod grab;
 mod guide;
 mod hotkey;
 mod http;
@@ -21,10 +22,11 @@ mod models;
 mod ocr;
 mod overlay;
 mod preferences;
+mod record;
+mod recorded;
 mod shell;
 mod tray;
 mod update;
-#[allow(dead_code)]
 mod video;
 
 use std::io;

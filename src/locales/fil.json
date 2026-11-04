@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Hindi pa bukas ang mikropono: pindutin nang matagal ang button hanggang umilaw ang pulang tuldok.",
     "The microphone didn't turn on.": "Hindi bumukas ang mikropono.",
     "The question asked aloud didn't go.": "Hindi naipadala ang tanong na binigkas.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: hudyat para magsalita."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: hudyat para magsalita.",
+    "Record a video or a GIF · Ctrl+R": "Mag-record ng video o GIF · Ctrl+R",
+    "Go on recording": "Ituloy ang pag-record",
+    "Stop": "Ihinto",
+    "The recording didn't start": "Hindi nagsimula ang pag-record",
+    "The recording stopped": "Huminto ang pag-record",
+    "The recording didn't open": "Hindi nabuksan ang recording",
+    "Recording": "Recording",
+    "This edition of Windows has no Media Feature Pack": "Walang Media Feature Pack ang edisyong ito ng Windows",
+    "Recording saved": "Na-save ang recording",
+    "Recording saved and copied": "Na-save at nakopya ang recording",
+    "Pause": "I-pause"
   },
   "settings": {
     "settings": "Mga Setting",
@@ -399,6 +410,16 @@
     "tip": "Tip: subukan ang {keys}: screenshot gamit ang kaliwang kamay lang, habang nasa mouse ang kanan.",
     "use": "Gamitin",
     "next": "Susunod"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopyahin",
+    "save": "I-save",
+    "preparing": "Inihahanda…",
+    "play": "I-play",
+    "pause": "I-pause",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "I-install ang ainitShot {version}",

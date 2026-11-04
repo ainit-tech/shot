@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon hali yoqilmagan edi: qizil nuqta yonguncha tugmani bosib turing.",
     "The microphone didn't turn on.": "Mikrofon yoqilmadi.",
     "The question asked aloud didn't go.": "Ovoz bilan berilgan savol yuborilmadi.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz: gapirish belgisi."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz: gapirish belgisi.",
+    "Record a video or a GIF · Ctrl+R": "Video yoki GIF yozib olish · Ctrl+R",
+    "Go on recording": "Yozishni davom ettirish",
+    "Stop": "To‘xtatish",
+    "The recording didn't start": "Yozish boshlanmadi",
+    "The recording stopped": "Yozish to‘xtadi",
+    "The recording didn't open": "Yozuv ochilmadi",
+    "Recording": "Yozuv",
+    "This edition of Windows has no Media Feature Pack": "Windows’ning bu nashrida Media Feature Pack yo‘q",
+    "Recording saved": "Yozuv saqlandi",
+    "Recording saved and copied": "Yozuv saqlandi va nusxalandi",
+    "Pause": "Pauza"
   },
   "settings": {
     "settings": "Sozlamalar",
@@ -399,6 +410,16 @@
     "tip": "Maslahat: {keys} birikmasini sinab koʻring: skrinshot faqat chap qoʻl bilan, oʻng qoʻl esa sichqonchada qoladi.",
     "use": "Ishlatish",
     "next": "Keyingi"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Nusxalash",
+    "save": "Saqlash",
+    "preparing": "Tayyorlanmoqda…",
+    "play": "Ijro etish",
+    "pause": "Pauza",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} oʻrnatish",

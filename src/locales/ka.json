@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "მიკროფონი ჯერ არ იყო ჩართული: გეჭიროთ ღილაკი, სანამ წითელი წერტილი არ აინთება.",
     "The microphone didn't turn on.": "მიკროფონი არ ჩაირთო.",
     "The question asked aloud didn't go.": "ხმით დასმული კითხვა არ გაიგზავნა.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ლაპარაკის ნიშანი."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ლაპარაკის ნიშანი.",
+    "Record a video or a GIF · Ctrl+R": "ვიდეოს ან GIF-ის ჩაწერა · Ctrl+R",
+    "Go on recording": "ჩაწერის გაგრძელება",
+    "Stop": "შეწყვეტა",
+    "The recording didn't start": "ჩაწერა არ დაიწყო",
+    "The recording stopped": "ჩაწერა შეწყდა",
+    "The recording didn't open": "ჩანაწერი არ გაიხსნა",
+    "Recording": "ჩანაწერი",
+    "This edition of Windows has no Media Feature Pack": "Windows-ის ამ გამოცემას Media Feature Pack არ აქვს",
+    "Recording saved": "ჩანაწერი შენახულია",
+    "Recording saved and copied": "ჩანაწერი შენახულია და დაკოპირებულია",
+    "Pause": "პაუზა"
   },
   "settings": {
     "settings": "პარამეტრები",
@@ -399,6 +410,16 @@
     "tip": "რჩევა: სცადეთ {keys}: ეკრანის ანაბეჭდი მხოლოდ მარცხენა ხელით, ხოლო მარჯვენა მაუსზე რჩება.",
     "use": "გამოყენება",
     "next": "შემდეგი"
+  },
+  "recorded": {
+    "video": "ვიდეო",
+    "copy": "კოპირება",
+    "save": "შენახვა",
+    "preparing": "მზადდება…",
+    "play": "დაკვრა",
+    "pause": "პაუზა",
+    "kilobytes": "კბ",
+    "megabytes": "მბ"
   },
   "installer": {
     "installTitle": "ainitShot {version}-ის ინსტალაცია",

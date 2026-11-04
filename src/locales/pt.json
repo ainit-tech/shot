@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "O microfone ainda não estava ligado: segure o botão até o ponto vermelho acender.",
     "The microphone didn't turn on.": "O microfone não ligou.",
     "The question asked aloud didn't go.": "A pergunta em voz alta não foi enviada.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: o sinal para falar."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: o sinal para falar.",
+    "Record a video or a GIF · Ctrl+R": "Gravar vídeo ou GIF · Ctrl+R",
+    "Go on recording": "Continuar gravando",
+    "Stop": "Parar",
+    "The recording didn't start": "A gravação não começou",
+    "The recording stopped": "A gravação parou",
+    "The recording didn't open": "A gravação não abriu",
+    "Recording": "Gravação",
+    "This edition of Windows has no Media Feature Pack": "Esta edição do Windows não tem o Media Feature Pack",
+    "Recording saved": "Gravação salva",
+    "Recording saved and copied": "Gravação salva e copiada",
+    "Pause": "Pausar"
   },
   "settings": {
     "settings": "Configurações",
@@ -399,6 +410,16 @@
     "tip": "Dica: experimente {keys}: uma captura só com a mão esquerda, enquanto a direita fica no mouse.",
     "use": "Usar",
     "next": "Avançar"
+  },
+  "recorded": {
+    "video": "Vídeo",
+    "copy": "Copiar",
+    "save": "Salvar",
+    "preparing": "Preparando…",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Instalar o ainitShot {version}",

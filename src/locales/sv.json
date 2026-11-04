@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonen var inte på än: håll ned knappen tills den röda pricken lyser.",
     "The microphone didn't turn on.": "Mikrofonen slogs inte på.",
     "The question asked aloud didn't go.": "Frågan som ställdes med rösten skickades inte.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tecknet att tala."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tecknet att tala.",
+    "Record a video or a GIF · Ctrl+R": "Spela in video eller GIF · Ctrl+R",
+    "Go on recording": "Fortsätt spela in",
+    "Stop": "Stoppa",
+    "The recording didn't start": "Inspelningen startade inte",
+    "The recording stopped": "Inspelningen stoppades",
+    "The recording didn't open": "Inspelningen kunde inte öppnas",
+    "Recording": "Inspelning",
+    "This edition of Windows has no Media Feature Pack": "Den här utgåvan av Windows saknar Media Feature Pack",
+    "Recording saved": "Inspelningen har sparats",
+    "Recording saved and copied": "Inspelningen har sparats och kopierats",
+    "Pause": "Pausa"
   },
   "settings": {
     "settings": "Inställningar",
@@ -399,6 +410,16 @@
     "tip": "Tips: prova {keys}: en skärmbild med bara vänster hand, medan den högra stannar på musen.",
     "use": "Använd",
     "next": "Nästa"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopiera",
+    "save": "Spara",
+    "preparing": "Förbereder…",
+    "play": "Spela upp",
+    "pause": "Pausa",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Installera ainitShot {version}",

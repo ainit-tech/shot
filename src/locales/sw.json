@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Maikrofoni ilikuwa bado haijawaka: shikilia kitufe hadi kitone chekundu kiwake.",
     "The microphone didn't turn on.": "Maikrofoni haikuwaka.",
     "The question asked aloud didn't go.": "Swali la kwa sauti halikutumwa.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Sauti fupi maikrofoni inapoanza kusikiliza swali la kwa sauti: ishara ya kuzungumza."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Sauti fupi maikrofoni inapoanza kusikiliza swali la kwa sauti: ishara ya kuzungumza.",
+    "Record a video or a GIF · Ctrl+R": "Rekodi video au GIF · Ctrl+R",
+    "Go on recording": "Endelea kurekodi",
+    "Stop": "Simamisha",
+    "The recording didn't start": "Kurekodi hakukuanza",
+    "The recording stopped": "Kurekodi kumesimama",
+    "The recording didn't open": "Rekodi haikufunguka",
+    "Recording": "Rekodi",
+    "This edition of Windows has no Media Feature Pack": "Toleo hili la Windows halina Media Feature Pack",
+    "Recording saved": "Rekodi imehifadhiwa",
+    "Recording saved and copied": "Rekodi imehifadhiwa na kunakiliwa",
+    "Pause": "Sitisha"
   },
   "settings": {
     "settings": "Mipangilio",
@@ -399,6 +410,16 @@
     "tip": "Kidokezo: jaribu {keys}: picha ya skrini kwa mkono wa kushoto pekee, huku wa kulia ukibaki kwenye kipanya.",
     "use": "Tumia",
     "next": "Endelea"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Nakili",
+    "save": "Hifadhi",
+    "preparing": "Inaandaliwa…",
+    "play": "Cheza",
+    "pause": "Sitisha",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Sakinisha ainitShot {version}",

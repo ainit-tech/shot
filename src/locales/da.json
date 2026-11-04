@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofonen var ikke tændt endnu: hold knappen nede, til den røde prik lyser.",
     "The microphone didn't turn on.": "Mikrofonen tændte ikke.",
     "The question asked aloud didn't go.": "Spørgsmålet stillet med stemmen blev ikke sendt.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tegnet til at tale."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tegnet til at tale.",
+    "Record a video or a GIF · Ctrl+R": "Optag video eller GIF · Ctrl+R",
+    "Go on recording": "Fortsæt optagelsen",
+    "Stop": "Stop",
+    "The recording didn't start": "Optagelsen startede ikke",
+    "The recording stopped": "Optagelsen stoppede",
+    "The recording didn't open": "Optagelsen kunne ikke åbnes",
+    "Recording": "Optagelse",
+    "This edition of Windows has no Media Feature Pack": "Denne udgave af Windows har ikke Media Feature Pack",
+    "Recording saved": "Optagelsen er gemt",
+    "Recording saved and copied": "Optagelsen er gemt og kopieret",
+    "Pause": "Pause"
   },
   "settings": {
     "settings": "Indstillinger",
@@ -399,6 +410,16 @@
     "tip": "Tip: prøv {keys}: et skærmbillede med kun venstre hånd, mens den højre bliver på musen.",
     "use": "Brug",
     "next": "Næste"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Kopiér",
+    "save": "Gem",
+    "preparing": "Forbereder…",
+    "play": "Afspil",
+    "pause": "Pause",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Installer ainitShot {version}",

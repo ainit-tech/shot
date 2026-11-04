@@ -20,7 +20,7 @@ use windows_sys::Win32::UI::Controls::Dialogs::{
     GetSaveFileNameW, OFN_EXPLORER, OFN_NOCHANGEDIR, OFN_OVERWRITEPROMPT, OFN_PATHMUSTEXIST, OPENFILENAMEW,
 };
 use windows_sys::Win32::UI::Shell::{
-    ASSOCF_NONE, ASSOCSTR_COMMAND, AssocQueryStringW, FOLDERID_Pictures, FOLDERID_Screenshots, KF_FLAG_CREATE,
+    ASSOCF_NONE, ASSOCSTR_COMMAND, AssocQueryStringW, FOLDERID_Pictures, FOLDERID_Screenshots, FOLDERID_Videos, KF_FLAG_CREATE,
     SHGetKnownFolderPath, ShellExecuteW,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
@@ -255,6 +255,35 @@ pub fn browser_profile() -> PathBuf {
     local.join("ainitShot").join("browser")
 }
 
+/// The folder of the recordings still in use, among the temporary files.
+fn recordings_folder() -> PathBuf {
+    pages_folder().join("recordings")
+}
+
+/// Where a new recording goes: its file in a new folder of its own, with what is made from it.
+pub fn new_recording() -> std::io::Result<PathBuf> {
+    let since = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_default();
+    let folder = recordings_folder().join(since.as_millis().to_string());
+    fs::create_dir_all(&folder)?;
+    Ok(folder.join("recording.mp4"))
+}
+
+/// Removes the recordings that have been lying for at least `age`.
+pub fn remove_recordings(age: Duration) {
+    let Ok(entries) = fs::read_dir(recordings_folder()) else { return };
+    for entry in entries.flatten() {
+        let old = entry.metadata().and_then(|m| m.modified()).ok().and_then(|t| t.elapsed().ok()).is_some_and(|e| e >= age);
+        if old {
+            let _ = fs::remove_dir_all(entry.path());
+        }
+    }
+}
+
+/// The folder for what is recorded, when the settings name no folder.
+pub fn videos_folder() -> PathBuf {
+    known_folder(&FOLDERID_Videos).unwrap_or_else(screenshots_folder)
+}
+
 /// The folder for screenshots: "Pictures\Screenshots", or "Pictures" if there is none.
 pub fn screenshots_folder() -> PathBuf {
     known_folder(&FOLDERID_Screenshots)
@@ -286,11 +315,11 @@ pub fn file_name(pattern: &str) -> String {
 
 /// A path in `folder` for a file named `name` with the extension `.png` that doesn't exist yet:
 /// "name (2).png" and so on if it does.
-pub fn new_path(folder: &Path, name: &str) -> PathBuf {
-    let mut path = folder.join(format!("{name}.png"));
+pub fn new_path(folder: &Path, name: &str, extension: &str) -> PathBuf {
+    let mut path = folder.join(format!("{name}.{extension}"));
     let mut number = 2;
     while path.exists() {
-        path = folder.join(format!("{name} ({number}).png"));
+        path = folder.join(format!("{name} ({number}).{extension}"));
         number += 1;
     }
     path
@@ -298,12 +327,13 @@ pub fn new_path(folder: &Path, name: &str) -> PathBuf {
 
 /// Asks where to save a PNG file, starting in `folder` with the name `name`. Nothing if the
 /// user cancels.
-pub fn ask_where_to_save(owner: HWND, folder: &Path, name: &str) -> Option<PathBuf> {
+pub fn ask_where_to_save(owner: HWND, folder: &Path, name: &str, extension: &str) -> Option<PathBuf> {
     let mut file = vec![0u16; 1024];
     let initial: Vec<u16> = name.encode_utf16().take(file.len() - 1).collect();
     file[..initial.len()].copy_from_slice(&initial);
     let folder = wide(&folder.to_string_lossy());
-    let filter: Vec<u16> = "PNG\0*.png\0\0".encode_utf16().collect();
+    let filter: Vec<u16> = format!("{}\0*.{extension}\0\0", extension.to_uppercase()).encode_utf16().collect();
+    let extension = wide(extension);
     let mut dialog = OPENFILENAMEW {
         lStructSize: size_of::<OPENFILENAMEW>() as u32,
         hwndOwner: owner,
@@ -311,7 +341,7 @@ pub fn ask_where_to_save(owner: HWND, folder: &Path, name: &str) -> Option<PathB
         lpstrFile: file.as_mut_ptr(),
         nMaxFile: file.len() as u32,
         lpstrInitialDir: folder.as_ptr(),
-        lpstrDefExt: w!("png"),
+        lpstrDefExt: extension.as_ptr(),
         Flags: OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
         ..Default::default()
     };

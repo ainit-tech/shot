@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "Mikrofon belum dihidupkan: tahan butang sehingga titik merah menyala.",
     "The microphone didn't turn on.": "Mikrofon tidak hidup.",
     "The question asked aloud didn't go.": "Soalan secara lisan tidak dihantar.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: isyarat untuk bercakap."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: isyarat untuk bercakap.",
+    "Record a video or a GIF · Ctrl+R": "Rakam video atau GIF · Ctrl+R",
+    "Go on recording": "Teruskan rakaman",
+    "Stop": "Henti",
+    "The recording didn't start": "Rakaman tidak bermula",
+    "The recording stopped": "Rakaman terhenti",
+    "The recording didn't open": "Rakaman tidak dapat dibuka",
+    "Recording": "Rakaman",
+    "This edition of Windows has no Media Feature Pack": "Edisi Windows ini tiada Media Feature Pack",
+    "Recording saved": "Rakaman disimpan",
+    "Recording saved and copied": "Rakaman disimpan dan disalin",
+    "Pause": "Jeda"
   },
   "settings": {
     "settings": "Tetapan",
@@ -399,6 +410,16 @@
     "tip": "Petua: cuba {keys}: tangkapan skrin dengan tangan kiri sahaja, sementara tangan kanan kekal pada tetikus.",
     "use": "Guna",
     "next": "Seterusnya"
+  },
+  "recorded": {
+    "video": "Video",
+    "copy": "Salin",
+    "save": "Simpan",
+    "preparing": "Menyediakan…",
+    "play": "Main",
+    "pause": "Jeda",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "Pasang ainitShot {version}",

@@ -1,18 +1,21 @@
 //! The clipboard: putting a picture into it as a device-independent bitmap, the standard format
-//! that every program pastes, and text, and taking text out of it.
+//! that every program pastes, a file, as Explorer copies one, and text, and taking text out of it.
 
 use std::io;
+use std::os::windows::ffi::OsStrExt;
+use std::path::Path;
 use std::ptr::{self, null_mut};
 use std::thread;
 use std::time::Duration;
 
-use windows_sys::Win32::Foundation::{GlobalFree, HWND};
+use windows_sys::Win32::Foundation::{GlobalFree, HWND, POINT};
 use windows_sys::Win32::Graphics::Gdi::BITMAPINFOHEADER;
 use windows_sys::Win32::System::DataExchange::{
     CloseClipboard, EmptyClipboard, GetClipboardData, OpenClipboard, SetClipboardData,
 };
 use windows_sys::Win32::System::Memory::{GMEM_MOVEABLE, GlobalAlloc, GlobalLock, GlobalSize, GlobalUnlock};
-use windows_sys::Win32::System::Ole::{CF_DIB, CF_UNICODETEXT};
+use windows_sys::Win32::System::Ole::{CF_DIB, CF_HDROP, CF_UNICODETEXT};
+use windows_sys::Win32::UI::Shell::DROPFILES;
 
 use super::gdi::bitmap_info;
 use super::last_error;
@@ -51,6 +54,24 @@ pub fn put_text(owner: HWND, text: &str) -> io::Result<()> {
     }
     unsafe { EmptyClipboard() };
     let placed = place(CF_UNICODETEXT as u32, bytes);
+    unsafe { CloseClipboard() };
+    placed
+}
+
+/// Puts a file into the clipboard, for programs to paste it as if it was copied in Explorer.
+pub fn put_file(owner: HWND, path: &Path) -> io::Result<()> {
+    let header = DROPFILES { pFiles: size_of::<DROPFILES>() as u32, pt: POINT::default(), fNC: 0, fWide: 1 };
+    let header = unsafe { std::slice::from_raw_parts((&raw const header).cast::<u8>(), size_of::<DROPFILES>()) };
+    let mut list = header.to_vec();
+    // The list of paths ends with an empty one.
+    for unit in path.as_os_str().encode_wide().chain([0, 0]) {
+        list.extend_from_slice(&unit.to_le_bytes());
+    }
+    if !open(owner) {
+        return Err(last_error());
+    }
+    unsafe { EmptyClipboard() };
+    let placed = place(CF_HDROP as u32, &list);
     unsafe { CloseClipboard() };
     placed
 }

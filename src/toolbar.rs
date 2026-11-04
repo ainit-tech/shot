@@ -20,9 +20,15 @@ pub enum Button {
     /// Copies the text in the screenshot.
     CopyText,
     Save,
+    /// Starts a recording of what is selected, instead of a screenshot.
+    Record,
     /// A query button from the settings, by its number there.
     Query(usize),
     Close,
+    // The panel of a recording.
+    Pause,
+    Resume,
+    Stop,
 }
 
 // Sizes in pixels at the scale of 100%.
@@ -65,12 +71,14 @@ impl Toolbar {
         ];
         // The query buttons come first. Copying and saving come last, at the end that meets the
         // main panel in the corner by default, and masking just before them: it hides what is
-        // private in the picture that then goes into the clipboard, a file or to Google.
+        // private in the picture that then goes into the clipboard, a file or to Google. A
+        // recording stands before them all: it leaves the picture behind.
         let mut actions: Vec<Vec<Button>> = queries
             .iter()
             .filter(|group| !group.is_empty())
             .map(|group| group.iter().map(|&i| Button::Query(i)).collect())
             .collect();
+        actions.push(vec![Button::Record]);
         actions.push(vec![Button::Mask]);
         actions.push(vec![Button::Copy, Button::CopyText, Button::Save]);
         let mut main = Layout::new(tools, settings.tools, selection, &monitor_at);
@@ -109,6 +117,30 @@ impl Toolbar {
             }
         }
         Toolbar { rect, buttons, separators, scale, column, away, monitor }
+    }
+
+    /// The panel of a recording, in a window of its own: `room` pixels for the time and then its
+    /// buttons.
+    pub fn recording(room: i32, paused: bool, scale: f32) -> Toolbar {
+        let group = vec![if paused { Button::Resume } else { Button::Pause }, Button::Stop];
+        let rect = Rect::new(0, 0, room + length(std::slice::from_ref(&group), scale), thickness(scale));
+        let inner = Rect::new(room, rect.top, rect.right, rect.bottom);
+        Toolbar { rect, ..Toolbar::place(&[group], inner, false, scale, Side::Bottom, rect) }
+    }
+
+    /// Where something of the given size goes in place of the toolbar when it is gone: as far from
+    /// the selection, and centred on a button along it.
+    pub fn instead(&self, anchor: Rect, size: (i32, i32)) -> Rect {
+        let m = self.monitor;
+        let middle = |start: i32, length: i32, wanted: i32| start + length / 2 - wanted / 2;
+        let (left, top) = match self.away {
+            Side::Bottom => (middle(anchor.left, anchor.width(), size.0), self.rect.top),
+            Side::Top => (middle(anchor.left, anchor.width(), size.0), self.rect.bottom - size.1),
+            Side::Right => (self.rect.left, middle(anchor.top, anchor.height(), size.1)),
+            Side::Left => (self.rect.right - size.0, middle(anchor.top, anchor.height(), size.1)),
+        };
+        let (left, top) = (left.min(m.right - size.0).max(m.left), top.min(m.bottom - size.1).max(m.top));
+        Rect::new(left, top, left + size.0, top + size.1)
     }
 
     pub fn hit(&self, p: Point) -> Option<Button> {
@@ -346,10 +378,35 @@ mod tests {
     fn the_column_asks_first_then_masks_copies_and_saves() {
         let (_, toolbar) = panels(SELECTION, &Panels::default());
         let order: Vec<Button> = toolbar.buttons.iter().map(|&(button, _)| button).collect();
-        let actions = [Button::Mask, Button::Copy, Button::CopyText, Button::Save];
+        let actions = [Button::Record, Button::Mask, Button::Copy, Button::CopyText, Button::Save];
         let expected: Vec<Button> = (0..5).map(Button::Query).chain(actions).collect();
         assert_eq!(order, expected);
-        assert_eq!(toolbar.separators.len(), 3);
+        assert_eq!(toolbar.separators.len(), 4);
+    }
+
+    #[test]
+    fn the_panel_of_a_recording_comes_in_place_of_the_panel_of_actions() {
+        let (_, actions) = panels(SELECTION, &Panels::default());
+        let button = actions.button(Button::Record).unwrap();
+        let place = actions.instead(button, (150, 40));
+        // A column on the right: it begins where the column did, next to the selection.
+        assert_eq!((place.left, place.width(), place.height()), (actions.rect.left, 150, 40));
+        assert_eq!(place.top + place.height() / 2, button.top + button.height() / 2);
+        // At the edge of the monitor it stays on the monitor.
+        let (_, actions) = panels(Rect::new(1200, 900, 1860, 1070), &Panels::default());
+        let place = actions.instead(actions.button(Button::Record).unwrap(), (150, 40));
+        assert!(place.right <= 1920 && place.bottom <= 1080, "{place:?}");
+    }
+
+    #[test]
+    fn the_buttons_of_a_recording_change_with_it() {
+        let going = Toolbar::recording(80, false, 1.0);
+        let paused = Toolbar::recording(80, true, 1.0);
+        assert_eq!(going.hit(Point::new(100, 20)), Some(Button::Pause));
+        assert_eq!(paused.hit(Point::new(100, 20)), Some(Button::Resume));
+        assert_eq!(going.hit(Point::new(130, 20)), Some(Button::Stop));
+        assert_eq!(going.hit(Point::new(30, 20)), None);
+        assert_eq!(going.rect.width(), 80 + 4 + 32 + 32 + 4);
     }
 
     #[test]
@@ -397,8 +454,8 @@ mod tests {
     fn without_query_buttons_the_column_has_the_actions_alone() {
         let (_, toolbar) = Toolbar::panels(SELECTION, &Panels::default(), &[vec![], vec![]], |_| (MONITOR, 1.0));
         let order: Vec<Button> = toolbar.buttons.iter().map(|&(button, _)| button).collect();
-        assert_eq!(order, [Button::Mask, Button::Copy, Button::CopyText, Button::Save]);
-        assert_eq!(toolbar.separators.len(), 1);
+        assert_eq!(order, [Button::Record, Button::Mask, Button::Copy, Button::CopyText, Button::Save]);
+        assert_eq!(toolbar.separators.len(), 2);
     }
 
     #[test]

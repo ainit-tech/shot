@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "ไมโครโฟนยังไม่เปิด: กดปุ่มค้างไว้จนจุดสีแดงสว่างขึ้น",
     "The microphone didn't turn on.": "ไมโครโฟนไม่เปิด",
     "The question asked aloud didn't go.": "คำถามที่พูดไม่ได้ถูกส่งไป",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# เสียงสั้น ๆ เมื่อไมโครโฟนเริ่มฟังคำถามที่พูด: สัญญาณให้เริ่มพูด"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# เสียงสั้น ๆ เมื่อไมโครโฟนเริ่มฟังคำถามที่พูด: สัญญาณให้เริ่มพูด",
+    "Record a video or a GIF · Ctrl+R": "บันทึกวิดีโอหรือ GIF · Ctrl+R",
+    "Go on recording": "บันทึกต่อ",
+    "Stop": "หยุด",
+    "The recording didn't start": "เริ่มบันทึกไม่ได้",
+    "The recording stopped": "การบันทึกหยุดลง",
+    "The recording didn't open": "เปิดการบันทึกไม่ได้",
+    "Recording": "การบันทึก",
+    "This edition of Windows has no Media Feature Pack": "Windows รุ่นนี้ไม่มี Media Feature Pack",
+    "Recording saved": "บันทึกวิดีโอแล้ว",
+    "Recording saved and copied": "บันทึกวิดีโอและคัดลอกแล้ว",
+    "Pause": "หยุดชั่วคราว"
   },
   "settings": {
     "settings": "การตั้งค่า",
@@ -399,6 +410,16 @@
     "tip": "เคล็ดลับ: ลอง {keys} จับภาพหน้าจอได้ด้วยมือซ้ายข้างเดียว ส่วนมือขวายังอยู่บนเมาส์",
     "use": "ใช้",
     "next": "ถัดไป"
+  },
+  "recorded": {
+    "video": "วิดีโอ",
+    "copy": "คัดลอก",
+    "save": "บันทึก",
+    "preparing": "กำลังเตรียม…",
+    "play": "เล่น",
+    "pause": "หยุดชั่วคราว",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ติดตั้ง ainitShot {version}",

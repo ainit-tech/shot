@@ -31,7 +31,7 @@ use windows_sys::w;
 
 use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
-use super::{browser, guide, invite, keys, languages, last_error, models, overlay, preferences, shell, update, wide};
+use super::{browser, guide, invite, keys, languages, last_error, models, overlay, preferences, record, shell, update, wide};
 use crate::settings::{self, Settings};
 use crate::site;
 use crate::text::{self, Language, tr};
@@ -247,6 +247,12 @@ pub fn announce(title: &str, text: &str) {
 /// notification shows the file in its folder.
 pub fn saved(path: &Path, copied: bool) {
     let title = if copied { tr("Screenshot saved and copied") } else { tr("Screenshot saved") };
+    show_notice(title, &path.display().to_string(), false, Some(path.to_path_buf()));
+}
+
+/// Tells the user where a recording is saved, as with a screenshot.
+pub fn recording_saved(path: &Path, copied: bool) {
+    let title = if copied { tr("Recording saved and copied") } else { tr("Recording saved") };
     show_notice(title, &path.display().to_string(), false, Some(path.to_path_buf()));
 }
 
@@ -526,9 +532,16 @@ fn tell(text: &str, icon: MESSAGEBOX_STYLE) {
     unsafe { MessageBoxW(null_mut(), text.as_ptr(), w!("ainitShot"), MB_OK | icon) };
 }
 
+/// The hotkey or the icon: the frozen screen, or the end of the recording going on.
+fn shot() {
+    if !record::stop() {
+        overlay::open();
+    }
+}
+
 unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     match message {
-        WM_HOTKEY => overlay::open(),
+        WM_HOTKEY => shot(),
         WM_TIMER if wparam == SETTINGS_TIMER => {
             reread();
             hotkey::follow(window);
@@ -536,6 +549,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
         WM_TIMER if wparam == hotkey::TIMER => hotkey::follow(window),
         WM_TIMER if wparam == update::TIMER => update::tick(),
         update::MESSAGE => update::heard(lparam),
+        record::MESSAGE => record::heard(lparam),
         models::MESSAGE => models::heard(wparam != 0),
         FIRST_RUN => {
             if !languages::is_open() && !keys::is_open() {
@@ -543,9 +557,9 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             }
         }
         tray::MESSAGE => match lparam as u32 {
-            WM_LBUTTONUP => overlay::open(),
+            WM_LBUTTONUP => shot(),
             WM_RBUTTONUP => match tray::menu(window, &settings().hotkey, update::menu_item().as_deref()) {
-                Some(tray::Command::Capture) => overlay::open(),
+                Some(tray::Command::Capture) => shot(),
                 Some(tray::Command::Settings) => preferences::open(),
                 Some(tray::Command::Guide) => guide::open(),
                 Some(tray::Command::Update) => update::menu_chosen(),

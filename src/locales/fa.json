@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "میکروفون هنوز روشن نشده بود: دکمه را نگه دارید تا نقطهٔ قرمز روشن شود.",
     "The microphone didn't turn on.": "میکروفون روشن نشد.",
     "The question asked aloud didn't go.": "پرسش صوتی فرستاده نشد.",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: نشانهٔ صحبت کردن."
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: نشانهٔ صحبت کردن.",
+    "Record a video or a GIF · Ctrl+R": "ضبط ویدیو یا GIF · Ctrl+R",
+    "Go on recording": "ادامهٔ ضبط",
+    "Stop": "توقف",
+    "The recording didn't start": "ضبط شروع نشد",
+    "The recording stopped": "ضبط متوقف شد",
+    "The recording didn't open": "ضبط باز نشد",
+    "Recording": "ضبط",
+    "This edition of Windows has no Media Feature Pack": "این نسخه از Windows بستهٔ Media Feature Pack را ندارد",
+    "Recording saved": "ضبط ذخیره شد",
+    "Recording saved and copied": "ضبط ذخیره و کپی شد",
+    "Pause": "مکث"
   },
   "settings": {
     "settings": "تنظیمات",
@@ -399,6 +410,16 @@
     "tip": "پیشنهاد: {keys} را امتحان کنید: اسکرین‌شات فقط با دست چپ، در حالی که دست راست روی ماوس می‌ماند.",
     "use": "استفاده",
     "next": "بعدی"
+  },
+  "recorded": {
+    "video": "ویدیو",
+    "copy": "کپی",
+    "save": "ذخیره",
+    "preparing": "در حال آماده‌سازی…",
+    "play": "پخش",
+    "pause": "مکث",
+    "kilobytes": "کیلوبایت",
+    "megabytes": "مگابایت"
   },
   "installer": {
     "installTitle": "نصب ainitShot {version}",

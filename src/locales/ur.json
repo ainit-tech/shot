@@ -154,7 +154,18 @@
     "The microphone wasn't on yet: hold the button until the red dot lights up.": "مائیکروفون ابھی آن نہیں ہوا تھا: سرخ نقطہ روشن ہونے تک بٹن دبائے رکھیں۔",
     "The microphone didn't turn on.": "مائیکروفون آن نہیں ہوا۔",
     "The question asked aloud didn't go.": "بول کر پوچھا گیا سوال نہیں گیا۔",
-    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز: بولنے کا اشارہ۔"
+    "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز: بولنے کا اشارہ۔",
+    "Record a video or a GIF · Ctrl+R": "ویڈیو یا GIF ریکارڈ کریں · Ctrl+R",
+    "Go on recording": "ریکارڈنگ جاری رکھیں",
+    "Stop": "ختم کریں",
+    "The recording didn't start": "ریکارڈنگ شروع نہیں ہوئی",
+    "The recording stopped": "ریکارڈنگ رک گئی",
+    "The recording didn't open": "ریکارڈنگ نہیں کھلی",
+    "Recording": "ریکارڈنگ",
+    "This edition of Windows has no Media Feature Pack": "Windows کے اس ایڈیشن میں Media Feature Pack نہیں ہے",
+    "Recording saved": "ریکارڈنگ محفوظ ہو گئی",
+    "Recording saved and copied": "ریکارڈنگ محفوظ اور کاپی ہو گئی",
+    "Pause": "روکیں"
   },
   "settings": {
     "settings": "ترتیبات",
@@ -399,6 +410,16 @@
     "tip": "مشورہ: {keys} آزمائیں: صرف بائیں ہاتھ سے اسکرین شاٹ، جبکہ دایاں ہاتھ ماؤس پر رہتا ہے۔",
     "use": "استعمال کریں",
     "next": "آگے"
+  },
+  "recorded": {
+    "video": "ویڈیو",
+    "copy": "کاپی کریں",
+    "save": "محفوظ کریں",
+    "preparing": "تیار ہو رہا ہے…",
+    "play": "چلائیں",
+    "pause": "روکیں",
+    "kilobytes": "KB",
+    "megabytes": "MB"
   },
   "installer": {
     "installTitle": "ainitShot {version} انسٹال کریں",
