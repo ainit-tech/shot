@@ -31,7 +31,7 @@ use windows_sys::w;
 
 use super::hotkey::{self, Hotkey};
 use super::tray::{self, Tray};
-use super::{browser, guide, invite, keys, languages, last_error, models, overlay, preferences, record, shell, update, wide};
+use super::{browser, guide, invite, keys, languages, last_error, models, overlay, preferences, record, recorded, shell, update, wide};
 use crate::settings::{self, Settings};
 use crate::site;
 use crate::text::{self, Language, tr};
@@ -187,6 +187,12 @@ pub fn retake_hotkey() {
 /// The program's hidden window, which holds the hotkey; none until the program has started.
 pub fn main_window() -> HWND {
     MAIN_WINDOW.load(Ordering::Acquire)
+}
+
+/// A window of a test that stands for the hidden one.
+#[cfg(test)]
+pub fn set_main_window(window: HWND) {
+    MAIN_WINDOW.store(window, Ordering::Release);
 }
 
 /// Finds out again whether someone is signed in to Google in the program's window, for the
@@ -356,6 +362,7 @@ pub fn run() -> io::Result<()> {
         SetTimer(window, SETTINGS_TIMER, SETTINGS_TICK, None);
         // Pages of queries left from the last run hold screenshots.
         shell::remove_pages(Duration::ZERO);
+        shell::remove_recordings(record::KEPT);
         // The first question goes to a page ready in the background, as every one after it does.
         browser::prepare();
         // The first time, the program asks which language to speak and which keys take a
@@ -585,6 +592,8 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             languages::close();
             keys::close();
             invite::close();
+            record::stop();
+            recorded::close();
             browser::close();
             shell::remove_pages(Duration::ZERO);
             hotkey::release(window);

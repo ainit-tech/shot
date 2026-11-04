@@ -171,6 +171,18 @@ pub fn close() {
     unsafe { DestroyWindow(window.window) };
 }
 
+/// Whether the window of a recording is open.
+#[cfg(test)]
+pub fn is_open() -> bool {
+    handle().is_some()
+}
+
+/// How many frames the recording in the window has, and its length in seconds.
+#[cfg(test)]
+pub fn frames() -> Option<(u64, f64)> {
+    WINDOW.with(|cell| cell.borrow().as_ref().map(|window| (window.recorded.frames, window.recorded.seconds)))
+}
+
 fn handle() -> Option<HWND> {
     WINDOW.with(|cell| cell.try_borrow().ok()?.as_ref().map(|window| window.window))
 }

@@ -78,7 +78,7 @@ const WAITING: Rgba = draw::MIC_WAITING;
 const PANEL: Rgba = [32, 32, 32, 255];
 
 /// How long what is recorded stays in the temporary folder, for what has been copied to be pasted.
-const KEPT: Duration = Duration::from_secs(24 * 60 * 60);
+pub const KEPT: Duration = Duration::from_secs(24 * 60 * 60);
 
 thread_local! {
     static ACTIVE: RefCell<Option<Recording>> = const { RefCell::new(None) };
@@ -358,7 +358,7 @@ impl Recording {
     /// The count still left, in whole seconds, while it lasts.
     fn counting(&self) -> Option<u64> {
         let gone = self.begins.elapsed().as_secs();
-        (!self.shared.begun.load(Ordering::Relaxed) && gone < COUNT).then_some(COUNT - gone)
+        (!self.shared.begun.load(Ordering::Relaxed) && gone < COUNT).then(|| COUNT - gone)
     }
 
     fn paused(&self) -> bool {
@@ -667,5 +667,115 @@ mod tests {
                 std::fs::write(std::path::Path::new(&folder).join(format!("panel-{name}.png")), picture.to_png().unwrap()).unwrap();
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod flow {
+    use windows_sys::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+    use windows_sys::Win32::Graphics::Gdi::IsRectEmpty;
+    use windows_sys::Win32::System::Com::{COINIT_APARTMENTTHREADED, CoInitializeEx};
+    use windows_sys::Win32::UI::WindowsAndMessaging::{GetWindowRect, IsWindowVisible};
+
+    use super::super::browser;
+    use super::super::browser::tests::pump_until;
+    use super::*;
+
+    unsafe extern "system" fn receiver(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+        if message == MESSAGE {
+            heard(lparam);
+            return 0;
+        }
+        unsafe { DefWindowProcW(window, message, wparam, lparam) }
+    }
+
+    fn text() -> Option<String> {
+        with(|recording| recording.text())
+    }
+
+    /// The whole way of a recording, its windows out of sight, of a place outside all the monitors:
+    /// nothing of the screen is read. The count ends, the time goes, pause holds it, Stop ends it
+    /// and the window of the result opens; a recording stopped during the count leaves nothing.
+    /// It starts WebView2, so it runs only when asked:
+    /// `LOCALAPPDATA=<folder> cargo test -p ainitshot a_recording_goes -- --ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn a_recording_goes_from_the_count_to_its_window() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        let class = WNDCLASSEXW {
+            cbSize: size_of::<WNDCLASSEXW>() as u32,
+            lpfnWndProc: Some(receiver),
+            hInstance: unsafe { GetModuleHandleW(null()) },
+            lpszClassName: w!("ainitShot.test.receiver"),
+            ..Default::default()
+        };
+        unsafe { RegisterClassExW(&class) };
+        let main = unsafe {
+            CreateWindowExW(0, class.lpszClassName, null(), 0, 0, 0, 0, 0, null_mut(), null_mut(), class.hInstance, null())
+        };
+        assert!(!main.is_null());
+        app::set_main_window(main);
+        let beyond = out_of_sight(RECT { left: 0, top: 100, right: 640, bottom: 460 });
+        let area = Rect::new(beyond.left + 200, beyond.top, beyond.right + 200, beyond.bottom);
+        let monitor = Rect::new(0, 0, 1920, 1080);
+        let panel = Rect::new(100, 100, 100 + panel_size(1.0).0, 100 + panel_size(1.0).1);
+
+        // Stopped during the count, it leaves nothing.
+        start(area, panel, monitor, 1.0);
+        assert!(active());
+        assert_eq!(text().as_deref(), Some("3"));
+        pump_until(1, || false);
+        assert!(stop());
+        assert!(!active() && !stop());
+        pump_until(1, || false);
+        assert!(!recorded::is_open());
+
+        start(area, panel, monitor, 1.0);
+        let shown = with(|recording| unsafe {
+            let mut place = RECT::default();
+            GetWindowRect(recording.panel, &mut place);
+            (IsWindowVisible(recording.frame) != 0, IsWindowVisible(recording.panel) != 0, IsRectEmpty(&place) == 0)
+        });
+        assert_eq!(shown, Some((true, true, true)));
+        let begun = pump_until(5, || with(|recording| recording.shared.begun.load(Ordering::Relaxed)) == Some(true));
+        assert!(begun, "the count didn't end");
+        // The time goes.
+        assert!(pump_until(3, || text().as_deref() == Some("00:01")), "{:?}", text());
+        // The mouse on Stop, as Windows tells it, and a hint for it.
+        with(|recording| {
+            let (bar, room) = (recording.bar(), recording.room);
+            let stop = bar.button(Button::Stop).unwrap();
+            assert!(stop.left >= room);
+            recording.hover(Some(Button::Stop));
+            assert!(unsafe { IsWindowVisible(recording.hint) } != 0);
+            assert!(!recording.hint_text.is_empty());
+            recording.hover(None);
+        });
+        // A pause holds the time, and the button turns into going on.
+        with(|recording| recording.click(Some(Button::Pause)));
+        assert_eq!(with(|recording| recording.bar().button(Button::Resume).is_some()), Some(true));
+        pump_until(1, || false);
+        let held = with(|recording| recording.shared.time.load(Ordering::Relaxed));
+        pump_until(1, || false);
+        assert_eq!(with(|recording| recording.shared.time.load(Ordering::Relaxed)), held);
+        with(|recording| recording.click(Some(Button::Resume)));
+        pump_until(1, || false);
+        assert!(with(|recording| recording.shared.time.load(Ordering::Relaxed)) > held);
+        let stopping = with(|recording| recording.click(Some(Button::Stop)));
+        assert_eq!(stopping, Some(true));
+        assert!(stop());
+        let opened = pump_until(15, recorded::is_open);
+        assert!(opened, "the window of the result didn't open");
+        let frames = recorded::frames();
+        pump_until(5, || false);
+        recorded::close();
+        browser::close();
+        pump_until(1, || false);
+        eprintln!("{frames:?}");
+        let (frames, seconds) = frames.unwrap();
+        // A second before the pause and a second after it.
+        assert!((1.5..3.0).contains(&seconds), "{seconds}");
+        // As many frames as the time had, give or take.
+        assert!(frames as f64 > seconds * 20.0, "{frames} in {seconds}");
     }
 }
