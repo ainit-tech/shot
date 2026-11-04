@@ -20,7 +20,7 @@ use windows_sys::Win32::UI::Controls::Dialogs::{
     GetSaveFileNameW, OFN_EXPLORER, OFN_NOCHANGEDIR, OFN_OVERWRITEPROMPT, OFN_PATHMUSTEXIST, OPENFILENAMEW,
 };
 use windows_sys::Win32::UI::Shell::{
-    ASSOCF_NONE, ASSOCSTR_COMMAND, AssocQueryStringW, FOLDERID_Pictures, FOLDERID_Screenshots, FOLDERID_Videos, KF_FLAG_CREATE,
+    ASSOCF_NONE, ASSOCSTR_COMMAND, AssocQueryStringW, FOLDERID_Pictures, FOLDERID_Screenshots, KF_FLAG_CREATE,
     SHGetKnownFolderPath, ShellExecuteW,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{
@@ -31,6 +31,7 @@ use windows_sys::core::{GUID, PCWSTR, PWSTR};
 use windows_sys::w;
 
 use super::wide;
+use crate::settings::Save;
 use crate::text::{Language, tr};
 
 /// The language of Windows as the program speaks it: the first of the user's languages, or
@@ -255,7 +256,7 @@ pub fn browser_profile() -> PathBuf {
     local.join("ainitShot").join("browser")
 }
 
-/// The folder of the recordings still in use, among the temporary files.
+/// The folder of the recordings whose windows are open, among the temporary files.
 fn recordings_folder() -> PathBuf {
     pages_folder().join("recordings")
 }
@@ -268,20 +269,32 @@ pub fn new_recording() -> std::io::Result<PathBuf> {
     Ok(folder.join("recording.mp4"))
 }
 
-/// Removes the recordings that have been lying for at least `age`.
-pub fn remove_recordings(age: Duration) {
-    let Ok(entries) = fs::read_dir(recordings_folder()) else { return };
-    for entry in entries.flatten() {
-        let old = entry.metadata().and_then(|m| m.modified()).ok().and_then(|t| t.elapsed().ok()).is_some_and(|e| e >= age);
-        if old {
-            let _ = fs::remove_dir_all(entry.path());
-        }
-    }
+/// Removes what recordings have left behind in the temporary files, when the program was stopped
+/// with a recording's window open.
+pub fn remove_recordings() {
+    let _ = fs::remove_dir_all(recordings_folder());
 }
 
-/// The folder for what is recorded, when the settings name no folder.
-pub fn videos_folder() -> PathBuf {
-    known_folder(&FOLDERID_Videos).unwrap_or_else(screenshots_folder)
+/// Removes a recording's temporary folder. The page and what is still being made let go of its
+/// files a moment after its window closes.
+pub fn remove_soon(folder: PathBuf) {
+    std::thread::spawn(move || {
+        for _ in 0..40 {
+            if fs::remove_dir_all(&folder).is_ok() || !folder.exists() {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(250));
+        }
+    });
+}
+
+/// The one folder for everything the program saves, the one the settings show: theirs, or the
+/// folder for screenshots when they name none.
+pub fn save_folder(save: &Save) -> PathBuf {
+    match save.folder.trim() {
+        "" => screenshots_folder(),
+        folder => PathBuf::from(folder),
+    }
 }
 
 /// The folder for screenshots: "Pictures\Screenshots", or "Pictures" if there is none.
@@ -366,7 +379,7 @@ pub fn pick_folder(owner: HWND, folder: &Path) -> Option<PathBuf> {
         let dialog: IFileOpenDialog = CoCreateInstance(&FileOpenDialog, None, CLSCTX_INPROC_SERVER).ok()?;
         let options = dialog.GetOptions().ok()?;
         dialog.SetOptions(options | FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM).ok()?;
-        let title = wide(tr("Folder for screenshots"));
+        let title = wide(tr("Folder for saving"));
         let _ = dialog.SetTitle(ComText(title.as_ptr()));
         if let Ok(start) = SHCreateItemFromParsingName::<_, _, IShellItem>(&HSTRING::from(folder.as_os_str()), None) {
             let _ = dialog.SetFolder(&start);

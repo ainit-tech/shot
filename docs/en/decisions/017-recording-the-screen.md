@@ -6,7 +6,7 @@ topic: product
 
 # Recording the screen
 
-Tried: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, pause and stop. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save.
+Tried: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, pause and stop. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save. Both put the file into the one folder the settings show, where screenshots go too.
 
 ## Question
 
@@ -30,6 +30,13 @@ Where recording starts:
 | A button on the toolbar of the actions, after the selection | Nothing changes in how the program works; what to record is chosen the way it always is | Two steps before recording |
 | A hotkey of its own | One step | One more key to remember; a selection is needed anyway |
 
+Where a recording goes:
+
+| Option | For | Against |
+|---|---|---|
+| The one folder of the settings, with the screenshots | The settings show one path, and everything is there | Videos lie among pictures |
+| Windows' Videos folder | Videos lie with videos | The settings show one path and the file goes to another, or they need a second path |
+
 When the format is chosen:
 
 | Option | For | Against |
@@ -41,6 +48,8 @@ When the format is chosen:
 
 The program's way of working stays: the hotkey, the selection, an action that finishes the work. Recording is one more action, so there is nothing new to learn, and the area comes from the same selection, with the windows lit up. The format comes last because only then is it known what came out; recording goes into an MP4 file anyway, from which a GIF takes a moment and which can be cut.
 
+What the program saves has one place, the one the settings show. Someone who has recorded something and copied it into a chat looks for it the next day and has to find it, so a finished recording is never left somewhere temporary.
+
 ## How it works
 
 - **The button** stands on the toolbar of the actions, before masking; what is drawn on the picture stays behind with the frozen screen.
@@ -49,8 +58,10 @@ The program's way of working stays: the hotkey, the selection, an action that fi
 - **The recording** is an MP4 file of H.264 at 30 frames a second, or as many as the computer manages, with their real times. A pause is left out of the time. The mouse pointer is in the picture; sound is not. The width and the height are even, as H.264 wants; an area beyond 4096 by 2304 is made smaller.
 - **The window of the result** plays the recording in a loop. The handles keep a part of it; a click on the line goes to a place in it. The file is made at once on a thread of its own and its size is shown; a new choice gives up what was being made.
 - **GIF or video.** A recording of up to 15 seconds opens as a GIF, a longer one as a video. A GIF has 15 frames a second and at most 1000 pixels of width; each frame keeps only what has changed, with 255 colours of its own. A video that isn't cut is the file itself; one that is cut goes through the encoder again.
-- **Copy** puts the file into the clipboard, as Explorer copies one, under the name of the pattern from the settings. **Save** puts it into the folder from the settings, or the Videos folder if none is set, and asks where if the settings say so. Then the window closes, as a screenshot does.
-- **What is left** stays in the temporary folder for a day, for what has been copied to be pasted.
+- **One folder.** Everything the program saves goes into the folder the settings show, screenshots and recordings alike, under the name of the pattern from the settings.
+- **Copy** puts the file into that folder and into the clipboard, as Explorer copies one. **Save** puts it into that folder, or asks where if the settings say so, as Ctrl+Shift+S always does, and into the clipboard too, unless the settings say otherwise. A notification says where the file is, and the window closes, as it does for a screenshot.
+- **The window's cross** asks whether to save the recording, so that it doesn't go by accident.
+- **Temporary files** live only while the window is open.
 
 ## Consequences
 

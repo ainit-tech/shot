@@ -12,4 +12,4 @@ A living list. Once a question's options are laid out, it becomes a draft [decis
 
 ## Saving
 
-- The default folder for screenshots is Windows' own folder of screenshots, which is inside OneDrive when OneDrive backs up the Pictures folder: every screenshot saved there goes to the cloud. Should the program save into a folder on the computer instead, and say where the folder is?
+- The default folder for screenshots is Windows' own folder of screenshots, which is inside OneDrive when OneDrive backs up the Pictures folder: every screenshot and recording saved there goes to the cloud. Should the program save into a folder on the computer instead, and say where the folder is?

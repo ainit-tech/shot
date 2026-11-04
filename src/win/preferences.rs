@@ -387,7 +387,7 @@ fn parts(icon: &[Part]) -> Value {
         .collect()
 }
 
-/// The folder for screenshots: the one given, or the default for an empty one.
+/// The folder for saving: the one given, or the default for an empty one.
 fn folder(given: Option<&str>) -> PathBuf {
     match given.map(str::trim).filter(|folder| !folder.is_empty()) {
         Some(folder) => PathBuf::from(folder),
@@ -864,7 +864,7 @@ mod tests {
                 r#""[\"pauseModels:true\"]""#,
                 r#""[\"record:true\",\"record:false\",\"save:Ctrl+Shift+S\"]""#,
                 // The keys read from left to right in every language.
-                "\"\u{2066}Q\u{2069} мешала бы печатать: добавь Ctrl, Alt или Win.\"",
+                "\"\u{2066}Q\u{2069} мешала бы печатать: добавьте Ctrl, Alt или Win.\"",
                 r#""[\"record:true\",\"record:false\"]""#,
                 r#""[\"Alt+~\",\"Ctrl+Alt+Z\"]""#,
                 "\"Клавиша P уже у инструмента «Карандаш». 0\"",

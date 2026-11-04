@@ -77,8 +77,6 @@ const WAITING: Rgba = draw::MIC_WAITING;
 /// The panel's colour, under what is drawn on it, and that of a hint.
 const PANEL: Rgba = [32, 32, 32, 255];
 
-/// How long what is recorded stays in the temporary folder, for what has been copied to be pasted.
-pub const KEPT: Duration = Duration::from_secs(24 * 60 * 60);
 
 thread_local! {
     static ACTIVE: RefCell<Option<Recording>> = const { RefCell::new(None) };
@@ -99,7 +97,8 @@ struct Shared {
 
 /// A recording, finished.
 pub struct Recorded {
-    /// The MP4 file, in a folder of its own that the result may use.
+    /// The MP4 file, in a temporary folder of its own that lasts as long as the window of the
+    /// result.
     pub path: PathBuf,
     pub width: u32,
     pub height: u32,
@@ -168,7 +167,6 @@ pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
     if active() {
         return;
     }
-    shell::remove_recordings(KEPT);
     let path = match shell::new_recording() {
         Ok(path) => path,
         Err(error) => return app::notify(not_started(), &error.to_string()),

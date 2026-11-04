@@ -362,7 +362,7 @@ pub fn run() -> io::Result<()> {
         SetTimer(window, SETTINGS_TIMER, SETTINGS_TICK, None);
         // Pages of queries left from the last run hold screenshots.
         shell::remove_pages(Duration::ZERO);
-        shell::remove_recordings(record::KEPT);
+        shell::remove_recordings();
         // The first question goes to a page ready in the background, as every one after it does.
         browser::prepare();
         // The first time, the program asks which language to speak and which keys take a

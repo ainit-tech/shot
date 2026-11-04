@@ -211,7 +211,7 @@ element("copy").addEventListener("click", () => send({ type: "copy" }));
 element("save").addEventListener("click", () => send({ type: "save" }));
 document.addEventListener("keydown", event => {
   if (event.ctrlKey && event.code === "KeyC") send({ type: "copy" });
-  else if (event.ctrlKey && event.code === "KeyS") send({ type: "save" });
+  else if (event.ctrlKey && event.code === "KeyS") send({ type: event.shiftKey ? "saveAs" : "save" });
   else if (event.code === "Space" && event.target === document.body) toggle();
   else return;
   event.preventDefault();

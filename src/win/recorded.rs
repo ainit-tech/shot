@@ -1,8 +1,10 @@
 //! The window of a recording that has ended: it goes round in the window, two handles keep a part
 //! of it, a switch says GIF or video, and Copy and Save finish it, as they finish a screenshot.
 //! Whatever is chosen is made at once on a thread of its own, so that its size can be shown and
-//! that Copy and Save have it ready; a change gives up what was being made. The recording itself
-//! stays an MP4 file in the temporary folder: a GIF is made from it, and a video only if it is cut.
+//! that Copy and Save have it ready; a change gives up what was being made. All this lives in a
+//! temporary folder as long as the window is open. What is finished goes into the folder of the
+//! settings, by Copy as well as by Save: a recording is never left somewhere temporary, and the
+//! window doesn't close without asking.
 
 use std::cell::{Cell, RefCell};
 use std::fs::{self, File};
@@ -28,10 +30,11 @@ use windows_sys::Win32::Graphics::Gdi::{CreateSolidBrush, GetMonitorInfoW, MONIT
 use windows_sys::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows_sys::Win32::UI::HiDpi::{GetDpiForMonitor, MDT_EFFECTIVE_DPI};
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    AdjustWindowRectEx, CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW,
-    LoadCursorW, PostMessageW, RegisterClassExW, SW_SHOW, SW_SHOWNOACTIVATE, SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow,
-    SetWindowPos, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE, WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_CAPTION,
-    WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_MINIMIZEBOX, WS_OVERLAPPED, WS_SYSMENU,
+    AdjustWindowRectEx, CreateWindowExW, DefWindowProcW, DestroyIcon, DestroyWindow, GetClientRect, GetCursorPos, HICON, IDC_ARROW, IDNO,
+    IDYES, LoadCursorW, MB_ICONQUESTION, MB_YESNOCANCEL, MessageBoxW, PostMessageW, RegisterClassExW, SW_SHOW, SW_SHOWNOACTIVATE,
+    SWP_NOACTIVATE, SWP_NOZORDER, SetForegroundWindow, SetWindowPos, ShowWindow, WA_INACTIVE, WM_ACTIVATE, WM_APP, WM_CLOSE,
+    WM_DPICHANGED, WM_MOVE, WM_SIZE, WNDCLASSEXW, WS_CAPTION, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_MINIMIZEBOX, WS_OVERLAPPED,
+    WS_SYSMENU,
 };
 use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
@@ -92,6 +95,8 @@ impl Format {
 enum Deed {
     Copy,
     Save,
+    /// Saving where the user says, whatever the settings.
+    SaveAs,
 }
 
 /// A file made.
@@ -160,7 +165,7 @@ fn title() -> String {
     format!("{} — ainitShot", tr("Recording"))
 }
 
-/// Closes the window: what has been made stays until the temporary folder is cleaned.
+/// Closes the window and lets its temporary folder go.
 pub fn close() {
     let Some(mut window) = WINDOW.with(|cell| cell.borrow_mut().take()) else { return };
     // What is being made gives up.
@@ -169,6 +174,19 @@ pub fn close() {
         let _ = unsafe { controller.Close() };
     }
     unsafe { DestroyWindow(window.window) };
+    if let Some(folder) = window.recorded.path.parent() {
+        shell::remove_soon(folder.to_path_buf());
+    }
+}
+
+/// The window's cross: a recording that goes unsaved is gone for good, so the user says so.
+fn leave(window: HWND) {
+    let question = wide(tr("Save the recording?"));
+    match unsafe { MessageBoxW(window, question.as_ptr(), w!("ainitShot"), MB_YESNOCANCEL | MB_ICONQUESTION) } {
+        IDYES => wish(Deed::Save),
+        IDNO => close(),
+        _ => {}
+    }
 }
 
 /// Whether the window of a recording is open.
@@ -276,6 +294,7 @@ fn heard(message: &str) {
         }
         "copy" => wish(Deed::Copy),
         "save" => wish(Deed::Save),
+        "saveAs" => wish(Deed::SaveAs),
         _ => {}
     }
 }
@@ -532,59 +551,53 @@ fn wish(deed: Deed) {
     }
 }
 
-/// Does what the user has asked with the file made. As with a screenshot, the window goes then.
+/// Does what the user has asked with the file made: whichever it is, the file goes where the
+/// settings say, so that it can be found later, and a notification says where. As with a
+/// screenshot, the window goes then.
 fn finish(deed: Deed) {
     let Some(window) = handle() else { return };
     let Some(made) = WINDOW.with(|cell| cell.borrow_mut().as_mut()?.made.take()) else { return };
     let save = app::settings().save.clone();
     let name = shell::file_name(&save.name);
     let extension = made.format.extension();
-    match deed {
-        Deed::Copy => {
-            // The file keeps a proper name wherever it is pasted.
-            let path = made.path.with_file_name(format!("{name}.{extension}"));
-            if let Err(error) = fs::rename(&made.path, &path) {
-                app::notify(tr("Couldn't copy"), &error.to_string());
-                return give_back(made);
-            }
-            match clipboard::put_file(window, &path) {
-                Ok(()) => close(),
-                Err(error) => {
-                    app::notify(tr("Couldn't copy"), &error.to_string());
-                    give_back(Made { path, ..made });
-                }
-            }
+    let folder = shell::save_folder(&save);
+    // Copying doesn't stop to ask.
+    let asked = match deed {
+        Deed::Copy => false,
+        Deed::Save => save.ask,
+        Deed::SaveAs => true,
+    };
+    let path = if asked {
+        match shell::ask_where_to_save(window, &folder, &name, extension) {
+            Some(path) => path,
+            None => return give_back(made),
         }
-        Deed::Save => {
-            let folder = match save.folder.trim() {
-                "" => shell::videos_folder(),
-                folder => PathBuf::from(folder),
-            };
-            let path = if save.ask {
-                let Some(path) = shell::ask_where_to_save(window, &folder, &name, extension) else {
-                    return give_back(made);
-                };
-                path
-            } else {
-                if let Err(error) = fs::create_dir_all(&folder) {
-                    app::notify(tr("Couldn't save"), &format!("{}: {error}", folder.display()));
-                    return give_back(made);
-                }
-                shell::new_path(&folder, &name, extension)
-            };
-            if let Err(error) = fs::copy(&made.path, &path) {
-                app::notify(tr("Couldn't save"), &format!("{}: {error}", path.display()));
-                return give_back(made);
-            }
-            let copied = save.copy.then(|| clipboard::put_file(window, &path));
-            match copied {
-                Some(Err(error)) => app::notify(tr("Couldn't copy"), &error.to_string()),
-                copied if !save.ask => app::recording_saved(&path, copied.is_some()),
-                _ => {}
-            }
-            close();
+    } else {
+        if let Err(error) = fs::create_dir_all(&folder) {
+            app::notify(tr("Couldn't save"), &format!("{}: {error}", folder.display()));
+            return give_back(made);
         }
+        shell::new_path(&folder, &name, extension)
+    };
+    if let Err(error) = move_file(&made.path, &path) {
+        app::notify(tr("Couldn't save"), &format!("{}: {error}", path.display()));
+        return give_back(made);
     }
+    let copied = (matches!(deed, Deed::Copy) || save.copy).then(|| clipboard::put_file(window, &path));
+    match copied {
+        Some(Err(error)) => app::notify(tr("Couldn't copy"), &format!("{}: {error}", path.display())),
+        copied if !asked => app::recording_saved(&path, copied.is_some()),
+        _ => {}
+    }
+    close();
+}
+
+/// Moves a file, also to another drive.
+fn move_file(from: &Path, to: &Path) -> io::Result<()> {
+    if fs::rename(from, to).is_ok() {
+        return Ok(());
+    }
+    fs::copy(from, to).map(|_| ())
 }
 
 /// What was made stays for another try.
@@ -706,7 +719,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             let outcome = unsafe { Box::from_raw(lparam as *mut Result<Option<Made>, String>) };
             prepared(wparam as u64, *outcome);
         }
-        WM_CLOSE => close(),
+        WM_CLOSE => leave(window),
         _ => return unsafe { DefWindowProcW(window, message, wparam, lparam) },
     }
     0
@@ -721,6 +734,25 @@ mod tests {
 
     fn evaluate(script: &str) -> String {
         evaluate_on(&unsafe { controller().unwrap().CoreWebView2() }.unwrap(), script)
+    }
+
+    /// A file goes where it is sent, and not over one of the same name.
+    #[test]
+    fn what_is_finished_goes_into_the_folder() {
+        let root = std::env::temp_dir().join(format!("ainitshot-moved-{}", std::process::id()));
+        let (temporary, kept) = (root.join("temporary"), root.join("kept"));
+        fs::create_dir_all(&temporary).unwrap();
+        fs::create_dir_all(&kept).unwrap();
+        for content in ["first", "second"] {
+            let made = temporary.join("1.gif");
+            fs::write(&made, content).unwrap();
+            let path = shell::new_path(&kept, "Name", "gif");
+            move_file(&made, &path).unwrap();
+            assert!(!made.exists());
+        }
+        assert_eq!(fs::read_to_string(kept.join("Name.gif")).unwrap(), "first");
+        assert_eq!(fs::read_to_string(kept.join("Name (2).gif")).unwrap(), "second");
+        fs::remove_dir_all(&root).unwrap();
     }
 
     /// Three seconds of a square going across lines of what looks like text.

@@ -5,7 +5,6 @@
 use std::cell::RefCell;
 use std::fs;
 use std::io;
-use std::path::PathBuf;
 use std::ptr::{null, null_mut};
 use std::rc::Rc;
 use std::thread;
@@ -1058,10 +1057,7 @@ impl Overlay {
         let Some(session) = &self.session else { return };
         let Some(picture) = session.picture() else { return };
         let save = session.settings.save.clone();
-        let folder = match save.folder.trim() {
-            "" => shell::screenshots_folder(),
-            folder => PathBuf::from(folder),
-        };
+        let folder = shell::save_folder(&save);
         let name = shell::file_name(&save.name);
         let ask = ask || save.ask;
         let path = if ask {
@@ -2299,6 +2295,8 @@ fn set_flag(window: HWND, attribute: DWMWINDOWATTRIBUTE, on: bool) {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use windows_sys::Win32::UI::WindowsAndMessaging::DestroyWindow;
 
     use super::*;

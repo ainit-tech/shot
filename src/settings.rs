@@ -519,10 +519,10 @@ const NOTES: Notes = Notes {
     listening_sound: "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.",
     colors: "# The colours for drawing, as \"#RRGGBB\"; the first one is chosen at once.",
     width: "# The width of the line in pixels at the screen's scale of 100%. While drawing, the mouse wheel changes it.",
-    ask: "# Ask where to save. If false, the screenshot is saved into the folder at once.
+    ask: "# Ask where to save. If false, the file is saved into the folder at once.
 # Ctrl+Shift+S always asks.",
-    copy: "# Copy the saved screenshot into the clipboard too.",
-    folder: "# The folder for screenshots. Empty means \"Pictures\\Screenshots\".",
+    copy: "# Copy the saved file into the clipboard too.",
+    folder: "# The folder for saving. Empty means \"Pictures\\Screenshots\".",
     name: "# The file's name without its extension: {date} is the date, {time} the time.",
     panels: "# The panels next to the selection.
 #   side: the side of the selection, \"bottom\", \"top\", \"left\" or \"right\";
