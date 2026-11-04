@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C rasmdagi matnni shu kompyuterning oʻzida oʻqiydi va almashuv buferiga qoʻyadi.",
     "scenes.save.title": "Faylga saqlash",
     "scenes.save.caption": "Ctrl + S sana va vaqt nomli PNG faylni darhol “Rasmlar\\Skrinshotlar” jildiga saqlaydi; bildirishnomani bossangiz, fayl jildda koʻrsatiladi.",
+    "scenes.record.title": "Ekranni yozib olish",
+    "scenes.record.caption": "Ctrl + R tanlanganni yozib oladi; keyin oyna uni qirqib, GIF yoki videoga aylantiradi.",
     "scenes.ask.title": "Google sunʼiy intellektidan soʻrash",
     "scenes.ask.caption": "{askKey} Google’ning AI Mode rejimidan rasmda kim yoki nima borligini soʻraydi; suhbat tanlangan joy yonida ochiladi.",
     "scenes.voice.title": "Ovoz bilan soʻrash",

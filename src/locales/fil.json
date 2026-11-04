@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Binabasa ng Ctrl + Shift + C ang text sa larawan, sa sarili mong computer, at inilalagay ito sa clipboard.",
     "scenes.save.title": "I-save bilang file",
     "scenes.save.caption": "Agad na sine-save ng Ctrl + S ang PNG file na may petsa at oras sa pangalan sa “Mga Larawan\\Mga Screenshot”; kapag na-click ang notification, ipinapakita ito sa folder.",
+    "scenes.record.title": "I-record ang screen",
+    "scenes.record.caption": "Nire-record ng Ctrl + R ang napili; pagkatapos, pinuputol ito ng isang window at ginagawang GIF o video.",
     "scenes.ask.title": "Magtanong sa AI ng Google",
     "scenes.ask.caption": "Tinatanong ng {askKey} ang AI Mode ng Google kung sino o ano ang nasa larawan; bumubukas ang usapan sa tabi ng napiling area.",
     "scenes.voice.title": "Magtanong nang malakas",

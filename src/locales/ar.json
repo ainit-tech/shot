@@ -453,6 +453,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C يقرأ النص الموجود في الصورة، على جهازك، ويضعه في الحافظة.",
     "scenes.save.title": "الحفظ في ملف",
     "scenes.save.caption": "Ctrl + S يحفظ فورًا ملف PNG باسم فيه التاريخ والوقت في «الصور\\لقطات الشاشة»، والنقر على الإشعار يعرضه في المجلد.",
+    "scenes.record.title": "تسجيل الشاشة",
+    "scenes.record.caption": "Ctrl + R يسجّل ما حددته، ثم تقص نافذة التسجيل وتجعله GIF أو فيديو.",
     "scenes.ask.title": "اسأل الذكاء الاصطناعي من Google",
     "scenes.ask.caption": "{askKey} يسأل وضع الذكاء الاصطناعي من Google مَن أو ما الذي في الصورة؛ وتُفتح المحادثة بجانب التحديد.",
     "scenes.voice.title": "اسأل صوتيًا",

@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C leest de tekst in de afbeelding op je eigen computer en zet hem op het klembord.",
     "scenes.save.title": "Opslaan als bestand",
     "scenes.save.caption": "Ctrl + S slaat meteen een PNG-bestand met datum en tijd in de naam op in “Afbeeldingen\\Schermafbeeldingen”; een klik op de melding toont het in de map.",
+    "scenes.record.title": "Het scherm opnemen",
+    "scenes.record.caption": "Ctrl + R neemt de selectie op; een venster knipt die daarna bij en maakt er een GIF of video van.",
     "scenes.ask.title": "Vraag het de AI van Google",
     "scenes.ask.caption": "{askKey} vraagt de AI-modus van Google wie of wat er op de afbeelding staat; het gesprek opent naast de selectie.",
     "scenes.voice.title": "Vraag het hardop",

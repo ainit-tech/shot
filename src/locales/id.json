@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C membaca teks di gambar langsung di komputer Anda dan menaruhnya di papan klip.",
     "scenes.save.title": "Simpan sebagai file",
     "scenes.save.caption": "Ctrl + S langsung menyimpan file PNG bernama tanggal dan waktu ke “Gambar\\Cuplikan Layar”; klik notifikasinya untuk melihat file itu di folder.",
+    "scenes.record.title": "Rekam layar",
+    "scenes.record.caption": "Ctrl + R merekam yang dipilih; lalu sebuah jendela memotongnya dan menjadikannya GIF atau video.",
     "scenes.ask.title": "Tanya AI Google",
     "scenes.ask.caption": "{askKey} menanyakan kepada Mode AI Google siapa atau apa yang ada di gambar; percakapan terbuka di samping pilihan.",
     "scenes.voice.title": "Tanya dengan suara",

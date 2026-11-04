@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C görseldeki metni bilgisayarınızda okur ve panoya koyar.",
     "scenes.save.title": "Dosya olarak kaydet",
     "scenes.save.caption": "Ctrl + S, adında tarih ve saat olan bir PNG dosyasını hemen “Resimler\\Ekran Görüntüleri” klasörüne kaydeder; bildirime tıklamak onu klasörde gösterir.",
+    "scenes.record.title": "Ekranı kaydetme",
+    "scenes.record.caption": "Ctrl + R seçili alanı kaydeder; ardından bir pencere onu kırpar ve GIF ya da videoya dönüştürür.",
     "scenes.ask.title": "Google'ın yapay zekâsına sorun",
     "scenes.ask.caption": "{askKey}, Google'ın Yapay Zeka Modu'na görselde kimin veya neyin olduğunu sorar; sohbet seçimin yanında açılır.",
     "scenes.voice.title": "Sesli sorun",

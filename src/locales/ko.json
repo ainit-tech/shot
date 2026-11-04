@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C는 이미지 속 텍스트를 이 컴퓨터에서 읽어 클립보드에 넣습니다.",
     "scenes.save.title": "파일로 저장",
     "scenes.save.caption": "Ctrl + S는 날짜와 시간을 이름으로 한 PNG 파일을 바로 “사진\\스크린샷”에 저장합니다. 알림을 클릭하면 폴더에서 보여 줍니다.",
+    "scenes.record.title": "화면 녹화",
+    "scenes.record.caption": "Ctrl + R로 선택 영역을 녹화하고, 창에서 잘라 GIF나 동영상으로 만듭니다.",
     "scenes.ask.title": "Google AI에 묻기",
     "scenes.ask.caption": "{askKey} 키는 사진 속 사람이나 사물이 무엇인지 Google AI 모드에 묻습니다. 대화는 선택 영역 옆에 열립니다.",
     "scenes.voice.title": "소리 내어 묻기",

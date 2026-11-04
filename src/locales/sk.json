@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C prečíta text z obrázka priamo vo vašom počítači a vloží ho do schránky.",
     "scenes.save.title": "Uložiť ako súbor",
     "scenes.save.caption": "Ctrl + S hneď uloží súbor PNG s dátumom a časom v názve do priečinka „Obrázky\\Snímky obrazovky“; kliknutím na oznámenie ho uvidíte v priečinku.",
+    "scenes.record.title": "Nahrávanie obrazovky",
+    "scenes.record.caption": "Ctrl + R nahrá vybranú časť; okno ju potom oreže a urobí z nej GIF alebo video.",
     "scenes.ask.title": "Opýtajte sa AI od Googlu",
     "scenes.ask.caption": "{askKey} sa opýta režimu AI od Googlu, kto alebo čo je na obrázku; rozhovor sa otvorí vedľa výberu.",
     "scenes.voice.title": "Opýtajte sa nahlas",

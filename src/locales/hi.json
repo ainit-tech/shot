@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C तस्वीर का टेक्स्ट आपके ही कंप्यूटर पर पढ़ता है और क्लिपबोर्ड में रख देता है।",
     "scenes.save.title": "फ़ाइल में सेव करें",
     "scenes.save.caption": "Ctrl + S तारीख़ और समय वाले नाम की PNG फ़ाइल तुरंत \"Pictures\\Screenshots\" में सेव कर देता है; सूचना पर क्लिक करने से वह फ़ोल्डर में दिखती है।",
+    "scenes.record.title": "स्क्रीन रिकॉर्ड करना",
+    "scenes.record.caption": "Ctrl + R चुने गए हिस्से को रिकॉर्ड करता है; फिर एक विंडो उसे काटकर GIF या वीडियो बनाती है।",
     "scenes.ask.title": "Google के AI से पूछें",
     "scenes.ask.caption": "{askKey} Google के AI Mode से पूछता है कि तस्वीर में कौन या क्या है; बातचीत चयनित क्षेत्र के पास खुलती है।",
     "scenes.voice.title": "बोलकर पूछें",

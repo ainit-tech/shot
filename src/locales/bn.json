@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C ছবির টেক্সট আপনার কম্পিউটারেই পড়ে ক্লিপবোর্ডে রাখে।",
     "scenes.save.title": "ফাইলে সেভ করুন",
     "scenes.save.caption": "Ctrl + S তারিখ ও সময়ের নামে একটি PNG ফাইল সঙ্গে সঙ্গে “ছবি\\স্ক্রিনশট”-এ সেভ করে; বিজ্ঞপ্তিতে ক্লিক করলে ফাইলটি ফোল্ডারে দেখা যায়।",
+    "scenes.record.title": "স্ক্রিন রেকর্ড করা",
+    "scenes.record.caption": "Ctrl + R নির্বাচিত অংশ রেকর্ড করে; তারপর একটি উইন্ডো সেটি কেটে GIF বা ভিডিও বানায়।",
     "scenes.ask.title": "Google-এর AI-কে জিজ্ঞেস করুন",
     "scenes.ask.caption": "{askKey} Google-এর AI মোডকে জিজ্ঞেস করে ছবিতে কে বা কী আছে; কথোপকথন নির্বাচনের পাশে খোলে।",
     "scenes.voice.title": "মুখে জিজ্ঞেস করুন",

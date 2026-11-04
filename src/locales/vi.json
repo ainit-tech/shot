@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C đọc văn bản trong ảnh ngay trên máy tính của bạn và đưa vào bảng nhớ tạm.",
     "scenes.save.title": "Lưu thành tệp",
     "scenes.save.caption": "Ctrl + S lưu ngay một tệp PNG đặt tên theo ngày giờ vào “Ảnh\\Ảnh chụp màn hình”; nhấp vào thông báo để xem tệp trong thư mục.",
+    "scenes.record.title": "Quay màn hình",
+    "scenes.record.caption": "Ctrl + R quay phần đã chọn; sau đó một cửa sổ cắt và tạo thành GIF hoặc video.",
     "scenes.ask.title": "Hỏi AI của Google",
     "scenes.ask.caption": "{askKey} hỏi Chế độ AI của Google ai hoặc cái gì có trong ảnh; cuộc trò chuyện mở ra cạnh vùng chọn.",
     "scenes.voice.title": "Hỏi bằng giọng nói",

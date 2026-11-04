@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C şəkildəki mətni elə öz kompüterinizdə oxuyur və mübadilə buferinə qoyur.",
     "scenes.save.title": "Fayl kimi saxla",
     "scenes.save.caption": "Ctrl + S adında tarix və vaxt olan PNG faylını dərhal «Şəkillər\\Ekran şəkilləri» qovluğuna saxlayır; bildirişə klikləsəniz, fayl qovluqda göstərilir.",
+    "scenes.record.title": "Ekranı qeydə almaq",
+    "scenes.record.caption": "Ctrl + R seçilmiş hissəni qeydə alır; sonra pəncərə onu kəsir və GIF və ya videoya çevirir.",
     "scenes.ask.title": "Google AI-dan soruşun",
     "scenes.ask.caption": "{askKey} Google AI rejimindən şəkildə kimin və ya nəyin olduğunu soruşur; söhbət seçimin yanında açılır.",
     "scenes.voice.title": "Səslə soruşun",

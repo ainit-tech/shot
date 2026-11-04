@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C nuskaito vaizde esantį tekstą jūsų kompiuteryje ir įdeda jį į mainų sritį.",
     "scenes.save.title": "Įrašyti kaip failą",
     "scenes.save.caption": "Ctrl + S iš karto įrašo PNG failą su data ir laiku pavadinime į aplanką „Paveikslėliai\\Ekrano kopijos“; spustelėjus pranešimą, jis parodomas aplanke.",
+    "scenes.record.title": "Ekrano įrašymas",
+    "scenes.record.caption": "Ctrl + R įrašo pasirinktą sritį; tada langas ją apkerpa ir paverčia GIF arba vaizdo įrašu.",
     "scenes.ask.title": "Klauskite „Google“ DI",
     "scenes.ask.caption": "{askKey} klausia „Google“ DI režimo, kas yra vaizde; pokalbis atsidaro šalia pažymėtos srities.",
     "scenes.voice.title": "Klauskite balsu",

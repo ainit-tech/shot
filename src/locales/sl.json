@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C prebere besedilo s slike kar v vašem računalniku in ga postavi v odložišče.",
     "scenes.save.title": "Shrani kot datoteko",
     "scenes.save.caption": "Ctrl + S takoj shrani datoteko PNG z datumom in časom v imenu v mapo „Slike\\Posnetki zaslona“; klik na obvestilo jo pokaže v mapi.",
+    "scenes.record.title": "Snemanje zaslona",
+    "scenes.record.caption": "Ctrl + R posname izbrano; okno to nato obreže in pretvori v GIF ali videoposnetek.",
     "scenes.ask.title": "Vprašajte Googlov AI",
     "scenes.ask.caption": "{askKey} vpraša Googlov AI Mode, kdo ali kaj je na sliki; pogovor se odpre ob izboru.",
     "scenes.voice.title": "Vprašajte na glas",

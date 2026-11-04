@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C leser teksten i bildet på din egen datamaskin og legger den på utklippstavlen.",
     "scenes.save.title": "Lagre som fil",
     "scenes.save.caption": "Ctrl + S lagrer straks en PNG-fil med dato og klokkeslett i navnet i «Bilder\\Skjermbilder»; et klikk på varselet viser den i mappen.",
+    "scenes.record.title": "Ta opp skjermen",
+    "scenes.record.caption": "Ctrl + R tar opp det som er valgt; deretter klipper et vindu det og gjør det til en GIF eller en video.",
     "scenes.ask.title": "Spør Googles AI",
     "scenes.ask.caption": "{askKey} spør Googles AI-modus hvem eller hva som er på bildet; samtalen åpnes ved siden av markeringen.",
     "scenes.voice.title": "Spør høyt",

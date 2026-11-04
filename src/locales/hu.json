@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "A Ctrl + Shift + C a saját gépeden olvassa be a képen lévő szöveget, és a vágólapra teszi.",
     "scenes.save.title": "Mentés fájlba",
     "scenes.save.caption": "A Ctrl + S rögtön elment egy dátummal és idővel elnevezett PNG-fájlt a „Képek\\Képernyőképek” mappába; az értesítésre kattintva megmutatja a mappában.",
+    "scenes.record.title": "Képernyő rögzítése",
+    "scenes.record.caption": "A Ctrl + R rögzíti a kijelölést; egy ablak ezután megvágja, és GIF-et vagy videót készít belőle.",
     "scenes.ask.title": "Kérdezd a Google MI-jét",
     "scenes.ask.caption": "A {askKey} megkérdezi a Google MI módját, ki vagy mi van a képen; a beszélgetés a kijelölés mellett nyílik meg.",
     "scenes.voice.title": "Kérdezz hangosan",

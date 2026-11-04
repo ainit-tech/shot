@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C で画像内のテキストをこのパソコン上で読み取り、クリップボードに入れます。",
     "scenes.save.title": "ファイルに保存",
     "scenes.save.caption": "Ctrl + S で、日付と時刻を名前にした PNG ファイルをすぐに「ピクチャ\\スクリーンショット」に保存します。通知をクリックするとフォルダーで表示されます。",
+    "scenes.record.title": "画面の録画",
+    "scenes.record.caption": "Ctrl + R で選択範囲を録画し、ウィンドウでカットして GIF や動画にします。",
     "scenes.ask.title": "Google の AI に質問",
     "scenes.ask.caption": "{askKey} で、画像に写っているのが誰か、何かを Google の AI モードに質問します。会話は選択範囲の横に開きます。",
     "scenes.voice.title": "声で質問",

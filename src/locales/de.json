@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Strg + Umschalt + C liest den Text im Bild auf Ihrem Computer und legt ihn in die Zwischenablage.",
     "scenes.save.title": "Als Datei speichern",
     "scenes.save.caption": "Strg + S speichert sofort eine PNG-Datei mit Datum und Uhrzeit im Namen in „Bilder\\Screenshots“; ein Klick auf die Benachrichtigung zeigt sie im Ordner.",
+    "scenes.record.title": "Bildschirm aufnehmen",
+    "scenes.record.caption": "Strg + R nimmt die Auswahl auf; ein Fenster schneidet sie dann zu und macht daraus ein GIF oder ein Video.",
     "scenes.ask.title": "Googles KI fragen",
     "scenes.ask.caption": "{askKey} fragt den KI-Modus von Google, wer oder was auf dem Bild ist; das Gespräch öffnet sich neben der Auswahl.",
     "scenes.voice.title": "Laut fragen",

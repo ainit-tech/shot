@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C membaca teks dalam gambar pada komputer anda sendiri dan meletakkannya ke papan keratan.",
     "scenes.save.title": "Simpan sebagai fail",
     "scenes.save.caption": "Ctrl + S terus menyimpan fail PNG yang dinamakan mengikut tarikh dan masa ke “Gambar\\Tangkapan Skrin”; klik pemberitahuan untuk melihatnya dalam folder.",
+    "scenes.record.title": "Rakam skrin",
+    "scenes.record.caption": "Ctrl + R merakam yang dipilih; kemudian tetingkap memotongnya dan menjadikannya GIF atau video.",
     "scenes.ask.title": "Tanya AI Google",
     "scenes.ask.caption": "{askKey} bertanya kepada Mod AI Google siapa atau apa dalam gambar; perbualan dibuka di sebelah pilihan.",
     "scenes.voice.title": "Tanya dengan suara",

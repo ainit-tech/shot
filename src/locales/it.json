@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Maiusc + C legge il testo nell'immagine sul tuo computer e lo mette negli Appunti.",
     "scenes.save.title": "Salva come file",
     "scenes.save.caption": "Ctrl + S salva subito un file PNG con data e ora nel nome in “Immagini\\Screenshot”; un clic sulla notifica lo mostra nella cartella.",
+    "scenes.record.title": "Registrare lo schermo",
+    "scenes.record.caption": "Ctrl + R registra la selezione; poi una finestra la taglia e ne fa una GIF o un video.",
     "scenes.ask.title": "Chiedi all'IA di Google",
     "scenes.ask.caption": "{askKey} chiede all'AI Mode di Google chi o cosa c'è nell'immagine; la conversazione si apre accanto alla selezione.",
     "scenes.voice.title": "Chiedi a voce",

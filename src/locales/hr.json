@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C čita tekst sa slike na vašem računalu i stavlja ga u međuspremnik.",
     "scenes.save.title": "Spremi kao datoteku",
     "scenes.save.caption": "Ctrl + S odmah sprema PNG datoteku s datumom i vremenom u nazivu u mapu „Slike\\Snimke zaslona“; klik na obavijest prikazuje je u mapi.",
+    "scenes.record.title": "Snimanje zaslona",
+    "scenes.record.caption": "Ctrl + R snima odabrano; prozor to zatim reže i pretvara u GIF ili videozapis.",
     "scenes.ask.title": "Pitajte Google AI",
     "scenes.ask.caption": "{askKey} pita Google AI Mode tko ili što je na slici; razgovor se otvara uz odabir.",
     "scenes.voice.title": "Pitajte naglas",

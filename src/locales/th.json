@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C อ่านข้อความในรูปภาพบนคอมพิวเตอร์ของคุณเอง แล้วใส่ลงในคลิปบอร์ด",
     "scenes.save.title": "บันทึกเป็นไฟล์",
     "scenes.save.caption": "Ctrl + S บันทึกไฟล์ PNG ที่ตั้งชื่อตามวันและเวลาลงใน “รูปภาพ\\ภาพหน้าจอ” ทันที คลิกการแจ้งเตือนเพื่อดูไฟล์ในโฟลเดอร์",
+    "scenes.record.title": "บันทึกหน้าจอ",
+    "scenes.record.caption": "Ctrl + R บันทึกส่วนที่เลือก จากนั้นหน้าต่างจะตัดและทำเป็น GIF หรือวิดีโอ",
     "scenes.ask.title": "ถาม AI ของ Google",
     "scenes.ask.caption": "{askKey} ถามโหมด AI ของ Google ว่าใครหรืออะไรอยู่ในรูป การสนทนาจะเปิดข้างส่วนที่เลือก",
     "scenes.voice.title": "ถามด้วยเสียง",

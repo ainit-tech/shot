@@ -453,6 +453,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C 在你的电脑上读取图片中的文字，并放进剪贴板。",
     "scenes.save.title": "保存为文件",
     "scenes.save.caption": "Ctrl + S 立即把以日期和时间命名的 PNG 文件保存到“图片\\屏幕截图”；点击通知即可在文件夹中看到它。",
+    "scenes.record.title": "录制屏幕",
+    "scenes.record.caption": "Ctrl + R 录制选中的区域，录完后可在窗口中裁剪，并生成 GIF 或视频。",
     "scenes.ask.title": "问 Google AI",
     "scenes.ask.caption": "按 {askKey}，向 Google AI 模式询问图片里是谁或什么；对话会在选区旁打开。",
     "scenes.voice.title": "语音提问",

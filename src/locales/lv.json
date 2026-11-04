@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C nolasa attēlā esošo tekstu jūsu pašu datorā un ievieto to starpliktuvē.",
     "scenes.save.title": "Saglabāt kā failu",
     "scenes.save.caption": "Ctrl + S uzreiz saglabā PNG failu ar datumu un laiku nosaukumā mapē „Attēli\\Ekrānuzņēmumi“; noklikšķinot uz paziņojuma, tas tiek parādīts mapē.",
+    "scenes.record.title": "Ekrāna ierakstīšana",
+    "scenes.record.caption": "Ctrl + R ieraksta atlasīto; pēc tam logs to apgriež un pārvērš GIF vai video.",
     "scenes.ask.title": "Jautājiet Google MI",
     "scenes.ask.caption": "{askKey} jautā Google MI režīmam, kas ir attēlā; saruna atveras blakus atlasei.",
     "scenes.voice.title": "Jautājiet balsī",

@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C husoma maandishi yaliyo kwenye picha, kwenye kompyuta yako, na kuyaweka kwenye ubao wa kunakili.",
     "scenes.save.title": "Hifadhi kama faili",
     "scenes.save.caption": "Ctrl + S huhifadhi mara moja faili ya PNG yenye tarehe na saa katika jina lake kwenye “Picha\\Picha za skrini”; kubofya arifa huionyesha kwenye folda.",
+    "scenes.record.title": "Kurekodi skrini",
+    "scenes.record.caption": "Ctrl + R hurekodi kilichochaguliwa; kisha dirisha hukikata na kukifanya GIF au video.",
     "scenes.ask.title": "Uliza AI ya Google",
     "scenes.ask.caption": "{askKey} huuliza AI Mode ya Google ni nani au nini kilicho kwenye picha; mazungumzo hufunguka kando ya eneo lililochaguliwa.",
     "scenes.voice.title": "Uliza kwa sauti",

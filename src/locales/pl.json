@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C odczytuje tekst z obrazu na twoim komputerze i umieszcza go w schowku.",
     "scenes.save.title": "Zapisz jako plik",
     "scenes.save.caption": "Ctrl + S od razu zapisuje plik PNG z datą i godziną w nazwie w folderze „Obrazy\\Zrzuty ekranu”; kliknięcie powiadomienia pokazuje go w folderze.",
+    "scenes.record.title": "Nagrywanie ekranu",
+    "scenes.record.caption": "Ctrl + R nagrywa zaznaczenie, a potem okno je przycina i robi z niego GIF lub wideo.",
     "scenes.ask.title": "Zapytaj AI Google",
     "scenes.ask.caption": "{askKey} pyta tryb AI Google, kto lub co jest na obrazie; rozmowa otwiera się obok zaznaczenia.",
     "scenes.voice.title": "Zapytaj na głos",

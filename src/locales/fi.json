@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C lukee kuvan tekstin omalla tietokoneellasi ja vie sen leikepöydälle.",
     "scenes.save.title": "Tallenna tiedostoksi",
     "scenes.save.caption": "Ctrl + S tallentaa heti PNG-tiedoston, jonka nimessä on päivämäärä ja kellonaika, kansioon ”Kuvat\\Näyttökuvat”; ilmoituksen napsauttaminen näyttää sen kansiossa.",
+    "scenes.record.title": "Näytön nauhoitus",
+    "scenes.record.caption": "Ctrl + R nauhoittaa valitun alueen; ikkuna leikkaa sen ja tekee siitä GIF-kuvan tai videon.",
     "scenes.ask.title": "Kysy Googlen tekoälyltä",
     "scenes.ask.caption": "{askKey} kysyy Googlen tekoälytilalta, kuka tai mikä kuvassa on; keskustelu avautuu valinnan viereen.",
     "scenes.voice.title": "Kysy ääneen",

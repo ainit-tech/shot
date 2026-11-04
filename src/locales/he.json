@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C קורא את הטקסט שבתמונה במחשב שלכם ומעביר אותו ללוח.",
     "scenes.save.title": "שמירה כקובץ",
     "scenes.save.caption": "Ctrl + S שומר מיד קובץ PNG שבשמו התאריך והשעה בתיקייה \"תמונות\\צילומי מסך\"; לחיצה על ההודעה מציגה אותו בתיקייה.",
+    "scenes.record.title": "הקלטת המסך",
+    "scenes.record.caption": "Ctrl + R מקליט את הבחירה; לאחר מכן חלון חותך אותה והופך אותה ל-GIF או לווידאו.",
     "scenes.ask.title": "שאלו את ה-AI של Google",
     "scenes.ask.caption": "{askKey} שואל את מצב AI של Google מי או מה בתמונה; השיחה נפתחת ליד האזור שנבחר.",
     "scenes.voice.title": "שאלו בקול",

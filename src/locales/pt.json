@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C lê o texto da imagem no seu computador e o coloca na área de transferência.",
     "scenes.save.title": "Salvar como arquivo",
     "scenes.save.caption": "Ctrl + S salva na hora um arquivo PNG com a data e a hora no nome em “Imagens\\Capturas de Tela”; um clique na notificação o mostra na pasta.",
+    "scenes.record.title": "Gravar a tela",
+    "scenes.record.caption": "Ctrl + R grava o que está selecionado; depois uma janela corta e transforma em GIF ou vídeo.",
     "scenes.ask.title": "Pergunte à IA do Google",
     "scenes.ask.caption": "{askKey} pergunta ao Modo IA do Google quem ou o que está na imagem; a conversa abre ao lado da seleção.",
     "scenes.voice.title": "Pergunte em voz alta",

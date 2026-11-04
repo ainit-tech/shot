@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C በምስሉ ላይ ያለውን ጽሑፍ በራስዎ ኮምፒውተር ላይ አንብቦ ወደ ቅንጥብ ሰሌዳው ያስገባዋል።",
     "scenes.save.title": "እንደ ፋይል አስቀምጥ",
     "scenes.save.caption": "Ctrl + S ቀኑና ሰዓቱ በስሙ ያለበትን የPNG ፋይል ወዲያውኑ በ«ስዕሎች\\ቅጽበታዊ ገጽ እይታዎች» ውስጥ ያስቀምጣል፤ ማሳወቂያውን ጠቅ ማድረግ ፋይሉን በአቃፊው ውስጥ ያሳያል።",
+    "scenes.record.title": "ማያ ገጹን መቅረጽ",
+    "scenes.record.caption": "Ctrl + R የተመረጠውን ይቀርጻል፤ ከዚያ መስኮት ይቆርጠዋል እና GIF ወይም ቪዲዮ ያደርገዋል።",
     "scenes.ask.title": "የGoogleን AI ይጠይቁ",
     "scenes.ask.caption": "{askKey} የGoogleን AI ሁነታ በምስሉ ላይ ማን ወይም ምን እንዳለ ይጠይቃል፤ ውይይቱ ከተመረጠው ቦታ አጠገብ ይከፈታል።",
     "scenes.voice.title": "በድምፅ ይጠይቁ",

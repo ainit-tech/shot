@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C citește textul din imagine chiar pe computerul dvs. și îl pune în clipboard.",
     "scenes.save.title": "Salvați ca fișier",
     "scenes.save.caption": "Ctrl + S salvează imediat un fișier PNG cu data și ora în nume în „Imagini\\Capturi de ecran”; un clic pe notificare îl arată în folder.",
+    "scenes.record.title": "Înregistrarea ecranului",
+    "scenes.record.caption": "Ctrl + R înregistrează selecția; apoi o fereastră o taie și o transformă într-un GIF sau un videoclip.",
     "scenes.ask.title": "Întrebați IA Google",
     "scenes.ask.caption": "{askKey} întreabă Modul AI de la Google cine sau ce este în imagine; conversația se deschide lângă selecție.",
     "scenes.voice.title": "Întrebați cu voce tare",

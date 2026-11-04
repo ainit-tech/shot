@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C loeb pildil oleva teksti teie enda arvutis ja paneb selle lõikelauale.",
     "scenes.save.title": "Salvesta failina",
     "scenes.save.caption": "Ctrl + S salvestab kohe PNG-faili, mille nimes on kuupäev ja kellaaeg, kausta „Pildid\\Kuvatõmmised“; teatisel klõpsates näete faili kaustas.",
+    "scenes.record.title": "Ekraani lindistamine",
+    "scenes.record.caption": "Ctrl + R lindistab valitud ala; seejärel lõikab aken selle ja teeb sellest GIF-i või video.",
     "scenes.ask.title": "Küsige Google’i tehisintellektilt",
     "scenes.ask.caption": "{askKey} küsib Google’i AI Mode’ilt, kes või mis pildil on; vestlus avaneb valiku kõrval.",
     "scenes.voice.title": "Küsige häälega",

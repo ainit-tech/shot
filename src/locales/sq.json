@@ -454,6 +454,8 @@
     "scenes.copy-text.caption": "Ctrl + Shift + C lexon tekstin në imazh, në kompjuterin tënd, dhe e vendos në kujtesën e fragmenteve.",
     "scenes.save.title": "Ruaje si skedar",
     "scenes.save.caption": "Ctrl + S ruan menjëherë një skedar PNG me datën dhe orën në emër te «Figurat\\Pamjet e ekranit»; një klikim mbi njoftimin ta tregon në dosje.",
+    "scenes.record.title": "Regjistrimi i ekranit",
+    "scenes.record.caption": "Ctrl + R regjistron përzgjedhjen; pastaj një dritare e pret dhe e kthen në GIF ose video.",
     "scenes.ask.title": "Pyet AI-në e Google",
     "scenes.ask.caption": "{askKey} pyet Modalitetin AI të Google se kush ose çfarë është në imazh; biseda hapet pranë përzgjedhjes.",
     "scenes.voice.title": "Pyet me zë",
