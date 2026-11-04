@@ -13,6 +13,8 @@ mod chime;
 mod color;
 mod draw;
 mod geometry;
+#[allow(dead_code)]
+mod gif;
 mod icons;
 mod image;
 mod magic;

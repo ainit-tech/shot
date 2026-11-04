@@ -24,6 +24,8 @@ mod preferences;
 mod shell;
 mod tray;
 mod update;
+#[allow(dead_code)]
+mod video;
 
 use std::io;
 
