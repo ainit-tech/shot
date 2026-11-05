@@ -38,10 +38,10 @@ const INK_OFF: Rgba = [236, 236, 236, 80];
 const TRACK: Rgba = [236, 236, 236, 46];
 const SEPARATOR: Rgba = [255, 255, 255, 30];
 pub const TEXT: Rgba = [242, 242, 242, 255];
-/// The dot in the hint of a question asked aloud: grey while the microphone is turned on, red
+/// The dot in the hint of a question asked aloud: grey while the microphone is turned on, green
 /// while it listens.
 pub const MIC_WAITING: Rgba = [158, 158, 158, 255];
-pub const MIC_LISTENING: Rgba = [229, 57, 53, 255];
+pub const MIC_LISTENING: Rgba = [46, 160, 67, 255];
 
 // Sizes in pixels at the scale of 100%.
 const HANDLE_RADIUS: f32 = 4.0;
@@ -516,7 +516,7 @@ pub struct ToolbarLook<'a> {
     pub voice: Option<f32>,
     /// The query button whose screenshot is being sent; the other buttons wait meanwhile.
     pub busy: Option<usize>,
-    /// Whether the busy button's microphone listens to a question asked aloud: the button is red,
+    /// Whether the busy button's microphone listens to a question asked aloud: the button is green,
     /// as a button that records.
     pub listening: bool,
     /// The icons of the query buttons.

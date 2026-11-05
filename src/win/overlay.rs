@@ -1143,11 +1143,11 @@ impl Overlay {
                 let button = listening.button;
                 let why = match holder {
                     Holder::Key(_) => match session.settings.buttons[button].key() {
-                        Some(key) => tr("The microphone wasn't on yet: hold {key} until the red dot lights up.")
+                        Some(key) => tr("The microphone wasn't on yet: hold {key} until the green dot lights up.")
                             .replace("{key}", &key.to_string()),
-                        None => tr("The microphone wasn't on yet: hold the button until the red dot lights up.").into(),
+                        None => tr("The microphone wasn't on yet: hold the button until the green dot lights up.").into(),
                     },
-                    Holder::Mouse => tr("The microphone wasn't on yet: hold the button until the red dot lights up.").into(),
+                    Holder::Mouse => tr("The microphone wasn't on yet: hold the button until the green dot lights up.").into(),
                 };
                 session.listening = None;
                 stop_waiting(window);
@@ -1248,7 +1248,7 @@ impl Overlay {
         let Some(listening) = &mut session.listening else { return };
         let button = listening.button;
         match heard {
-            // The dot turns red and stays, and the chime says to speak, once.
+            // The dot turns green and stays, and the chime says to speak, once.
             Heard::Listening => {
                 if !listening.on && session.settings.listening_sound {
                     shell::chime();
@@ -1932,7 +1932,7 @@ impl Session {
     /// asked aloud, or what happened to it, next to its toolbar.
     fn hint(&mut self, main: Option<&Toolbar>, actions: Option<&Toolbar>) -> Option<Hint> {
         // A question asked aloud has a dot at the start of its hint: grey and blinking while the
-        // microphone is turned on, red while it listens and until the last words have come;
+        // microphone is turned on, green while it listens and until the last words have come;
         // none as the question goes. The room stays as the grey dot blinks.
         let mut dot = None;
         let (button, text) = match (&self.sending, &self.listening, &self.note) {
@@ -2534,7 +2534,7 @@ mod tests {
             save(&mut session, name);
         }
         session.listening = None;
-        let why = tr("The microphone wasn't on yet: hold {key} until the red dot lights up.").replace("{key}", "G");
+        let why = tr("The microphone wasn't on yet: hold {key} until the green dot lights up.").replace("{key}", "G");
         session.note = Some((Button::Query(0), why));
         save(&mut session, "6-too-early");
     }

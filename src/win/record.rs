@@ -72,9 +72,9 @@ const TIME_GAP: f32 = 6.0;
 const HINT_SIZE: f32 = 12.0;
 const HINT_PADDING: (f32, f32) = (9.0, 5.0);
 const HINT_GAP: f32 = 6.0;
-/// The colours of the frame and of the dot: red while recording, grey otherwise, as the
-/// microphone's.
-const RECORDING: Rgba = draw::MIC_LISTENING;
+/// The colours of the frame and of the dot: red while recording, as a recording always is, and
+/// grey otherwise.
+const RECORDING: Rgba = [229, 57, 53, 255];
 const WAITING: Rgba = draw::MIC_WAITING;
 /// The panel's colour, under what is drawn on it, and that of a hint.
 const PANEL: Rgba = [32, 32, 32, 255];
