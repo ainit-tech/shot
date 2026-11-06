@@ -36,7 +36,7 @@ use windows_sys::core::PCWSTR;
 use windows_sys::w;
 
 use super::gdi::{self, Font};
-use super::{browser, wide};
+use super::{QUIET, browser, out_of_sight, wide};
 use crate::card as layout;
 use crate::color::Rgba;
 use crate::geometry::Rect;
@@ -95,6 +95,9 @@ pub fn open(selection: Rect) {
     let window = card.window;
     CARD.with(|cell| *cell.borrow_mut() = Some(card));
     set_text(waiting(), true);
+    if QUIET {
+        return;
+    }
     unsafe {
         SetForegroundWindow(window);
         if let Some(text_box) = CARD.with(|cell| cell.borrow().as_ref().map(|card| card.text_box)) {
@@ -248,8 +251,13 @@ fn fit() {
         }
         unsafe { ReleaseDC(card.window, dc) };
         let place = layout::place(card.selection, (width, height), scale, card.screen);
+        // The tests look at the card as far right of all the screens (see `QUIET`).
+        let left = match QUIET {
+            true => out_of_sight(RECT { left: 0, top: 0, right: 0, bottom: 0 }).left,
+            false => place.left,
+        };
         unsafe {
-            SetWindowPos(card.window, HWND_TOPMOST, place.left, place.top, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+            SetWindowPos(card.window, HWND_TOPMOST, left, place.top, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
             MoveWindow(card.text_box, padding, padding, width - frame, height - frame - link_line + padding / 2, 1);
             ShowScrollBar(card.text_box, SB_VERT, scrolls as i32);
             InvalidateRect(card.window, null(), 1);

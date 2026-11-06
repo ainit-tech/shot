@@ -1619,8 +1619,8 @@ pub(super) mod tests {
     }
 
     /// AI Mode as the program's script sees it: the question field with its send button, which
-    /// takes a pasted picture, and the answer in a block of its own, marked complete a moment
-    /// after the question goes.
+    /// takes a pasted picture, and the answer in a block of its own, its turn marked complete a
+    /// moment after the question goes.
     const AI_MODE_PAGE: &str = r#"<!doctype html><title>AI Mode</title>
 <textarea></textarea><button data-xid="input-plate-send-button" disabled>Send</button>
 <script>
@@ -1641,7 +1641,7 @@ pub(super) mod tests {
     block.textContent = "Bonjour";
     turn.append(block);
     document.body.append(turn);
-    setTimeout(() => block.setAttribute("data-sfc-inited", ""), 300);
+    setTimeout(() => turn.setAttribute("data-asrc", "true"), 300);
   });
 </script>"#;
 
@@ -1756,7 +1756,7 @@ pub(super) mod tests {
         let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
         let failed = FAILED.with(|failed| failed.borrow().clone());
         let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
-        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-asrc]').length");
         close();
         assert!(done, "the query didn't finish: {navigations}");
         assert!(failed.is_empty() && !shown, "failed: {failed:?}, the window shown: {shown}; {navigations}");
@@ -1776,7 +1776,7 @@ pub(super) mod tests {
         let shown = unsafe { IsWindowVisible(window().unwrap()) } != 0;
         let failed = FAILED.with(|failed| failed.borrow().clone());
         let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
-        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-asrc]').length");
         close();
         assert!(navigations.contains(" false "), "the stream didn't break: {navigations}");
         assert_eq!(navigations.matches(&address).count(), 2, "not asked for once more: {navigations}");
@@ -1818,7 +1818,7 @@ pub(super) mod tests {
         let done = pump_until(30, idle);
         let failed = FAILED.with(|failed| failed.borrow().clone());
         let navigations = NAVIGATIONS.with(|all| all.borrow().join(", "));
-        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-sfc-inited]').length");
+        let page = evaluate("document.title + ' ' + document.querySelectorAll('[data-asrc]').length");
         close();
         assert!(shown, "the window didn't come out with the check: {navigations}");
         assert!(waiting && failed_early.is_empty(), "the query gave up at the check: {failed_early:?}; {navigations}");
@@ -2249,7 +2249,7 @@ pub(super) mod tests {
         let job = Job { name: button.name, question: button.prompt.clone(), script, picture, mode: button.mode, listener: None };
         ask(&url, job, Some(selection)).unwrap();
         let sent = pump_until(90, idle);
-        let complete = r#"!!document.querySelector('[data-xid="aim-mars-turn-root"] [data-container-id="main-col"][data-sfc-inited]')"#;
+        let complete = r#"!!document.querySelector('[data-xid="aim-mars-turn-root"][data-asrc] [data-container-id="main-col"]')"#;
         let answered = sent && pump_until(90, || evaluate(complete) == "true");
         let problems = evaluate(
             r##"(() => {
@@ -2274,6 +2274,77 @@ pub(super) mod tests {
         assert_eq!(problems, "[]");
         let (left, top) = (frame.left, frame.top);
         assert!(left > selection.right && top == selection.top, "the window isn't to the right of the selection: {left}, {top}");
+    }
+
+    /// What AI Mode's page holds for a question, as JSON: its size, its send buttons and question
+    /// fields, each with the plate it stands in, whether it shows and how it is, the picture
+    /// pasted and the turns of the conversation.
+    const QUESTION_PLACES: &str = r#"(() => {
+      const plate = (e) => e.closest('[data-xid$="input-plate"]')?.getAttribute("data-xid") ?? "";
+      return JSON.stringify({
+        size: [innerWidth, innerHeight],
+        hidden: document.hidden,
+        address: location.href.slice(0, 70),
+        buttons: [...document.querySelectorAll('button[data-xid="input-plate-send-button"]')].map((b) => [plate(b), !!b.offsetParent, b.disabled]),
+        fields: [...document.querySelectorAll("textarea")].map((t) => [plate(t), !!t.offsetParent, t.value]),
+        plates: [...document.querySelectorAll('[data-xid$="input-plate"]')].map((p) => [p.getAttribute("data-xid"), !!p.offsetParent]),
+        pictures: document.querySelectorAll('[aria-label="screenshot.png"]').length,
+        focused: document.activeElement?.tagName,
+        says: [...document.querySelectorAll('[role="alert"], [aria-live]')].map((e) => e.innerText.trim()).filter((t) => t && t.length < 120),
+        turns: document.querySelectorAll('[data-xid="aim-mars-turn-root"]').length,
+      });
+    })()"#;
+
+    /// Asks AI Mode as G does in the program: the question takes the spare page, a fresh AI Mode
+    /// loaded hidden in the size of a window that no query has brought, and the window comes out
+    /// narrow next to the selection. It goes online and asks Google, out of sight, so it runs only
+    /// when asked: `LOCALAPPDATA=<folder> cargo test -p ainitshot -- --ignored --exact --nocapture
+    /// win::browser::tests::a_question_goes_on_ai_modes_spare_page`. With
+    /// `SCREENSHOT_PREVIEW=<file.png>` it also saves what the page shows, and with
+    /// `SPARE_AGE=<seconds>` the spare page waits as long for the question.
+    #[test]
+    #[ignore]
+    fn a_question_goes_on_ai_modes_spare_page() {
+        unsafe { CoInitializeEx(null(), COINIT_APARTMENTTHREADED as u32) };
+        prepare();
+        assert!(pump_until(60, is_ready), "the spare page didn't come");
+        let spare = spare_window().unwrap();
+        let places = || evaluate_on(&webview_of(spare).unwrap(), QUESTION_PLACES);
+        // As long as the spare page has waited for the question, in seconds.
+        let waited = std::env::var("SPARE_AGE").ok().and_then(|age| age.parse().ok()).unwrap_or(3);
+        pump_until(waited, || false);
+        eprintln!("spare page: {}", places());
+        let button = button("Спросить Google", Mode::Chat, "Что на картинке? Объясни.");
+        let query::Way::Window { url, script } = query::send(&button, &english()) else { panic!("not the window") };
+        let selection = Rect::new(300, 200, 780, 290);
+        let picture = Image { width: 1, height: 1, pixels: vec![255; 4] };
+        let job = Job { name: button.name, question: button.prompt.clone(), script, picture, mode: button.mode, listener: None };
+        ask(&url, job, Some(selection)).unwrap();
+        // What the page holds as the script goes, whenever that changes.
+        let mut last = String::new();
+        let mut sent = false;
+        for _ in 0..60 {
+            let now = places();
+            if now != last {
+                eprintln!("{now}");
+                last = now;
+            }
+            sent = idle();
+            if sent {
+                break;
+            }
+            pump_until(1, || false);
+        }
+        eprintln!("the question {}: {}", if sent { "went" } else { "stayed" }, places());
+        eprintln!("the program was told: {:?}", FAILED.with(|failed| failed.borrow().clone()));
+        let turned = pump_until(10, || evaluate("document.querySelectorAll('[data-xid=\"aim-mars-turn-root\"]').length") != "0");
+        eprintln!("after it: {}", places());
+        if let Ok(path) = std::env::var("SCREENSHOT_PREVIEW") {
+            save_page(&path);
+        }
+        close();
+        assert!(sent, "the question didn't go");
+        assert!(turned, "the page took no question");
     }
 
     /// Searches Google by Google's own logo, as "Search by image in Google" does, and checks

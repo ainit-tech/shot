@@ -297,14 +297,17 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
       childList: true,
       characterData: true,
       attributes: true,
-      attributeFilter: ["disabled", "class", "style", "hidden", "data-sfc-inited"],
+      attributeFilter: ["disabled", "class", "style", "hidden", "data-asrc"],
     }});
     window.addEventListener("load", check);
   }});
   try {{
     {own_page}{listening}
-    const sendButton = () => document.querySelector('button[data-xid="input-plate-send-button"]');
-    const field = await until(() => sendButton() && [...document.querySelectorAll("textarea")].find((t) => t.offsetParent), 60);
+    // The page may hold more than one plate with a field and a send button: the plate of the
+    // field that shows is the one that sends.
+    const sendButton = (field) =>
+      (field.closest('[data-xid$="input-plate"]') ?? document).querySelector('button[data-xid="input-plate-send-button"]');
+    const field = await until(() => [...document.querySelectorAll("textarea")].find((t) => t.offsetParent && sendButton(t)), 60);
     if (!field) return report({no_field});
     // Pasted once: if the page's own script isn't ready yet, Google keeps the event and hands it
     // over later, so a second paste would attach the picture twice.
@@ -317,14 +320,14 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
     }}
     {typing}
     const send = await until(() => {{
-      const button = sendButton();
+      const button = sendButton(field);
       return button && !button.disabled ? button : null;
     }}, 120);
     if (!send) return report({not_uploaded});
     const before = new Set(document.querySelectorAll('[data-container-id="main-col"]'));
     send.click();
     if (!{answer}) return report("sent");
-    // The answer grows in a block of its own, and Google marks the block once it is complete.
+    // The answer grows in a block of its own, and Google marks its turn once it is complete.
     // Its parts have containers of their own; next to them Google may add a warning that AI can
     // make mistakes, which is not part of the answer.
     const answerOf = (block) => {{
@@ -340,7 +343,7 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
         shown = text;
         report("partial:" + text);
       }}
-      return text && block.hasAttribute("data-sfc-inited") ? text : null;
+      return text && block.closest('[data-xid="aim-mars-turn-root"]')?.hasAttribute("data-asrc") ? text : null;
     }}, 180);
     if (complete || shown) return report("answer:" + (complete || shown));
     report({no_answer});
@@ -651,7 +654,7 @@ mod tests {
         let Way::Window { script, .. } = send(&button(Mode::Answer), b"png") else { panic!("not the window") };
         assert!(script.contains("if (!true) return report(\"sent\");"));
         assert!(script.contains("aim-mars-turn-root"));
-        assert!(script.contains("data-sfc-inited"));
+        assert!(script.contains("data-asrc"));
     }
 
     #[test]
