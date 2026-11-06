@@ -74,11 +74,14 @@ impl Finder {
         let description: Description = serde_json::from_str(&text).map_err(|error| error.to_string())?;
         let environment = runtime::environment(library)?;
         let threads = available_parallelism().map_or(THREADS, usize::from).min(THREADS);
+        // The threads of the two graphs don't wait on the processor: spinning, they get in each
+        // other's way, and a window takes more than twice as long.
         let session = |file: &str| {
             Session::builder(&environment)
                 .and_then(|builder| builder.with_optimization_level(GraphOptimizationLevel::Level3).map_err(Into::into))
                 .and_then(|builder| builder.with_intra_threads(threads).map_err(Into::into))
                 .and_then(|builder| builder.with_inter_threads(1).map_err(Into::into))
+                .and_then(|builder| builder.with_intra_op_spinning(false).map_err(Into::into))
                 .and_then(|mut builder| builder.commit_from_file(folder.join(file)))
                 .map_err(|error| error.to_string())
         };
@@ -192,10 +195,13 @@ fn planes(picture: &Image, reduced: (usize, usize), whole: (usize, usize)) -> Ve
             next += 1;
         }
     }
+    // Rounded as the model's training rounded: half up by a whole ratio, half to even by any other.
+    let whole = old_wide.is_multiple_of(wide) && old_high.is_multiple_of(high);
+    let rounded = |sum: f32| if whole { (sum + 0.5).floor() } else { sum.round_ties_even() };
     for y in 0..high {
         for x in 0..wide {
             for plane in 0..3 {
-                planes[at(plane, x, y)] = (sums[(y * wide + x) * 3 + plane] + 0.5) as u8;
+                planes[at(plane, x, y)] = rounded(sums[(y * wide + x) * 3 + plane]) as u8;
             }
         }
     }
@@ -363,6 +369,7 @@ mod tests {
         let folder = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
         let library = PathBuf::from(std::env::var_os("ONNX_RUNTIME").expect("ONNX_RUNTIME names the library"));
         let mut finder = Finder::load(&library, &folder).unwrap();
+        let (mut all, mut alike) = (0, 0);
         for entry in fs::read_dir(folder.join("check")).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().is_none_or(|extension| extension != "png") {
@@ -374,12 +381,22 @@ mod tests {
             let started = Instant::now();
             let (found, _) = finder.found(&shot).unwrap();
             let seconds = started.elapsed().as_secs_f32();
+            // The reference gives the frames that stay, with their nearest parents that stay.
+            let least = finder.description.score;
+            let kept_parent = |block: &Found| {
+                let mut parent = block.parent;
+                while parent != 0 && found[parent as usize - 1].score < least {
+                    parent = found[parent as usize - 1].parent;
+                }
+                parent
+            };
+            let kept: Vec<&Found> = found.iter().filter(|block| block.score >= least).collect();
             let same = |block: &&serde_json::Value| {
                 let want: Vec<i64> = block["box"].as_array().unwrap().iter().map(|side| side.as_i64().unwrap()).collect();
-                found.iter().any(|mine| {
+                kept.iter().any(|mine| {
                     let rect = [mine.rect.left, mine.rect.top, mine.rect.right, mine.rect.bottom];
                     rect.iter().zip(&want).all(|(a, b)| (i64::from(*a) - b).abs() <= 3)
-                        && i64::from(mine.parent) == block["parent"].as_i64().unwrap()
+                        && i64::from(kept_parent(mine)) == block["parent"].as_i64().unwrap()
                 })
             };
             let matched = expected.iter().filter(same).count();
@@ -389,9 +406,25 @@ mod tests {
                 shot.width,
                 shot.height,
                 expected.len(),
-                found.len(),
+                kept.len(),
             );
-            assert!(matched * 10 >= expected.len() * 9, "{matched} of {}", expected.len());
+            for block in expected.iter().filter(|block| !same(block)) {
+                println!("  not found: {block}");
+            }
+            for mine in &kept {
+                let rect = [mine.rect.left, mine.rect.top, mine.rect.right, mine.rect.bottom];
+                let there = expected.iter().any(|block| {
+                    let want: Vec<i64> = block["box"].as_array().unwrap().iter().map(|side| side.as_i64().unwrap()).collect();
+                    rect.iter().zip(&want).all(|(a, b)| (i64::from(*a) - b).abs() <= 3)
+                });
+                if !there {
+                    println!("  only here: {rect:?} parent {} score {:.3}", kept_parent(mine), mine.score);
+                }
+            }
+            all += expected.len();
+            alike += matched;
         }
+        println!("{alike} of {all} alike");
+        assert!(alike * 100 >= all * 95, "{alike} of {all}");
     }
 }
