@@ -1,6 +1,7 @@
 //! The models the program downloads for what rules can't do: now OpenAI Privacy Filter, with which
 //! masking finds names, addresses and other private data, and ONNX Runtime, which runs it. They
-//! live in `%LOCALAPPDATA%\ainitShot\models`.
+//! live in `%LOCALAPPDATA%\ainitShot\models`. Our own model of the blocks of a window lies next to
+//! the program in a test build, in the folder `blocks`.
 //!
 //! A thread of its own downloads them in the background as the settings want them: a file after a
 //! file, each checked against its SHA-256 before it takes its place, so a file in place is a
@@ -23,6 +24,9 @@ use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageW, WM_APP};
 
 use super::http::{self, Failure, Get};
 use super::{app, overlay, preferences};
+use crate::blocks::Tree;
+use crate::finder::Finder;
+use crate::image::Image;
 use crate::mask::Found;
 use crate::privacy::Filter;
 use crate::text::tr;
@@ -477,12 +481,13 @@ fn unzip(zipped: &[u8], packed: u64) -> Option<Vec<u8>> {
     }
 }
 
-struct Loaded {
-    filter: Filter,
+struct Loaded<T> {
+    model: T,
     used: Instant,
 }
 
-static FILTER_LOADED: Mutex<Option<Loaded>> = Mutex::new(None);
+static FILTER_LOADED: Mutex<Option<Loaded<Filter>>> = Mutex::new(None);
+static BLOCKS_LOADED: Mutex<Option<Loaded<Finder>>> = Mutex::new(None);
 static WATCHED: AtomicBool = AtomicBool::new(false);
 
 /// Whether OpenAI Privacy Filter is downloaded, with what runs it.
@@ -513,7 +518,7 @@ pub fn find(text: &str) -> Option<Result<Vec<Found>, String>> {
         let started = Instant::now();
         let runtime = FILTER[0].path();
         match Filter::load(&runtime, &folder().join("privacy-filter")) {
-            Ok(filter) => *loaded = Some(Loaded { filter, used: started }),
+            Ok(model) => *loaded = Some(Loaded { model, used: started }),
             Err(problem) => return Some(Err(problem)),
         }
         eprintln!("OpenAI Privacy Filter loaded in {:.1} s", started.elapsed().as_secs_f32());
@@ -521,7 +526,38 @@ pub fn find(text: &str) -> Option<Result<Vec<Found>, String>> {
     }
     let loaded = loaded.as_mut()?;
     loaded.used = Instant::now();
-    Some(loaded.filter.find(text))
+    Some(loaded.model.find(text))
+}
+
+/// The folder of the model of the blocks of a window, if the model is there.
+fn blocks_folder() -> Option<PathBuf> {
+    let beside = std::env::current_exe().ok()?.parent()?.join("blocks");
+    beside.join("model.json").is_file().then_some(beside)
+}
+
+/// Whether the model of the blocks of a window is there, with what runs it.
+pub fn blocks_ready() -> bool {
+    FILTER[0].done() && blocks_folder().is_some()
+}
+
+/// The blocks of a window on its picture, or nothing without the model. It is loaded the first
+/// time and runs for a moment, so it is called away from the window's thread; windows wait for
+/// one another.
+pub fn blocks(picture: &Image) -> Option<Result<Tree, String>> {
+    let folder = blocks_folder()?;
+    let mut loaded = lock(&BLOCKS_LOADED);
+    if loaded.is_none() {
+        let started = Instant::now();
+        match Finder::load(&FILTER[0].path(), &folder) {
+            Ok(model) => *loaded = Some(Loaded { model, used: started }),
+            Err(problem) => return Some(Err(problem)),
+        }
+        eprintln!("The model of blocks loaded in {:.1} s", started.elapsed().as_secs_f32());
+        watch();
+    }
+    let loaded = loaded.as_mut()?;
+    loaded.used = Instant::now();
+    Some(loaded.model.find(picture))
 }
 
 /// Lets the model go once it has lain unused long enough.
@@ -532,10 +568,16 @@ fn watch() {
     thread::spawn(|| {
         loop {
             thread::sleep(Duration::from_secs(30));
-            let mut loaded = lock(&FILTER_LOADED);
-            if loaded.as_ref().is_some_and(|loaded| loaded.used.elapsed() > KEPT) {
-                *loaded = None;
+            let mut filter = lock(&FILTER_LOADED);
+            if filter.as_ref().is_some_and(|loaded| loaded.used.elapsed() > KEPT) {
+                *filter = None;
                 eprintln!("OpenAI Privacy Filter let go");
+            }
+            drop(filter);
+            let mut blocks = lock(&BLOCKS_LOADED);
+            if blocks.as_ref().is_some_and(|loaded| loaded.used.elapsed() > KEPT) {
+                *blocks = None;
+                eprintln!("The model of blocks let go");
             }
         }
     });

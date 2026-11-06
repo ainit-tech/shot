@@ -3,10 +3,12 @@
 //! annotations and how things look live outside Windows, in `selection`, `annotation` and `draw`.
 
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::fs;
 use std::io;
 use std::ptr::{null, null_mut};
 use std::rc::Rc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 
 use tiny_skia::Pixmap;
@@ -40,7 +42,9 @@ use super::gdi::{self, Buffer, Font};
 use super::browser::{self, Heard};
 use super::{app, card, clipboard, last_error, masking, models, ocr, record, shell};
 use crate::annotation::{self, Annotation, Draft, Grip, History, Label, Shape, Tool};
+#[cfg(test)]
 use crate::areas::Areas;
+use crate::blocks::Tree;
 use crate::color::Rgba;
 use crate::draw::{self, Text, ToolbarLook};
 use crate::geometry::{Point, PointF, Rect};
@@ -59,6 +63,8 @@ const WM_ANSWER: u32 = WM_APP + 2;
 const WM_READ: u32 = WM_APP + 4;
 /// The private data of the screenshot has been looked for: a [`Masked`] in a box in `lparam`.
 const WM_MASKED: u32 = WM_APP + 5;
+/// The blocks of a window of the frozen screen have been found: LPARAM is a box with them.
+const WM_BLOCKS: u32 = WM_APP + 6;
 const HINT_TIMER: usize = 1;
 const RING_TIMER: usize = 2;
 const HOLD_TIMER: usize = 3;
@@ -89,9 +95,6 @@ const HELD_TICK: u32 = 100;
 const NOTE_TIME: u32 = 3000;
 /// The most of the words heard that the frozen screen shows, in letters: the last ones.
 const WORDS_SHOWN: usize = 60;
-/// Whether a click takes the area of the window under the mouse rather than the window. Off until
-/// the areas are found well enough (decision 16): the code stays, with its tests.
-const AREAS: bool = false;
 /// How long the ring with the line width stays after the wheel turns, in milliseconds.
 const RING_TIME: u32 = 700;
 /// A selection smaller than this both ways, in pixels, was a click: it selects the window under it.
@@ -162,13 +165,21 @@ struct Session {
     /// An annotation being moved or reshaped with the mouse.
     grabbed: Option<Grab>,
     /// While nothing is selected, what a click selects under the mouse: the window there, or the
-    /// area of it, if areas are on.
+    /// block of it, once its blocks are found.
     snap: Option<Rect>,
     /// What was under the mouse where a new selection began, selected if the mouse doesn't move
     /// before it is let go.
     snap_press: Option<Rect>,
-    /// The areas of the windows of the frozen screen, found as the mouse comes to them.
-    areas: Areas,
+    /// The overlay's window, which hears when the blocks of a window are found.
+    overlay: HWND,
+    /// Which frozen screen this is: blocks found on another one are nothing to this one.
+    frozen: u64,
+    /// Whether the model of blocks is there: looked at once, as the mouse moves too often for
+    /// the disk.
+    blocks: bool,
+    /// The blocks of the windows of the frozen screen, found as the mouse comes to them: nothing
+    /// while they are on their way or if they couldn't be found.
+    trees: HashMap<Rect, Option<Tree>>,
     /// What everything around the selection covered when it was last drawn.
     decorated: Option<Rect>,
     fonts: Vec<((i32, bool), Font)>,
@@ -335,8 +346,9 @@ pub fn open() {
         };
         let place = session.screen.image.bounds().offset(session.screen.origin.x, session.screen.origin.y);
         let mut session = session;
-        // The area under the mouse is lit up at once, and remembered as drawn, so that it goes
+        // What is under the mouse is lit up at once, and remembered as drawn, so that it goes
         // dark again when the mouse leaves it.
+        session.overlay = overlay.window;
         let cursor = session.cursor();
         session.snap = session.snap_at(cursor);
         session.refresh(overlay.window);
@@ -367,6 +379,18 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
                 && let Some(overlay) = overlay.as_mut()
             {
                 overlay.heard(*heard);
+            }
+        });
+        return 0;
+    }
+    if message == WM_BLOCKS {
+        // Taken over first, like an answer.
+        let found = unsafe { Box::from_raw(lparam as *mut FoundBlocks) };
+        OVERLAY.with(|cell| {
+            if let Ok(mut overlay) = cell.try_borrow_mut()
+                && let Some(overlay) = overlay.as_mut()
+            {
+                overlay.blocks_found(*found);
             }
         });
         return 0;
@@ -414,6 +438,16 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
         Err(_) => None,
     });
     handled.unwrap_or_else(|| unsafe { DefWindowProcW(window, message, wparam, lparam) })
+}
+
+/// How many screens have been frozen so far.
+static FROZEN: AtomicU64 = AtomicU64::new(0);
+
+/// What the model found in a window of a frozen screen.
+struct FoundBlocks {
+    frozen: u64,
+    window: Rect,
+    tree: Result<Tree, String>,
 }
 
 /// What a key asks for.
@@ -620,8 +654,28 @@ impl Overlay {
         }
     }
 
+    /// The blocks of a window have been found: what is under the mouse may be one of them now.
+    fn blocks_found(&mut self, found: FoundBlocks) {
+        let window = self.window;
+        let Some(session) = &mut self.session else { return };
+        if session.frozen != found.frozen {
+            return;
+        }
+        let tree = found.tree.map_err(|problem| eprintln!("The blocks of a window: {problem}")).ok();
+        session.trees.insert(found.window, tree);
+        if session.selection.rect().is_some() || session.selection.is_dragging() {
+            return;
+        }
+        let cursor = session.cursor();
+        let snap = session.snap_at(cursor);
+        if snap != session.snap {
+            session.snap = snap;
+            session.refresh(window);
+        }
+    }
+
     /// Ctrl pressed or let go while nothing is selected: the window under the mouse lights up in
-    /// place of its area, or the area again.
+    /// place of its block, or the block again.
     fn control(&mut self, key: u16) {
         let window = self.window;
         let Some(session) = &mut self.session else { return };
@@ -1406,7 +1460,6 @@ impl Session {
     /// A screenshot of the screen frozen, with nothing selected yet.
     fn over(screen: Screen, settings: Rc<Settings>, color: usize, width: Option<f32>) -> io::Result<Session> {
         let buffer = Buffer::new(screen.image.width, screen.image.height)?;
-        let areas = Areas::new(&screen.image);
         let mut colors = settings.palette();
         if colors.is_empty() {
             colors.push([229, 57, 53, 255]);
@@ -1438,22 +1491,49 @@ impl Session {
             grabbed: None,
             snap: None,
             snap_press: None,
-            areas,
+            overlay: null_mut(),
+            frozen: FROZEN.fetch_add(1, Ordering::Relaxed),
+            blocks: models::blocks_ready(),
+            trees: HashMap::new(),
             decorated: None,
             fonts: Vec::new(),
         })
     }
 
-    /// What a click selects at the point while nothing is selected: the window under it; with
-    /// areas on, the area of the window under it, or the whole window with Ctrl held or where the
-    /// window has no area there.
+    /// What a click selects at the point while nothing is selected: the block of the window
+    /// under it, or the whole window with Ctrl held, until the window's blocks are found, and
+    /// where it has none.
     fn snap_at(&mut self, p: Point) -> Option<Rect> {
         let window = self.screen.window_at(p)?;
-        if !AREAS || key_down(VK_CONTROL) {
+        if key_down(VK_CONTROL) || !self.blocks {
             return Some(window);
         }
+        let seen = window.intersect(self.screen.image.bounds());
+        let Some(tree) = self.trees.get(&seen) else {
+            self.find_blocks(seen);
+            return Some(window);
+        };
         let scale = self.screen.monitor_at(p).scale;
-        Some(self.areas.at(&self.screen.image, window, p, scale).unwrap_or(window))
+        let block = tree.as_ref().and_then(|tree| tree.lit(Point::new(p.x - seen.left, p.y - seen.top), scale));
+        Some(block.map_or(window, |block| block.offset(seen.left, seen.top)))
+    }
+
+    /// Starts looking for the blocks of a window, once, away from the window's thread: the model
+    /// takes a moment, and the frozen screen goes on meanwhile.
+    fn find_blocks(&mut self, window: Rect) {
+        self.trees.insert(window, None);
+        if window.is_empty() {
+            return;
+        }
+        let picture = self.screen.image.crop(window);
+        let (frozen, target) = (self.frozen, self.overlay as isize);
+        thread::spawn(move || {
+            let Some(tree) = models::blocks(&picture) else { return };
+            let found = Box::into_raw(Box::new(FoundBlocks { frozen, window, tree }));
+            if unsafe { PostMessageW(target as HWND, WM_BLOCKS, 0, found as isize) } == 0 {
+                drop(unsafe { Box::from_raw(found) });
+            }
+        });
     }
 
     /// Where the mouse is on the frozen screen.

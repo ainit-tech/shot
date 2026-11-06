@@ -7,12 +7,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod annotation;
+#[cfg(test)]
 mod areas;
+mod blocks;
 mod card;
 mod chime;
 mod clicks;
 mod color;
 mod draw;
+mod finder;
 mod geometry;
 mod gif;
 mod icons;
@@ -21,6 +24,7 @@ mod magic;
 mod mask;
 mod privacy;
 mod query;
+mod runtime;
 mod selection;
 mod settings;
 mod site;

@@ -10,13 +10,13 @@
 
 use std::path::Path;
 
-use ort::environment::Environment;
 use ort::session::Session;
 use ort::session::builder::GraphOptimizationLevel;
 use ort::value::Tensor;
 use tokenizers::Tokenizer;
 
 use crate::mask::{Found, Kind};
+use crate::runtime;
 
 /// The kinds of data in the order of the model's labels.
 const KINDS: [Kind; 8] =
@@ -28,23 +28,18 @@ const LABELS: usize = 1 + 4 * KINDS.len();
 pub struct Filter {
     session: Session,
     tokenizer: Tokenizer,
-    _environment: Environment,
 }
 
 impl Filter {
     /// Loads the model from its folder, with ONNX Runtime from its library.
     pub fn load(runtime: &Path, folder: &Path) -> Result<Filter, String> {
-        let environment = ort::init_from(runtime)
-            .map_err(|error| error.to_string())?
-            .with_telemetry(false)
-            .build()
-            .map_err(|error| error.to_string())?;
+        let environment = runtime::environment(runtime)?;
         let session = Session::builder(&environment)
             .and_then(|builder| builder.with_optimization_level(GraphOptimizationLevel::Level3).map_err(Into::into))
             .and_then(|mut builder| builder.commit_from_file(folder.join("model_q4.onnx")))
             .map_err(|error| error.to_string())?;
         let tokenizer = Tokenizer::from_file(folder.join("tokenizer.json")).map_err(|error| error.to_string())?;
-        Ok(Filter { session, tokenizer, _environment: environment })
+        Ok(Filter { session, tokenizer })
     }
 
     /// What the model marks in the text, by its bytes.
