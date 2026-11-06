@@ -1628,7 +1628,7 @@ pub(super) mod tests {
   field.addEventListener("paste", (event) => {
     for (const file of event.clipboardData.files) {
       const chip = document.createElement("span");
-      chip.setAttribute("aria-label", file.name);
+      chip.setAttribute("aria-label", "Удалить " + file.name);
       document.body.append(chip);
       send.disabled = false;
     }

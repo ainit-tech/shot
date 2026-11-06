@@ -255,9 +255,10 @@ fn googles_own_page(foreign: &str, why: &str) -> String {
 /// document is there. It does what the user would: pastes the screenshot into the question
 /// field, as Ctrl+V does, types the question and sends it; with `answer`, it also waits for the
 /// answer and hands its text over, as it comes and once it is complete. Every step starts when
-/// the page is ready for it: the field has appeared, the picture shows in the field under the
-/// pasted file's name, Google has enabled the send button, which it does once the picture is
-/// uploaded, and Google has marked the answer complete. Without a question, the question is
+/// the page is ready for it: the field has appeared, the picture shows in the field, by the
+/// pasted file's name in a label or by a new picture on its plate, Google has enabled the send
+/// button, which it does once the picture is uploaded, and Google has marked the answer complete.
+/// Without a question, the question is
 /// asked aloud: the microphone goes on at once, while the picture uploads, and the words heard
 /// go into the field once the program has said to stop listening. Blocks are found by Google's own names
 /// for them, the same in every language. Time limits only decide when to give up. The script
@@ -309,13 +310,18 @@ fn ai_mode_script(png: &[u8], question: Option<&str>, answer: bool) -> String {
       (field.closest('[data-xid$="input-plate"]') ?? document).querySelector('button[data-xid="input-plate-send-button"]');
     const field = await until(() => [...document.querySelectorAll("textarea")].find((t) => t.offsetParent && sendButton(t)), 60);
     if (!field) return report({no_field});
+    const pictures = () => [...document.querySelectorAll('[data-xid$="input-plate"] img')];
+    const earlier = new Set(pictures());
     // Pasted once: if the page's own script isn't ready yet, Google keeps the event and hands it
     // over later, so a second paste would attach the picture twice.
     const files = new DataTransfer();
     files.items.add(new File([Uint8Array.from(atob("{data}"), (c) => c.charCodeAt(0))], "screenshot.png", {{ type: "image/png" }}));
     field.focus();
     field.dispatchEvent(new ClipboardEvent("paste", {{ clipboardData: files, bubbles: true, cancelable: true }}));
-    if (!(await until(() => document.querySelector('[aria-label="screenshot.png"]'), 30))) {{
+    // The label with the file's name differs by account and language, and one may come before
+    // the other.
+    const taken = () => document.querySelector('[aria-label*="screenshot.png"]') ?? pictures().find((picture) => !earlier.has(picture));
+    if (!(await until(taken, 30))) {{
       return report({not_taken});
     }}
     {typing}
@@ -646,6 +652,7 @@ mod tests {
         assert!(script.contains("atob(\"cG5n\")"));
         assert!(script.contains(r#"document.execCommand("insertText", false, "Что \"это\"?")"#), "{script}");
         assert!(script.contains("input-plate-send-button"));
+        assert!(script.contains(r#"[aria-label*="screenshot.png"]"#), "whatever else the label says");
         assert!(script.contains("if (!false) return report(\"sent\");"));
     }
 
