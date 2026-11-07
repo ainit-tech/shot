@@ -12,8 +12,9 @@ const NEAR: f32 = 24.0;
 const MERGE: f32 = 0.9;
 /// How much of a frame's side a real edge runs along for the side to go to it.
 const EDGE_ALONG: f32 = 0.7;
-/// How far neighbouring pixels are apart in a channel across an edge.
-const EDGE_STEP: i32 = 12;
+/// How far neighbouring pixels are apart in a channel across an edge: the screen has no noise, and
+/// the panels of a dark window differ by a few levels.
+const EDGE_STEP: i32 = 4;
 /// How many places along a side are looked at.
 const EDGE_PLACES: i32 = 64;
 
@@ -197,29 +198,28 @@ fn merge_only_children(blocks: &mut Vec<Block>) {
     }
 }
 
-/// A frame with its sides at the real edges next to them, no further than `reach` pixels away:
-/// the model finds frames on a smaller picture, and a line of a pixel or two is lost there. A side
-/// with no edge along most of it stays, as around plain text.
-pub fn fitted(picture: &Image, frame: Rect, reach: i32) -> Rect {
+/// A frame with its sides at the real edges next to them, no further than `across` pixels away for
+/// the left and the right side and `down` for the top and the bottom: the model places a frame
+/// roughly, and a line of a pixel or two is lost on the smaller picture it looks at. A side with
+/// no edge along most of it stays, as around plain text.
+pub fn fitted(picture: &Image, frame: Rect, across: i32, down: i32) -> Rect {
     let (width, height) = (picture.width as i32, picture.height as i32);
-    let across = |start: i32, end: i32| {
+    let places = |start: i32, end: i32| {
         let step = ((end - start) / EDGE_PLACES).max(1);
         (start..end).step_by(step as usize)
     };
     // How much of a side the edge at a row or a column runs along.
     let row = |y: i32| {
-        let places = across(frame.left.max(0), frame.right.min(width));
-        along(places.map(|x| differs(picture, (x, y - 1), (x, y))))
+        along(places(frame.left.max(0), frame.right.min(width)).map(|x| differs(picture, (x, y - 1), (x, y))))
     };
     let column = |x: i32| {
-        let places = across(frame.top.max(0), frame.bottom.min(height));
-        along(places.map(|y| differs(picture, (x - 1, y), (x, y))))
+        along(places(frame.top.max(0), frame.bottom.min(height)).map(|y| differs(picture, (x - 1, y), (x, y))))
     };
     let fitted = Rect::new(
-        best(frame.left, reach, width, column),
-        best(frame.top, reach, height, row),
-        best(frame.right, reach, width, column),
-        best(frame.bottom, reach, height, row),
+        best(frame.left, across, width, column),
+        best(frame.top, down, height, row),
+        best(frame.right, across, width, column),
+        best(frame.bottom, down, height, row),
     );
     if fitted.is_empty() { frame } else { fitted }
 }
@@ -394,28 +394,48 @@ mod tests {
     fn a_frame_goes_to_the_real_edges_next_to_it() {
         let card = Rect::new(40, 30, 200, 120);
         let picture = picture_with(card);
-        assert_eq!(fitted(&picture, Rect::new(43, 28, 197, 123), 4), card);
-        assert_eq!(fitted(&picture, card, 4), card);
+        assert_eq!(fitted(&picture, Rect::new(43, 28, 197, 123), 4, 4), card);
+        assert_eq!(fitted(&picture, card, 4, 4), card);
     }
 
     #[test]
     fn a_side_stays_where_no_edge_is_within_reach() {
         let card = Rect::new(40, 30, 200, 120);
         let picture = picture_with(card);
-        assert_eq!(fitted(&picture, Rect::new(30, 20, 210, 130), 4), Rect::new(30, 20, 210, 130));
+        assert_eq!(fitted(&picture, Rect::new(30, 20, 210, 130), 4, 4), Rect::new(30, 20, 210, 130));
     }
 
     #[test]
     fn a_side_stays_where_an_edge_runs_along_only_a_part_of_it() {
         let picture = picture_with(Rect::new(40, 30, 80, 120));
         let frame = Rect::new(40, 28, 250, 120);
-        assert_eq!(fitted(&picture, frame, 4).top, 28);
+        assert_eq!(fitted(&picture, frame, 4, 4).top, 28);
+    }
+
+    #[test]
+    fn the_sides_reach_as_far_as_they_are_told() {
+        let card = Rect::new(40, 30, 200, 120);
+        let picture = picture_with(card);
+        let frame = Rect::new(50, 40, 190, 110);
+        assert_eq!(fitted(&picture, frame, 10, 2), Rect::new(40, 40, 200, 110));
+        assert_eq!(fitted(&picture, frame, 2, 10), Rect::new(50, 30, 190, 120));
+    }
+
+    #[test]
+    fn a_faint_edge_is_an_edge_as_between_the_panels_of_a_dark_window() {
+        let card = Rect::new(40, 30, 200, 120);
+        let mut picture = picture_with(card);
+        for pixel in picture.pixels.chunks_exact_mut(4) {
+            let level = if pixel[0] == 200 { 37 } else { 30 };
+            pixel[..3].fill(level);
+        }
+        assert_eq!(fitted(&picture, Rect::new(43, 28, 197, 123), 4, 4), card);
     }
 
     #[test]
     fn a_frame_on_the_side_of_the_picture_stays_there() {
         let picture = picture_with(Rect::new(40, 30, 200, 120));
-        assert_eq!(fitted(&picture, Rect::new(0, 0, 300, 200), 4), Rect::new(0, 0, 300, 200));
+        assert_eq!(fitted(&picture, Rect::new(0, 0, 300, 200), 4, 4), Rect::new(0, 0, 300, 200));
     }
 
     #[test]

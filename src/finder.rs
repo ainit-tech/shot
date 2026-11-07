@@ -24,8 +24,12 @@ use crate::runtime;
 const THREADS: usize = 8;
 /// A narrower or lower box is no frame, in pixels of the reduced picture.
 const LEAST: f32 = 2.0;
-/// How far a frame's side may be off a real edge, in pixels of the reduced picture.
-const OFF: f32 = 3.0;
+/// How far a frame's side may be off a real edge: this share of the frame's width or height, at
+/// least and at most these many pixels of the reduced picture. The model is off in proportion to
+/// a frame, and a long reach would take a small frame to its neighbour's edge.
+const OFF: f32 = 0.05;
+const OFF_LEAST: f32 = 3.0;
+const OFF_MOST: f32 = 24.0;
 
 /// A version of the model, as its `model.json` describes it.
 #[derive(Deserialize)]
@@ -92,10 +96,10 @@ impl Finder {
     /// The tree of the blocks that the model finds on a window's picture.
     pub fn find(&mut self, picture: &Image) -> Result<Tree, String> {
         let (mut found, ratio) = self.found(picture)?;
-        let reach = (OFF / ratio).ceil() as i32;
         let least = self.description.score;
         for block in found.iter_mut().filter(|block| block.score >= least) {
-            block.rect = fitted(picture, block.rect, reach);
+            let (across, down) = (reach(block.rect.width(), ratio), reach(block.rect.height(), ratio));
+            block.rect = fitted(picture, block.rect, across, down);
         }
         Ok(Tree::new(&found, least))
     }
@@ -154,6 +158,12 @@ impl Finder {
         });
         Ok((found.collect(), ratio))
     }
+}
+
+/// How far the sides at either end of a frame's width or height may go to a real edge, in pixels
+/// of the window.
+fn reach(size: i32, ratio: f32) -> i32 {
+    ((size as f32 * ratio * OFF).clamp(OFF_LEAST, OFF_MOST) / ratio).ceil() as i32
 }
 
 /// The picture as the first graph takes it, in planes of red, green and blue, top row first:
@@ -318,6 +328,16 @@ mod tests {
             }
             assert!(sums.iter().all(|sum| (sum - 1.0f32).abs() < 1e-4), "{old} to {new}");
         }
+    }
+
+    #[test]
+    fn a_frames_reach_grows_with_it_between_its_limits() {
+        assert_eq!(reach(40, 1.0), 3);
+        assert_eq!(reach(200, 1.0), 10);
+        assert_eq!(reach(800, 1.0), 24);
+        // A window reduced to two thirds: the same in pixels of the reduced picture.
+        assert_eq!(reach(300, 2.0 / 3.0), 15);
+        assert_eq!(reach(1500, 2.0 / 3.0), 36);
     }
 
     fn nodes() -> Nodes {
