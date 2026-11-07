@@ -1,6 +1,7 @@
 //! Our model of the blocks of a window, which runs on the computer with ONNX Runtime. Two graphs
-//! make it. The first looks at the picture of the window, reduced to a working size, and gives
-//! candidate frames, best first, with what it saw at each. The program takes the frames worth
+//! make it. The first looks at the picture of the window, reduced to a working size, with the
+//! edges of the full picture if the version asks for them, and gives candidate frames, best
+//! first, with what it saw at each. The program takes the frames worth
 //! going on with, leaving out near copies alone, and the second graph, a small graph network,
 //! gives each of them its parent, its final score and whether it lies over others. The program
 //! brings the frames back to the window's pixels and puts the tree in order. The numbers of a
@@ -53,8 +54,15 @@ struct Files {
 struct Input {
     long_side: u32,
     multiple: u32,
+    /// How many planes the first graph takes: red, green and blue, with or without two of edges.
+    #[serde(default = "colours_alone")]
+    planes: usize,
     /// Smaller windows aren't looked at, across and down.
     smallest_window: (u32, u32),
+}
+
+fn colours_alone() -> usize {
+    3
 }
 
 #[derive(Deserialize)]
@@ -76,6 +84,9 @@ impl Finder {
     pub fn load(library: &Path, folder: &Path) -> Result<Finder, String> {
         let text = fs::read_to_string(folder.join("model.json")).map_err(|error| error.to_string())?;
         let description: Description = serde_json::from_str(&text).map_err(|error| error.to_string())?;
+        if ![3, 5].contains(&description.input.planes) {
+            return Err(format!("A model of {} planes is unknown to this program", description.input.planes));
+        }
         let environment = runtime::environment(library)?;
         let threads = available_parallelism().map_or(THREADS, usize::from).min(THREADS);
         // The threads of the two graphs don't wait on the processor: spinning, they get in each
@@ -112,13 +123,12 @@ impl Finder {
         if picture.width < least_wide || picture.height < least_high {
             return Ok((Vec::new(), 1.0));
         }
-        let ratio = (input.long_side as f32 / picture.width.max(picture.height) as f32).min(1.0);
-        let wide = ((picture.width as f32 * ratio + 0.5).floor() as usize).max(1);
-        let high = ((picture.height as f32 * ratio + 0.5).floor() as usize).max(1);
-        let multiple = input.multiple as usize;
-        let (across, down) = (wide.next_multiple_of(multiple), high.next_multiple_of(multiple));
-        let planes = planes(picture, (wide, high), (across, down));
-        let tensor = Tensor::from_array(([1usize, 3, down, across], planes)).map_err(|error| error.to_string())?;
+        let (ratio, (wide, high), (across, down)) = sizes(picture, input);
+        let mut all = planes(picture, (wide, high), (across, down));
+        if input.planes == 5 {
+            all.extend(edges(picture, (wide, high), (across, down)));
+        }
+        let tensor = Tensor::from_array(([1usize, input.planes, down, across], all)).map_err(|error| error.to_string())?;
         let outputs = self.frames.run(ort::inputs!["image" => tensor]).map_err(|error| error.to_string())?;
         let (_, boxes) = outputs["boxes"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
         let (_, scores) = outputs["scores"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
@@ -164,6 +174,15 @@ impl Finder {
 /// of the window.
 fn reach(size: i32, ratio: f32) -> i32 {
     ((size as f32 * ratio * OFF).clamp(OFF_LEAST, OFF_MOST) / ratio).ceil() as i32
+}
+
+/// How far a picture is reduced, how large that makes it, and how large its tensor is.
+fn sizes(picture: &Image, input: &Input) -> (f32, (usize, usize), (usize, usize)) {
+    let ratio = (input.long_side as f32 / picture.width.max(picture.height) as f32).min(1.0);
+    let wide = ((picture.width as f32 * ratio + 0.5).floor() as usize).max(1);
+    let high = ((picture.height as f32 * ratio + 0.5).floor() as usize).max(1);
+    let multiple = input.multiple as usize;
+    (ratio, (wide, high), (wide.next_multiple_of(multiple), high.next_multiple_of(multiple)))
 }
 
 /// The picture as the first graph takes it, in planes of red, green and blue, top row first:
@@ -216,6 +235,37 @@ fn planes(picture: &Image, reduced: (usize, usize), whole: (usize, usize)) -> Ve
         }
     }
     planes
+}
+
+/// The two planes of edges as the first graph takes them, across and then down: what the reduction
+/// destroys, a line a pixel wide and a wall of a few grey levels in a dark window. They are made at
+/// the window's full size: each pixel of `reduced` takes the largest step between neighbouring
+/// pixels under it, in the channel that differs most, on a scale on which a step in the dark
+/// counts like a step in the light. What is left of `whole` stays 0.
+fn edges(picture: &Image, reduced: (usize, usize), whole: (usize, usize)) -> Vec<u8> {
+    let ((wide, high), (across, down)) = (reduced, whole);
+    let (old_wide, old_high) = (picture.width as usize, picture.height as usize);
+    let step = |a: &[u8], b: &[u8]| a.iter().zip(b).take(3).map(|(a, b)| a.abs_diff(*b)).max().unwrap_or(0);
+    let columns: Vec<usize> = (0..old_wide).map(|x| x * wide / old_wide).collect();
+    let mut edges = vec![0u8; 2 * across * down];
+    let (sideways, upright) = edges.split_at_mut(across * down);
+    let mut above: Option<&[u8]> = None;
+    for (y, row) in picture.pixels.chunks_exact(picture.stride()).enumerate() {
+        let start = y * high / old_high * across;
+        for (x, pixel) in row.chunks_exact(4).enumerate() {
+            let at = start + columns[x];
+            if x > 0 {
+                sideways[at] = sideways[at].max(step(pixel, &row[(x - 1) * 4..]));
+            }
+            if let Some(above) = above {
+                upright[at] = upright[at].max(step(pixel, &above[x * 4..]));
+            }
+        }
+        above = Some(row);
+    }
+    let scale: [u8; 256] = std::array::from_fn(|step| (255.0 * (1.0 + step as f64).log2() / 8.0 + 0.5).floor() as u8);
+    edges.iter_mut().for_each(|value| *value = scale[usize::from(*value)]);
+    edges
 }
 
 /// How much of a new pixel an old one makes up, along one side.
@@ -282,6 +332,7 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+    use crate::update::Hash;
 
     fn picture(width: u32, height: u32, color: impl Fn(u32, u32) -> [u8; 3]) -> Image {
         let mut pixels = Vec::with_capacity((width * height * 4) as usize);
@@ -340,6 +391,44 @@ mod tests {
         assert_eq!(reach(1500, 2.0 / 3.0), 36);
     }
 
+    #[test]
+    fn a_step_in_the_dark_counts_like_a_step_in_the_light() {
+        let shot = picture(5, 1, |x, _| [[0, 1, 4, 19, 255][x as usize], 0, 0]);
+        // Steps of 1, 3, 15 and 236 from the pixel on the left.
+        assert_eq!(&edges(&shot, (5, 1), (5, 1))[..5], &[0, 32, 64, 128, 251]);
+        let black_and_white = picture(2, 1, |x, _| [255 * x as u8; 3]);
+        assert_eq!(&edges(&black_and_white, (2, 1), (2, 1))[..2], &[0, 255]);
+    }
+
+    #[test]
+    fn the_channel_that_differs_most_makes_an_edge() {
+        let shot = picture(2, 1, |x, _| [10, 10 + 3 * x as u8, 10 + x as u8]);
+        assert_eq!(&edges(&shot, (2, 1), (2, 1))[..2], &[0, 64]);
+    }
+
+    #[test]
+    fn the_first_column_and_row_have_no_edge_and_the_second_plane_goes_down() {
+        let shot = picture(2, 2, |x, y| [15 * (x + y) as u8, 0, 0]);
+        assert_eq!(edges(&shot, (2, 2), (2, 2)), vec![0, 128, 0, 128, 0, 0, 128, 128]);
+    }
+
+    #[test]
+    fn a_line_a_pixel_wide_survives_the_reduction_and_the_padding_stays_empty() {
+        let shot = picture(4, 2, |x, _| [if x == 1 { 15 } else { 0 }, 0, 0]);
+        let found = edges(&shot, (2, 1), (4, 2));
+        assert_eq!(found.len(), 16);
+        assert_eq!(&found[..2], &[128, 128]);
+        assert!(found[2..].iter().all(|value| *value == 0));
+    }
+
+    #[test]
+    fn a_version_says_how_many_planes_it_takes() {
+        let input = r#"{ "long_side": 1920, "multiple": 32, "planes": 5, "smallest_window": [320, 200] }"#;
+        assert_eq!(serde_json::from_str::<Input>(input).unwrap().planes, 5);
+        let input = r#"{ "long_side": 1280, "multiple": 32, "smallest_window": [320, 200] }"#;
+        assert_eq!(serde_json::from_str::<Input>(input).unwrap().planes, 3);
+    }
+
     fn nodes() -> Nodes {
         Nodes { min_score: 0.1, nms_iou: 0.8, max_nodes: 3 }
     }
@@ -389,7 +478,7 @@ mod tests {
         let folder = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
         let library = PathBuf::from(std::env::var_os("ONNX_RUNTIME").expect("ONNX_RUNTIME names the library"));
         let mut finder = Finder::load(&library, &folder).unwrap();
-        let (mut all, mut alike) = (0, 0);
+        let (mut all, mut alike, mut to_the_byte) = (0, 0, 0);
         for entry in fs::read_dir(folder.join("check")).unwrap() {
             let path = entry.unwrap().path();
             if path.extension().is_none_or(|extension| extension != "png") {
@@ -397,6 +486,13 @@ mod tests {
             }
             let shot = Image::from_png(&fs::read(&path).unwrap()).unwrap();
             let expected: serde_json::Value = serde_json::from_slice(&fs::read(path.with_extension("json")).unwrap()).unwrap();
+            if let Some(reference) = expected["edges_sha256"].as_str() {
+                let (_, reduced, whole) = sizes(&shot, &finder.description.input);
+                let mut hash = Hash::default();
+                hash.update(&edges(&shot, reduced, whole));
+                assert_eq!(hash.hex(), reference, "the edges of {}", path.display());
+                to_the_byte += 1;
+            }
             let expected = expected["blocks"].as_array().unwrap();
             let started = Instant::now();
             let (found, _) = finder.found(&shot).unwrap();
@@ -444,7 +540,7 @@ mod tests {
             all += expected.len();
             alike += matched;
         }
-        println!("{alike} of {all} alike");
+        println!("{alike} of {all} alike, the edges of {to_the_byte} windows to the byte");
         assert!(alike * 100 >= all * 95, "{alike} of {all}");
     }
 }
