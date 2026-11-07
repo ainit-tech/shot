@@ -776,6 +776,22 @@ mod tests {
             seen.push(evaluate("document.querySelector('#filter-state').textContent + ' | ' + document.querySelector('#filter-fill').style.width"));
             evaluate("told.length = 0; document.querySelector('#filter-pause').click()");
             seen.push(told("m.type + ':' + m.paused"));
+            // The model of blocks: nowhere, not even in the search, without it; with it, its version,
+            // and what it needs while it can't run.
+            let blocks = |state: &str| format!("heard({{ type: 'models', models: {{ state: 'ready', problem: null, done: 951000000, total: 951000000, speed: 0, version: '7ffa9a0', blocks: {state} }} }})");
+            let search = |word: &str| format!("{{ const s = document.querySelector('#search'); s.value = '{word}'; s.dispatchEvent(new Event('input')); }}");
+            let shown = "document.querySelector('#blocks-model').checkVisibility() + ' ' + document.querySelector('nav [data-section=models] .count').textContent";
+            evaluate(&blocks("null"));
+            evaluate(&search("карточка"));
+            seen.push(evaluate(shown));
+            evaluate(&blocks("{ version: '0.2', size: 2353851, runs: true }"));
+            evaluate(&search("карточка"));
+            seen.push(evaluate(shown));
+            evaluate(&search(""));
+            look("models-blocks");
+            seen.push(evaluate("document.querySelector('#filter-version').textContent + ' | ' + document.querySelector('#blocks-version').textContent + ' | ' + document.querySelector('#blocks-state').textContent"));
+            evaluate(&blocks("{ version: '0.2', size: 2353851, runs: false }"));
+            seen.push(evaluate("document.querySelector('#blocks-state').textContent"));
             evaluate("document.querySelector('nav [data-section=about]').click()");
             look("updates");
             evaluate("told.length = 0; document.querySelector('#hotkey').click()");
@@ -862,6 +878,10 @@ mod tests {
                 r#""[\"save:false\"]""#,
                 "\"39% · 380 из 951 МБ · 12,3 МБ/с | 40%\"",
                 r#""[\"pauseModels:true\"]""#,
+                "\"false \"",
+                "\"true 1\"",
+                "\"7ffa9a0 | 0.2 | В папке рядом с программой · 2,4 МБ\"",
+                "\"Не работает без ONNX Runtime, он скачивается вместе с OpenAI Privacy Filter\"",
                 r#""[\"record:true\",\"record:false\",\"save:Ctrl+Shift+S\"]""#,
                 // The keys read from left to right in every language.
                 "\"\u{2066}Q\u{2069} мешала бы печатать: добавьте Ctrl, Alt или Win.\"",

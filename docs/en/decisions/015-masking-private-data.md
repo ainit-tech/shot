@@ -48,7 +48,7 @@ The recognition with the rectangles of words is already in the program, and a fi
   - a thin line under the button's icon shows how far the download has come;
   - the button's hint and a note after masking say that names and addresses aren't looked for yet;
   - when the download ends, one notification says that smart masking is ready.
-- **The settings window** has a section "Models" with the model's switch, how its download goes, and a button that pauses it. The switch is `privacy_filter` in the settings file; turning it off removes the model.
+- **The settings window** has a section "Models" with the model's switch and version, how its download goes, and a button that pauses it. The switch is `privacy_filter` in the settings file; turning it off removes the model.
 
 ## Consequences
 

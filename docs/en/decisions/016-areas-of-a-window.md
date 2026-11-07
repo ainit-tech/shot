@@ -6,7 +6,7 @@ topic: product
 
 # Areas of a window
 
-Switched off on November 4, 2026: the frozen screen lights up the window under the mouse again, and a click takes it. The parts found by the pixels of a window, as this page tells, didn't satisfy the author; a neural network of our own, trained on windows, is what to try next. That code stays in the repository with its tests, out of the program. Since November 6, 2026 the program can run such a network: a test build with the model in the folder `blocks` beside it lights up the block under the mouse, and with Ctrl the whole window. The ordinary build has no model and lights up the window.
+Switched off on November 4, 2026: the frozen screen lights up the window under the mouse again, and a click takes it. The parts found by the pixels of a window, as this page tells, didn't satisfy the author; a neural network of our own, trained on windows, is what to try next. That code stays in the repository with its tests, out of the program. Since November 6, 2026 the program can run such a network: a test build with the model in the folder `blocks` beside it lights up the block under the mouse, and with Ctrl the whole window. The section "Models" of the settings then shows this model, ainitShot Blocks, with its version and what it is for, so that one can see which model is at work. The ordinary build has no model and lights up the window.
 
 Tried: while nothing is selected, the frozen screen lights up the area of the window under the mouse, a panel, a table, a message, a card, a picture or a paragraph, and a click without dragging selects it; with Ctrl held, the whole window lights up instead. The program finds the areas in the pixels of the frozen screen itself, by filling the surface under the mouse.
 

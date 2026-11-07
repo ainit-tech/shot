@@ -236,6 +236,7 @@ body.searching .hero, body.searching .group-title { display: none; }
 .meter { height: 4px; margin: 4px 0 8px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
 .meter .fill { height: 100%; width: 0; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .model-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 32px; color: var(--muted); font-size: 12.5px; }
+.row .label .version { margin-inline-start: 4px; color: var(--faint); font-size: 12px; }
 /* Controls. */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -684,12 +685,16 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     <p class="intro" data-t="modelsIntro"></p>
     <div class="rows">
       <div class="row wide item" data-k="kModels">
-        <div><div class="label find">OpenAI Privacy Filter</div><div class="desc find" data-t="privacyFilterDesc"></div></div>
+        <div><div class="label find">OpenAI Privacy Filter <span class="version" id="filter-version"></span></div><div class="desc find" data-t="privacyFilterDesc"></div></div>
         <div class="control"><button class="switch" id="privacy-filter" role="switch" aria-label="OpenAI Privacy Filter"><span class="state"></span><span class="track"></span></button></div>
         <div class="body model">
           <div class="meter" id="filter-meter"><div class="fill" id="filter-fill"></div></div>
           <div class="model-line"><span id="filter-state"></span><button class="btn quiet" id="filter-pause"></button></div>
         </div>
+      </div>
+      <div class="row wide hidden" id="blocks-model" data-k="kBlocksModel">
+        <div><div class="label find">ainitShot Blocks <span class="version" id="blocks-version"></span></div><div class="desc find" data-t="blocksModelDesc"></div></div>
+        <div class="body model"><div class="model-line"><span id="blocks-state"></span></div></div>
       </div>
     </div>
   </section>
@@ -888,6 +893,9 @@ const TEXT = {
   modelServer: "The server answered with an error: trying again in two minutes",
   modelDamaged: "A file came damaged: it is downloaded again in two minutes",
   modelDisk: "The model couldn't be saved: is there room on the disk? Trying again in two minutes",
+  blocksModelDesc: "Finds the blocks of a window: panels, lists, cards. On the frozen screen the block under the mouse lights up, and with Ctrl the whole window.",
+  modelBeside: "In the folder next to the program · {size} MB",
+  modelNoRuntime: "Doesn't work without ONNX Runtime, which is downloaded with OpenAI Privacy Filter",
   pause: "Pause",
   resume: "Resume",
   about: "About",
@@ -981,6 +989,7 @@ const TEXT = {
   kListeningSound: "sound chime beep signal microphone voice aloud speak listen",
   kButtons: "add new button query standard default bring back",
   kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
+  kBlocksModel: "blocks block model window panel list card mouse selection neural network ai version",
   kAbout: "about program version license gpl copyright open source components libraries website site authors ainit",
   kSupport: "support donate donation help thanks author development",
   kAccount: "google account sign in sign out switch profile user login",
@@ -1519,8 +1528,9 @@ $("#listening-sound").addEventListener("click", () => {
 });
 $("#filter-pause").addEventListener("click", () => send({ type: "pauseModels", paused: !!state.models && state.models.state !== "paused" }));
 
-/** How the download of OpenAI Privacy Filter goes: a line filled as far as it has come while it
- * is downloaded, what is going on, and the button that pauses it or goes on. */
+/** The models and their versions. How the download of OpenAI Privacy Filter goes: a line filled
+ * as far as it has come while it is downloaded, what is going on, and the button that pauses it
+ * or goes on. The model of blocks shows only where it is: out of sight, the search leaves it out. */
 function renderModels() {
   const models = state.models;
   if (!models) return;
@@ -1549,6 +1559,14 @@ function renderModels() {
   const pause = $("#filter-pause");
   pause.classList.toggle("hidden", !coming);
   pause.textContent = t(models.state === "paused" ? "resume" : "pause");
+  $("#filter-version").textContent = models.version || "";
+  const blocks = models.blocks;
+  const row = $("#blocks-model");
+  row.classList.toggle("hidden", !blocks);
+  row.classList.toggle("item", !!blocks);
+  if (!blocks) return;
+  $("#blocks-version").textContent = blocks.version || "";
+  $("#blocks-state").textContent = blocks.runs ? t("modelBeside", { size: number(blocks.size / 1e6, 1) }) : t("modelNoRuntime");
 }
 
 // About: the program and its version, its updates, a way to support it, and its site, its source

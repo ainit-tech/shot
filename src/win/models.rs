@@ -108,6 +108,9 @@ const FILTER: [Download; 4] = [
     },
 ];
 
+/// The version of OpenAI Privacy Filter, as the settings show it: the commit its files come from.
+const FILTER_VERSION: &str = "7ffa9a0";
+
 /// Where the model stands.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum State {
@@ -228,7 +231,29 @@ pub fn describe() -> Value {
         Problem::Damaged => "damaged",
         Problem::Disk => "disk",
     });
-    json!({ "state": state, "problem": problem, "done": status.done, "total": status.total, "speed": status.speed })
+    json!({
+        "state": state,
+        "problem": problem,
+        "done": status.done,
+        "total": status.total,
+        "speed": status.speed,
+        "version": FILTER_VERSION,
+        "blocks": describe_blocks(),
+    })
+}
+
+/// What the settings window shows of the model of the blocks of a window, whether it can run, which
+/// takes the ONNX Runtime that comes with OpenAI Privacy Filter: nothing without the model.
+fn describe_blocks() -> Value {
+    blocks_folder().map_or(Value::Null, |folder| described(&folder, FILTER[0].done()))
+}
+
+/// A model in its folder: the version in its `model.json` and the bytes of the folder.
+fn described(folder: &Path, runs: bool) -> Value {
+    let model: Value = fs::read(folder.join("model.json")).ok().and_then(|text| serde_json::from_slice(&text).ok()).unwrap_or_default();
+    let files = fs::read_dir(folder).into_iter().flatten().flatten();
+    let size: u64 = files.filter_map(|file| file.metadata().ok()).map(|meta| meta.len()).sum();
+    json!({ "version": model["version"], "size": size, "runs": runs })
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
@@ -646,6 +671,26 @@ mod tests {
         assert!(fetch(tokenizer).is_ok());
         assert!(tokenizer.done());
         let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn a_model_is_described_from_its_folder() {
+        let folder = std::env::temp_dir().join("ainitshot-model-description");
+        let _ = fs::remove_dir_all(&folder);
+        fs::create_dir_all(&folder).unwrap();
+        let description = r#"{ "contract": 4, "version": "0.2", "name": "ainitShot Blocks" }"#;
+        fs::write(folder.join("model.json"), description).unwrap();
+        fs::write(folder.join("areas-frames.onnx"), [0; 1000]).unwrap();
+        let size = 1000 + description.len();
+        assert_eq!(described(&folder, true), json!({ "version": "0.2", "size": size, "runs": true }));
+        fs::write(folder.join("model.json"), "not a description").unwrap();
+        assert_eq!(described(&folder, false)["version"], Value::Null);
+        let _ = fs::remove_dir_all(&folder);
+    }
+
+    #[test]
+    fn the_version_shown_is_the_commit_of_the_files() {
+        assert!(FILTER[1..].iter().all(|file| file.url.contains(FILTER_VERSION)));
     }
 
     #[test]
