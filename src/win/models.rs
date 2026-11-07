@@ -565,10 +565,10 @@ pub fn blocks_ready() -> bool {
     FILTER[0].done() && blocks_folder().is_some()
 }
 
-/// The blocks of a window on its picture, or nothing without the model. It is loaded the first
-/// time and runs for a moment, so it is called away from the window's thread; windows wait for
-/// one another.
-pub fn blocks(picture: &Image) -> Option<Result<Tree, String>> {
+/// The blocks of a window on its picture, on a monitor of that scale, or nothing without the
+/// model. It is loaded the first time and runs for a moment, so it is called away from the
+/// window's thread; windows wait for one another.
+pub fn blocks(picture: &Image, scale: f32) -> Option<Result<Tree, String>> {
     let folder = blocks_folder()?;
     let mut loaded = lock(&BLOCKS_LOADED);
     if loaded.is_none() {
@@ -582,7 +582,7 @@ pub fn blocks(picture: &Image) -> Option<Result<Tree, String>> {
     }
     let loaded = loaded.as_mut()?;
     loaded.used = Instant::now();
-    Some(loaded.model.find(picture))
+    Some(loaded.model.find(picture, scale))
 }
 
 /// Lets the model go once it has lain unused long enough.

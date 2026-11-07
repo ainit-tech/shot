@@ -1509,18 +1509,18 @@ impl Session {
             return Some(window);
         }
         let seen = window.intersect(self.screen.image.bounds());
+        let scale = self.screen.monitor_at(p).scale;
         let Some(tree) = self.trees.get(&seen) else {
-            self.find_blocks(seen);
+            self.find_blocks(seen, scale);
             return Some(window);
         };
-        let scale = self.screen.monitor_at(p).scale;
         let block = tree.as_ref().and_then(|tree| tree.lit(Point::new(p.x - seen.left, p.y - seen.top), scale));
         Some(block.map_or(window, |block| block.offset(seen.left, seen.top)))
     }
 
     /// Starts looking for the blocks of a window, once, away from the window's thread: the model
     /// takes a moment, and the frozen screen goes on meanwhile.
-    fn find_blocks(&mut self, window: Rect) {
+    fn find_blocks(&mut self, window: Rect, scale: f32) {
         self.trees.insert(window, None);
         if window.is_empty() {
             return;
@@ -1528,7 +1528,7 @@ impl Session {
         let picture = self.screen.image.crop(window);
         let (frozen, target) = (self.frozen, self.overlay as isize);
         thread::spawn(move || {
-            let Some(tree) = models::blocks(&picture) else { return };
+            let Some(tree) = models::blocks(&picture, scale) else { return };
             let found = Box::into_raw(Box::new(FoundBlocks { frozen, window, tree }));
             if unsafe { PostMessageW(target as HWND, WM_BLOCKS, 0, found as isize) } == 0 {
                 drop(unsafe { Box::from_raw(found) });

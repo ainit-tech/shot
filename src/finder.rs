@@ -25,6 +25,10 @@ use crate::runtime;
 const THREADS: usize = 8;
 /// A narrower or lower box is no frame, in pixels of the reduced picture.
 const LEAST: f32 = 2.0;
+/// How small things on a window may get for the model, at most, as a share of their size at the
+/// monitor's scale of 100%: as small as on the windows it has learned most from. A very wide
+/// window at a small scale is reduced no further, or its text and bars go out of its reach.
+const THINGS_AT_LEAST: f32 = 2.0 / 3.0;
 /// How far a frame's side may be off a real edge: this share of the frame's width or height, at
 /// least and at most these many pixels of the reduced picture. The model is off in proportion to
 /// a frame, and a long reach would take a small frame to its neighbour's edge.
@@ -104,9 +108,10 @@ impl Finder {
         Ok(Finder { frames, tree, description })
     }
 
-    /// The tree of the blocks that the model finds on a window's picture.
-    pub fn find(&mut self, picture: &Image) -> Result<Tree, String> {
-        let (mut found, ratio) = self.found(picture)?;
+    /// The tree of the blocks that the model finds on the picture of a window, on a monitor of
+    /// that scale.
+    pub fn find(&mut self, picture: &Image, scale: f32) -> Result<Tree, String> {
+        let (mut found, ratio) = self.found(picture, scale)?;
         let least = self.description.score;
         for block in found.iter_mut().filter(|block| block.score >= least) {
             let (across, down) = (reach(block.rect.width(), ratio), reach(block.rect.height(), ratio));
@@ -117,13 +122,13 @@ impl Finder {
 
     /// What the model says of a window's picture, in pixels of the window, and how far the
     /// picture was reduced for it.
-    fn found(&mut self, picture: &Image) -> Result<(Vec<Found>, f32), String> {
+    fn found(&mut self, picture: &Image, scale: f32) -> Result<(Vec<Found>, f32), String> {
         let Description { input, nodes, over, .. } = &self.description;
         let (least_wide, least_high) = input.smallest_window;
         if picture.width < least_wide || picture.height < least_high {
             return Ok((Vec::new(), 1.0));
         }
-        let (ratio, (wide, high), (across, down)) = sizes(picture, input);
+        let (ratio, (wide, high), (across, down)) = sizes(picture, input, scale);
         let mut all = planes(picture, (wide, high), (across, down));
         if input.planes == 5 {
             all.extend(edges(picture, (wide, high), (across, down)));
@@ -176,9 +181,11 @@ fn reach(size: i32, ratio: f32) -> i32 {
     ((size as f32 * ratio * OFF).clamp(OFF_LEAST, OFF_MOST) / ratio).ceil() as i32
 }
 
-/// How far a picture is reduced, how large that makes it, and how large its tensor is.
-fn sizes(picture: &Image, input: &Input) -> (f32, (usize, usize), (usize, usize)) {
-    let ratio = (input.long_side as f32 / picture.width.max(picture.height) as f32).min(1.0);
+/// How far the picture of a window on a monitor of that scale is reduced, how large that makes
+/// it, and how large its tensor is.
+fn sizes(picture: &Image, input: &Input, scale: f32) -> (f32, (usize, usize), (usize, usize)) {
+    let working = input.long_side as f32 / picture.width.max(picture.height) as f32;
+    let ratio = working.max(THINGS_AT_LEAST / scale).min(1.0);
     let wide = ((picture.width as f32 * ratio + 0.5).floor() as usize).max(1);
     let high = ((picture.height as f32 * ratio + 0.5).floor() as usize).max(1);
     let multiple = input.multiple as usize;
@@ -382,6 +389,18 @@ mod tests {
     }
 
     #[test]
+    fn a_very_wide_window_at_a_small_scale_is_reduced_no_further_than_things_can_be_read() {
+        let input = Input { long_side: 1280, multiple: 32, planes: 5, smallest_window: (320, 200) };
+        let reduced = |width, height, scale| sizes(&picture(width, height, |_, _| [0; 3]), &input, scale).1;
+        assert_eq!(reduced(3440, 1400, 1.0), (2293, 933));
+        assert_eq!(reduced(3440, 1400, 2.0), (1280, 521));
+        // The long side rules where things are large enough on it.
+        assert_eq!(reduced(1920, 1080, 1.0), (1280, 720));
+        assert_eq!(reduced(3840, 2160, 2.0), (1280, 720));
+        assert_eq!(reduced(1000, 700, 1.0), (1000, 700));
+    }
+
+    #[test]
     fn a_frames_reach_grows_with_it_between_its_limits() {
         assert_eq!(reach(40, 1.0), 3);
         assert_eq!(reach(200, 1.0), 10);
@@ -468,6 +487,9 @@ mod tests {
         assert_eq!((read.nodes.max_nodes, read.score), (128, 0.3));
     }
 
+    /// The reference goes by the long side alone, which this scale leaves as it is.
+    const REFERENCE_SCALE: f32 = 2.0;
+
     /// Runs a version of the model on the windows of its folder `check` and compares what comes
     /// with what the reference in Python made of them. It needs ONNX Runtime and the model, so it
     /// runs only when asked: `BLOCKS_MODEL=<folder> ONNX_RUNTIME=<onnxruntime.dll> cargo test -p
@@ -487,7 +509,7 @@ mod tests {
             let shot = Image::from_png(&fs::read(&path).unwrap()).unwrap();
             let expected: serde_json::Value = serde_json::from_slice(&fs::read(path.with_extension("json")).unwrap()).unwrap();
             if let Some(reference) = expected["edges_sha256"].as_str() {
-                let (_, reduced, whole) = sizes(&shot, &finder.description.input);
+                let (_, reduced, whole) = sizes(&shot, &finder.description.input, REFERENCE_SCALE);
                 let mut hash = Hash::default();
                 hash.update(&edges(&shot, reduced, whole));
                 assert_eq!(hash.hex(), reference, "the edges of {}", path.display());
@@ -495,7 +517,7 @@ mod tests {
             }
             let expected = expected["blocks"].as_array().unwrap();
             let started = Instant::now();
-            let (found, _) = finder.found(&shot).unwrap();
+            let (found, _) = finder.found(&shot, REFERENCE_SCALE).unwrap();
             let seconds = started.elapsed().as_secs_f32();
             // The reference gives the frames that stay, with their nearest parents that stay.
             let least = finder.description.score;
