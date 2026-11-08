@@ -37,9 +37,13 @@ macro_rules! known {
     };
 }
 
+/// How many languages the program speaks.
+const COUNT: usize = 50;
+
 /// The languages: the six of the UN first, by how many people speak them, then Hindi, a language
-/// of the documentation, then the others.
-const LANGUAGES: [Known; 50] = [
+/// of the documentation, then the others. A static, not a constant: a constant is copied into
+/// every part of the program that reads it, and the catalogs with it, many times over.
+static LANGUAGES: [Known; COUNT] = [
     Known { code: "en", native: "English", catalog: None },
     known!("zh", "中文"),
     known!("es", "Español"),
@@ -236,7 +240,7 @@ struct Catalog {
 /// A language's catalog, read when it is first needed: the program's texts live as long as the
 /// program.
 fn catalog(language: Language) -> Option<&'static Catalog> {
-    static CATALOGS: [OnceLock<Option<Catalog>>; LANGUAGES.len()] = [const { OnceLock::new() }; LANGUAGES.len()];
+    static CATALOGS: [OnceLock<Option<Catalog>>; COUNT] = [const { OnceLock::new() }; COUNT];
     CATALOGS[language.0 as usize].get_or_init(|| read(language.known().catalog?)).as_ref()
 }
 
