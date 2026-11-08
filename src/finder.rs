@@ -1,11 +1,12 @@
-//! Our model of the blocks of a window, which runs on the computer with ONNX Runtime. Two graphs
-//! make it. The first looks at the picture of the window, reduced to a working size, with the
-//! edges of the full picture if the version asks for them, and gives candidate frames, best
-//! first, with what it saw at each. The program takes the frames worth
+//! Our model of the blocks of a window, which runs on the computer with ONNX Runtime. A version
+//! up to contract 5 is two graphs. The first looks at the picture of the window, reduced to a
+//! working size, with the edges of the full picture if the version asks for them, and gives
+//! candidate frames, best first, with what it saw at each. The program takes the frames worth
 //! going on with, leaving out near copies alone, and the second graph, a small graph network,
-//! gives each of them its parent, its final score and whether it lies over others. The program
-//! brings the frames back to the window's pixels and puts the tree in order. The numbers of a
-//! version of the model are in its `model.json`.
+//! gives each of them its parent, its final score and whether it lies over others. A version of
+//! contract 6 is one graph that gives all of that at once, a frame for each thing, with no near
+//! copies to leave out. The program brings the frames back to the window's pixels and puts the
+//! tree in order. The numbers of a version of the model are in its `model.json`.
 
 use std::fs;
 use std::path::Path;
@@ -39,23 +40,36 @@ const OFF_MOST: f32 = 24.0;
 /// A version of the model, as its `model.json` describes it.
 #[derive(Deserialize)]
 struct Description {
+    /// How the version and the program work together: up to 5 with two graphs, 6 with one.
+    #[serde(default = "two_graphs")]
+    contract: u32,
     files: Files,
     input: Input,
-    nodes: Nodes,
+    /// Which candidates of the first of two graphs go on to the second.
+    nodes: Option<Nodes>,
     /// The final score below which a frame goes.
     score: f32,
     /// How sure the model is to be that a frame lies over others.
     over: f32,
 }
 
+fn two_graphs() -> u32 {
+    5
+}
+
 #[derive(Deserialize)]
 struct Files {
-    frames: String,
-    tree: String,
+    /// Of two graphs, the one of the frames and the one of their tree.
+    frames: Option<String>,
+    tree: Option<String>,
+    /// The one graph.
+    graph: Option<String>,
 }
 
 #[derive(Deserialize)]
 struct Input {
+    /// How far a window is reduced: a version up to contract 5 doesn't say.
+    fit: Option<Fit>,
     long_side: u32,
     multiple: u32,
     /// How many planes the first graph takes: red, green and blue, with or without two of edges.
@@ -69,6 +83,16 @@ fn colours_alone() -> usize {
     3
 }
 
+/// How far a window is reduced for the model.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+enum Fit {
+    /// Its long side to the working size, whatever the monitor's scale.
+    LongSide,
+    /// So too, but no further than things on it can be read at the monitor's scale.
+    Scale,
+}
+
 #[derive(Deserialize)]
 struct Nodes {
     min_score: f32,
@@ -76,10 +100,17 @@ struct Nodes {
     max_nodes: usize,
 }
 
+/// The graphs of a version.
+enum Graphs {
+    /// The first gives candidate frames, and the second the tree of those that go on.
+    Two { frames: Session, tree: Session, nodes: Nodes },
+    /// One gives the frames, their scores, their parents and what lies over others.
+    One(Session),
+}
+
 /// The model, loaded and ready.
 pub struct Finder {
-    frames: Session,
-    tree: Session,
+    graphs: Graphs,
     description: Description,
 }
 
@@ -87,9 +118,12 @@ impl Finder {
     /// Loads the model from its folder, with ONNX Runtime from its library.
     pub fn load(library: &Path, folder: &Path) -> Result<Finder, String> {
         let text = fs::read_to_string(folder.join("model.json")).map_err(|error| error.to_string())?;
-        let description: Description = serde_json::from_str(&text).map_err(|error| error.to_string())?;
+        let mut description: Description = serde_json::from_str(&text).map_err(|error| error.to_string())?;
         if ![3, 5].contains(&description.input.planes) {
             return Err(format!("A model of {} planes is unknown to this program", description.input.planes));
+        }
+        if description.contract > 6 {
+            return Err(format!("A model of contract {} is unknown to this program", description.contract));
         }
         let environment = runtime::environment(library)?;
         let threads = available_parallelism().map_or(THREADS, usize::from).min(THREADS);
@@ -104,8 +138,18 @@ impl Finder {
                 .and_then(|mut builder| builder.commit_from_file(folder.join(file)))
                 .map_err(|error| error.to_string())
         };
-        let (frames, tree) = (session(&description.files.frames)?, session(&description.files.tree)?);
-        Ok(Finder { frames, tree, description })
+        let graphs = if description.contract == 6 {
+            match (&description.files.graph, description.input.fit) {
+                (Some(graph), Some(_)) => Graphs::One(session(graph)?),
+                _ => return Err("A model of one graph names it and says how a window is fitted".into()),
+            }
+        } else {
+            match (&description.files.frames, &description.files.tree, description.nodes.take()) {
+                (Some(frames), Some(tree), Some(nodes)) => Graphs::Two { frames: session(frames)?, tree: session(tree)?, nodes },
+                _ => return Err("A model of two graphs names both and says which candidates go on".into()),
+            }
+        };
+        Ok(Finder { graphs, description })
     }
 
     /// The tree of the blocks that the model finds on the picture of a window, on a monitor of
@@ -113,6 +157,11 @@ impl Finder {
     pub fn find(&mut self, picture: &Image, scale: f32) -> Result<Tree, String> {
         let (mut found, ratio) = self.found(picture, scale)?;
         let least = self.description.score;
+        if let Graphs::One(_) = self.graphs {
+            // A frame for each thing, as the model has placed it: going to the real edges made it
+            // worse, and a parent and its only child are what it gave.
+            return Ok(Tree::as_found(&found, least));
+        }
         for block in found.iter_mut().filter(|block| block.score >= least) {
             let (across, down) = (reach(block.rect.width(), ratio), reach(block.rect.height(), ratio));
             block.rect = fitted(picture, block.rect, across, down);
@@ -123,7 +172,8 @@ impl Finder {
     /// What the model says of a window's picture, in pixels of the window, and how far the
     /// picture was reduced for it.
     fn found(&mut self, picture: &Image, scale: f32) -> Result<(Vec<Found>, f32), String> {
-        let Description { input, nodes, over, .. } = &self.description;
+        let Finder { graphs, description } = self;
+        let Description { input, over, .. } = &*description;
         let (least_wide, least_high) = input.smallest_window;
         if picture.width < least_wide || picture.height < least_high {
             return Ok((Vec::new(), 1.0));
@@ -134,7 +184,19 @@ impl Finder {
             all.extend(edges(picture, (wide, high), (across, down)));
         }
         let tensor = Tensor::from_array(([1usize, input.planes, down, across], all)).map_err(|error| error.to_string())?;
-        let outputs = self.frames.run(ort::inputs!["image" => tensor]).map_err(|error| error.to_string())?;
+        let size = (picture.width, picture.height);
+        let (frames, tree, nodes) = match graphs {
+            Graphs::One(graph) => {
+                let outputs = graph.run(ort::inputs!["image" => tensor]).map_err(|error| error.to_string())?;
+                let (_, boxes) = outputs["boxes"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
+                let (_, scores) = outputs["scores"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
+                let (_, lying) = outputs["over"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
+                let (_, parents) = outputs["parent"].try_extract_tensor::<i64>().map_err(|error| error.to_string())?;
+                return Ok((rows(boxes, scores, lying, parents, *over, ratio, size), ratio));
+            }
+            Graphs::Two { frames, tree, nodes } => (frames, tree, nodes),
+        };
+        let outputs = frames.run(ort::inputs!["image" => tensor]).map_err(|error| error.to_string())?;
         let (_, boxes) = outputs["boxes"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
         let (_, scores) = outputs["scores"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
         let (shape, seen) = outputs["features"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
@@ -151,28 +213,48 @@ impl Finder {
             Tensor::from_array(([count, length], features)).map_err(|error| error.to_string())?,
             Tensor::from_array(([2usize], vec![wide as f32, high as f32])).map_err(|error| error.to_string())?,
         );
-        let outputs = self
-            .tree
+        let outputs = tree
             .run(ort::inputs!["boxes" => inputs.0, "features" => inputs.1, "size" => inputs.2])
             .map_err(|error| error.to_string())?;
         let (_, parents) = outputs["parent"].try_extract_tensor::<i64>().map_err(|error| error.to_string())?;
         let (_, final_scores) = outputs["score"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
         let (_, lying) = outputs["over"].try_extract_tensor::<f32>().map_err(|error| error.to_string())?;
-        let back = |value: f32, size: u32| ((value / ratio + 0.5).floor() as i32).clamp(0, size as i32);
-        let found = chosen.iter().enumerate().map(|(node, (_, [left, top, right, bottom]))| Found {
+        let found = chosen.iter().enumerate().map(|(node, (_, place))| Found {
             id: node as u32 + 1,
             parent: (parents[node] + 1) as u32,
-            rect: Rect::new(
-                back(*left, picture.width),
-                back(*top, picture.height),
-                back(*right, picture.width),
-                back(*bottom, picture.height),
-            ),
+            rect: back(place, ratio, size),
             score: final_scores[node],
             over: lying[node] >= *over,
         });
         Ok((found.collect(), ratio))
     }
+}
+
+/// What one graph says of a window, in pixels of the window, every row of it, best first. A row
+/// less sure than the version wants stays, for its children to pass through to its parent, and so
+/// does a frame left with no width or height, sure of nothing. A parent is a row or -1, the window.
+fn rows(boxes: &[f32], scores: &[f32], lying: &[f32], parents: &[i64], over: f32, ratio: f32, size: (u32, u32)) -> Vec<Found> {
+    let rows = boxes.chunks_exact(4).zip(scores).zip(lying).zip(parents);
+    rows.enumerate()
+        .map(|(row, (((place, score), lying), parent))| {
+            let rect = back(place, ratio, size);
+            let empty = rect.width() <= 0 || rect.height() <= 0;
+            Found {
+                id: row as u32 + 1,
+                parent: u32::try_from(parent + 1).unwrap_or(0),
+                rect,
+                score: if empty { f32::NEG_INFINITY } else { *score },
+                over: *lying >= over,
+            }
+        })
+        .collect()
+}
+
+/// A frame on the reduced picture, left, top, right and bottom, in pixels of the window of that
+/// size, within it.
+fn back(place: &[f32], ratio: f32, (width, height): (u32, u32)) -> Rect {
+    let side = |value: f32, size: u32| ((value / ratio + 0.5).floor() as i32).clamp(0, size as i32);
+    Rect::new(side(place[0], width), side(place[1], height), side(place[2], width), side(place[3], height))
 }
 
 /// How far the sides at either end of a frame's width or height may go to a real edge, in pixels
@@ -185,7 +267,11 @@ fn reach(size: i32, ratio: f32) -> i32 {
 /// it, and how large its tensor is.
 fn sizes(picture: &Image, input: &Input, scale: f32) -> (f32, (usize, usize), (usize, usize)) {
     let working = input.long_side as f32 / picture.width.max(picture.height) as f32;
-    let ratio = working.max(THINGS_AT_LEAST / scale).min(1.0);
+    let ratio = match input.fit.unwrap_or(Fit::Scale) {
+        Fit::LongSide => working,
+        Fit::Scale => working.max(THINGS_AT_LEAST / scale),
+    }
+    .min(1.0);
     let wide = ((picture.width as f32 * ratio + 0.5).floor() as usize).max(1);
     let high = ((picture.height as f32 * ratio + 0.5).floor() as usize).max(1);
     let multiple = input.multiple as usize;
@@ -390,7 +476,7 @@ mod tests {
 
     #[test]
     fn a_very_wide_window_at_a_small_scale_is_reduced_no_further_than_things_can_be_read() {
-        let input = Input { long_side: 1280, multiple: 32, planes: 5, smallest_window: (320, 200) };
+        let input = Input { fit: None, long_side: 1280, multiple: 32, planes: 5, smallest_window: (320, 200) };
         let reduced = |width, height, scale| sizes(&picture(width, height, |_, _| [0; 3]), &input, scale).1;
         assert_eq!(reduced(3440, 1400, 1.0), (2293, 933));
         assert_eq!(reduced(3440, 1400, 2.0), (1280, 521));
@@ -398,6 +484,16 @@ mod tests {
         assert_eq!(reduced(1920, 1080, 1.0), (1280, 720));
         assert_eq!(reduced(3840, 2160, 2.0), (1280, 720));
         assert_eq!(reduced(1000, 700, 1.0), (1000, 700));
+    }
+
+    #[test]
+    fn a_version_fitted_by_the_long_side_takes_no_notice_of_the_scale() {
+        let input = Input { fit: Some(Fit::LongSide), long_side: 1280, multiple: 32, planes: 3, smallest_window: (320, 200) };
+        let reduced = |width, height, scale| sizes(&picture(width, height, |_, _| [0; 3]), &input, scale).1;
+        assert_eq!(reduced(3440, 1400, 1.0), (1280, 521));
+        assert_eq!(reduced(1000, 700, 1.0), (1000, 700));
+        let input = Input { fit: Some(Fit::Scale), ..input };
+        assert_eq!(sizes(&picture(3440, 1400, |_, _| [0; 3]), &input, 1.0).1, (2293, 933));
     }
 
     #[test]
@@ -484,7 +580,40 @@ mod tests {
         }"#;
         let read: Description = serde_json::from_str(text).unwrap();
         assert_eq!((read.input.long_side, read.input.smallest_window), (1280, (320, 200)));
-        assert_eq!((read.nodes.max_nodes, read.score), (128, 0.3));
+        assert_eq!((read.nodes.as_ref().unwrap().max_nodes, read.score), (128, 0.3));
+        assert_eq!((read.contract, read.input.fit), (4, None));
+    }
+
+    #[test]
+    fn a_version_of_one_graph_is_read_as_contract_6_has_it() {
+        let text = r#"{
+          "contract": 6, "name": "ainitShot Blocks", "version": "dfine-early", "made": "2026-11-08",
+          "files": { "graph": "areas.onnx" },
+          "input": { "fit": "long_side", "long_side": 1280, "resize": "area", "multiple": 32, "pad": 0, "type": "uint8", "planes": 3, "smallest_window": [320, 200] },
+          "queries": 300, "score": 0.5, "over": 0.5, "heads": { "over": false, "parent": false }
+        }"#;
+        let read: Description = serde_json::from_str(text).unwrap();
+        assert_eq!((read.contract, read.input.fit, read.input.planes), (6, Some(Fit::LongSide), 3));
+        assert_eq!((read.files.graph.as_deref(), read.files.frames.as_deref()), (Some("areas.onnx"), None));
+        assert!(read.nodes.is_none());
+        let scale = text.replace(r#""fit": "long_side""#, r#""fit": "scale""#);
+        assert_eq!(serde_json::from_str::<Description>(&scale).unwrap().input.fit, Some(Fit::Scale));
+    }
+
+    #[test]
+    fn the_rows_of_one_graph_come_back_to_the_window_with_their_parents() {
+        // A window reduced to a half: a panel, a card in it, a frame with no height, and a row
+        // whose parent is the frame with no height.
+        let boxes = [0., 0., 400., 300., 10.2, 10.7, 100., 60., 20., 20., 80., 20.2, 22., 21., 30., 29.];
+        let found = rows(&boxes, &[0.9, 0.8, 0.7, 0.6], &[0.0, 0.7, 0.0, 0.0], &[-1, 0, 1, 2], 0.5, 0.5, (700, 500));
+        let ids: Vec<(u32, u32)> = found.iter().map(|block| (block.id, block.parent)).collect();
+        assert_eq!(ids, [(1, 0), (2, 1), (3, 2), (4, 3)]);
+        assert_eq!(found[0].rect, Rect::new(0, 0, 700, 500));
+        assert_eq!(found[1].rect, Rect::new(20, 21, 200, 120));
+        assert_eq!((found[0].over, found[1].over), (false, true));
+        assert_eq!(found[2].score, f32::NEG_INFINITY);
+        let tree = Tree::as_found(&found, 0.5);
+        assert_eq!(tree.lit(crate::geometry::Point::new(50, 50), 1.0), Some(Rect::new(44, 42, 60, 58)));
     }
 
     /// The reference goes by the long side alone, which this scale leaves as it is.

@@ -55,6 +55,16 @@ impl Tree {
     /// that isn't there, or a block that comes back to itself through its parents, stands in the
     /// window.
     pub fn new(found: &[Found], least: f32) -> Tree {
+        Tree::made(found, least, true)
+    }
+
+    /// As [`Tree::new`], but a parent and its only child stay two blocks: a model that gives a
+    /// frame for each thing and each frame's parent has decided that itself.
+    pub fn as_found(found: &[Found], least: f32) -> Tree {
+        Tree::made(found, least, false)
+    }
+
+    fn made(found: &[Found], least: f32, merge: bool) -> Tree {
         let kept: Vec<&Found> = found.iter().filter(|block| block.score >= least).collect();
         let place = |id: u32| kept.iter().position(|block| block.id == id);
         // Up from a block's parent to the nearest one kept: what was dropped is passed through.
@@ -73,7 +83,9 @@ impl Tree {
         let mut blocks: Vec<Block> =
             kept.iter().map(|block| Block { parent: parent_of(block), rect: block.rect, over: block.over }).collect();
         cut_circles(&mut blocks);
-        merge_only_children(&mut blocks);
+        if merge {
+            merge_only_children(&mut blocks);
+        }
         Tree::of(blocks)
     }
 
@@ -375,6 +387,20 @@ mod tests {
     fn a_child_with_a_neighbour_doesnt_merge_however_large() {
         let blocks = [found(1, 0, (0, 0, 100, 100)), found(2, 1, (0, 0, 100, 95)), found(3, 1, (0, 95, 100, 100))];
         assert_eq!(Tree::new(&blocks, 0.5).blocks.len(), 3);
+    }
+
+    #[test]
+    fn as_found_an_only_child_stays_a_block_of_its_own_and_the_unsure_still_go() {
+        let blocks = [
+            found(1, 0, (0, 0, 100, 100)),
+            found(2, 1, (1, 1, 99, 99)),
+            Found { score: 0.2, ..found(3, 2, (10, 10, 90, 50)) },
+            found(4, 3, (10, 10, 40, 40)),
+        ];
+        let tree = Tree::as_found(&blocks, 0.5);
+        assert_eq!(tree.blocks.len(), 3);
+        assert_eq!(tree.blocks[1].rect, Rect::new(1, 1, 99, 99));
+        assert_eq!((tree.blocks[1].parent, tree.blocks[2].parent), (Some(0), Some(1)));
     }
 
     /// A white picture with a box of grey on it.
