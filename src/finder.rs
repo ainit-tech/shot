@@ -694,4 +694,98 @@ mod tests {
         println!("{alike} of {all} alike, the edges of {to_the_byte} windows to the byte");
         assert!(alike * 100 >= all * 95, "{alike} of {all}");
     }
+
+    /// Runs a version of one graph on the windows of its folder `check` and compares every row of
+    /// the graph and the tree after it with what the reference in Python made of them. Rows go by
+    /// their frames, not their places: rows of nearly the same score can come in another order.
+    /// Asked for as the test above, with `finder::tests::a_version_of_one_graph_gives_what_its_reference_gives`.
+    #[test]
+    #[ignore]
+    fn a_version_of_one_graph_gives_what_its_reference_gives() {
+        let folder = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
+        let library = PathBuf::from(std::env::var_os("ONNX_RUNTIME").expect("ONNX_RUNTIME names the library"));
+        let mut finder = Finder::load(&library, &folder).unwrap();
+        let (over, least) = (finder.description.over, finder.description.score);
+        let sides = |rect: Rect| [rect.left, rect.top, rect.right, rect.bottom];
+        let near = |a: Rect, b: Rect| sides(a).iter().zip(sides(b)).all(|(a, b)| (a - b).abs() <= 1);
+        let (mut rows_all, mut rows_alike, mut blocks_all, mut blocks_alike) = (0, 0, 0, 0);
+        for entry in fs::read_dir(folder.join("check")).unwrap() {
+            let path = entry.unwrap().path();
+            if path.extension().is_none_or(|extension| extension != "png") {
+                continue;
+            }
+            let shot = Image::from_png(&fs::read(&path).unwrap()).unwrap();
+            let read = |extension: &str| -> serde_json::Value {
+                serde_json::from_slice(&fs::read(path.with_extension(extension)).unwrap()).unwrap()
+            };
+            let (outputs, label) = (read("outputs.json"), read("json"));
+            let numbers = |value: &serde_json::Value| -> Vec<f64> {
+                value.as_array().unwrap().iter().flat_map(|item| item.as_array().cloned().unwrap_or(vec![item.clone()])).map(|item| item.as_f64().unwrap()).collect()
+            };
+            let (ratio, reduced, whole) = sizes(&shot, &finder.description.input, REFERENCE_SCALE);
+            assert_eq!(numbers(&outputs["reduced"]), [reduced.0 as f64, reduced.1 as f64], "{}", path.display());
+            assert_eq!(numbers(&outputs["tensor"]), [1.0, 3.0, whole.1 as f64, whole.0 as f64], "{}", path.display());
+            assert!((f64::from(ratio) - outputs["ratio"].as_f64().unwrap()).abs() < 1e-6, "{}", path.display());
+            let floats = |key: &str| -> Vec<f32> { numbers(&outputs[key]).into_iter().map(|value| value as f32).collect() };
+            let parents: Vec<i64> = outputs["parent"].as_array().unwrap().iter().map(|parent| parent.as_i64().unwrap()).collect();
+            let size = (shot.width, shot.height);
+            let expected = rows(&floats("boxes"), &floats("scores"), &floats("over"), &parents, over, ratio, size);
+            let started = Instant::now();
+            let (mine, _) = finder.found(&shot, REFERENCE_SCALE).unwrap();
+            let seconds = started.elapsed().as_secs_f32();
+            let same_row = |a: &Found, b: &Found| {
+                near(a.rect, b.rect) && (a.score == b.score || (a.score - b.score).abs() <= 0.001) && a.over == b.over
+            };
+            let rows_matched = expected.iter().filter(|row| mine.iter().any(|other| same_row(row, other))).count();
+            // The tree: the frames that stay, each with the frame of its nearest parent that stays.
+            let kept_parent = |block: &Found| {
+                let mut parent = block.parent;
+                while parent != 0 && mine[parent as usize - 1].score < least {
+                    parent = mine[parent as usize - 1].parent;
+                }
+                (parent != 0).then(|| mine[parent as usize - 1].rect)
+            };
+            let kept: Vec<(Rect, Option<Rect>)> =
+                mine.iter().filter(|block| block.score >= least).map(|block| (block.rect, kept_parent(block))).collect();
+            let blocks = label["blocks"].as_array().unwrap();
+            let rect_of = |block: &serde_json::Value| {
+                let side: Vec<i32> = block["box"].as_array().unwrap().iter().map(|side| side.as_i64().unwrap() as i32).collect();
+                Rect::new(side[0], side[1], side[2], side[3])
+            };
+            let wanted: Vec<(Rect, Option<Rect>)> = blocks
+                .iter()
+                .map(|block| {
+                    let parent = blocks.iter().find(|other| other["id"] == block["parent"]).map(rect_of);
+                    (rect_of(block), parent)
+                })
+                .collect();
+            let same_block = |a: &(Rect, Option<Rect>), b: &(Rect, Option<Rect>)| {
+                near(a.0, b.0)
+                    && match (a.1, b.1) {
+                        (Some(a), Some(b)) => near(a, b),
+                        (a, b) => a.is_none() && b.is_none(),
+                    }
+            };
+            let blocks_matched = wanted.iter().filter(|block| kept.iter().any(|mine| same_block(block, mine))).count();
+            println!(
+                "{}: {}x{}, rows {rows_matched} of {}, blocks {blocks_matched} of {} ({} here), in {seconds:.3} s",
+                path.file_stem().unwrap().to_string_lossy(),
+                shot.width,
+                shot.height,
+                expected.len(),
+                wanted.len(),
+                kept.len(),
+            );
+            for block in wanted.iter().filter(|block| !kept.iter().any(|mine| same_block(block, mine))) {
+                println!("  not found: {:?} in {:?}", sides(block.0), block.1.map(sides));
+            }
+            rows_all += expected.len();
+            rows_alike += rows_matched;
+            blocks_all += wanted.len().max(kept.len());
+            blocks_alike += blocks_matched;
+        }
+        println!("rows {rows_alike} of {rows_all} alike, blocks {blocks_alike} of {blocks_all}");
+        assert!(rows_alike * 100 >= rows_all * 99, "rows {rows_alike} of {rows_all}");
+        assert!(blocks_alike * 100 >= blocks_all * 99, "blocks {blocks_alike} of {blocks_all}");
+    }
 }
