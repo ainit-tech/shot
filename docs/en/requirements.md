@@ -29,7 +29,7 @@ On the program's first start, once the language is chosen, a window asks for the
 
 Then, and later from the menu of the icon in the notification area, "How to use" plays a clip of the program at work, the one the site shows: short chapters on taking a screenshot, the magic pencil, hiding and masking what is private, putting annotations right, copying the text, saving, the queries to Google, aloud too, the languages and the settings. The clip speaks the program's language and shows the hotkey and the query buttons from the settings; the list of its chapters and the arrow keys go to any of them. Under the clip the window offers to sign in to Google while nobody is signed in, and opens the settings.
 
-The menu of the icon in the notification area takes a screenshot and opens the settings, "How to use" and the site's page where people support the program, in the program's language where the site speaks it; while updates are installed by hand, it offers a newer version too. The menu is dark or light, as Windows is.
+The menu of the icon in the notification area takes a screenshot and opens the folder where everything is saved, the settings, "How to use" and the site's page where people support the program, in the program's language where the site speaks it; while updates are installed by hand, it offers a newer version too. The menu is dark or light, as Windows is.
 
 ## Tools
 

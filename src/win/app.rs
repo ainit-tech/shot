@@ -239,6 +239,15 @@ pub fn open_site(path: &str) {
     }
 }
 
+/// Opens a folder for saving in Explorer: the settings' own from the icon's menu, or the one the
+/// settings window shows. One that isn't there yet is made, as the first file saved would make it.
+pub fn open_folder(folder: &Path) {
+    let _ = std::fs::create_dir_all(folder);
+    if let Err(problem) = shell::open(&folder.to_string_lossy()) {
+        notify(tr("The folder didn't open"), &problem);
+    }
+}
+
 /// Tells the user of a problem next to the icon in the notification area.
 pub fn notify(title: &str, text: &str) {
     show_notice(title, text, true, None);
@@ -567,6 +576,7 @@ unsafe extern "system" fn window_proc(window: HWND, message: u32, wparam: WPARAM
             WM_LBUTTONUP => shot(),
             WM_RBUTTONUP => match tray::menu(window, &settings().hotkey, update::menu_item().as_deref()) {
                 Some(tray::Command::Capture) => shot(),
+                Some(tray::Command::Folder) => open_folder(&shell::save_folder(&settings().save)),
                 Some(tray::Command::Settings) => preferences::open(),
                 Some(tray::Command::Guide) => guide::open(),
                 Some(tray::Command::Update) => update::menu_chosen(),

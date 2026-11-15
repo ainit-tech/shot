@@ -307,13 +307,7 @@ fn heard(message: &str) {
                 unsafe { PostMessageW(window, WM_PICK_FOLDER, 0, 0) };
             }
         }
-        "openFolder" => {
-            let folder = folder(message["folder"].as_str());
-            let _ = std::fs::create_dir_all(&folder);
-            if let Err(problem) = shell::open(&folder.to_string_lossy()) {
-                app::notify(tr("The folder didn't open"), &problem);
-            }
-        }
+        "openFolder" => app::open_folder(&folder(message["folder"].as_str())),
         "openFile" => {
             if let Err(problem) = shell::open_text(&app::settings_path()) {
                 app::notify(tr("The settings file didn't open"), &problem);

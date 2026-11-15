@@ -1,7 +1,7 @@
 //! The icon in the notification area. A click on it takes a screenshot; its menu also opens the
-//! settings, the presentation of how to use the program and the site's page where people support
-//! it, and closes the program. It is also where the program tells the user about problems and
-//! news, such as a screenshot saved.
+//! folder where everything is saved, the settings, the presentation of how to use the program and
+//! the site's page where people support it, and closes the program. It is also where the program
+//! tells the user about problems and news, such as a screenshot saved.
 
 use std::io;
 use std::mem::transmute;
@@ -36,6 +36,7 @@ const ID: u32 = 1;
 
 pub enum Command {
     Capture,
+    Folder,
     Settings,
     Guide,
     Update,
@@ -49,6 +50,7 @@ const EXIT: usize = 3;
 const GUIDE: usize = 4;
 const UPDATE: usize = 5;
 const SUPPORT: usize = 6;
+const FOLDER: usize = 7;
 
 pub struct Tray {
     window: HWND,
@@ -132,6 +134,7 @@ fn track(window: HWND, hotkey: &str, update: Option<&str>, dark: bool) -> Option
     // A combination reads from left to right in every language, as Windows writes it: the mark
     // keeps "Alt+~" from turning into "~+Alt" in a menu from right to left.
     let capture = wide(&format!("{}\t{hotkey}\u{200E}", tr("Take a screenshot")));
+    let folder = wide(tr("Open the folder"));
     let settings = wide(tr("Settings"));
     let guide = wide(tr("How to use"));
     let update = update.map(wide);
@@ -140,6 +143,7 @@ fn track(window: HWND, hotkey: &str, update: Option<&str>, dark: bool) -> Option
     unsafe {
         let menu = CreatePopupMenu();
         AppendMenuW(menu, MF_STRING, CAPTURE, capture.as_ptr());
+        AppendMenuW(menu, MF_STRING, FOLDER, folder.as_ptr());
         AppendMenuW(menu, MF_STRING, SETTINGS, settings.as_ptr());
         AppendMenuW(menu, MF_STRING, GUIDE, guide.as_ptr());
         if let Some(update) = &update {
@@ -170,6 +174,7 @@ fn track(window: HWND, hotkey: &str, update: Option<&str>, dark: bool) -> Option
         DestroyMenu(menu);
         match chosen as usize {
             CAPTURE => Some(Command::Capture),
+            FOLDER => Some(Command::Folder),
             SETTINGS => Some(Command::Settings),
             GUIDE => Some(Command::Guide),
             UPDATE => Some(Command::Update),
