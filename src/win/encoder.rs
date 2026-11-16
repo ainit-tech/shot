@@ -509,10 +509,13 @@ mod tests {
         std::fs::create_dir_all(&folder).unwrap();
         let length = SECOND / FRAMES as i64;
         let count = 5 * FRAMES as usize;
+        // The same motion a second whatever the frames a second: the page goes up 100 pixels a
+        // second for two seconds, the square 210 pixels a second to the right and 90 down.
+        let rate = FRAMES as usize;
         let shown = |n: usize| {
-            let top = (n * 200 / 60).min(200) as i32;
+            let top = (n * 100 / rate).min(200) as i32;
             let mut pixels = picture_of.crop(Rect::new(0, top, width as i32, top + height as i32)).pixels;
-            let (x, y) = (100 + n * 7, 100 + n * 3);
+            let (x, y) = (100 + n * 210 / rate, 100 + n * 90 / rate);
             for row in y..y + 16 {
                 pixels[(row * width + x) * 4..(row * width + x + 12) * 4].fill(0);
             }
