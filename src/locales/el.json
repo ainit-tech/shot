@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: χρειάζεται τουλάχιστον ένα χρώμα.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: το «{bad}» δεν είναι χρώμα. Πρέπει να έχει τη μορφή \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: το πάχος πρέπει να είναι από 1 έως 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: μια εγγραφή έχει 30 ή 60 καρέ ανά δευτερόλεπτο.",
     "below": "κάτω",
     "above": "πάνω",
     "on the left": "αριστερά",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Η φωνητική ερώτηση δεν στάλθηκε.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ένας σύντομος ήχος όταν το μικρόφωνο αρχίζει να ακούει μια φωνητική ερώτηση: το σήμα για να μιλήσετε.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Εγγραφή βίντεο με τον κωδικοποιητή της κάρτας γραφικών: η εγγραφή μένει ομαλή ακόμη κι όταν\n# ο επεξεργαστής είναι απασχολημένος. Αν είναι false ή η κάρτα δεν έχει, εγγράφει ο επεξεργαστής.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Καρέ ανά δευτερόλεπτο μιας εγγραφής, 30 ή 60: στα 60 η κύλιση και το ποντίκι κινούνται πιο\n# ομαλά, και το αρχείο είναι λίγο μεγαλύτερο. Ο επεξεργαστής εγγράφει το πολύ 30.",
     "Record a video or a GIF · Ctrl+R": "Εγγραφή βίντεο ή GIF · Ctrl+R",
     "Go on recording": "Συνέχεια εγγραφής",
     "Stop": "Διακοπή",
@@ -234,6 +236,8 @@
     "recordingIntro": "Βίντεο ή GIF της επιλογής: Ctrl+R ή το κουμπί εγγραφής δίπλα στην επιλογή.",
     "graphicsCard": "Εγγραφή με την κάρτα γραφικών",
     "graphicsCardDesc": "Η κάρτα γραφικών κωδικοποιεί το βίντεο, ώστε η εγγραφή να μένει ομαλή ακόμη κι όταν ο επεξεργαστής είναι απασχολημένος. Αν η κάρτα δεν μπορεί, εγγράφει ο επεξεργαστής.",
+    "framesPerSecond": "Καρέ ανά δευτερόλεπτο",
+    "framesPerSecondDesc": "Στα 60 η κύλιση και το ποντίκι κινούνται πιο ομαλά, και το αρχείο είναι λίγο μεγαλύτερο. Ο επεξεργαστής εγγράφει το πολύ 30.",
     "ask": "Ερώτηση για τη θέση αποθήκευσης",
     "askDesc": "Αν είναι ανενεργό, το αρχείο αποθηκεύεται αμέσως στον παρακάτω φάκελο. Το Ctrl+Shift+S ρωτά πάντα.",
     "saveCopy": "Αντιγραφή και στο πρόχειρο",
@@ -385,7 +389,8 @@
     "listeningSound": "Ήχος όταν ακούει το μικρόφωνο",
     "listeningSoundDesc": "Ένας σύντομος ήχος όταν το μικρόφωνο αρχίζει να ακούει μια φωνητική ερώτηση: μιλήστε μετά από αυτόν.",
     "kListeningSound": "ήχος σήμα μπιπ μικρόφωνο φωνή φωνητική μιλώ ακούω sound microphone",
-    "kGraphicsCard": "κάρτα γραφικών κάρτα βίντεο gpu nvidia amd intel κωδικοποιητής υλικό ομαλά κολλάει καθυστέρηση καρέ fps επεξεργαστής cpu"
+    "kGraphicsCard": "κάρτα γραφικών κάρτα βίντεο gpu nvidia amd intel κωδικοποιητής υλικό ομαλά κολλάει καθυστέρηση καρέ fps επεξεργαστής cpu",
+    "kFramesPerSecond": "καρέ ανά δευτερόλεπτο ρυθμός καρέ fps 30 60 ομαλά ομαλότητα frames per second"
   },
   "guide": {
     "start": "Έναρξη",

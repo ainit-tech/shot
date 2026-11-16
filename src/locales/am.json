@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: ቢያንስ አንድ ቀለም ያስፈልጋል።",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» ቀለም አይደለም፤ እንደ \"#RRGGBB\" መሆን አለበት።",
     "width: the width must be from 1 to 50.": "width: ውፍረቱ ከ1 እስከ 50 መሆን አለበት።",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ቀረጻው በሰከንድ 30 ወይም 60 ፍሬሞች ሊኖሩት ይችላል።",
     "below": "ከታች",
     "above": "ከላይ",
     "on the left": "በግራ",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "በድምፅ የተጠየቀው ጥያቄ አልተላከም።",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ለመናገር ምልክት።",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# ቪዲዮን በግራፊክስ ካርዱ ኢንኮደር መቅረጽ፦ ፕሮሰሰሩ ሥራ ቢበዛበትም ቀረጻው ለስላሳ ይሆናል።\n# false ከሆነ ወይም ካርዱ ኢንኮደር ከሌለው፣ ፕሮሰሰሩ ይቀርጻል።",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# የቀረጻው ፍሬሞች በሰከንድ፣ 30 ወይም 60፦ በ60 መሸብለልና መዳፊቱ ይበልጥ ለስላሳ ይሆናሉ፣ ፋይሉም\n# ትንሽ ይበልጣል። ፕሮሰሰሩ ቢበዛ 30 ይቀርጻል።",
     "Record a video or a GIF · Ctrl+R": "ቪዲዮ ወይም GIF ቅረጽ · Ctrl+R",
     "Go on recording": "ቀረጻውን ቀጥል",
     "Stop": "አቁም",
@@ -234,6 +236,8 @@
     "recordingIntro": "የተመረጠው ቦታ ቪዲዮ ወይም GIF፦ Ctrl+R ወይም ከምርጫው አጠገብ ያለው የመቅረጫ ቁልፍ።",
     "graphicsCard": "በግራፊክስ ካርዱ ቅረጽ",
     "graphicsCardDesc": "ቪዲዮውን የግራፊክስ ካርዱ ኢንኮድ ያደርጋል፣ ስለዚህ ፕሮሰሰሩ ሥራ ቢበዛበትም ቀረጻው ለስላሳ ይሆናል። ካርዱ ካልቻለ ፕሮሰሰሩ ይቀርጻል።",
+    "framesPerSecond": "ፍሬሞች በሰከንድ",
+    "framesPerSecondDesc": "በ60 መሸብለልና መዳፊቱ ይበልጥ ለስላሳ ይሆናሉ፣ ፋይሉም ትንሽ ይበልጣል። ፕሮሰሰሩ ቢበዛ 30 ይቀርጻል።",
     "ask": "የት እንደሚቀመጥ ጠይቅ",
     "askDesc": "ከጠፋ ፋይሉ ወዲያውኑ ከታች ባለው አቃፊ ውስጥ ይቀመጣል። Ctrl+Shift+S ሁልጊዜ ይጠይቃል።",
     "saveCopy": "ወደ ቅንጥብ ሰሌዳም ቅዳ",
@@ -385,7 +389,8 @@
     "listeningSound": "ማይክሮፎኑ ሲያዳምጥ ድምፅ",
     "listeningSoundDesc": "በድምፅ ለሚጠየቅ ጥያቄ ማይክሮፎኑ ማዳመጥ ሲጀምር አጭር ድምፅ፦ ከእሱ በኋላ ይናገሩ።",
     "kListeningSound": "ድምፅ ምልክት ማይክሮፎን በድምፅ መናገር ማዳመጥ sound microphone",
-    "kGraphicsCard": "ግራፊክስ ካርድ ቪዲዮ ካርድ gpu nvidia amd intel ኢንኮደር ሃርድዌር ለስላሳ መንተባተብ ፍሬም fps ፕሮሰሰር cpu video card encoder"
+    "kGraphicsCard": "ግራፊክስ ካርድ ቪዲዮ ካርድ gpu nvidia amd intel ኢንኮደር ሃርድዌር ለስላሳ መንተባተብ ፍሬም fps ፕሮሰሰር cpu video card encoder",
+    "kFramesPerSecond": "ፍሬሞች በሰከንድ የፍሬም ፍጥነት fps 30 60 ለስላሳ frames per second"
   },
   "guide": {
     "start": "ጀምር",

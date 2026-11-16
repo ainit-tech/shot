@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: diperlukan setidaknya satu warna.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” bukan warna; formatnya harus seperti \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: ketebalan harus dari 1 sampai 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: rekaman memiliki 30 atau 60 frame per detik.",
     "below": "di bawah",
     "above": "di atas",
     "on the left": "di kiri",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Pertanyaan lisan tidak terkirim.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Bunyi singkat saat mikrofon mulai mendengarkan pertanyaan lisan: tanda untuk berbicara.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Rekam video dengan encoder kartu grafis: rekaman tetap mulus meski prosesor sedang sibuk.\n# Jika false, atau kartu tidak memilikinya, prosesor yang merekam.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Frame per detik rekaman, 30 atau 60: pada 60, gulir dan mouse lebih mulus, dan file-nya sedikit\n# lebih besar. Prosesor merekam paling banyak 30.",
     "Record a video or a GIF · Ctrl+R": "Rekam video atau GIF · Ctrl+R",
     "Go on recording": "Lanjutkan merekam",
     "Stop": "Hentikan",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video atau GIF dari yang dipilih: Ctrl+R atau tombol rekam di samping pilihan.",
     "graphicsCard": "Rekam dengan kartu grafis",
     "graphicsCardDesc": "Kartu grafis mengodekan video, sehingga rekaman tetap mulus meski prosesor sedang sibuk. Jika kartu tidak bisa, prosesor yang merekam.",
+    "framesPerSecond": "Frame per detik",
+    "framesPerSecondDesc": "Pada 60, gulir dan mouse lebih mulus, dan file-nya sedikit lebih besar. Prosesor merekam paling banyak 30.",
     "ask": "Tanya lokasi penyimpanan",
     "askDesc": "Jika nonaktif, file langsung disimpan ke folder di bawah. Ctrl+Shift+S selalu bertanya.",
     "saveCopy": "Salin juga ke papan klip",
@@ -385,7 +389,8 @@
     "listeningSound": "Bunyi saat mikrofon mendengarkan",
     "listeningSoundDesc": "Bunyi singkat saat mikrofon mulai mendengarkan pertanyaan lisan: bicaralah setelahnya.",
     "kListeningSound": "bunyi suara sinyal bip mikrofon lisan bicara dengar sound microphone",
-    "kGraphicsCard": "kartu grafis kartu video vga gpu nvidia amd intel encoder perangkat keras mulus patah-patah lag frame fps prosesor cpu"
+    "kGraphicsCard": "kartu grafis kartu video vga gpu nvidia amd intel encoder perangkat keras mulus patah-patah lag frame fps prosesor cpu",
+    "kFramesPerSecond": "frame per detik laju frame fps 30 60 mulus kelancaran frames per second"
   },
   "guide": {
     "start": "Mulai",

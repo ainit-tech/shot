@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: minst en färg behövs.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: ”{bad}” är inte en färg; den ska se ut som \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: bredden måste vara från 1 till 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: en inspelning har 30 eller 60 bilder per sekund.",
     "below": "nedanför",
     "above": "ovanför",
     "on the left": "till vänster",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Frågan som ställdes med rösten skickades inte.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tecknet att tala.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Spela in video med grafikkortets kodare: inspelningen förblir jämn även när processorn är\n# upptagen. Om false, eller om kortet saknar en, spelar processorn in.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Bilder per sekund i en inspelning, 30 eller 60: vid 60 blir rullning och mus jämnare, och\n# filen lite större. Processorn spelar in högst 30.",
     "Record a video or a GIF · Ctrl+R": "Spela in video eller GIF · Ctrl+R",
     "Go on recording": "Fortsätt spela in",
     "Stop": "Stoppa",
@@ -234,6 +236,8 @@
     "recordingIntro": "En video eller GIF av markeringen: Ctrl+R eller inspelningsknappen bredvid markeringen.",
     "graphicsCard": "Spela in med grafikkortet",
     "graphicsCardDesc": "Grafikkortet kodar videon, så inspelningen förblir jämn även när processorn är upptagen. Om kortet inte kan, spelar processorn in.",
+    "framesPerSecond": "Bilder per sekund",
+    "framesPerSecondDesc": "Vid 60 blir rullning och mus jämnare, och filen lite större. Processorn spelar in högst 30.",
     "ask": "Fråga var du vill spara",
     "askDesc": "Om det är av sparas filen direkt i mappen nedan. Ctrl+Shift+S frågar alltid.",
     "saveCopy": "Kopiera även till urklipp",
@@ -385,7 +389,8 @@
     "listeningSound": "Ljud när mikrofonen lyssnar",
     "listeningSoundDesc": "Ett kort ljud när mikrofonen börjar lyssna på en fråga som ställs med rösten: tala efter det.",
     "kListeningSound": "ljud signal pip mikrofon röst tala lyssna sound microphone",
-    "kGraphicsCard": "grafikkort skärmkort gpu nvidia amd intel kodare hårdvara jämn hackar fördröjning bilder fps processor cpu"
+    "kGraphicsCard": "grafikkort skärmkort gpu nvidia amd intel kodare hårdvara jämn hackar fördröjning bilder fps processor cpu",
+    "kFramesPerSecond": "bilder per sekund bildfrekvens fps 30 60 jämn jämnare frames per second"
   },
   "guide": {
     "start": "Kom igång",

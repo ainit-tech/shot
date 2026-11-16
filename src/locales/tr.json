@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: en az bir renk gerekli.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” bir renk değil; \"#RRGGBB\" biçiminde olmalı.",
     "width: the width must be from 1 to 50.": "width: kalınlık 1 ile 50 arasında olmalı.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: bir kayıt saniyede 30 veya 60 kare olabilir.",
     "below": "altta",
     "above": "üstte",
     "on the left": "solda",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Sesli soru gönderilmedi.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon sesli soruyu dinlemeye başladığında kısa bir ses: konuşma işareti.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videoyu ekran kartının kodlayıcısıyla kaydet: işlemci meşgulken de kayıt akıcı kalır.\n# false ise veya kartta kodlayıcı yoksa işlemci kaydeder.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Kaydın saniyedeki kare sayısı, 30 veya 60: 60'ta kaydırma ve fare daha akıcı olur, dosya\n# biraz büyür. İşlemci en fazla 30 kaydeder.",
     "Record a video or a GIF · Ctrl+R": "Video veya GIF kaydet · Ctrl+R",
     "Go on recording": "Kayda devam et",
     "Stop": "Durdur",
@@ -234,6 +236,8 @@
     "recordingIntro": "Seçilen alanın videosu veya GIF'i: Ctrl+R ya da seçimin yanındaki kayıt düğmesi.",
     "graphicsCard": "Ekran kartıyla kaydet",
     "graphicsCardDesc": "Videoyu ekran kartı kodlar, bu yüzden işlemci meşgulken de kayıt akıcı kalır. Kart yapamazsa işlemci kaydeder.",
+    "framesPerSecond": "Saniyedeki kare",
+    "framesPerSecondDesc": "60'ta kaydırma ve fare daha akıcı olur, dosya biraz büyür. İşlemci en fazla 30 kaydeder.",
     "ask": "Nereye kaydedileceğini sor",
     "askDesc": "Kapalıysa dosya hemen aşağıdaki klasöre kaydedilir. Ctrl+Shift+S her zaman sorar.",
     "saveCopy": "Panoya da kopyala",
@@ -385,7 +389,8 @@
     "listeningSound": "Mikrofon dinlerken ses",
     "listeningSoundDesc": "Mikrofon sesli soruyu dinlemeye başladığında kısa bir ses çalar: ondan sonra konuşun.",
     "kListeningSound": "ses sinyal bip mikrofon sesli konuşmak dinlemek sound microphone",
-    "kGraphicsCard": "ekran kartı grafik kartı gpu nvidia amd intel kodlayıcı donanım akıcı takılma gecikme kare fps işlemci cpu"
+    "kGraphicsCard": "ekran kartı grafik kartı gpu nvidia amd intel kodlayıcı donanım akıcı takılma gecikme kare fps işlemci cpu",
+    "kFramesPerSecond": "saniyedeki kare kare hızı fps 30 60 akıcı akıcılık frames per second"
   },
   "guide": {
     "start": "Başla",

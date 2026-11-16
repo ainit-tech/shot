@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: нужен хотя бы один цвет.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» — не цвет; нужен вид \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: толщина должна быть от 1 до 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: в записи может быть 30 или 60 кадров в секунду.",
     "below": "снизу",
     "above": "сверху",
     "on the left": "слева",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Вопрос голосом не ушёл.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, когда микрофон начинает слушать вопрос голосом: знак, что можно говорить.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Записывать видео кодировщиком видеокарты: запись идёт плавно, даже когда процессор занят.\n# Если false или у видеокарты его нет, записывает процессор.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Кадров в секунду в записи, 30 или 60: при 60 прокрутка и мышь идут плавнее, а файл чуть\n# больше. Процессор записывает не больше 30.",
     "Record a video or a GIF · Ctrl+R": "Записать видео или GIF · Ctrl+R",
     "Go on recording": "Продолжить запись",
     "Stop": "Остановить",
@@ -234,6 +236,8 @@
     "recordingIntro": "Видео или GIF выделенного: Ctrl+R или кнопка записи рядом с выделением.",
     "graphicsCard": "Записывать видеокартой",
     "graphicsCardDesc": "Видео кодирует видеокарта, и запись идёт плавно, даже когда процессор занят. Если видеокарта не может, записывает процессор.",
+    "framesPerSecond": "Кадров в секунду",
+    "framesPerSecondDesc": "При 60 прокрутка и мышь идут плавнее, а файл чуть больше. Процессор записывает не больше 30.",
     "ask": "Спрашивать, куда сохранить",
     "askDesc": "Если выключено, файл сразу сохраняется в папку ниже. Ctrl+Shift+S спрашивает всегда.",
     "saveCopy": "Также копировать в буфер обмена",
@@ -385,7 +389,8 @@
     "listeningSound": "Звук, когда микрофон слушает",
     "listeningSoundDesc": "Короткий звук, когда микрофон начинает слушать вопрос голосом: говорите после него.",
     "kListeningSound": "звук сигнал микрофон голос голосом говорить слушать sound microphone",
-    "kGraphicsCard": "видеокарта видео карта графика gpu nvidia amd intel кодировщик аппаратный плавно лаги рывки тормозит кадры fps процессор cpu"
+    "kGraphicsCard": "видеокарта видео карта графика gpu nvidia amd intel кодировщик аппаратный плавно лаги рывки тормозит кадры fps процессор cpu",
+    "kFramesPerSecond": "кадры в секунду частота кадров fps 30 60 плавность плавно frames per second"
   },
   "guide": {
     "start": "Начать",

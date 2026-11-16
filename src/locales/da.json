@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: der skal være mindst én farve.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: ”{bad}” er ikke en farve; den skal se ud som \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: bredden skal være fra 1 til 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: en optagelse har 30 eller 60 billeder pr. sekund.",
     "below": "nedenfor",
     "above": "ovenfor",
     "on the left": "til venstre",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Spørgsmålet stillet med stemmen blev ikke sendt.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tegnet til at tale.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Optag video med grafikkortets encoder: optagelsen forbliver flydende, selv når processoren\n# er optaget. Hvis false, eller hvis kortet ikke har en, optager processoren.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Billeder pr. sekund i en optagelse, 30 eller 60: ved 60 bliver rulning og mus mere flydende,\n# og filen lidt større. Processoren optager højst 30.",
     "Record a video or a GIF · Ctrl+R": "Optag video eller GIF · Ctrl+R",
     "Go on recording": "Fortsæt optagelsen",
     "Stop": "Stop",
@@ -234,6 +236,8 @@
     "recordingIntro": "En video eller GIF af det markerede: Ctrl+R eller optageknappen ved siden af markeringen.",
     "graphicsCard": "Optag med grafikkortet",
     "graphicsCardDesc": "Grafikkortet koder videoen, så optagelsen forbliver flydende, selv når processoren er optaget. Kan kortet ikke, optager processoren.",
+    "framesPerSecond": "Billeder pr. sekund",
+    "framesPerSecondDesc": "Ved 60 bliver rulning og mus mere flydende, og filen lidt større. Processoren optager højst 30.",
     "ask": "Spørg, hvor der skal gemmes",
     "askDesc": "Hvis den er slået fra, gemmes filen med det samme i mappen nedenfor. Ctrl+Shift+S spørger altid.",
     "saveCopy": "Kopiér også til udklipsholderen",
@@ -385,7 +389,8 @@
     "listeningSound": "Lyd, når mikrofonen lytter",
     "listeningSoundDesc": "En kort lyd, når mikrofonen begynder at lytte til et spørgsmål stillet med stemmen: tal efter den.",
     "kListeningSound": "lyd signal bip mikrofon stemme tale lytte sound microphone",
-    "kGraphicsCard": "grafikkort skærmkort gpu nvidia amd intel encoder hardware flydende hakker forsinkelse billeder fps processor cpu"
+    "kGraphicsCard": "grafikkort skærmkort gpu nvidia amd intel encoder hardware flydende hakker forsinkelse billeder fps processor cpu",
+    "kFramesPerSecond": "billeder pr sekund billedhastighed fps 30 60 flydende jævn frames per second"
   },
   "guide": {
     "start": "Kom i gang",

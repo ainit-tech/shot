@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: ən azı bir rəng lazımdır.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» rəng deyil; \"#RRGGBB\" formatında olmalıdır.",
     "width: the width must be from 1 to 50.": "width: qalınlıq 1 ilə 50 arasında olmalıdır.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: qeyddə saniyədə 30 və ya 60 kadr ola bilər.",
     "below": "aşağıda",
     "above": "yuxarıda",
     "on the left": "solda",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Səsli sual göndərilmədi.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon səsli sualı dinləməyə başlayanda qısa səs: danışmaq üçün işarə.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videonu qrafik kartın enkoderi ilə qeydə al: prosessor məşğul olanda da qeyd səlis qalır.\n# false olarsa və ya kartda enkoder yoxdursa, prosessor qeydə alır.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Qeydin saniyədəki kadr sayı, 30 və ya 60: 60-da sürüşdürmə və siçan daha səlis olur, fayl isə\n# bir az böyük. Prosessor ən çox 30 qeydə alır.",
     "Record a video or a GIF · Ctrl+R": "Video və ya GIF qeydə al · Ctrl+R",
     "Go on recording": "Qeydə almağa davam et",
     "Stop": "Dayandır",
@@ -234,6 +236,8 @@
     "recordingIntro": "Seçilmiş hissənin videosu və ya GIF-i: Ctrl+R və ya seçimin yanındakı qeyd düyməsi.",
     "graphicsCard": "Qrafik kartla qeydə al",
     "graphicsCardDesc": "Videonu qrafik kart kodlaşdırır, ona görə də prosessor məşğul olanda da qeyd səlis qalır. Kart bacarmasa, prosessor qeydə alır.",
+    "framesPerSecond": "Saniyədə kadr",
+    "framesPerSecondDesc": "60-da sürüşdürmə və siçan daha səlis olur, fayl isə bir az böyük. Prosessor ən çox 30 qeydə alır.",
     "ask": "Harada saxlamağı soruş",
     "askDesc": "Deaktiv olduqda fayl dərhal aşağıdakı qovluğa saxlanılır. Ctrl+Shift+S həmişə soruşur.",
     "saveCopy": "Mübadilə buferinə də kopyala",
@@ -385,7 +389,8 @@
     "listeningSound": "Mikrofon dinləyəndə səs",
     "listeningSoundDesc": "Mikrofon səsli sualı dinləməyə başlayanda qısa səs: ondan sonra danışın.",
     "kListeningSound": "səs siqnal mikrofon səsli danışmaq dinləmək sound microphone",
-    "kGraphicsCard": "qrafik kart video kart gpu nvidia amd intel enkoder aparat səlis donma ləngimə kadrlar fps prosessor cpu"
+    "kGraphicsCard": "qrafik kart video kart gpu nvidia amd intel enkoder aparat səlis donma ləngimə kadrlar fps prosessor cpu",
+    "kFramesPerSecond": "saniyədə kadr kadr tezliyi fps 30 60 səlis axıcı frames per second"
   },
   "guide": {
     "start": "Başla",

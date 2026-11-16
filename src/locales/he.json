@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: צריך לפחות צבע אחד.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: \"{bad}\" אינו צבע; הוא צריך להיות בצורה \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: העובי צריך להיות בין 1 ל-50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: להקלטה יש 30 או 60 פריימים לשנייה.",
     "below": "מתחת",
     "above": "מעל",
     "on the left": "משמאל",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "השאלה בקול לא נשלחה.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: הסימן לדבר.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# הקלטת וידאו במקודד של כרטיס המסך: ההקלטה נשארת חלקה גם כשהמעבד עמוס.\n# אם false, או אם אין לכרטיס מקודד, המעבד מקליט.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# פריימים לשנייה בהקלטה, 30 או 60: ב-60 הגלילה והעכבר זזים בצורה חלקה יותר,\n# והקובץ מעט גדול יותר. המעבד מקליט 30 לכל היותר.",
     "Record a video or a GIF · Ctrl+R": "הקלטת וידאו או GIF · Ctrl+R",
     "Go on recording": "המשך הקלטה",
     "Stop": "עצירה",
@@ -234,6 +236,8 @@
     "recordingIntro": "וידאו או GIF של האזור הנבחר: Ctrl+R או כפתור ההקלטה ליד הבחירה.",
     "graphicsCard": "הקלטה באמצעות כרטיס המסך",
     "graphicsCardDesc": "כרטיס המסך מקודד את הווידאו, כך שההקלטה נשארת חלקה גם כשהמעבד עמוס. אם הכרטיס לא יכול, המעבד מקליט.",
+    "framesPerSecond": "פריימים לשנייה",
+    "framesPerSecondDesc": "ב-60 הגלילה והעכבר זזים בצורה חלקה יותר, והקובץ מעט גדול יותר. המעבד מקליט 30 לכל היותר.",
     "ask": "לשאול איפה לשמור",
     "askDesc": "אם האפשרות כבויה, הקובץ נשמר מיד בתיקייה שלמטה. אבל Ctrl+Shift+S שואל תמיד.",
     "saveCopy": "להעתיק גם ללוח",
@@ -385,7 +389,8 @@
     "listeningSound": "צליל כשהמיקרופון מאזין",
     "listeningSoundDesc": "צליל קצר כשהמיקרופון מתחיל להאזין לשאלה בקול: דברו אחריו.",
     "kListeningSound": "צליל אות צפצוף מיקרופון קול דיבור האזנה sound microphone",
-    "kGraphicsCard": "כרטיס מסך כרטיס גרפי gpu nvidia amd intel מקודד חומרה חלק קפיצות לאג פריימים fps מעבד cpu"
+    "kGraphicsCard": "כרטיס מסך כרטיס גרפי gpu nvidia amd intel מקודד חומרה חלק קפיצות לאג פריימים fps מעבד cpu",
+    "kFramesPerSecond": "פריימים לשנייה קצב פריימים fps 30 60 חלק חלקות frames per second"
   },
   "guide": {
     "start": "התחלה",

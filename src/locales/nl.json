@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: er is minstens één kleur nodig.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” is geen kleur; het moet eruitzien als \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: de breedte moet tussen 1 en 50 liggen.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: een opname heeft 30 of 60 beelden per seconde.",
     "below": "onderaan",
     "above": "bovenaan",
     "on the left": "links",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "De gesproken vraag is niet verstuurd.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: het teken om te praten.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Video opnemen met de encoder van de videokaart: de opname blijft vloeiend, ook als de processor\n# druk bezig is. Bij false, of als de kaart er geen heeft, neemt de processor op.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Beelden per seconde van een opname, 30 of 60: bij 60 lopen scrollen en de muis vloeiender, en\n# is het bestand iets groter. De processor neemt hoogstens 30 op.",
     "Record a video or a GIF · Ctrl+R": "Video of GIF opnemen · Ctrl+R",
     "Go on recording": "Opname hervatten",
     "Stop": "Stoppen",
@@ -234,6 +236,8 @@
     "recordingIntro": "Een video of GIF van de selectie: Ctrl+R of de opnameknop naast de selectie.",
     "graphicsCard": "Opnemen met de videokaart",
     "graphicsCardDesc": "De videokaart codeert de video, zodat de opname vloeiend blijft, ook als de processor druk bezig is. Kan de kaart het niet, dan neemt de processor op.",
+    "framesPerSecond": "Beelden per seconde",
+    "framesPerSecondDesc": "Bij 60 lopen scrollen en de muis vloeiender, en is het bestand iets groter. De processor neemt hoogstens 30 op.",
     "ask": "Vragen waar je opslaat",
     "askDesc": "Als dit uit staat, wordt het bestand meteen opgeslagen in de map hieronder. Ctrl+Shift+S vraagt het altijd.",
     "saveCopy": "Ook naar het klembord kopiëren",
@@ -385,7 +389,8 @@
     "listeningSound": "Geluid als de microfoon luistert",
     "listeningSoundDesc": "Een kort geluid als de microfoon begint te luisteren naar een gesproken vraag: praat daarna.",
     "kListeningSound": "geluid signaal piep microfoon stem spreken praten luisteren sound microphone",
-    "kGraphicsCard": "videokaart grafische kaart gpu nvidia amd intel encoder hardware vloeiend hapert schokkerig vertraging frames fps processor cpu"
+    "kGraphicsCard": "videokaart grafische kaart gpu nvidia amd intel encoder hardware vloeiend hapert schokkerig vertraging frames fps processor cpu",
+    "kFramesPerSecond": "beelden per seconde framerate fps 30 60 vloeiend vloeiender frames per second"
   },
   "guide": {
     "start": "Beginnen",

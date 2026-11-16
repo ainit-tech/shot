@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: Mindestens eine Farbe ist nötig.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ ist keine Farbe; sie sollte wie \"#RRGGBB\" aussehen.",
     "width: the width must be from 1 to 50.": "width: Die Breite muss zwischen 1 und 50 liegen.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: Eine Aufnahme hat 30 oder 60 Bilder pro Sekunde.",
     "below": "unten",
     "above": "oben",
     "on the left": "links",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Die gesprochene Frage wurde nicht gesendet.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: das Zeichen zum Sprechen.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videos mit dem Encoder der Grafikkarte aufnehmen: Die Aufnahme bleibt flüssig, auch wenn der\n# Prozessor ausgelastet ist. Bei false oder ohne Encoder auf der Karte nimmt der Prozessor auf.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Bilder pro Sekunde einer Aufnahme, 30 oder 60: Bei 60 laufen Scrollen und Maus flüssiger, und\n# die Datei wird etwas größer. Der Prozessor nimmt höchstens 30 auf.",
     "Record a video or a GIF · Ctrl+R": "Video oder GIF aufnehmen · Strg+R",
     "Go on recording": "Aufnahme fortsetzen",
     "Stop": "Beenden",
@@ -234,6 +236,8 @@
     "recordingIntro": "Ein Video oder GIF der Auswahl: Strg+R oder die Aufnahmeschaltfläche neben der Auswahl.",
     "graphicsCard": "Mit der Grafikkarte aufnehmen",
     "graphicsCardDesc": "Die Grafikkarte kodiert das Video, sodass die Aufnahme flüssig bleibt, auch wenn der Prozessor ausgelastet ist. Kann die Karte das nicht, nimmt der Prozessor auf.",
+    "framesPerSecond": "Bilder pro Sekunde",
+    "framesPerSecondDesc": "Bei 60 laufen Scrollen und Maus flüssiger, und die Datei wird etwas größer. Der Prozessor nimmt höchstens 30 auf.",
     "ask": "Fragen, wo gespeichert wird",
     "askDesc": "Wenn aus, wird die Datei sofort im Ordner unten gespeichert. Strg+Umschalt+S fragt immer.",
     "saveCopy": "Auch in die Zwischenablage kopieren",
@@ -385,7 +389,8 @@
     "listeningSound": "Ton, wenn das Mikrofon zuhört",
     "listeningSoundDesc": "Ein kurzer Ton, wenn das Mikrofon beginnt, einer gesprochenen Frage zuzuhören: Sprechen Sie danach.",
     "kListeningSound": "ton klang signal piepton mikrofon stimme sprechen zuhören sound microphone",
-    "kGraphicsCard": "grafikkarte videokarte gpu nvidia amd intel encoder hardware flüssig ruckelt ruckeln verzögerung bilder fps prozessor cpu"
+    "kGraphicsCard": "grafikkarte videokarte gpu nvidia amd intel encoder hardware flüssig ruckelt ruckeln verzögerung bilder fps prozessor cpu",
+    "kFramesPerSecond": "bilder pro sekunde bildrate fps 30 60 flüssig flüssiger ruckelfrei frames per second"
   },
   "guide": {
     "start": "Los geht’s",

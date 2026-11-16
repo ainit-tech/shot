@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: é preciso pelo menos uma cor.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” não é uma cor; deve ter a forma \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: a espessura deve ser de 1 a 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: uma gravação tem 30 ou 60 quadros por segundo.",
     "below": "abaixo",
     "above": "acima",
     "on the left": "à esquerda",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "A pergunta em voz alta não foi enviada.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: o sinal para falar.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Gravar vídeo com o codificador da placa de vídeo: a gravação continua fluida mesmo com o\n# processador ocupado. Se false, ou se a placa não tiver um, o processador grava.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Quadros por segundo de uma gravação, 30 ou 60: com 60, a rolagem e o mouse ficam mais fluidos,\n# e o arquivo fica um pouco maior. O processador grava no máximo 30.",
     "Record a video or a GIF · Ctrl+R": "Gravar vídeo ou GIF · Ctrl+R",
     "Go on recording": "Continuar gravando",
     "Stop": "Parar",
@@ -234,6 +236,8 @@
     "recordingIntro": "Um vídeo ou GIF da seleção: Ctrl+R ou o botão de gravar ao lado da seleção.",
     "graphicsCard": "Gravar com a placa de vídeo",
     "graphicsCardDesc": "A placa de vídeo codifica o vídeo, então a gravação continua fluida mesmo com o processador ocupado. Se a placa não puder, o processador grava.",
+    "framesPerSecond": "Quadros por segundo",
+    "framesPerSecondDesc": "Com 60, a rolagem e o mouse ficam mais fluidos, e o arquivo fica um pouco maior. O processador grava no máximo 30.",
     "ask": "Perguntar onde salvar",
     "askDesc": "Se desligado, o arquivo é salvo direto na pasta abaixo. Ctrl+Shift+S sempre pergunta.",
     "saveCopy": "Copiar também para a área de transferência",
@@ -385,7 +389,8 @@
     "listeningSound": "Som quando o microfone escuta",
     "listeningSoundDesc": "Um som curto quando o microfone começa a ouvir uma pergunta em voz alta: fale depois dele.",
     "kListeningSound": "som sinal bipe microfone voz falar ouvir sound microphone",
-    "kGraphicsCard": "placa de vídeo placa gráfica gpu nvidia amd intel codificador hardware fluido travando lag quadros fps processador cpu"
+    "kGraphicsCard": "placa de vídeo placa gráfica gpu nvidia amd intel codificador hardware fluido travando lag quadros fps processador cpu",
+    "kFramesPerSecond": "quadros por segundo taxa de quadros fps 30 60 fluido fluidez frames per second"
   },
   "guide": {
     "start": "Começar",

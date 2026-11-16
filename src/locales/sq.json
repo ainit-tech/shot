@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: duhet të paktën një ngjyrë.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» nuk është ngjyrë; duhet të duket si \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: trashësia duhet të jetë nga 1 deri në 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: regjistrimi ka 30 ose 60 kuadro në sekondë.",
     "below": "poshtë",
     "above": "sipër",
     "on the left": "majtas",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Pyetja me zë nuk u dërgua.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: shenja për të folur.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Regjistro videon me koduesin e kartës grafike: regjistrimi mbetet i rrjedhshëm edhe kur\n# procesori është i zënë. Nëse false, ose nëse karta nuk ka, regjistron procesori.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Kuadro në sekondë të regjistrimit, 30 ose 60: me 60, rrëshqitja dhe miu lëvizin më butë,\n# ndërsa skedari është pak më i madh. Procesori regjistron jo më shumë se 30.",
     "Record a video or a GIF · Ctrl+R": "Regjistro video ose GIF · Ctrl+R",
     "Go on recording": "Vazhdo regjistrimin",
     "Stop": "Ndalo",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video ose GIF e përzgjedhjes: Ctrl+R ose butoni i regjistrimit pranë përzgjedhjes.",
     "graphicsCard": "Regjistro me kartën grafike",
     "graphicsCardDesc": "Karta grafike e kodon videon, ndaj regjistrimi mbetet i rrjedhshëm edhe kur procesori është i zënë. Nëse karta nuk mundet, regjistron procesori.",
+    "framesPerSecond": "Kuadro në sekondë",
+    "framesPerSecondDesc": "Me 60, rrëshqitja dhe miu lëvizin më butë, ndërsa skedari është pak më i madh. Procesori regjistron jo më shumë se 30.",
     "ask": "Pyet ku të ruhet",
     "askDesc": "Nëse është joaktiv, skedari ruhet menjëherë në dosjen më poshtë. Ctrl+Shift+S pyet gjithmonë.",
     "saveCopy": "Kopjo edhe në kujtesën e fragmenteve",
@@ -385,7 +389,8 @@
     "listeningSound": "Tingull kur mikrofoni dëgjon",
     "listeningSoundDesc": "Një tingull i shkurtër kur mikrofoni nis të dëgjojë një pyetje me zë: fol pas tij.",
     "kListeningSound": "tingull sinjal bip mikrofon zë flas dëgjoj sound microphone",
-    "kGraphicsCard": "kartë grafike kartë video gpu nvidia amd intel kodues harduer i rrjedhshëm ngec vonesë kuadro fps procesor cpu"
+    "kGraphicsCard": "kartë grafike kartë video gpu nvidia amd intel kodues harduer i rrjedhshëm ngec vonesë kuadro fps procesor cpu",
+    "kFramesPerSecond": "kuadro në sekondë shpejtësia e kuadrove fps 30 60 butë rrjedhshëm frames per second"
   },
   "guide": {
     "start": "Fillo",

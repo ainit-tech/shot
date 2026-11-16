@@ -42,10 +42,10 @@ use windows::Win32::Media::MediaFoundation::{
 use windows::Win32::System::Com::CoTaskMemFree;
 use windows_core::{GUID, HSTRING, Interface, PCWSTR, PWSTR, Result};
 
-use super::video::{self, FRAMES};
+use super::video;
 
 /// A key frame every two seconds: a cut or a jump in the player finds one near.
-const KEY_FRAMES: u32 = 2 * FRAMES;
+const KEY_SECONDS: u32 = 2;
 /// The quality the encoder keeps, of 100: on screens it is as good as the processor's encoder,
 /// with files half as large.
 const QUALITY: u32 = 90;
@@ -105,9 +105,11 @@ pub fn picture(device: &ID3D11Device, (width, height): (u32, u32)) -> Result<ID3
     texture.ok_or_else(windows_core::Error::empty)
 }
 
-/// An MP4 file that the graphics card writes.
+/// An MP4 file that the graphics card writes. Its sink writer, with the card's encoder in it, is
+/// never let go, whatever becomes of the writer: NVIDIA's encoder has crashed the process as it
+/// was let go. The process of a recording ends instead.
 pub struct CardWriter {
-    sink: IMFSinkWriter,
+    sink: ManuallyDrop<IMFSinkWriter>,
     stream: u32,
     device: ID3D11Device,
     context: ID3D11DeviceContext,
@@ -129,9 +131,10 @@ pub struct CardWriter {
 }
 
 impl CardWriter {
-    /// A new file of frames of `size`, which H.264 wants even, from pictures of `from` on the card
-    /// of `device`. It fails if the card has no encoder: the processor's is for that.
-    pub fn create(path: &Path, device: &ID3D11Device, from: (u32, u32), size: (u32, u32)) -> Result<CardWriter> {
+    /// A new file of frames of `size`, which H.264 wants even, `rate` of them a second, from
+    /// pictures of `from` on the card of `device`. It fails if the card has no encoder: the
+    /// processor's is for that.
+    pub fn create(path: &Path, device: &ID3D11Device, from: (u32, u32), size: (u32, u32), rate: u32) -> Result<CardWriter> {
         let foundation = video::foundation()?;
         let (Some(device_manager), Some(sample_allocator)) = (foundation.device_manager, foundation.sample_allocator) else {
             return Err(E_NOTIMPL.into());
@@ -145,8 +148,9 @@ impl CardWriter {
             settings.SetUnknown(&MF_SINK_WRITER_D3D_MANAGER, &manager)?;
             settings.SetUINT32(&MF_READWRITE_ENABLE_HARDWARE_TRANSFORMS, 1)?;
             let wide = HSTRING::from(path);
-            let sink: IMFSinkWriter =
-                video::made(|place| (foundation.sink_writer)(PCWSTR(wide.as_ptr()), null_mut(), settings.as_raw(), place))?;
+            let sink: ManuallyDrop<IMFSinkWriter> = ManuallyDrop::new(video::made(|place| {
+                (foundation.sink_writer)(PCWSTR(wide.as_ptr()), null_mut(), settings.as_raw(), place)
+            })?);
             // The colours of BT.709 at every size: those Media Foundation and the browser take a
             // video to have when it doesn't say, and the encoders don't.
             let colours = |kind: &IMFMediaType| -> Result<()> {
@@ -156,28 +160,28 @@ impl CardWriter {
                 kind.SetUINT32(&MF_MT_TRANSFER_FUNCTION, MFVideoTransFunc_709.0 as u32)
             };
             let output = video::video_type(&MFVideoFormat_H264)?;
-            video::frame_of(&output, width, height)?;
+            video::frame_of(&output, width, height, rate)?;
             output.SetUINT32(&MF_MT_AVG_BITRATE, video::bitrate(width, height))?;
             colours(&output)?;
             // The encoders begin with the plainest kind of H.264 otherwise, and files twice as large.
             output.SetUINT32(&MF_MT_MPEG2_PROFILE, eAVEncH264VProfile_High.0 as u32)?;
             let stream = sink.AddStream(&output)?;
             let input = video::video_type(&MFVideoFormat_NV12)?;
-            video::frame_of(&input, width, height)?;
+            video::frame_of(&input, width, height, rate)?;
             colours(&input)?;
             // A screen is mostly still: the encoder keeps a quality, and its bits go where it moves.
             // One that can't keep a quality keeps a bitrate on average, and one that takes no
             // settings goes its own way.
             let mut taken = Err(windows_core::Error::empty());
-            for rate in [Some(eAVEncCommonRateControlMode_Quality), Some(eAVEncCommonRateControlMode_UnconstrainedVBR), None] {
-                let Some(rate) = rate else {
+            for control in [Some(eAVEncCommonRateControlMode_Quality), Some(eAVEncCommonRateControlMode_UnconstrainedVBR), None] {
+                let Some(control) = control else {
                     taken = sink.SetInputMediaType(stream, &input, None);
                     break;
                 };
                 let parameters = video::attributes(3)?;
-                parameters.SetUINT32(&CODECAPI_AVEncCommonRateControlMode, rate.0 as u32)?;
+                parameters.SetUINT32(&CODECAPI_AVEncCommonRateControlMode, control.0 as u32)?;
                 parameters.SetUINT32(&CODECAPI_AVEncCommonQuality, QUALITY)?;
-                parameters.SetUINT32(&CODECAPI_AVEncMPVGOPSize, KEY_FRAMES)?;
+                parameters.SetUINT32(&CODECAPI_AVEncMPVGOPSize, KEY_SECONDS * rate)?;
                 taken = sink.SetInputMediaType(stream, &input, &parameters);
                 if taken.is_ok() {
                     break;
@@ -191,13 +195,13 @@ impl CardWriter {
             let context = device.GetImmediateContext()?;
             let video: ID3D11VideoContext = context.cast()?;
             let video_device: ID3D11VideoDevice = device.cast()?;
-            let rate = DXGI_RATIONAL { Numerator: FRAMES, Denominator: 1 };
+            let frames = DXGI_RATIONAL { Numerator: rate, Denominator: 1 };
             let content = D3D11_VIDEO_PROCESSOR_CONTENT_DESC {
                 InputFrameFormat: D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
-                InputFrameRate: rate,
+                InputFrameRate: frames,
                 InputWidth: from.0,
                 InputHeight: from.1,
-                OutputFrameRate: rate,
+                OutputFrameRate: frames,
                 OutputWidth: width,
                 OutputHeight: height,
                 Usage: D3D11_VIDEO_USAGE_OPTIMAL_QUALITY,
@@ -431,9 +435,9 @@ mod tests {
         std::fs::create_dir_all(&folder).unwrap();
         let Ok((device, _)) = video_device(None) else { return };
         let count = std::env::var("CARD_FRAMES").ok().and_then(|n| n.parse().ok()).unwrap_or(90);
-        for (width, height) in [(642usize, 362usize), (2018, 1276)] {
+        for (width, height, rate) in [(642usize, 362usize, 30u32), (2018, 1276, 60)] {
             let path = folder.join(format!("{width}x{height}.mp4"));
-            let writer = CardWriter::create(&path, &device, (width as u32, height as u32), (width as u32, height as u32));
+            let writer = CardWriter::create(&path, &device, (width as u32, height as u32), (width as u32, height as u32), rate);
             let mut writer = match writer {
                 Ok(writer) => writer,
                 Err(error) => {
@@ -451,7 +455,7 @@ mod tests {
                     texture
                 })
                 .collect();
-            let length = SECOND / FRAMES as i64;
+            let length = SECOND / rate as i64;
             let (start, used) = (Instant::now(), processor_time());
             let mut left_out = 0;
             for n in 0..count {
@@ -468,9 +472,8 @@ mod tests {
                 used * 1000.0 / count as f64,
                 bytes / 1024
             );
-            // Let go of nothing: NVIDIA's encoder may crash the process as it is let go.
-            std::mem::forget(writer);
             let mut reader = Reader::open(&path).unwrap();
+            assert_eq!(reader.rate, rate);
             let mut read = 0;
             while let Some((_, pixels)) = reader.next_frame().unwrap() {
                 assert_eq!((reader.width, reader.height), (width, height));
@@ -507,11 +510,13 @@ mod tests {
         let (width, height) = (picture_of.width as usize & !1, (picture_of.height as usize & !1) - 200);
         let folder = std::env::temp_dir().join(format!("ainitshot-card-screen-{}", std::process::id()));
         std::fs::create_dir_all(&folder).unwrap();
-        let length = SECOND / FRAMES as i64;
-        let count = 5 * FRAMES as usize;
+        // The frames a second of a recording by default, unless asked for others.
+        let fps = std::env::var("CARD_RATE").ok().and_then(|rate| rate.parse().ok()).unwrap_or(60u32);
+        let length = SECOND / fps as i64;
+        let count = 5 * fps as usize;
         // The same motion a second whatever the frames a second: the page goes up 100 pixels a
         // second for two seconds, the square 210 pixels a second to the right and 90 down.
-        let rate = FRAMES as usize;
+        let rate = fps as usize;
         let shown = |n: usize| {
             let top = (n * 100 / rate).min(200) as i32;
             let mut pixels = picture_of.crop(Rect::new(0, top, width as i32, top + height as i32)).pixels;
@@ -544,7 +549,7 @@ mod tests {
             })
             .collect();
         let path = folder.join("card.mp4");
-        let mut writer = CardWriter::create(&path, &device, size, size).unwrap();
+        let mut writer = CardWriter::create(&path, &device, size, size, fps).unwrap();
         let (start, used) = (Instant::now(), processor_time());
         for (n, picture) in pictures.iter().enumerate() {
             assert!(writer.write(picture, n as i64 * length, length).unwrap());
@@ -552,13 +557,12 @@ mod tests {
         writer.finish().unwrap();
         let (took, used) = (start.elapsed(), processor_time() - used);
         let encoder = writer.encoder().to_string();
-        std::mem::forget(writer);
         let (frames, decibels) = quality(&path);
         let kilobytes = |path: &Path| std::fs::metadata(path).unwrap().len() / 1024;
         eprintln!("{width}x{height}, the card ({encoder}): {took:?}, {:.1} ms of the processor a frame, {} KB, {frames} frames at {decibels:?} dB", used * 1000.0 / count as f64, kilobytes(&path));
         let path = folder.join("processor.mp4");
         let frames: Vec<Vec<u8>> = (0..count).map(shown).collect();
-        let mut writer = Writer::create(&path, size.0, size.1, None).unwrap();
+        let mut writer = Writer::create(&path, size.0, size.1, fps, None).unwrap();
         let (start, used) = (Instant::now(), processor_time());
         for (n, pixels) in frames.iter().enumerate() {
             writer.write(pixels, width * 4, n as i64 * length, length).unwrap();

@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: საჭიროა ერთი ფერი მაინც.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ ფერი არ არის; უნდა იყოს \"#RRGGBB\" სახით.",
     "width: the width must be from 1 to 50.": "width: სისქე უნდა იყოს 1-დან 50-მდე.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ჩანაწერს შეიძლება ჰქონდეს წამში 30 ან 60 კადრი.",
     "below": "ქვემოთ",
     "above": "ზემოთ",
     "on the left": "მარცხნივ",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "ხმით დასმული კითხვა არ გაიგზავნა.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ლაპარაკის ნიშანი.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# ვიდეოს ჩაწერა ვიდეობარათის ენკოდერით: ჩანაწერი გლუვი რჩება მაშინაც, როცა პროცესორი\n# დაკავებულია. თუ false-ია ან ბარათს ენკოდერი არ აქვს, იწერს პროცესორი.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# ჩანაწერის კადრები წამში, 30 ან 60: 60-ზე გადახვევა და მაუსი უფრო გლუვად მოძრაობს, ფაილი კი\n# ცოტა დიდია. პროცესორი არაუმეტეს 30-ს იწერს.",
     "Record a video or a GIF · Ctrl+R": "ვიდეოს ან GIF-ის ჩაწერა · Ctrl+R",
     "Go on recording": "ჩაწერის გაგრძელება",
     "Stop": "შეწყვეტა",
@@ -234,6 +236,8 @@
     "recordingIntro": "მონიშნულის ვიდეო ან GIF: Ctrl+R ან ჩაწერის ღილაკი მონიშნულის გვერდით.",
     "graphicsCard": "ჩაწერა ვიდეობარათით",
     "graphicsCardDesc": "ვიდეოს ვიდეობარათი კოდავს, ამიტომ ჩანაწერი გლუვი რჩება მაშინაც, როცა პროცესორი დაკავებულია. თუ ბარათს არ შეუძლია, იწერს პროცესორი.",
+    "framesPerSecond": "კადრი წამში",
+    "framesPerSecondDesc": "60-ზე გადახვევა და მაუსი უფრო გლუვად მოძრაობს, ფაილი კი ცოტა დიდია. პროცესორი არაუმეტეს 30-ს იწერს.",
     "ask": "იკითხოს, სად შეინახოს",
     "askDesc": "თუ გამორთულია, ფაილი მაშინვე ქვემოთ მითითებულ საქაღალდეში ინახება. Ctrl+Shift+S ყოველთვის გკითხავთ.",
     "saveCopy": "ბუფერშიც დაკოპირდეს",
@@ -385,7 +389,8 @@
     "listeningSound": "ხმა, როცა მიკროფონი უსმენს",
     "listeningSoundDesc": "მოკლე ხმა, როცა მიკროფონი ხმით დასმული კითხვის მოსმენას იწყებს: ილაპარაკეთ მის შემდეგ.",
     "kListeningSound": "ხმა სიგნალი მიკროფონი ხმით ლაპარაკი მოსმენა sound microphone",
-    "kGraphicsCard": "ვიდეობარათი გრაფიკული ბარათი gpu nvidia amd intel ენკოდერი აპარატურა გლუვი ჭედავს დაყოვნება კადრები fps პროცესორი cpu"
+    "kGraphicsCard": "ვიდეობარათი გრაფიკული ბარათი gpu nvidia amd intel ენკოდერი აპარატურა გლუვი ჭედავს დაყოვნება კადრები fps პროცესორი cpu",
+    "kFramesPerSecond": "კადრი წამში კადრების სიხშირე fps 30 60 გლუვი გლუვად frames per second"
   },
   "guide": {
     "start": "დაწყება",

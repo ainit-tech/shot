@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: vajadzīga vismaz viena krāsa.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ nav krāsa; tai jāizskatās kā \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: biezumam jābūt no 1 līdz 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ierakstā var būt 30 vai 60 kadri sekundē.",
     "below": "apakšā",
     "above": "augšā",
     "on the left": "pa kreisi",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Balsī uzdotais jautājums netika nosūtīts.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: zīme runāt.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Ierakstīt video ar videokartes kodētāju: ieraksts paliek plūstošs arī tad, kad procesors ir\n# aizņemts. Ja false vai kartei tā nav, ieraksta procesors.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Ieraksta kadri sekundē, 30 vai 60: ar 60 ritināšana un pele kustas plūstošāk, bet fails ir\n# mazliet lielāks. Procesors ieraksta ne vairāk kā 30.",
     "Record a video or a GIF · Ctrl+R": "Ierakstīt video vai GIF · Ctrl+R",
     "Go on recording": "Turpināt ierakstīšanu",
     "Stop": "Apturēt",
@@ -234,6 +236,8 @@
     "recordingIntro": "Atlasītā video vai GIF: Ctrl+R vai ierakstīšanas poga blakus atlasei.",
     "graphicsCard": "Ierakstīt ar videokarti",
     "graphicsCardDesc": "Video kodē videokarte, tāpēc ieraksts paliek plūstošs arī tad, kad procesors ir aizņemts. Ja karte nevar, ieraksta procesors.",
+    "framesPerSecond": "Kadri sekundē",
+    "framesPerSecondDesc": "Ar 60 ritināšana un pele kustas plūstošāk, bet fails ir mazliet lielāks. Procesors ieraksta ne vairāk kā 30.",
     "ask": "Jautāt, kur saglabāt",
     "askDesc": "Ja izslēgts, fails uzreiz tiek saglabāts tālāk norādītajā mapē. Ctrl+Shift+S vienmēr jautā.",
     "saveCopy": "Kopēt arī starpliktuvē",
@@ -385,7 +389,8 @@
     "listeningSound": "Skaņa, kad mikrofons klausās",
     "listeningSoundDesc": "Īsa skaņa, kad mikrofons sāk klausīties balsī uzdotu jautājumu: runājiet pēc tās.",
     "kListeningSound": "skaņa signāls pīkstiens mikrofons balss runāt klausīties sound microphone",
-    "kGraphicsCard": "videokarte grafiskā karte gpu nvidia amd intel kodētājs aparatūra plūstošs raustās aizture kadri fps procesors cpu"
+    "kGraphicsCard": "videokarte grafiskā karte gpu nvidia amd intel kodētājs aparatūra plūstošs raustās aizture kadri fps procesors cpu",
+    "kFramesPerSecond": "kadri sekundē kadru ātrums fps 30 60 plūstošs vienmērīgs frames per second"
   },
   "guide": {
     "start": "Sākt",

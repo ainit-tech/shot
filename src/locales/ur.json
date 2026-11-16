@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: کم از کم ایک رنگ ضروری ہے۔",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” رنگ نہیں ہے؛ یہ \"#RRGGBB\" جیسا ہونا چاہیے۔",
     "width: the width must be from 1 to 50.": "width: موٹائی 1 سے 50 تک ہونی چاہیے۔",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ریکارڈنگ میں فی سیکنڈ 30 یا 60 فریم ہو سکتے ہیں۔",
     "below": "نیچے",
     "above": "اوپر",
     "on the left": "بائیں",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "بول کر پوچھا گیا سوال نہیں گیا۔",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز: بولنے کا اشارہ۔",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# ویڈیو گرافکس کارڈ کے انکوڈر سے ریکارڈ کریں: پروسیسر مصروف ہو تب بھی ریکارڈنگ ہموار رہتی ہے۔\n# اگر false ہو، یا کارڈ میں انکوڈر نہ ہو، تو پروسیسر ریکارڈ کرتا ہے۔",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# ریکارڈنگ کے فریم فی سیکنڈ، 30 یا 60: 60 پر اسکرول اور ماؤس زیادہ ہموار چلتے ہیں، اور فائل\n# تھوڑی بڑی ہوتی ہے۔ پروسیسر زیادہ سے زیادہ 30 ریکارڈ کرتا ہے۔",
     "Record a video or a GIF · Ctrl+R": "ویڈیو یا GIF ریکارڈ کریں · Ctrl+R",
     "Go on recording": "ریکارڈنگ جاری رکھیں",
     "Stop": "ختم کریں",
@@ -234,6 +236,8 @@
     "recordingIntro": "منتخب حصے کی ویڈیو یا GIF: Ctrl+R یا انتخاب کے پاس ریکارڈ بٹن۔",
     "graphicsCard": "گرافکس کارڈ سے ریکارڈ کریں",
     "graphicsCardDesc": "ویڈیو کو گرافکس کارڈ انکوڈ کرتا ہے، اس لیے پروسیسر مصروف ہو تب بھی ریکارڈنگ ہموار رہتی ہے۔ کارڈ نہ کر سکے تو پروسیسر ریکارڈ کرتا ہے۔",
+    "framesPerSecond": "فریم فی سیکنڈ",
+    "framesPerSecondDesc": "60 پر اسکرول اور ماؤس زیادہ ہموار چلتے ہیں، اور فائل تھوڑی بڑی ہوتی ہے۔ پروسیسر زیادہ سے زیادہ 30 ریکارڈ کرتا ہے۔",
     "ask": "پوچھیں کہ کہاں محفوظ کرنا ہے",
     "askDesc": "اگر بند ہو، تو فائل فوراً نیچے والے فولڈر میں محفوظ ہوتی ہے۔ البتہ Ctrl+Shift+S ہمیشہ پوچھتا ہے۔",
     "saveCopy": "کلپ بورڈ میں بھی کاپی کریں",
@@ -385,7 +389,8 @@
     "listeningSound": "مائیکروفون کے سننے پر آواز",
     "listeningSoundDesc": "جب مائیکروفون بول کر پوچھے گئے سوال کو سننا شروع کرتا ہے تو ایک چھوٹی سی آواز آتی ہے: اس کے بعد بولیں۔",
     "kListeningSound": "آواز اشارہ بیپ مائیکروفون بولنا سننا sound microphone",
-    "kGraphicsCard": "گرافکس کارڈ ویڈیو کارڈ gpu nvidia amd intel انکوڈر ہارڈویئر ہموار اٹکنا لیگ فریم fps پروسیسر cpu"
+    "kGraphicsCard": "گرافکس کارڈ ویڈیو کارڈ gpu nvidia amd intel انکوڈر ہارڈویئر ہموار اٹکنا لیگ فریم fps پروسیسر cpu",
+    "kFramesPerSecond": "فریم فی سیکنڈ فریم ریٹ fps 30 60 ہموار روانی frames per second"
   },
   "guide": {
     "start": "شروع کریں",

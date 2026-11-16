@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: कम से कम एक रंग चाहिए।",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: \"{bad}\" रंग नहीं है; उसका रूप \"#RRGGBB\" जैसा होना चाहिए।",
     "width: the width must be from 1 to 50.": "width: मोटाई 1 से 50 तक होनी चाहिए।",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: रिकॉर्डिंग में प्रति सेकंड 30 या 60 फ़्रेम हो सकते हैं।",
     "below": "नीचे",
     "above": "ऊपर",
     "on the left": "बाएँ",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "बोलकर पूछा गया सवाल नहीं गया।",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# जब माइक्रोफ़ोन बोलकर पूछे गए सवाल को सुनना शुरू करता है, तब एक छोटी आवाज़: बोलने का संकेत।",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# वीडियो ग्राफ़िक्स कार्ड के एनकोडर से रिकॉर्ड करें: प्रोसेसर व्यस्त होने पर भी रिकॉर्डिंग सहज रहती है।\n# false हो, या कार्ड में एनकोडर न हो, तो प्रोसेसर रिकॉर्ड करता है।",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# रिकॉर्डिंग के फ़्रेम प्रति सेकंड, 30 या 60: 60 पर स्क्रॉल और माउस ज़्यादा सहज चलते हैं, और फ़ाइल\n# थोड़ी बड़ी होती है। प्रोसेसर ज़्यादा से ज़्यादा 30 रिकॉर्ड करता है।",
     "Record a video or a GIF · Ctrl+R": "वीडियो या GIF रिकॉर्ड करें · Ctrl+R",
     "Go on recording": "रिकॉर्डिंग जारी रखें",
     "Stop": "समाप्त करें",
@@ -234,6 +236,8 @@
     "recordingIntro": "चुने गए हिस्से का वीडियो या GIF: Ctrl+R या चयन के पास वाला रिकॉर्ड बटन।",
     "graphicsCard": "ग्राफ़िक्स कार्ड से रिकॉर्ड करें",
     "graphicsCardDesc": "वीडियो को ग्राफ़िक्स कार्ड एनकोड करता है, इसलिए प्रोसेसर व्यस्त होने पर भी रिकॉर्डिंग सहज रहती है। कार्ड न कर सके, तो प्रोसेसर रिकॉर्ड करता है।",
+    "framesPerSecond": "फ़्रेम प्रति सेकंड",
+    "framesPerSecondDesc": "60 पर स्क्रॉल और माउस ज़्यादा सहज चलते हैं, और फ़ाइल थोड़ी बड़ी होती है। प्रोसेसर ज़्यादा से ज़्यादा 30 रिकॉर्ड करता है।",
     "ask": "पूछें कि कहाँ सेव करें",
     "askDesc": "बंद हो, तो फ़ाइल तुरंत नीचे वाले फ़ोल्डर में सेव होती है। Ctrl+Shift+S हमेशा पूछता है।",
     "saveCopy": "क्लिपबोर्ड में भी कॉपी करें",
@@ -385,7 +389,8 @@
     "listeningSound": "माइक्रोफ़ोन के सुनने पर आवाज़",
     "listeningSoundDesc": "जब माइक्रोफ़ोन बोलकर पूछे गए सवाल को सुनना शुरू करता है, तब एक छोटी आवाज़: उसके बाद बोलो।",
     "kListeningSound": "आवाज़ संकेत बीप माइक्रोफ़ोन बोलना सुनना sound microphone",
-    "kGraphicsCard": "ग्राफ़िक्स कार्ड वीडियो कार्ड gpu nvidia amd intel एनकोडर हार्डवेयर सहज अटकना लैग फ़्रेम fps प्रोसेसर cpu"
+    "kGraphicsCard": "ग्राफ़िक्स कार्ड वीडियो कार्ड gpu nvidia amd intel एनकोडर हार्डवेयर सहज अटकना लैग फ़्रेम fps प्रोसेसर cpu",
+    "kFramesPerSecond": "फ़्रेम प्रति सेकंड फ़्रेम दर fps 30 60 सहज स्मूद frames per second"
   },
   "guide": {
     "start": "शुरू करें",

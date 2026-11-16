@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors : il faut au moins une couleur.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors : « {bad} » n’est pas une couleur ; elle doit avoir la forme \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width : l’épaisseur doit être comprise entre 1 et 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second : un enregistrement a 30 ou 60 images par seconde.",
     "below": "en dessous",
     "above": "au-dessus",
     "on the left": "à gauche",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "La question posée à voix haute n’est pas partie.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un son bref quand le micro commence à écouter une question posée à voix haute : le signal pour parler.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Enregistrer la vidéo avec l’encodeur de la carte graphique : l’enregistrement reste fluide même\n# quand le processeur est occupé. Si false, ou si la carte n’en a pas, le processeur enregistre.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Images par seconde d’un enregistrement, 30 ou 60 : à 60, le défilement et la souris sont plus\n# fluides, et le fichier un peu plus gros. Le processeur enregistre 30 au plus.",
     "Record a video or a GIF · Ctrl+R": "Enregistrer une vidéo ou un GIF · Ctrl+R",
     "Go on recording": "Reprendre l’enregistrement",
     "Stop": "Arrêter",
@@ -234,6 +236,8 @@
     "recordingIntro": "Une vidéo ou un GIF de la sélection : Ctrl+R ou le bouton d’enregistrement à côté de la sélection.",
     "graphicsCard": "Enregistrer avec la carte graphique",
     "graphicsCardDesc": "La carte graphique encode la vidéo, donc l’enregistrement reste fluide même quand le processeur est occupé. Si la carte ne peut pas, le processeur enregistre.",
+    "framesPerSecond": "Images par seconde",
+    "framesPerSecondDesc": "À 60, le défilement et la souris sont plus fluides, et le fichier un peu plus gros. Le processeur enregistre 30 au plus.",
     "ask": "Demander où enregistrer",
     "askDesc": "Si c’est désactivé, le fichier est enregistré directement dans le dossier ci-dessous. Ctrl+Shift+S demande toujours.",
     "saveCopy": "Copier aussi dans le presse-papiers",
@@ -385,7 +389,8 @@
     "listeningSound": "Son quand le micro écoute",
     "listeningSoundDesc": "Un son bref quand le micro commence à écouter une question posée à voix haute : parlez après lui.",
     "kListeningSound": "son signal bip micro microphone voix parler écouter sound",
-    "kGraphicsCard": "carte graphique carte vidéo gpu nvidia amd intel encodeur matériel fluide saccades lag images fps processeur cpu"
+    "kGraphicsCard": "carte graphique carte vidéo gpu nvidia amd intel encodeur matériel fluide saccades lag images fps processeur cpu",
+    "kFramesPerSecond": "images par seconde fréquence d’images fps 30 60 fluide fluidité frames per second"
   },
   "guide": {
     "start": "Commencer",

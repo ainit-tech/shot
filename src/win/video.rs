@@ -29,8 +29,8 @@ use windows_sys::w;
 
 use crate::text::tr;
 
-/// The frames a second of a recording, and how many of Media Foundation's units of time, a tenth
-/// of a microsecond each, a second has.
+/// The frames a second that the processor records at most and that a video has when it says none,
+/// and how many of Media Foundation's units of time, a tenth of a microsecond each, a second has.
 pub const FRAMES: u32 = 30;
 pub const SECOND: i64 = 10_000_000;
 /// The microphone's sound: this many samples a second, of 16 bits, in one channel.
@@ -244,17 +244,18 @@ pub(super) fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
     }
 }
 
-/// The frames of a video: their size, their rate and that they are whole frames.
-pub(super) fn frame_of(kind: &IMFMediaType, width: u32, height: u32) -> Result<()> {
+/// The frames of a video: their size, their rate a second and that they are whole frames.
+pub(super) fn frame_of(kind: &IMFMediaType, width: u32, height: u32, rate: u32) -> Result<()> {
     unsafe {
         kind.SetUINT32(&MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive.0 as u32)?;
         kind.SetUINT64(&MF_MT_FRAME_SIZE, pair(width, height))?;
-        kind.SetUINT64(&MF_MT_FRAME_RATE, pair(FRAMES, 1))?;
+        kind.SetUINT64(&MF_MT_FRAME_RATE, pair(rate, 1))?;
         kind.SetUINT64(&MF_MT_PIXEL_ASPECT_RATIO, pair(1, 1))
     }
 }
 
-/// The bits a second a video of this size has on average.
+/// The bits a second a video of this size has on average, whatever its frames a second: more
+/// frames change less from one to the next.
 pub(super) fn bitrate(width: u32, height: u32) -> u32 {
     (width as f32 * height as f32 * FRAMES as f32 * BITS).clamp(LEAST_RATE, MOST_RATE) as u32
 }
@@ -269,14 +270,14 @@ pub struct Writer {
 }
 
 impl Writer {
-    /// A new file of frames of this size, both of which H.264 wants even, with the part of the
-    /// microphone's file between two times, if there is one.
-    pub fn create(path: &Path, width: u32, height: u32, voice: Option<(&Path, i64, i64)>) -> Result<Writer> {
+    /// A new file of frames of this size, both of which H.264 wants even, `rate` of them a
+    /// second, with the part of the microphone's file between two times, if there is one.
+    pub fn create(path: &Path, width: u32, height: u32, rate: u32, voice: Option<(&Path, i64, i64)>) -> Result<Writer> {
         let foundation = foundation()?;
         unsafe {
             let path = HSTRING::from(path);
             let sink: IMFSinkWriter = made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), null_mut(), place))?;
-            let frame = |kind: &IMFMediaType| frame_of(kind, width, height);
+            let frame = |kind: &IMFMediaType| frame_of(kind, width, height, rate);
             let output = video_type(&MFVideoFormat_H264)?;
             output.SetUINT32(&MF_MT_AVG_BITRATE, bitrate(width, height))?;
             frame(&output)?;
@@ -339,6 +340,8 @@ pub struct Reader {
     reader: IMFSourceReader,
     pub width: usize,
     pub height: usize,
+    /// The frames a second the file says it has.
+    pub rate: u32,
     /// The rows a frame has in memory, more than the picture's when H.264 wants a multiple of 16.
     rows: usize,
     /// The bytes from row to row: below zero when the rows come from the bottom.
@@ -362,7 +365,7 @@ impl Reader {
             reader.SetStreamSelection(STREAM, true)?;
             let wanted = video_type(&MFVideoFormat_RGB32)?;
             reader.SetCurrentMediaType(STREAM, None, &wanted)?;
-            let mut made = Reader { reader, width: 0, height: 0, rows: 0, stride: 0 };
+            let mut made = Reader { reader, width: 0, height: 0, rate: FRAMES, rows: 0, stride: 0 };
             made.learn()?;
             Ok(made)
         }
@@ -377,6 +380,12 @@ impl Reader {
             let (columns, rows) = ((size >> 32) as usize, (size & 0xFFFF_FFFF) as usize);
             self.rows = rows;
             self.stride = current.GetUINT32(&MF_MT_DEFAULT_STRIDE).map_or(columns as i32 * 4, |stride| stride as i32);
+            if let Ok(rate) = current.GetUINT64(&MF_MT_FRAME_RATE) {
+                let (frames, seconds) = ((rate >> 32) as u32, (rate & 0xFFFF_FFFF) as u32);
+                if frames > 0 && seconds > 0 {
+                    self.rate = (frames as f64 / seconds as f64).round().max(1.0) as u32;
+                }
+            }
             let mut shown = MFVideoArea::default();
             let bytes = std::slice::from_raw_parts_mut((&raw mut shown).cast::<u8>(), size_of::<MFVideoArea>());
             (self.width, self.height) = match current.GetBlob(&MF_MT_MINIMUM_DISPLAY_APERTURE, bytes, None) {
@@ -498,7 +507,7 @@ mod tests {
         let folder = std::env::temp_dir().join(format!("ainitshot-voice-video-{}", std::process::id()));
         std::fs::create_dir_all(&folder).unwrap();
         let (picture, voice) = (folder.join("picture.mp4"), folder.join("voice.pcm"));
-        let mut writer = Writer::create(&picture, width as u32, height as u32, None).unwrap();
+        let mut writer = Writer::create(&picture, width as u32, height as u32, FRAMES, None).unwrap();
         let length = SECOND / FRAMES as i64;
         for n in 0..90 {
             writer.write(&frame(width, height, n), width * 4, n as i64 * length, length).unwrap();
@@ -527,7 +536,7 @@ mod tests {
         // From the first second to the second one: a second of picture and of sound.
         let cut = folder.join("cut.mp4");
         let mut reader = Reader::open(&mixed).unwrap();
-        let mut writer = Writer::create(&cut, width as u32, height as u32, Some((&voice, SECOND, 2 * SECOND))).unwrap();
+        let mut writer = Writer::create(&cut, width as u32, height as u32, FRAMES, Some((&voice, SECOND, 2 * SECOND))).unwrap();
         while let Some((time, pixels)) = reader.next_frame().unwrap() {
             if (SECOND..2 * SECOND).contains(&time) {
                 writer.write(&pixels, width * 4, time - SECOND, length).unwrap();
@@ -544,7 +553,7 @@ mod tests {
     /// Writes frames of a size into a file and reads them back.
     fn read_back(folder: &Path, width: usize, height: usize, frames: usize) {
         let path = folder.join(format!("{width}x{height}.mp4"));
-        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, FRAMES, None).unwrap();
         let length = SECOND / FRAMES as i64;
         for n in 0..frames {
             writer.write(&frame(width, height, n), width * 4, n as i64 * length, length).unwrap();
@@ -552,6 +561,7 @@ mod tests {
         writer.finish().unwrap();
         assert!(std::fs::metadata(&path).unwrap().len() > 1000);
         let mut reader = Reader::open(&path).unwrap();
+        assert_eq!(reader.rate, FRAMES);
         let (mut count, mut last) = (0, 0);
         while let Some((time, pixels)) = reader.next_frame().unwrap() {
             assert_eq!((reader.width, reader.height), (width, height));

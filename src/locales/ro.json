@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: este nevoie de cel puțin o culoare.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}” nu este o culoare; trebuie să arate ca \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: grosimea trebuie să fie între 1 și 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: o înregistrare are 30 sau 60 de cadre pe secundă.",
     "below": "dedesubt",
     "above": "deasupra",
     "on the left": "în stânga",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Întrebarea pusă cu voce tare nu a plecat.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: semnalul să vorbiți.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Înregistrează video cu encoderul plăcii video: înregistrarea rămâne fluidă chiar și când\n# procesorul este ocupat. Dacă e false sau placa nu are unul, înregistrează procesorul.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Cadrele pe secundă ale unei înregistrări, 30 sau 60: la 60, derularea și mouse-ul sunt mai\n# fluide, iar fișierul e puțin mai mare. Procesorul înregistrează cel mult 30.",
     "Record a video or a GIF · Ctrl+R": "Înregistrați un videoclip sau un GIF · Ctrl+R",
     "Go on recording": "Continuați înregistrarea",
     "Stop": "Opriți",
@@ -234,6 +236,8 @@
     "recordingIntro": "Un videoclip sau un GIF al selecției: Ctrl+R sau butonul de înregistrare de lângă selecție.",
     "graphicsCard": "Înregistrează cu placa video",
     "graphicsCardDesc": "Placa video codifică videoclipul, astfel că înregistrarea rămâne fluidă chiar și când procesorul este ocupat. Dacă placa nu poate, înregistrează procesorul.",
+    "framesPerSecond": "Cadre pe secundă",
+    "framesPerSecondDesc": "La 60, derularea și mouse-ul sunt mai fluide, iar fișierul e puțin mai mare. Procesorul înregistrează cel mult 30.",
     "ask": "Întreabă unde se salvează",
     "askDesc": "Dacă e dezactivat, fișierul se salvează imediat în folderul de mai jos. Ctrl+Shift+S întreabă mereu.",
     "saveCopy": "Copiază și în clipboard",
@@ -385,7 +389,8 @@
     "listeningSound": "Sunet când microfonul ascultă",
     "listeningSoundDesc": "Un sunet scurt când microfonul începe să asculte o întrebare pusă cu voce tare: vorbiți după el.",
     "kListeningSound": "sunet semnal bip microfon voce vorbire ascultare sound microphone",
-    "kGraphicsCard": "placă video placă grafică gpu nvidia amd intel encoder hardware fluid sacadat întârziere cadre fps procesor cpu"
+    "kGraphicsCard": "placă video placă grafică gpu nvidia amd intel encoder hardware fluid sacadat întârziere cadre fps procesor cpu",
+    "kFramesPerSecond": "cadre pe secundă rată de cadre fps 30 60 fluid fluiditate frames per second"
   },
   "guide": {
     "start": "Începeți",

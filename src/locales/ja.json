@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: 色が 1 つ以上必要です。",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: 「{bad}」は色ではありません。\"#RRGGBB\" の形式で指定してください。",
     "width: the width must be from 1 to 50.": "width: 太さは 1～50 の範囲で指定してください。",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: 録画のフレーム数は 1 秒あたり 30 または 60 です。",
     "below": "下",
     "above": "上",
     "on the left": "左",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "音声の質問は送信されませんでした。",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 音声の質問をマイクが聞き始めたときの短い音: 話し始める合図です。",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# グラフィックカードのエンコーダーで動画を録画します: プロセッサーが忙しくても録画は滑らかです。\n# false の場合、またはカードにエンコーダーがない場合は、プロセッサーが録画します。",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# 録画の 1 秒あたりのフレーム数、30 または 60: 60 ではスクロールとマウスが滑らかになり、\n# ファイルは少し大きくなります。プロセッサーは最大 30 で録画します。",
     "Record a video or a GIF · Ctrl+R": "動画または GIF を録画 · Ctrl+R",
     "Go on recording": "録画を続ける",
     "Stop": "停止",
@@ -234,6 +236,8 @@
     "recordingIntro": "選択範囲を動画または GIF に。Ctrl+R か、選択範囲の横にある録画ボタンで。",
     "graphicsCard": "グラフィックカードで録画",
     "graphicsCardDesc": "動画はグラフィックカードがエンコードするので、プロセッサーが忙しくても録画は滑らかです。カードにできない場合は、プロセッサーが録画します。",
+    "framesPerSecond": "フレームレート",
+    "framesPerSecondDesc": "60 にするとスクロールやマウスが滑らかになり、ファイルは少し大きくなります。プロセッサーは最大 30 で録画します。",
     "ask": "保存先を確認する",
     "askDesc": "オフの場合、ファイルはすぐに下のフォルダーに保存されます。Ctrl+Shift+S では常に確認します。",
     "saveCopy": "クリップボードにもコピーする",
@@ -385,7 +389,8 @@
     "listeningSound": "マイクが聞いているときの音",
     "listeningSoundDesc": "音声の質問をマイクが聞き始めたときに短い音が鳴ります。音のあとに話してください。",
     "kListeningSound": "音 サウンド 合図 ビープ マイク 音声 話す 聞く sound microphone",
-    "kGraphicsCard": "グラフィックカード ビデオカード グラボ gpu nvidia amd intel エンコーダー ハードウェア 滑らか カクつく ラグ フレーム fps プロセッサー cpu"
+    "kGraphicsCard": "グラフィックカード ビデオカード グラボ gpu nvidia amd intel エンコーダー ハードウェア 滑らか カクつく ラグ フレーム fps プロセッサー cpu",
+    "kFramesPerSecond": "フレームレート フレーム数 fps 30 60 滑らか なめらか 秒間 frames per second"
   },
   "guide": {
     "start": "始める",

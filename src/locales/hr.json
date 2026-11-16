@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: potrebna je barem jedna boja.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ nije boja; treba izgledati kao \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: debljina mora biti od 1 do 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: snimka može imati 30 ili 60 okvira u sekundi.",
     "below": "dolje",
     "above": "gore",
     "on the left": "lijevo",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Glasovno pitanje nije poslano.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Kratak zvuk kad mikrofon počne slušati glasovno pitanje: znak da govorite.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Snimaj video koderom grafičke kartice: snimka ostaje glatka i kad je procesor zauzet.\n# Ako je false ili kartica nema koder, snima procesor.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Okvira u sekundi u snimci, 30 ili 60: sa 60 pomicanje i miš idu glađe, a datoteka je malo\n# veća. Procesor snima najviše 30.",
     "Record a video or a GIF · Ctrl+R": "Snimi videozapis ili GIF · Ctrl+R",
     "Go on recording": "Nastavi snimanje",
     "Stop": "Zaustavi",
@@ -234,6 +236,8 @@
     "recordingIntro": "Videozapis ili GIF odabranog: Ctrl+R ili gumb za snimanje pokraj odabira.",
     "graphicsCard": "Snimaj grafičkom karticom",
     "graphicsCardDesc": "Grafička kartica kodira videozapis, pa snimka ostaje glatka i kad je procesor zauzet. Ako kartica ne može, snima procesor.",
+    "framesPerSecond": "Okvira u sekundi",
+    "framesPerSecondDesc": "Sa 60 pomicanje i miš idu glađe, a datoteka je malo veća. Procesor snima najviše 30.",
     "ask": "Pitaj gdje spremiti",
     "askDesc": "Ako je isključeno, datoteka se odmah sprema u mapu ispod. Ctrl+Shift+S uvijek pita.",
     "saveCopy": "Kopiraj i u međuspremnik",
@@ -385,7 +389,8 @@
     "listeningSound": "Zvuk kad mikrofon sluša",
     "listeningSoundDesc": "Kratak zvuk kad mikrofon počne slušati glasovno pitanje: govorite nakon njega.",
     "kListeningSound": "zvuk signal pisak mikrofon glas govoriti slušati sound microphone",
-    "kGraphicsCard": "grafička kartica video kartica gpu nvidia amd intel koder hardverski glatko trza kašnjenje okviri fps procesor cpu"
+    "kGraphicsCard": "grafička kartica video kartica gpu nvidia amd intel koder hardverski glatko trza kašnjenje okviri fps procesor cpu",
+    "kFramesPerSecond": "okviri u sekundi broj sličica fps 30 60 glatkoća glatko frames per second"
   },
   "guide": {
     "start": "Započni",

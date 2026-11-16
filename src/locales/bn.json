@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: অন্তত একটি রঙ দরকার।",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” কোনো রঙ নয়; এটি \"#RRGGBB\"-এর মতো হওয়া উচিত।",
     "width: the width must be from 1 to 50.": "width: পুরুত্ব ১ থেকে ৫০-এর মধ্যে হতে হবে।",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: রেকর্ডিংয়ে প্রতি সেকেন্ডে ৩০ বা ৬০ ফ্রেম থাকতে পারে।",
     "below": "নিচে",
     "above": "উপরে",
     "on the left": "বাঁ দিকে",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "মুখে বলা প্রশ্নটি পাঠানো হয়নি।",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: বলার সংকেত।",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# গ্রাফিক্স কার্ডের এনকোডার দিয়ে ভিডিও রেকর্ড করা: প্রসেসর ব্যস্ত থাকলেও রেকর্ডিং মসৃণ থাকে।\n# false হলে বা কার্ডে এনকোডার না থাকলে, প্রসেসর রেকর্ড করে।",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# রেকর্ডিংয়ের প্রতি সেকেন্ডে ফ্রেম, ৩০ বা ৬০: ৬০-এ স্ক্রল আর মাউস আরও মসৃণ চলে, আর ফাইল\n# একটু বড় হয়। প্রসেসর সর্বোচ্চ ৩০ রেকর্ড করে।",
     "Record a video or a GIF · Ctrl+R": "ভিডিও বা GIF রেকর্ড করুন · Ctrl+R",
     "Go on recording": "রেকর্ডিং চালিয়ে যান",
     "Stop": "শেষ করুন",
@@ -234,6 +236,8 @@
     "recordingIntro": "নির্বাচিত অংশের ভিডিও বা GIF: Ctrl+R বা নির্বাচনের পাশের রেকর্ড বোতাম।",
     "graphicsCard": "গ্রাফিক্স কার্ড দিয়ে রেকর্ড করুন",
     "graphicsCardDesc": "গ্রাফিক্স কার্ড ভিডিও এনকোড করে, তাই প্রসেসর ব্যস্ত থাকলেও রেকর্ডিং মসৃণ থাকে। কার্ড না পারলে, প্রসেসর রেকর্ড করে।",
+    "framesPerSecond": "প্রতি সেকেন্ডে ফ্রেম",
+    "framesPerSecondDesc": "৬০-এ স্ক্রল আর মাউস আরও মসৃণ চলে, আর ফাইল একটু বড় হয়। প্রসেসর সর্বোচ্চ ৩০ রেকর্ড করে।",
     "ask": "কোথায় সেভ করবেন জিজ্ঞেস করুন",
     "askDesc": "বন্ধ থাকলে ফাইল সঙ্গে সঙ্গে নিচের ফোল্ডারে সেভ হয়। Ctrl+Shift+S সবসময় জিজ্ঞেস করে।",
     "saveCopy": "ক্লিপবোর্ডেও কপি করুন",
@@ -385,7 +389,8 @@
     "listeningSound": "মাইক্রোফোন শুনলে শব্দ",
     "listeningSoundDesc": "মুখে বলা প্রশ্ন শুনতে মাইক্রোফোন শুরু করলে একটি ছোট শব্দ: এর পরে বলুন।",
     "kListeningSound": "শব্দ সংকেত মাইক্রোফোন ভয়েস বলা শোনা sound microphone",
-    "kGraphicsCard": "গ্রাফিক্স কার্ড ভিডিও কার্ড gpu nvidia amd intel এনকোডার হার্ডওয়্যার মসৃণ ল্যাগ আটকে যাওয়া ফ্রেম fps প্রসেসর cpu"
+    "kGraphicsCard": "গ্রাফিক্স কার্ড ভিডিও কার্ড gpu nvidia amd intel এনকোডার হার্ডওয়্যার মসৃণ ল্যাগ আটকে যাওয়া ফ্রেম fps প্রসেসর cpu",
+    "kFramesPerSecond": "প্রতি সেকেন্ডে ফ্রেম ফ্রেম রেট fps 30 60 ৩০ ৬০ মসৃণ frames per second"
   },
   "guide": {
     "start": "শুরু করুন",

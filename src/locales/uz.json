@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: kamida bitta rang kerak.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” rang emas; u \"#RRGGBB\" koʻrinishida boʻlishi kerak.",
     "width: the width must be from 1 to 50.": "width: qalinlik 1 dan 50 gacha boʻlishi kerak.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: yozuvda soniyasiga 30 yoki 60 kadr boʻladi.",
     "below": "pastda",
     "above": "tepada",
     "on the left": "chapda",
@@ -156,7 +157,8 @@
     "The microphone didn't turn on.": "Mikrofon yoqilmadi.",
     "The question asked aloud didn't go.": "Ovoz bilan berilgan savol yuborilmadi.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz: gapirish belgisi.",
-    "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videoni videokarta enkoderi bilan yozib olish: protsessor band bo‘lsa ham yozuv silliq qoladi.\n# false bo‘lsa yoki kartada enkoder bo‘lmasa, protsessor yozib oladi.",
+    "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videoni videokarta enkoderi bilan yozib olish: protsessor band boʻlsa ham yozuv silliq qoladi.\n# false boʻlsa yoki kartada enkoder boʻlmasa, protsessor yozib oladi.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Yozuvning soniyasiga kadrlari, 30 yoki 60: 60 da aylantirish va sichqoncha silliqroq yuradi,\n# fayl esa biroz kattaroq boʻladi. Protsessor koʻpi bilan 30 ta yozadi.",
     "Record a video or a GIF · Ctrl+R": "Video yoki GIF yozib olish · Ctrl+R",
     "Go on recording": "Yozishni davom ettirish",
     "Stop": "To‘xtatish",
@@ -233,7 +235,9 @@
     "savingIntro": "“Saqlash” tugmasi va Ctrl+S nima qiladi.",
     "recordingIntro": "Tanlangan qism videosi yoki GIF: Ctrl+R yoki tanlov yonidagi yozish tugmasi.",
     "graphicsCard": "Videokarta bilan yozib olish",
-    "graphicsCardDesc": "Videoni videokarta kodlaydi, shuning uchun protsessor band bo‘lsa ham yozuv silliq qoladi. Karta qila olmasa, protsessor yozib oladi.",
+    "graphicsCardDesc": "Videoni videokarta kodlaydi, shuning uchun protsessor band boʻlsa ham yozuv silliq qoladi. Karta qila olmasa, protsessor yozib oladi.",
+    "framesPerSecond": "Soniyasiga kadr",
+    "framesPerSecondDesc": "60 da aylantirish va sichqoncha silliqroq yuradi, fayl esa biroz kattaroq boʻladi. Protsessor koʻpi bilan 30 ta yozadi.",
     "ask": "Qayerga saqlashni soʻrash",
     "askDesc": "Oʻchiq boʻlsa, fayl darhol quyidagi jildga saqlanadi. Ctrl+Shift+S har doim soʻraydi.",
     "saveCopy": "Almashuv buferiga ham nusxalash",
@@ -385,7 +389,8 @@
     "listeningSound": "Mikrofon tinglayotganda ovoz",
     "listeningSoundDesc": "Mikrofon ovoz bilan beriladigan savolni tinglay boshlaganda qisqa ovoz chiqadi: undan keyin gapiring.",
     "kListeningSound": "ovoz signal mikrofon gapirish tinglash sound microphone",
-    "kGraphicsCard": "videokarta grafik karta gpu nvidia amd intel enkoder apparat silliq qotish kechikish kadrlar fps protsessor cpu"
+    "kGraphicsCard": "videokarta grafik karta gpu nvidia amd intel enkoder apparat silliq qotish kechikish kadrlar fps protsessor cpu",
+    "kFramesPerSecond": "soniyasiga kadr kadr chastotasi fps 30 60 silliq ravon frames per second"
   },
   "guide": {
     "start": "Boshlash",

@@ -40,7 +40,7 @@ use windows_sys::core::{BOOL, PCWSTR};
 use windows_sys::w;
 
 use super::record::Recorded;
-use super::video::{FRAMES, Reader, SECOND, Writer};
+use super::video::{Reader, SECOND, Writer};
 use super::{QUIET, app, browser, clipboard, last_error, out_of_sight, shell, tray, wide};
 use crate::gif::{self, Gif};
 use crate::text::{self, tr};
@@ -406,8 +406,9 @@ impl Job {
         let mut reader = Reader::open(source).map_err(|error| error.to_string())?;
         let (width, height) = (reader.width, reader.height);
         let voice = voice.map(|path| (path, from, to));
-        let mut writer = Writer::create(target, width as u32, height as u32, voice).map_err(|error| error.to_string())?;
-        let length = SECOND / FRAMES as i64;
+        let rate = reader.rate;
+        let mut writer = Writer::create(target, width as u32, height as u32, rate, voice).map_err(|error| error.to_string())?;
+        let length = SECOND / rate as i64;
         while let Some((time, pixels)) = reader.next_frame().map_err(|error| error.to_string())? {
             if self.given_up() {
                 return Ok(None);
@@ -734,6 +735,7 @@ mod tests {
     use windows_sys::Win32::System::Com::{COINIT_APARTMENTTHREADED, CoInitializeEx};
 
     use super::super::browser::tests::{evaluate_on, pump_until, save_page_of};
+    use super::super::video::FRAMES;
     use super::*;
 
     fn evaluate(script: &str) -> String {
@@ -763,7 +765,7 @@ mod tests {
     fn recording(folder: &Path) -> Recorded {
         let (width, height) = (640usize, 360usize);
         let path = folder.join("recording.mp4");
-        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, FRAMES, None).unwrap();
         let length = SECOND / FRAMES as i64;
         for n in 0..90usize {
             let mut pixels = vec![240u8; width * height * 4];
@@ -805,7 +807,7 @@ mod tests {
         fs::create_dir_all(&folder).unwrap();
         let path = folder.join("recording.mp4");
         let start = Instant::now();
-        let mut writer = Writer::create(&path, width as u32, height as u32, None).unwrap();
+        let mut writer = Writer::create(&path, width as u32, height as u32, FRAMES, None).unwrap();
         let length = SECOND / FRAMES as i64;
         let count = 5 * FRAMES as usize;
         let shown = |n: usize| {

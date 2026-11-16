@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: legalább egy szín kell.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}” nem szín; ilyen alakúnak kell lennie: \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: a vastagság 1 és 50 között lehet.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: a felvételben másodpercenként 30 vagy 60 képkocka lehet.",
     "below": "lent",
     "above": "fent",
     "on the left": "bal oldalt",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "A hangosan feltett kérdés nem ment el.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: jel, hogy beszélhetsz.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Videó rögzítése a videokártya kódolójával: a felvétel akkor is folyamatos marad, ha a processzor\n# terhelt. Ha false, vagy a kártyán nincs kódoló, a processzor rögzít.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# A felvétel képkockái másodpercenként, 30 vagy 60: 60-nál a görgetés és az egér folyamatosabb,\n# a fájl pedig kicsit nagyobb. A processzor legfeljebb 30-at rögzít.",
     "Record a video or a GIF · Ctrl+R": "Videó vagy GIF rögzítése · Ctrl+R",
     "Go on recording": "Felvétel folytatása",
     "Stop": "Leállítás",
@@ -234,6 +236,8 @@
     "recordingIntro": "Videó vagy GIF a kijelölésről: Ctrl+R vagy a kijelölés melletti felvétel gomb.",
     "graphicsCard": "Felvétel a videokártyával",
     "graphicsCardDesc": "A videót a videokártya kódolja, így a felvétel akkor is folyamatos marad, ha a processzor terhelt. Ha a kártya nem tudja, a processzor rögzít.",
+    "framesPerSecond": "Képkocka másodpercenként",
+    "framesPerSecondDesc": "60-nál a görgetés és az egér folyamatosabb, a fájl pedig kicsit nagyobb. A processzor legfeljebb 30-at rögzít.",
     "ask": "Rákérdezés a mentés helyére",
     "askDesc": "Ha ki van kapcsolva, a fájl rögtön az alábbi mappába kerül. A Ctrl+Shift+S mindig rákérdez.",
     "saveCopy": "Másolás a vágólapra is",
@@ -385,7 +389,8 @@
     "listeningSound": "Hang, amikor a mikrofon hallgat",
     "listeningSoundDesc": "Rövid hang, amikor a mikrofon elkezdi hallgatni a hangosan feltett kérdést: utána beszélj.",
     "kListeningSound": "hang jelzés sípolás mikrofon hangos beszéd hallgat sound microphone",
-    "kGraphicsCard": "videokártya grafikus kártya gpu nvidia amd intel kódoló hardveres folyamatos akadozik késés képkocka fps processzor cpu"
+    "kGraphicsCard": "videokártya grafikus kártya gpu nvidia amd intel kódoló hardveres folyamatos akadozik késés képkocka fps processzor cpu",
+    "kFramesPerSecond": "képkocka másodpercenként képfrissítés fps 30 60 folyamatos sima frames per second"
   },
   "guide": {
     "start": "Kezdés",

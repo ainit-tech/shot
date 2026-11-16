@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: кемінде бір түс қажет.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» түс емес; ол \"#RRGGBB\" сияқты болуы керек.",
     "width: the width must be from 1 to 50.": "width: қалыңдық 1-ден 50-ге дейін болуы керек.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: жазбада секундына 30 немесе 60 кадр болады.",
     "below": "төменде",
     "above": "жоғарыда",
     "on the left": "сол жақта",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Дауыспен қойылған сұрақ жіберілмеді.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Микрофон дауыспен қойылған сұрақты тыңдай бастағанда шығатын қысқа дыбыс: сөйлеу белгісі.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Бейнені бейнекартаның кодтауышымен жазу: процессор бос болмаса да, жазба біркелкі болады.\n# false болса немесе картада кодтауыш болмаса, процессор жазады.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Жазбаның секундына кадр саны, 30 немесе 60: 60 кезінде айналдыру мен тінтуір біркелкірек\n# жүреді, ал файл сәл үлкенірек болады. Процессор 30-дан артық жазбайды.",
     "Record a video or a GIF · Ctrl+R": "Бейне немесе GIF жазу · Ctrl+R",
     "Go on recording": "Жазуды жалғастыру",
     "Stop": "Тоқтату",
@@ -234,6 +236,8 @@
     "recordingIntro": "Таңдалғанның бейнесі немесе GIF: Ctrl+R немесе таңдаудың жанындағы жазу түймесі.",
     "graphicsCard": "Бейнекартамен жазу",
     "graphicsCardDesc": "Бейнені бейнекарта кодтайды, сондықтан процессор бос болмаса да, жазба біркелкі болады. Карта алмаса, процессор жазады.",
+    "framesPerSecond": "Секундына кадр",
+    "framesPerSecondDesc": "60 кезінде айналдыру мен тінтуір біркелкірек жүреді, ал файл сәл үлкенірек болады. Процессор 30-дан артық жазбайды.",
     "ask": "Қайда сақтау керектігін сұрау",
     "askDesc": "Өшірулі болса, файл бірден төмендегі қалтаға сақталады. Ctrl+Shift+S әрқашан сұрайды.",
     "saveCopy": "Алмасу буферіне де көшіру",
@@ -385,7 +389,8 @@
     "listeningSound": "Микрофон тыңдағанда дыбыс",
     "listeningSoundDesc": "Микрофон дауыспен қойылған сұрақты тыңдай бастағанда қысқа дыбыс шығады: одан кейін сөйлеңіз.",
     "kListeningSound": "дыбыс белгі сигнал микрофон дауыс сөйлеу тыңдау sound microphone",
-    "kGraphicsCard": "бейнекарта видеокарта графикалық карта gpu nvidia amd intel кодтауыш аппараттық біркелкі кідіріс тұрып қалу кадрлар fps процессор cpu"
+    "kGraphicsCard": "бейнекарта видеокарта графикалық карта gpu nvidia amd intel кодтауыш аппараттық біркелкі кідіріс тұрып қалу кадрлар fps процессор cpu",
+    "kFramesPerSecond": "секундына кадр кадр жиілігі fps 30 60 біркелкі тегіс frames per second"
   },
   "guide": {
     "start": "Бастау",

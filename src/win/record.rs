@@ -212,13 +212,15 @@ pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
         Err(error) => return app::notify(not_started(), &error.to_string()),
     };
     let (area, size) = fitted(area);
+    let settings = app::settings();
     let order = Order {
         area: [area.left, area.top, area.right, area.bottom],
         size,
         scale,
         panel: [panel.left, panel.top, panel.right, panel.bottom],
         path: path.clone(),
-        card: app::settings().record_with_graphics_card,
+        card: settings.record_with_graphics_card,
+        frames: settings.frames_per_second,
     };
     let shared = Arc::new(Shared::default());
     shared.line.wanted.store(MICROPHONE.get(), Ordering::Relaxed);
@@ -240,7 +242,7 @@ pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
         };
         let mut outcome = recorder::capture(&shared, &order).map(|made| {
             made.map(|made| Recorded {
-                path: path.clone(),
+                path: made.path,
                 width: size.0,
                 height: size.1,
                 seconds: made.seconds,

@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: потрібен хоча б один колір.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» — не колір; потрібен вигляд \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: товщина має бути від 1 до 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: у записі може бути 30 або 60 кадрів за секунду.",
     "below": "знизу",
     "above": "згори",
     "on the left": "ліворуч",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Питання голосом не надіслано.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Короткий звук, коли мікрофон починає слухати питання голосом: знак, що можна говорити.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Записувати відео кодувальником відеокарти: запис іде плавно, навіть коли процесор зайнятий.\n# Якщо false або у відеокарти його немає, записує процесор.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Кадрів за секунду в записі, 30 або 60: при 60 прокрутка й миша рухаються плавніше, а файл\n# трохи більший. Процесор записує не більше 30.",
     "Record a video or a GIF · Ctrl+R": "Записати відео або GIF · Ctrl+R",
     "Go on recording": "Продовжити запис",
     "Stop": "Зупинити",
@@ -234,6 +236,8 @@
     "recordingIntro": "Відео або GIF виділеного: Ctrl+R або кнопка запису поруч із виділенням.",
     "graphicsCard": "Записувати відеокартою",
     "graphicsCardDesc": "Відео кодує відеокарта, і запис іде плавно, навіть коли процесор зайнятий. Якщо відеокарта не може, записує процесор.",
+    "framesPerSecond": "Кадрів за секунду",
+    "framesPerSecondDesc": "При 60 прокрутка й миша рухаються плавніше, а файл трохи більший. Процесор записує не більше 30.",
     "ask": "Питати, куди зберегти",
     "askDesc": "Якщо вимкнено, файл одразу зберігається в папку нижче. Ctrl+Shift+S питає завжди.",
     "saveCopy": "Також копіювати в буфер обміну",
@@ -385,7 +389,8 @@
     "listeningSound": "Звук, коли мікрофон слухає",
     "listeningSoundDesc": "Короткий звук, коли мікрофон починає слухати питання голосом: говоріть після нього.",
     "kListeningSound": "звук сигнал мікрофон голос голосом говорити слухати sound microphone",
-    "kGraphicsCard": "відеокарта відео карта графіка gpu nvidia amd intel кодувальник апаратний плавно лаги ривки гальмує кадри fps процесор cpu"
+    "kGraphicsCard": "відеокарта відео карта графіка gpu nvidia amd intel кодувальник апаратний плавно лаги ривки гальмує кадри fps процесор cpu",
+    "kFramesPerSecond": "кадри за секунду частота кадрів fps 30 60 плавність плавно frames per second"
   },
   "guide": {
     "start": "Почати",

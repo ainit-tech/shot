@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors：至少需要一种颜色。",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors：“{bad}”不是颜色；格式应为 \"#RRGGBB\"。",
     "width: the width must be from 1 to 50.": "width：粗细必须在 1 到 50 之间。",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second：录制的帧率只能是每秒 30 或 60 帧。",
     "below": "下方",
     "above": "上方",
     "on the left": "左侧",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "语音提问没有发出。",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 麦克风开始聆听语音提问时发出的短促声音：提示可以说话了。",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# 用显卡的编码器录制视频：即使处理器繁忙，录制也保持流畅。\n# 若为 false，或显卡没有编码器，则由处理器录制。",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# 录制的每秒帧数，30 或 60：60 帧时滚动和鼠标更流畅，文件稍大一些。\n# 由处理器录制时最多 30 帧。",
     "Record a video or a GIF · Ctrl+R": "录制视频或 GIF · Ctrl+R",
     "Go on recording": "继续录制",
     "Stop": "停止",
@@ -234,6 +236,8 @@
     "recordingIntro": "所选区域的视频或 GIF：Ctrl+R，或选区旁的录制按钮。",
     "graphicsCard": "用显卡录制",
     "graphicsCardDesc": "由显卡编码视频，因此即使处理器繁忙，录制也保持流畅。显卡无法编码时，由处理器录制。",
+    "framesPerSecond": "每秒帧数",
+    "framesPerSecondDesc": "60 帧时滚动和鼠标更流畅，文件稍大一些。由处理器录制时最多 30 帧。",
     "ask": "询问保存位置",
     "askDesc": "关闭后，文件会直接保存到下面的文件夹。Ctrl+Shift+S 总是会询问。",
     "saveCopy": "同时复制到剪贴板",
@@ -385,7 +389,8 @@
     "listeningSound": "麦克风聆听时的提示音",
     "listeningSoundDesc": "麦克风开始聆听语音提问时，会发出一声短促的提示音：听到后再说话。",
     "kListeningSound": "声音 提示音 信号 麦克风 语音 说话 聆听 sound microphone",
-    "kGraphicsCard": "显卡 图形卡 gpu nvidia amd intel 编码器 硬件 流畅 卡顿 延迟 帧 fps 处理器 cpu"
+    "kGraphicsCard": "显卡 图形卡 gpu nvidia amd intel 编码器 硬件 流畅 卡顿 延迟 帧 fps 处理器 cpu",
+    "kFramesPerSecond": "每秒帧数 帧率 fps 30 60 流畅 顺滑 frames per second"
   },
   "guide": {
     "start": "开始使用",

@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: အရောင် အနည်းဆုံး တစ်ခု လိုအပ်သည်။",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” သည် အရောင် မဟုတ်ပါ။ \"#RRGGBB\" ပုံစံ ဖြစ်ရမည်။",
     "width: the width must be from 1 to 50.": "width: အထူသည် ၁ မှ ၅၀ အတွင်း ဖြစ်ရမည်။",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ရိုက်ကူးမှုတွင် တစ်စက္ကန့်လျှင် ဖရိမ် ၃၀ သို့မဟုတ် ၆၀ ရှိရမည်။",
     "below": "အောက်ဘက်",
     "above": "အပေါ်ဘက်",
     "on the left": "ဘယ်ဘက်",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "အသံဖြင့်မေးသော မေးခွန်း မပို့ရပါ။",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- စကားပြောရန် အချက်ပြ။",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# ဗီဒီယိုကို ဂရပ်ဖစ်ကတ်၏ encoder ဖြင့် ရိုက်ကူးရန်- ပရိုဆက်ဆာ အလုပ်များနေသော်လည်း ရိုက်ကူးမှု ချောမွေ့နေမည်။\n# false ဖြစ်လျှင် သို့မဟုတ် ကတ်တွင် encoder မရှိလျှင် ပရိုဆက်ဆာက ရိုက်ကူးမည်။",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# ရိုက်ကူးမှု၏ တစ်စက္ကန့်လျှင် ဖရိမ်၊ ၃၀ သို့မဟုတ် ၆၀- ၆၀ တွင် လှိမ့်ခြင်းနှင့် မောက်စ် ပိုချောမွေ့ပြီး\n# ဖိုင်က အနည်းငယ် ပိုကြီးသည်။ ပရိုဆက်ဆာက အများဆုံး ၃၀ သာ ရိုက်ကူးသည်။",
     "Record a video or a GIF · Ctrl+R": "ဗီဒီယို သို့မဟုတ် GIF ရိုက်ကူးရန် · Ctrl+R",
     "Go on recording": "ဆက်လက်ရိုက်ကူးရန်",
     "Stop": "ရပ်ရန်",
@@ -234,6 +236,8 @@
     "recordingIntro": "ရွေးထားသည့်အပိုင်း၏ ဗီဒီယို သို့မဟုတ် GIF- Ctrl+R သို့မဟုတ် ရွေးချယ်မှုဘေးရှိ ရိုက်ကူးခလုတ်။",
     "graphicsCard": "ဂရပ်ဖစ်ကတ်ဖြင့် ရိုက်ကူးရန်",
     "graphicsCardDesc": "ဗီဒီယိုကို ဂရပ်ဖစ်ကတ်က encode လုပ်သဖြင့် ပရိုဆက်ဆာ အလုပ်များနေသော်လည်း ရိုက်ကူးမှု ချောမွေ့နေပါသည်။ ကတ်မလုပ်နိုင်လျှင် ပရိုဆက်ဆာက ရိုက်ကူးပါသည်။",
+    "framesPerSecond": "တစ်စက္ကန့်လျှင် ဖရိမ်",
+    "framesPerSecondDesc": "၆၀ တွင် လှိမ့်ခြင်းနှင့် မောက်စ် ပိုချောမွေ့ပြီး ဖိုင်က အနည်းငယ် ပိုကြီးသည်။ ပရိုဆက်ဆာက အများဆုံး ၃၀ သာ ရိုက်ကူးသည်။",
     "ask": "မည်သည့်နေရာတွင် သိမ်းမည်ကို မေးရန်",
     "askDesc": "ပိတ်ထားလျှင် ဖိုင်ကို အောက်ပါ ဖိုင်တွဲထဲ ချက်ချင်း သိမ်းသည်။ Ctrl+Shift+S က အမြဲ မေးသည်။",
     "saveCopy": "ကလစ်ဘုတ်ထဲသို့လည်း မိတ္တူကူးရန်",
@@ -385,7 +389,8 @@
     "listeningSound": "မိုက်ခရိုဖုန်း နားထောင်သည့်အခါ အသံ",
     "listeningSoundDesc": "အသံဖြင့်မေးသော မေးခွန်းကို မိုက်ခရိုဖုန်း စတင်နားထောင်သည့်အခါ တိုတောင်းသော အသံ- ၎င်းနောက်မှ ပြောပါ။",
     "kListeningSound": "အသံ အချက်ပြ မိုက်ခရိုဖုန်း ပြော နားထောင် sound microphone",
-    "kGraphicsCard": "ဂရပ်ဖစ်ကတ် ဗီဒီယိုကတ် gpu nvidia amd intel encoder hardware ချောမွေ့ ထစ် lag frame fps ပရိုဆက်ဆာ cpu"
+    "kGraphicsCard": "ဂရပ်ဖစ်ကတ် ဗီဒီယိုကတ် gpu nvidia amd intel encoder hardware ချောမွေ့ ထစ် lag frame fps ပရိုဆက်ဆာ cpu",
+    "kFramesPerSecond": "တစ်စက္ကန့်လျှင် ဖရိမ် ဖရိမ်နှုန်း fps 30 60 ၃၀ ၆၀ ချောမွေ့ frames per second"
   },
   "guide": {
     "start": "စတင်ရန်",

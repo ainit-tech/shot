@@ -34,6 +34,8 @@ pub struct Settings {
     pub listening_sound: bool,
     /// Whether the graphics card packs a recording, if it can: the processor does otherwise.
     pub record_with_graphics_card: bool,
+    /// The frames a second of a recording, 30 or 60; the processor records at most 30.
+    pub frames_per_second: u32,
     pub colors: Vec<String>,
     pub width: f32,
     pub save: Save,
@@ -199,6 +201,7 @@ impl Settings {
             privacy_filter: true,
             listening_sound: true,
             record_with_graphics_card: true,
+            frames_per_second: 60,
             colors: ["#E53935", "#FB8C00", "#FDD835", "#43A047", "#1E88E5", "#8E24AA", "#212121", "#FFFFFF"]
                 .map(String::from)
                 .into(),
@@ -287,6 +290,9 @@ listening_sound = {listening_sound}
 {record_with_graphics_card_note}
 record_with_graphics_card = {record_with_graphics_card}
 
+{frames_per_second_note}
+frames_per_second = {frames_per_second}
+
 {colors_note}
 colors = [{colors}]
 
@@ -329,6 +335,8 @@ first = \"{first}\"
             listening_sound = self.listening_sound,
             record_with_graphics_card_note = notes.record_with_graphics_card,
             record_with_graphics_card = self.record_with_graphics_card,
+            frames_per_second_note = notes.frames_per_second,
+            frames_per_second = self.frames_per_second,
             colors_note = notes.colors,
             colors = colors.join(", "),
             width_note = notes.width,
@@ -379,6 +387,9 @@ first = \"{first}\"
         }
         if !(1.0..=50.0).contains(&self.width) {
             return Err(tr("width: the width must be from 1 to 50.").into());
+        }
+        if ![30, 60].contains(&self.frames_per_second) {
+            return Err(tr("frames_per_second: a recording has 30 or 60 frames a second.").into());
         }
         for (name, place) in [("tools", self.panels.tools), ("queries", self.panels.queries)] {
             if !place.fits() {
@@ -444,6 +455,7 @@ impl Notes {
             privacy_filter: tr_in(language, self.privacy_filter),
             listening_sound: tr_in(language, self.listening_sound),
             record_with_graphics_card: tr_in(language, self.record_with_graphics_card),
+            frames_per_second: tr_in(language, self.frames_per_second),
             colors: tr_in(language, self.colors),
             width: tr_in(language, self.width),
             ask: tr_in(language, self.ask),
@@ -461,7 +473,7 @@ impl Notes {
 
 /// The comments of the settings file in English, for the test that every catalog has them.
 #[cfg(test)]
-pub fn notes() -> [&'static str; 19] {
+pub fn notes() -> [&'static str; 20] {
     let Notes {
         head,
         hotkey,
@@ -471,6 +483,7 @@ pub fn notes() -> [&'static str; 19] {
         privacy_filter,
         listening_sound,
         record_with_graphics_card,
+        frames_per_second,
         colors,
         width,
         ask,
@@ -484,8 +497,8 @@ pub fn notes() -> [&'static str; 19] {
         buttons,
     } = NOTES;
     [
-        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, record_with_graphics_card, colors, width, ask,
-        copy, folder, name, panels, tools, queries, first, buttons,
+        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, record_with_graphics_card, frames_per_second,
+        colors, width, ask, copy, folder, name, panels, tools, queries, first, buttons,
     ]
 }
 
@@ -499,6 +512,7 @@ struct Notes {
     privacy_filter: &'static str,
     listening_sound: &'static str,
     record_with_graphics_card: &'static str,
+    frames_per_second: &'static str,
     colors: &'static str,
     width: &'static str,
     ask: &'static str,
@@ -530,6 +544,8 @@ const NOTES: Notes = Notes {
     listening_sound: "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.",
     record_with_graphics_card: "# Record video with the graphics card's encoder: the recording stays smooth while the processor
 # is busy. If false, or if the card has none, the processor records.",
+    frames_per_second: "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the
+# file is a little larger. The processor records at most 30.",
     colors: "# The colours for drawing, as \"#RRGGBB\"; the first one is chosen at once.",
     width: "# The width of the line in pixels at the screen's scale of 100%. While drawing, the mouse wheel changes it.",
     ask: "# Ask where to save. If false, the file is saved into the folder at once.
@@ -809,5 +825,14 @@ mod tests {
         assert!(error.contains("line 1"), "{error}");
         let error = Settings::parse("colors = [\"red\"]").unwrap_err();
         assert!(error.contains("red"), "{error}");
+    }
+
+    /// A recording has 60 frames a second unless the file says 30; nothing else is taken.
+    #[test]
+    fn a_recording_has_30_or_60_frames_a_second() {
+        assert_eq!(Settings::parse("").unwrap().frames_per_second, 60);
+        assert_eq!(Settings::parse("frames_per_second = 30").unwrap().frames_per_second, 30);
+        let error = Settings::parse("frames_per_second = 45").unwrap_err();
+        assert!(error.starts_with("frames_per_second:"), "{error}");
     }
 }

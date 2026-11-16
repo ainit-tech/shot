@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: 색이 하나 이상 필요합니다.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” 값은 색이 아닙니다. \"#RRGGBB\" 형식이어야 합니다.",
     "width: the width must be from 1 to 50.": "width: 두께는 1~50이어야 합니다.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: 녹화는 초당 30 또는 60 프레임입니다.",
     "below": "아래",
     "above": "위",
     "on the left": "왼쪽",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "음성 질문을 보내지 못했습니다.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# 마이크가 음성 질문을 듣기 시작할 때 나는 짧은 소리: 말하라는 신호입니다.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# 그래픽 카드의 인코더로 동영상을 녹화합니다: 프로세서가 바빠도 녹화가 부드럽습니다.\n# false이거나 카드에 인코더가 없으면 프로세서가 녹화합니다.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# 녹화의 초당 프레임, 30 또는 60: 60이면 스크롤과 마우스가 더 부드럽고 파일은 조금 커집니다.\n# 프로세서는 최대 30으로 녹화합니다.",
     "Record a video or a GIF · Ctrl+R": "동영상 또는 GIF 녹화 · Ctrl+R",
     "Go on recording": "녹화 계속",
     "Stop": "중지",
@@ -234,6 +236,8 @@
     "recordingIntro": "선택한 영역의 동영상 또는 GIF: Ctrl+R 또는 선택 영역 옆의 녹화 버튼.",
     "graphicsCard": "그래픽 카드로 녹화",
     "graphicsCardDesc": "그래픽 카드가 동영상을 인코딩하므로 프로세서가 바빠도 녹화가 부드럽습니다. 카드가 할 수 없으면 프로세서가 녹화합니다.",
+    "framesPerSecond": "초당 프레임",
+    "framesPerSecondDesc": "60이면 스크롤과 마우스가 더 부드럽고 파일은 조금 커집니다. 프로세서는 최대 30으로 녹화합니다.",
     "ask": "저장할 위치 묻기",
     "askDesc": "끄면 파일이 아래 폴더에 바로 저장됩니다. Ctrl+Shift+S는 항상 묻습니다.",
     "saveCopy": "클립보드에도 복사",
@@ -385,7 +389,8 @@
     "listeningSound": "마이크가 들을 때 소리",
     "listeningSoundDesc": "마이크가 음성 질문을 듣기 시작하면 짧은 소리가 납니다. 소리가 난 뒤에 말하세요.",
     "kListeningSound": "소리 신호 알림음 마이크 음성 말하기 듣기 sound microphone",
-    "kGraphicsCard": "그래픽 카드 그래픽카드 비디오 카드 gpu nvidia amd intel 인코더 하드웨어 부드럽게 끊김 랙 프레임 fps 프로세서 cpu"
+    "kGraphicsCard": "그래픽 카드 그래픽카드 비디오 카드 gpu nvidia amd intel 인코더 하드웨어 부드럽게 끊김 랙 프레임 fps 프로세서 cpu",
+    "kFramesPerSecond": "초당 프레임 프레임 레이트 fps 30 60 부드럽게 부드러움 frames per second"
   },
   "guide": {
     "start": "시작",

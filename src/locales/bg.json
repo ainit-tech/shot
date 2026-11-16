@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: нужен е поне един цвят.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ не е цвят; трябва да е във вид \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: дебелината трябва да е от 1 до 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: записът може да има 30 или 60 кадъра в секунда.",
     "below": "отдолу",
     "above": "отгоре",
     "on the left": "отляво",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Гласовият въпрос не беше изпратен.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Кратък звук, когато микрофонът започне да слуша гласов въпрос: знак да говорите.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Записване на видео с кодера на видеокартата: записът е плавен, дори когато процесорът\n# е зает. Ако е false или картата няма кодер, записва процесорът.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Кадри в секунда на записа, 30 или 60: при 60 превъртането и мишката са по-плавни, а файлът\n# е малко по-голям. Процесорът записва най-много 30.",
     "Record a video or a GIF · Ctrl+R": "Запис на видео или GIF · Ctrl+R",
     "Go on recording": "Продължаване на записа",
     "Stop": "Спиране",
@@ -234,6 +236,8 @@
     "recordingIntro": "Видео или GIF на избраното: Ctrl+R или бутонът за запис до избраното.",
     "graphicsCard": "Запис с видеокартата",
     "graphicsCardDesc": "Видеокартата кодира видеото и записът остава плавен, дори когато процесорът е зает. Ако картата не може, записва процесорът.",
+    "framesPerSecond": "Кадри в секунда",
+    "framesPerSecondDesc": "При 60 превъртането и мишката са по-плавни, а файлът е малко по-голям. Процесорът записва най-много 30.",
     "ask": "Питане къде да се запише",
     "askDesc": "Ако е изключено, файлът се записва веднага в папката по-долу. Ctrl+Shift+S винаги пита.",
     "saveCopy": "Копиране и в клипборда",
@@ -385,7 +389,8 @@
     "listeningSound": "Звук, когато микрофонът слуша",
     "listeningSoundDesc": "Кратък звук, когато микрофонът започне да слуша гласов въпрос: говорете след него.",
     "kListeningSound": "звук сигнал микрофон глас гласов говорене слушане sound microphone",
-    "kGraphicsCard": "видеокарта графична карта gpu nvidia amd intel кодер хардуерен плавно накъсано забавяне кадри fps процесор cpu"
+    "kGraphicsCard": "видеокарта графична карта gpu nvidia amd intel кодер хардуерен плавно накъсано забавяне кадри fps процесор cpu",
+    "kFramesPerSecond": "кадри в секунда честота на кадрите fps 30 60 плавност плавно frames per second"
   },
   "guide": {
     "start": "Начало",

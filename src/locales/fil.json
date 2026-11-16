@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: kailangan ng kahit isang kulay.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: hindi kulay ang “{bad}”; dapat itong maging katulad ng \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: dapat mula 1 hanggang 50 ang kapal.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: may 30 o 60 frame bawat segundo ang recording.",
     "below": "sa ibaba",
     "above": "sa itaas",
     "on the left": "sa kaliwa",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Hindi naipadala ang tanong na binigkas.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: hudyat para magsalita.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Mag-record ng video gamit ang encoder ng graphics card: nananatiling makinis ang recording kahit\n# abala ang processor. Kung false, o kung wala nito ang card, ang processor ang magre-record.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Frame bawat segundo ng recording, 30 o 60: sa 60, mas makinis ang pag-scroll at ang mouse, at\n# medyo mas malaki ang file. Hanggang 30 lang ang nire-record ng processor.",
     "Record a video or a GIF · Ctrl+R": "Mag-record ng video o GIF · Ctrl+R",
     "Go on recording": "Ituloy ang pag-record",
     "Stop": "Ihinto",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video o GIF ng napili: Ctrl+R o ang button na pang-record sa tabi ng napili.",
     "graphicsCard": "Mag-record gamit ang graphics card",
     "graphicsCardDesc": "Ang graphics card ang nag-e-encode ng video, kaya nananatiling makinis ang recording kahit abala ang processor. Kung hindi kaya ng card, ang processor ang magre-record.",
+    "framesPerSecond": "Frame bawat segundo",
+    "framesPerSecondDesc": "Sa 60, mas makinis ang pag-scroll at ang mouse, at medyo mas malaki ang file. Hanggang 30 lang ang nire-record ng processor.",
     "ask": "Itanong kung saan ise-save",
     "askDesc": "Kapag naka-off, agad na sine-save ang file sa folder sa ibaba. Laging nagtatanong ang Ctrl+Shift+S.",
     "saveCopy": "Kopyahin din sa clipboard",
@@ -385,7 +389,8 @@
     "listeningSound": "Tunog kapag nakikinig ang mikropono",
     "listeningSoundDesc": "Isang maikling tunog kapag nagsimulang makinig ang mikropono sa tanong na binibigkas: magsalita pagkatapos nito.",
     "kListeningSound": "tunog hudyat beep mikropono boses magsalita makinig sound microphone",
-    "kGraphicsCard": "graphics card video card gpu nvidia amd intel encoder hardware makinis lag putol-putol frames fps processor cpu"
+    "kGraphicsCard": "graphics card video card gpu nvidia amd intel encoder hardware makinis lag putol-putol frames fps processor cpu",
+    "kFramesPerSecond": "frame bawat segundo frame rate fps 30 60 makinis kinis frames per second"
   },
   "guide": {
     "start": "Magsimula",

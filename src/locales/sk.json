@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: je potrebná aspoň jedna farba.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ nie je farba; má vyzerať ako \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: hrúbka musí byť od 1 do 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: záznam môže mať 30 alebo 60 snímok za sekundu.",
     "below": "dole",
     "above": "hore",
     "on the left": "vľavo",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Otázka položená hlasom sa neodoslala.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: znamenie, že môžete hovoriť.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Nahrávať video kodérom grafickej karty: záznam zostane plynulý, aj keď je procesor vyťažený.\n# Ak je false alebo karta kodér nemá, nahráva procesor.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Snímok za sekundu v zázname, 30 alebo 60: pri 60 sú posúvanie a myš plynulejšie a súbor\n# je o niečo väčší. Procesor nahráva najviac 30.",
     "Record a video or a GIF · Ctrl+R": "Nahrať video alebo GIF · Ctrl+R",
     "Go on recording": "Pokračovať v nahrávaní",
     "Stop": "Zastaviť",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video alebo GIF vybranej oblasti: Ctrl+R alebo tlačidlo nahrávania vedľa výberu.",
     "graphicsCard": "Nahrávať grafickou kartou",
     "graphicsCardDesc": "Video kóduje grafická karta, takže záznam zostane plynulý, aj keď je procesor vyťažený. Ak karta nemôže, nahráva procesor.",
+    "framesPerSecond": "Snímok za sekundu",
+    "framesPerSecondDesc": "Pri 60 sú posúvanie a myš plynulejšie a súbor je o niečo väčší. Procesor nahráva najviac 30.",
     "ask": "Pýtať sa, kam uložiť",
     "askDesc": "Ak je vypnuté, súbor sa hneď uloží do priečinka nižšie. Ctrl+Shift+S sa opýta vždy.",
     "saveCopy": "Skopírovať aj do schránky",
@@ -385,7 +389,8 @@
     "listeningSound": "Zvuk, keď mikrofón počúva",
     "listeningSoundDesc": "Krátky zvuk, keď mikrofón začne počúvať otázku kladenú hlasom: hovorte po ňom.",
     "kListeningSound": "zvuk signál pípnutie mikrofón hlas hovoriť počúvať sound microphone",
-    "kGraphicsCard": "grafická karta videokarta gpu nvidia amd intel kodér hardvérový plynulé seká oneskorenie snímky fps procesor cpu"
+    "kGraphicsCard": "grafická karta videokarta gpu nvidia amd intel kodér hardvérový plynulé seká oneskorenie snímky fps procesor cpu",
+    "kFramesPerSecond": "snímky za sekundu snímková frekvencia fps 30 60 plynulosť plynulé frames per second"
   },
   "guide": {
     "start": "Začať",

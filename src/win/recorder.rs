@@ -42,7 +42,8 @@ pub const ARGUMENT: &str = "--recording";
 const ENDING: Duration = Duration::from_secs(60);
 
 /// What a recording is to be: the area of the desktop, the size of its video, the scale of the
-/// screen, where its panel stands, its file, and whether the graphics card packs it.
+/// screen, where its panel stands, its file, whether the graphics card packs it and its frames
+/// a second.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Order {
     pub area: [i32; 4],
@@ -51,14 +52,17 @@ pub struct Order {
     pub panel: [i32; 4],
     pub path: PathBuf,
     pub card: bool,
+    pub frames: u32,
 }
 
-/// What a recording has made: its frames, its length in seconds, and how it was read and packed.
+/// What a recording has made: its frames, its length in seconds, how it was read and packed, and
+/// its file.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Made {
     pub frames: u64,
     pub seconds: f64,
     pub way: String,
+    pub path: PathBuf,
 }
 
 /// A recording, from the end of the count until it is stopped: in a process of its own if it can
@@ -269,12 +273,7 @@ impl Packer {
 
     fn finish(self) -> windows_core::Result<()> {
         match self {
-            Packer::Card(writer) => {
-                let finished = writer.finish();
-                // The card's encoder is never let go: its process ends instead.
-                std::mem::forget(writer);
-                finished
-            }
+            Packer::Card(writer) => writer.finish(),
             Packer::Processor(writer) => writer.finish(),
         }
     }
@@ -287,34 +286,41 @@ impl Packer {
     }
 }
 
-/// The graphics card's way, if the order asks for it and the card can, or the processor's.
-fn packing(order: &Order) -> Result<(Grab, Packer), String> {
+/// The graphics card's way, if the order asks for it and the card can, or the processor's, with
+/// the frames a second it takes, the processor no more than it keeps up with, and the file. A
+/// card that couldn't keeps the file of the order open, so the processor writes another beside it.
+fn packing(order: &Order) -> Result<(Grab, Packer, u32, PathBuf), String> {
     let (area, panel) = (rect(order.area), rect(order.panel));
+    let mut path = order.path.clone();
     if order.card {
-        let card = || -> Result<(Grab, Packer), String> {
+        let card = || -> Result<(Grab, Packer, u32, PathBuf), String> {
             let grab = Grab::new(area, order.size, order.scale, panel, true).map_err(|problem| problem.to_string())?;
             let device = match grab.device() {
                 Some(device) => device,
                 None => encoder::video_device(None).map_err(|problem| problem.to_string())?.0,
             };
-            let writer = CardWriter::create(&order.path, &device, grab.size(), order.size).map_err(|problem| problem.to_string())?;
-            Ok((grab, Packer::Card(writer)))
+            let writer =
+                CardWriter::create(&order.path, &device, grab.size(), order.size, order.frames).map_err(|problem| problem.to_string())?;
+            Ok((grab, Packer::Card(writer), order.frames, order.path.clone()))
         };
         match card() {
             Ok(card) => return Ok(card),
             Err(problem) => eprintln!("The graphics card doesn't record: {problem}"),
         }
+        let name = order.path.file_stem().map(|stem| stem.to_string_lossy().into_owned()).unwrap_or_default();
+        path = order.path.with_file_name(format!("{name}-processor.mp4"));
     }
     let grab = Grab::new(area, order.size, order.scale, panel, false).map_err(|problem| problem.to_string())?;
-    let writer = Writer::create(&order.path, order.size.0, order.size.1, None).map_err(|problem| problem.to_string())?;
-    Ok((grab, Packer::Processor(writer)))
+    let rate = order.frames.min(FRAMES);
+    let writer = Writer::create(&path, order.size.0, order.size.1, rate, None).map_err(|problem| problem.to_string())?;
+    Ok((grab, Packer::Processor(writer), rate, path))
 }
 
 /// The recording itself: the file is made during the count, for the first frame to come as soon
 /// as it ends, and then frames go into it at their rate, or as fast as they come, each told to
 /// `recorded`. When something goes wrong halfway, what has been recorded is still kept.
 fn record(shared: &Shared, order: &Order, mut recorded: impl FnMut(Duration)) -> Result<Option<Made>, String> {
-    let (mut grab, mut packer) = packing(order)?;
+    let (mut grab, mut packer, rate, path) = packing(order)?;
     while shared.clock().now().is_none() {
         if shared.stopped.load(Ordering::Relaxed) {
             return Ok(None);
@@ -322,8 +328,8 @@ fn record(shared: &Shared, order: &Order, mut recorded: impl FnMut(Duration)) ->
         thread::sleep(Duration::from_millis(5));
     }
     grab.forget_clicks();
-    let step = Duration::from_secs(1) / FRAMES;
-    let length = SECOND / FRAMES as i64;
+    let step = Duration::from_secs(1) / rate;
+    let length = SECOND / rate as i64;
     let (mut frames, mut next) = (0u64, Instant::now());
     let mut problem = None;
     while !shared.stopped.load(Ordering::Relaxed) {
@@ -361,9 +367,11 @@ fn record(shared: &Shared, order: &Order, mut recorded: impl FnMut(Duration)) ->
     let way = format!("{} · {}", grab.way(), packer.name());
     let finished = packer.finish().map_err(|error| error.to_string());
     match (frames, finished, problem) {
-        (0, _, Some(problem)) | (_, Err(problem), _) => Err(problem),
-        (0, Ok(()), None) => Ok(None),
-        (_, Ok(()), _) => Ok(Some(Made { frames, seconds, way })),
+        (0, _, Some(problem)) => Err(problem),
+        // An encoder that hasn't taken a frame has nothing to end its file with.
+        (0, _, None) => Ok(None),
+        (_, Err(problem), _) => Err(problem),
+        (_, Ok(()), _) => Ok(Some(Made { frames, seconds, way, path })),
     }
 }
 
@@ -381,15 +389,17 @@ mod tests {
         let folder = std::env::temp_dir().join(format!("ainitshot-recorder-{}", std::process::id()));
         std::fs::create_dir_all(&folder).unwrap();
         let beyond = crate::win::out_of_sight(windows_sys::Win32::Foundation::RECT { left: 0, top: 100, right: 642, bottom: 462 });
-        let order = Order {
+        // Each recording has a file of its own: the card's encoder keeps the file it was given open.
+        let order = |name: &str| Order {
             area: [beyond.left + 200, beyond.top, beyond.left + 842, beyond.top + 362],
             size: (642, 362),
             scale: 1.0,
             panel: [0, 0, 10, 10],
-            path: folder.join("recording.mp4"),
+            path: folder.join(name),
             card: true,
+            frames: 60,
         };
-        let run = |words: Vec<(u64, &'static str)>| {
+        let run = |order: Order, words: Vec<(u64, &'static str)>| {
             let (reader, mut writer) = std::io::pipe().unwrap();
             writeln!(writer, "{}", serde_json::to_string(&order).unwrap()).unwrap();
             let telling = thread::spawn(move || {
@@ -403,19 +413,20 @@ mod tests {
             telling.join().unwrap();
             String::from_utf8(said).unwrap()
         };
-        assert_eq!(run(vec![(300, "stop")]).trim(), "nothing");
+        assert_eq!(run(order("stopped.mp4"), vec![(300, "stop")]).trim(), "nothing");
 
-        let said = run(vec![(200, "go"), (1000, "pause"), (500, "resume"), (1000, "stop")]);
+        let said = run(order("recording.mp4"), vec![(200, "go"), (1000, "pause"), (500, "resume"), (1000, "stop")]);
         let last = said.lines().last().unwrap();
         let made: Made = serde_json::from_str(last.strip_prefix("done ").unwrap_or_else(|| panic!("{said}"))).unwrap();
         eprintln!("{made:?}");
         // Two seconds, the pause left out.
         assert!((1.8..2.4).contains(&made.seconds), "{}", made.seconds);
-        // GDI reads the screen here, slower than the card does, and other tests take the processor too.
-        assert!(made.frames as f64 > made.seconds * 12.0, "{} frames", made.frames);
+        // GDI reads the screen here, slower than the card does, and the other tests take the
+        // processor and the card's encoder too: alone, it has 60 frames a second.
+        assert!(made.frames as f64 > made.seconds * 3.0, "{} frames", made.frames);
         let times: Vec<u64> = said.lines().filter_map(|line| line.strip_prefix("time ")?.parse().ok()).collect();
         assert!(times.windows(2).all(|pair| pair[0] <= pair[1]) && *times.last().unwrap() >= 1800, "{times:?}");
-        let mut reader = Reader::open(&order.path).unwrap();
+        let mut reader = Reader::open(&made.path).unwrap();
         let mut count = 0;
         while reader.next_frame().unwrap().is_some() {
             count += 1;

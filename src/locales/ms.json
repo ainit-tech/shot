@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: sekurang-kurangnya satu warna diperlukan.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: “{bad}” bukan warna; formatnya mestilah seperti \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: ketebalan mestilah dari 1 hingga 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: rakaman mempunyai 30 atau 60 bingkai sesaat.",
     "below": "di bawah",
     "above": "di atas",
     "on the left": "di kiri",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Soalan secara lisan tidak dihantar.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: isyarat untuk bercakap.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Rakam video dengan pengekod kad grafik: rakaman kekal lancar walaupun pemproses sibuk.\n# Jika false, atau kad tiada pengekod, pemproses yang merakam.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Bingkai sesaat rakaman, 30 atau 60: pada 60, penatalan dan tetikus lebih lancar, dan fail\n# sedikit lebih besar. Pemproses merakam paling banyak 30.",
     "Record a video or a GIF · Ctrl+R": "Rakam video atau GIF · Ctrl+R",
     "Go on recording": "Teruskan rakaman",
     "Stop": "Henti",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video atau GIF bahagian yang dipilih: Ctrl+R atau butang rakam di sebelah pilihan.",
     "graphicsCard": "Rakam dengan kad grafik",
     "graphicsCardDesc": "Kad grafik mengekod video, jadi rakaman kekal lancar walaupun pemproses sibuk. Jika kad tidak boleh, pemproses yang merakam.",
+    "framesPerSecond": "Bingkai sesaat",
+    "framesPerSecondDesc": "Pada 60, penatalan dan tetikus lebih lancar, dan fail sedikit lebih besar. Pemproses merakam paling banyak 30.",
     "ask": "Tanya tempat untuk menyimpan",
     "askDesc": "Jika dimatikan, fail terus disimpan ke dalam folder di bawah. Ctrl+Shift+S sentiasa bertanya.",
     "saveCopy": "Salin juga ke papan keratan",
@@ -385,7 +389,8 @@
     "listeningSound": "Bunyi apabila mikrofon mendengar",
     "listeningSoundDesc": "Bunyi pendek apabila mikrofon mula mendengar soalan secara lisan: bercakap selepasnya.",
     "kListeningSound": "bunyi isyarat bip mikrofon lisan suara bercakap dengar sound microphone",
-    "kGraphicsCard": "kad grafik kad video gpu nvidia amd intel pengekod perkakasan lancar tersekat lag bingkai fps pemproses cpu"
+    "kGraphicsCard": "kad grafik kad video gpu nvidia amd intel pengekod perkakasan lancar tersekat lag bingkai fps pemproses cpu",
+    "kFramesPerSecond": "bingkai sesaat kadar bingkai fps 30 60 lancar kelancaran frames per second"
   },
   "guide": {
     "start": "Mula",

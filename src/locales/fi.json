@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: tarvitaan vähintään yksi väri.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: ”{bad}” ei ole väri; sen pitää olla muotoa \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: paksuuden pitää olla 1–50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: nauhoituksessa voi olla 30 tai 60 kuvaa sekunnissa.",
     "below": "alla",
     "above": "yllä",
     "on the left": "vasemmalla",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Ääneen esitettyä kysymystä ei lähetetty.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: merkki puhua.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Nauhoita video näytönohjaimen enkooderilla: nauhoitus pysyy sujuvana, vaikka suoritin olisi\n# kiireinen. Jos false tai näytönohjaimessa ei ole sitä, nauhoittaa suoritin.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Nauhoituksen kuvaa sekunnissa, 30 tai 60: 60:llä vieritys ja hiiri liikkuvat sujuvammin, ja\n# tiedosto on hieman suurempi. Suoritin nauhoittaa enintään 30.",
     "Record a video or a GIF · Ctrl+R": "Nauhoita video tai GIF · Ctrl+R",
     "Go on recording": "Jatka nauhoitusta",
     "Stop": "Lopeta",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video tai GIF valitusta alueesta: Ctrl+R tai nauhoituspainike valinnan vieressä.",
     "graphicsCard": "Nauhoita näytönohjaimella",
     "graphicsCardDesc": "Näytönohjain koodaa videon, joten nauhoitus pysyy sujuvana, vaikka suoritin olisi kiireinen. Jos näytönohjain ei pysty, nauhoittaa suoritin.",
+    "framesPerSecond": "Kuvaa sekunnissa",
+    "framesPerSecondDesc": "60:llä vieritys ja hiiri liikkuvat sujuvammin, ja tiedosto on hieman suurempi. Suoritin nauhoittaa enintään 30.",
     "ask": "Kysy tallennuspaikkaa",
     "askDesc": "Jos pois päältä, tiedosto tallennetaan heti alla olevaan kansioon. Ctrl+Shift+S kysyy aina.",
     "saveCopy": "Kopioi myös leikepöydälle",
@@ -385,7 +389,8 @@
     "listeningSound": "Ääni, kun mikrofoni kuuntelee",
     "listeningSoundDesc": "Lyhyt ääni, kun mikrofoni alkaa kuunnella ääneen esitettyä kysymystä: puhu sen jälkeen.",
     "kListeningSound": "ääni merkki piippaus mikrofoni puhe puhua kuunnella sound microphone",
-    "kGraphicsCard": "näytönohjain grafiikkakortti gpu nvidia amd intel enkooderi laitteisto sujuva nykii viive kuvat fps suoritin prosessori cpu"
+    "kGraphicsCard": "näytönohjain grafiikkakortti gpu nvidia amd intel enkooderi laitteisto sujuva nykii viive kuvat fps suoritin prosessori cpu",
+    "kFramesPerSecond": "kuvaa sekunnissa kuvataajuus fps 30 60 sujuva sujuvampi frames per second"
   },
   "guide": {
     "start": "Aloita",

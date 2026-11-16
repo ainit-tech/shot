@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: يلزم لون واحد على الأقل.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» ليس لونًا؛ يجب أن يكون بالشكل \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: يجب أن يكون السُّمك بين 1 و50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: يكون للتسجيل 30 أو 60 إطارًا في الثانية.",
     "below": "في الأسفل",
     "above": "في الأعلى",
     "on the left": "على اليسار",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "لم يُرسَل السؤال الصوتي.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صوت قصير عندما يبدأ الميكروفون الاستماع إلى سؤال صوتي: إشارة لتبدأ الكلام.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# تسجيل الفيديو بمرمِّز بطاقة الرسومات: يبقى التسجيل سلسًا حتى عندما يكون المعالج مشغولًا.\n# إذا كانت القيمة false أو لم يكن للبطاقة مرمِّز، يسجّل المعالج.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# عدد إطارات التسجيل في الثانية، 30 أو 60: عند 60 يصبح التمرير والفأرة أكثر سلاسة، ويكبر\n# الملف قليلًا. يسجّل المعالج 30 على الأكثر.",
     "Record a video or a GIF · Ctrl+R": "تسجيل فيديو أو GIF · Ctrl+R",
     "Go on recording": "متابعة التسجيل",
     "Stop": "إيقاف",
@@ -234,6 +236,8 @@
     "recordingIntro": "فيديو أو GIF للجزء المحدد: Ctrl+R أو زر التسجيل بجانب التحديد.",
     "graphicsCard": "التسجيل ببطاقة الرسومات",
     "graphicsCardDesc": "تُرمِّز بطاقة الرسومات الفيديو، فيبقى التسجيل سلسًا حتى عندما يكون المعالج مشغولًا. إذا لم تستطع البطاقة، يسجّل المعالج.",
+    "framesPerSecond": "الإطارات في الثانية",
+    "framesPerSecondDesc": "عند 60 يصبح التمرير والفأرة أكثر سلاسة، ويكبر الملف قليلًا. يسجّل المعالج 30 على الأكثر.",
     "ask": "السؤال عن مكان الحفظ",
     "askDesc": "إذا كان متوقفًا، يُحفظ الملف مباشرة في المجلد أدناه. أما Ctrl+Shift+S فيسأل دائمًا.",
     "saveCopy": "النسخ إلى الحافظة أيضًا",
@@ -385,7 +389,8 @@
     "listeningSound": "صوت عندما يستمع الميكروفون",
     "listeningSoundDesc": "صوت قصير عندما يبدأ الميكروفون الاستماع إلى سؤال صوتي: تكلّم بعده.",
     "kListeningSound": "صوت إشارة تنبيه ميكروفون صوتي تكلم استماع sound microphone",
-    "kGraphicsCard": "بطاقة الرسومات بطاقة الفيديو كرت الشاشة gpu nvidia amd intel مرمز ترميز عتاد سلس تقطيع بطء إطارات fps معالج cpu"
+    "kGraphicsCard": "بطاقة الرسومات بطاقة الفيديو كرت الشاشة gpu nvidia amd intel مرمز ترميز عتاد سلس تقطيع بطء إطارات fps معالج cpu",
+    "kFramesPerSecond": "إطارات في الثانية معدل الإطارات fps 30 60 سلاسة سلس frames per second"
   },
   "guide": {
     "start": "ابدأ",

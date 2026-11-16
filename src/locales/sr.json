@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: потребна је бар једна боја.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ није боја; треба да изгледа као \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: дебљина мора бити од 1 до 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: снимак може имати 30 или 60 кадрова у секунди.",
     "below": "испод",
     "above": "изнад",
     "on the left": "лево",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Гласовно питање није послато.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Кратак звук када микрофон почне да слуша гласовно питање: знак да говорите.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Снимање видеа кодером графичке картице: снимак остаје гладак и када је процесор заузет.\n# Ако је false или картица нема кодер, снима процесор.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Кадрова у секунди у снимку, 30 или 60: са 60 померање и миш иду глаткије, а датотека је\n# мало већа. Процесор снима највише 30.",
     "Record a video or a GIF · Ctrl+R": "Сними видео или GIF · Ctrl+R",
     "Go on recording": "Настави снимање",
     "Stop": "Заустави",
@@ -234,6 +236,8 @@
     "recordingIntro": "Видео или GIF изабраног: Ctrl+R или дугме за снимање поред избора.",
     "graphicsCard": "Снимај графичком картицом",
     "graphicsCardDesc": "Графичка картица кодира видео, па снимак остаје гладак и када је процесор заузет. Ако картица не може, снима процесор.",
+    "framesPerSecond": "Кадрова у секунди",
+    "framesPerSecondDesc": "Са 60 померање и миш иду глаткије, а датотека је мало већа. Процесор снима највише 30.",
     "ask": "Питај где сачувати",
     "askDesc": "Ако је искључено, датотека се одмах чува у фасциклу испод. Ctrl+Shift+S увек пита.",
     "saveCopy": "Копирај и у оставу",
@@ -385,7 +389,8 @@
     "listeningSound": "Звук када микрофон слуша",
     "listeningSoundDesc": "Кратак звук када микрофон почне да слуша гласовно питање: говорите после њега.",
     "kListeningSound": "звук сигнал пиштање микрофон глас говорити слушати sound microphone",
-    "kGraphicsCard": "графичка картица видео картица gpu nvidia amd intel кодер хардверски глатко сецка кашњење кадрови fps процесор cpu"
+    "kGraphicsCard": "графичка картица видео картица gpu nvidia amd intel кодер хардверски глатко сецка кашњење кадрови fps процесор cpu",
+    "kFramesPerSecond": "кадрова у секунди брзина кадрова fps 30 60 глаткоћа глатко frames per second"
   },
   "guide": {
     "start": "Почни",

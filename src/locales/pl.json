@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: potrzebny jest co najmniej jeden kolor.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}” to nie kolor; powinien wyglądać tak: \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: grubość musi wynosić od 1 do 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: nagranie może mieć 30 lub 60 klatek na sekundę.",
     "below": "u dołu",
     "above": "u góry",
     "on the left": "po lewej",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Pytanie zadane głosem nie zostało wysłane.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Krótki dźwięk, gdy mikrofon zaczyna słuchać pytania zadawanego głosem: znak, by mówić.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Nagrywaj wideo koderem karty graficznej: nagranie jest płynne, nawet gdy procesor jest zajęty.\n# Jeśli false albo karta nie ma kodera, nagrywa procesor.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Klatek na sekundę w nagraniu, 30 lub 60: przy 60 przewijanie i mysz są płynniejsze, a plik\n# jest trochę większy. Procesor nagrywa najwyżej 30.",
     "Record a video or a GIF · Ctrl+R": "Nagraj wideo lub GIF · Ctrl+R",
     "Go on recording": "Wznów nagrywanie",
     "Stop": "Zatrzymaj",
@@ -234,6 +236,8 @@
     "recordingIntro": "Wideo lub GIF zaznaczonego obszaru: Ctrl+R lub przycisk nagrywania obok zaznaczenia.",
     "graphicsCard": "Nagrywaj kartą graficzną",
     "graphicsCardDesc": "Karta graficzna koduje wideo, więc nagranie jest płynne, nawet gdy procesor jest zajęty. Jeśli karta nie może, nagrywa procesor.",
+    "framesPerSecond": "Klatek na sekundę",
+    "framesPerSecondDesc": "Przy 60 przewijanie i mysz są płynniejsze, a plik jest trochę większy. Procesor nagrywa najwyżej 30.",
     "ask": "Pytaj, gdzie zapisać",
     "askDesc": "Gdy wyłączone, plik od razu zapisuje się w folderze poniżej. Ctrl+Shift+S zawsze pyta.",
     "saveCopy": "Kopiuj także do schowka",
@@ -385,7 +389,8 @@
     "listeningSound": "Dźwięk, gdy mikrofon słucha",
     "listeningSoundDesc": "Krótki dźwięk, gdy mikrofon zaczyna słuchać pytania zadawanego głosem: mów po nim.",
     "kListeningSound": "dźwięk sygnał piknięcie mikrofon głos mówić słuchać sound microphone",
-    "kGraphicsCard": "karta graficzna karta wideo gpu nvidia amd intel koder sprzętowy płynnie przycina lagi klatki fps procesor cpu"
+    "kGraphicsCard": "karta graficzna karta wideo gpu nvidia amd intel koder sprzętowy płynnie przycina lagi klatki fps procesor cpu",
+    "kFramesPerSecond": "klatki na sekundę liczba klatek fps 30 60 płynność płynnie frames per second"
   },
   "guide": {
     "start": "Rozpocznij",

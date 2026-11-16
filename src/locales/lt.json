@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: reikia bent vienos spalvos.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ nėra spalva; ji turi atrodyti kaip \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: storis turi būti nuo 1 iki 50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: įraše gali būti 30 arba 60 kadrų per sekundę.",
     "below": "apačioje",
     "above": "viršuje",
     "on the left": "kairėje",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Balsu užduotas klausimas neišsiųstas.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Trumpas garsas, kai mikrofonas pradeda klausytis balsu užduodamo klausimo: ženklas kalbėti.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Įrašyti vaizdo įrašą vaizdo plokštės koduotuvu: įrašas lieka sklandus net kai procesorius\n# užimtas. Jei false arba plokštė jo neturi, įrašo procesorius.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Įrašo kadrų per sekundę, 30 arba 60: esant 60, slinkimas ir pelė juda sklandžiau, o failas\n# šiek tiek didesnis. Procesorius įrašo ne daugiau kaip 30.",
     "Record a video or a GIF · Ctrl+R": "Įrašyti vaizdo įrašą arba GIF · Ctrl+R",
     "Go on recording": "Tęsti įrašymą",
     "Stop": "Stabdyti",
@@ -234,6 +236,8 @@
     "recordingIntro": "Pasirinktos srities vaizdo įrašas arba GIF: Ctrl+R arba įrašymo mygtukas šalia pasirinkimo.",
     "graphicsCard": "Įrašyti vaizdo plokšte",
     "graphicsCardDesc": "Vaizdo įrašą koduoja vaizdo plokštė, todėl įrašas lieka sklandus net kai procesorius užimtas. Jei plokštė negali, įrašo procesorius.",
+    "framesPerSecond": "Kadrų per sekundę",
+    "framesPerSecondDesc": "Esant 60, slinkimas ir pelė juda sklandžiau, o failas šiek tiek didesnis. Procesorius įrašo ne daugiau kaip 30.",
     "ask": "Klausti, kur įrašyti",
     "askDesc": "Jei išjungta, failas iš karto įrašomas į toliau nurodytą aplanką. Ctrl+Shift+S visada klausia.",
     "saveCopy": "Kopijuoti ir į mainų sritį",
@@ -385,7 +389,8 @@
     "listeningSound": "Garsas, kai mikrofonas klausosi",
     "listeningSoundDesc": "Trumpas garsas, kai mikrofonas pradeda klausytis balsu užduodamo klausimo: kalbėkite po jo.",
     "kListeningSound": "garsas signalas pyptelėjimas mikrofonas balsas kalbėti klausytis sound microphone",
-    "kGraphicsCard": "vaizdo plokštė grafikos plokštė gpu nvidia amd intel koduotuvas aparatinis sklandus stringa vėlavimas kadrai fps procesorius cpu"
+    "kGraphicsCard": "vaizdo plokštė grafikos plokštė gpu nvidia amd intel koduotuvas aparatinis sklandus stringa vėlavimas kadrai fps procesorius cpu",
+    "kFramesPerSecond": "kadrai per sekundę kadrų dažnis fps 30 60 sklandus sklandžiau frames per second"
   },
   "guide": {
     "start": "Pradėti",

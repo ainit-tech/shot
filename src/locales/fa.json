@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: دست‌کم یک رنگ لازم است.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}» رنگ نیست؛ باید به‌شکل \"#RRGGBB\" باشد.",
     "width: the width must be from 1 to 50.": "width: ضخامت باید از ۱ تا ۵۰ باشد.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: ضبط می‌تواند ۳۰ یا ۶۰ فریم در ثانیه داشته باشد.",
     "below": "زیر",
     "above": "بالای",
     "on the left": "سمت چپ",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "پرسش صوتی فرستاده نشد.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: نشانهٔ صحبت کردن.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# ضبط ویدیو با رمزگذار کارت گرافیک: ضبط حتی وقتی پردازنده مشغول است روان می‌ماند.\n# اگر false باشد یا کارت رمزگذار نداشته باشد، پردازنده ضبط می‌کند.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# فریم‌های ضبط در ثانیه، ۳۰ یا ۶۰: با ۶۰، پیمایش و ماوس روان‌تر حرکت می‌کنند و فایل کمی\n# بزرگ‌تر می‌شود. پردازنده حداکثر ۳۰ ضبط می‌کند.",
     "Record a video or a GIF · Ctrl+R": "ضبط ویدیو یا GIF · Ctrl+R",
     "Go on recording": "ادامهٔ ضبط",
     "Stop": "توقف",
@@ -234,6 +236,8 @@
     "recordingIntro": "ویدیو یا GIF از بخش انتخاب‌شده: Ctrl+R یا دکمهٔ ضبط کنار انتخاب.",
     "graphicsCard": "ضبط با کارت گرافیک",
     "graphicsCardDesc": "کارت گرافیک ویدیو را رمزگذاری می‌کند، پس ضبط حتی وقتی پردازنده مشغول است روان می‌ماند. اگر کارت نتواند، پردازنده ضبط می‌کند.",
+    "framesPerSecond": "فریم در ثانیه",
+    "framesPerSecondDesc": "با ۶۰، پیمایش و ماوس روان‌تر حرکت می‌کنند و فایل کمی بزرگ‌تر می‌شود. پردازنده حداکثر ۳۰ ضبط می‌کند.",
     "ask": "پرسیدن محل ذخیره",
     "askDesc": "اگر خاموش باشد، فایل بی‌درنگ در پوشهٔ زیر ذخیره می‌شود. ولی Ctrl+Shift+S همیشه می‌پرسد.",
     "saveCopy": "کپی هم‌زمان در کلیپ‌بورد",
@@ -385,7 +389,8 @@
     "listeningSound": "صدا هنگام شنیدن میکروفون",
     "listeningSoundDesc": "صدایی کوتاه وقتی میکروفون شروع به شنیدن پرسش صوتی می‌کند: پس از آن صحبت کنید.",
     "kListeningSound": "صدا علامت بوق میکروفون صوتی صحبت شنیدن sound microphone",
-    "kGraphicsCard": "کارت گرافیک کارت ویدیو gpu nvidia amd intel رمزگذار سخت‌افزار روان لگ پرش فریم fps پردازنده cpu"
+    "kGraphicsCard": "کارت گرافیک کارت ویدیو gpu nvidia amd intel رمزگذار سخت‌افزار روان لگ پرش فریم fps پردازنده cpu",
+    "kFramesPerSecond": "فریم در ثانیه نرخ فریم fps 30 60 ۳۰ ۶۰ روان روانی frames per second"
   },
   "guide": {
     "start": "شروع",

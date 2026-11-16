@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: vaja on vähemalt üht värvi.",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: „{bad}“ pole värv; see peab olema kujul \"#RRGGBB\".",
     "width: the width must be from 1 to 50.": "width: paksus peab olema vahemikus 1–50.",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: lindistusel võib olla 30 või 60 kaadrit sekundis.",
     "below": "all",
     "above": "üleval",
     "on the left": "vasakul",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Häälega esitatud küsimust ei saadetud.",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: märk, et võib rääkida.",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Lindista videot graafikakaardi kodeerijaga: lindistus jääb sujuvaks ka siis, kui protsessor\n# on hõivatud. Kui false või kaardil seda pole, lindistab protsessor.",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Lindistuse kaadrid sekundis, 30 või 60: 60 korral liiguvad kerimine ja hiir sujuvamalt ning\n# fail on veidi suurem. Protsessor lindistab kõige rohkem 30.",
     "Record a video or a GIF · Ctrl+R": "Lindista video või GIF · Ctrl+R",
     "Go on recording": "Jätka lindistamist",
     "Stop": "Lõpeta",
@@ -234,6 +236,8 @@
     "recordingIntro": "Video või GIF valitud alast: Ctrl+R või lindistusnupp valiku kõrval.",
     "graphicsCard": "Lindista graafikakaardiga",
     "graphicsCardDesc": "Video kodeerib graafikakaart, nii et lindistus jääb sujuvaks ka siis, kui protsessor on hõivatud. Kui kaart ei saa, lindistab protsessor.",
+    "framesPerSecond": "Kaadrit sekundis",
+    "framesPerSecondDesc": "60 korral liiguvad kerimine ja hiir sujuvamalt ning fail on veidi suurem. Protsessor lindistab kõige rohkem 30.",
     "ask": "Küsi, kuhu salvestada",
     "askDesc": "Kui see on väljas, salvestatakse fail kohe allolevasse kausta. Ctrl+Shift+S küsib alati.",
     "saveCopy": "Kopeeri ka lõikelauale",
@@ -385,7 +389,8 @@
     "listeningSound": "Heli, kui mikrofon kuulab",
     "listeningSoundDesc": "Lühike heli, kui mikrofon hakkab häälega esitatud küsimust kuulama: rääkige pärast seda.",
     "kListeningSound": "heli signaal piiks mikrofon hääl rääkida kuulata sound microphone",
-    "kGraphicsCard": "graafikakaart videokaart gpu nvidia amd intel kodeerija riistvara sujuv hakib viivitus kaadrid fps protsessor cpu"
+    "kGraphicsCard": "graafikakaart videokaart gpu nvidia amd intel kodeerija riistvara sujuv hakib viivitus kaadrid fps protsessor cpu",
+    "kFramesPerSecond": "kaadrid sekundis kaadrisagedus fps 30 60 sujuv sujuvam frames per second"
   },
   "guide": {
     "start": "Alusta",

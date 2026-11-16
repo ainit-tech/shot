@@ -20,6 +20,7 @@
     "colors: at least one colour is needed.": "colors: անհրաժեշտ է առնվազն մեկ գույն։",
     "colors: “{bad}” is not a colour; it should look like \"#RRGGBB\".": "colors: «{bad}»-ը գույն չէ. այն պետք է լինի \"#RRGGBB\" տեսքի։",
     "width: the width must be from 1 to 50.": "width: հաստությունը պետք է լինի 1-ից 50։",
+    "frames_per_second: a recording has 30 or 60 frames a second.": "frames_per_second: տեսագրությունը կարող է ունենալ վայրկյանում 30 կամ 60 կադր։",
     "below": "ներքևում",
     "above": "վերևում",
     "on the left": "ձախում",
@@ -157,6 +158,7 @@
     "The question asked aloud didn't go.": "Բարձրաձայն տրված հարցը չուղարկվեց։",
     "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.": "# Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսելու նշան։",
     "# Record video with the graphics card's encoder: the recording stays smooth while the processor\n# is busy. If false, or if the card has none, the processor records.": "# Տեսագրել վիդեոն վիդեոքարտի կոդավորիչով՝ տեսագրությունը սահուն է մնում, նույնիսկ երբ\n# պրոցեսորը զբաղված է։ Եթե false է կամ քարտը կոդավորիչ չունի, տեսագրում է պրոցեսորը։",
+    "# The frames a second of a recording, 30 or 60: at 60 scrolling and the mouse go smoother, and the\n# file is a little larger. The processor records at most 30.": "# Տեսագրության կադրերը վայրկյանում՝ 30 կամ 60։ 60-ի դեպքում ոլորումն ու մկնիկը ավելի սահուն\n# են շարժվում, իսկ ֆայլը մի փոքր ավելի մեծ է։ Պրոցեսորը տեսագրում է առավելագույնը 30։",
     "Record a video or a GIF · Ctrl+R": "Տեսագրել վիդեո կամ GIF · Ctrl+R",
     "Go on recording": "Շարունակել տեսագրումը",
     "Stop": "Կանգնեցնել",
@@ -234,6 +236,8 @@
     "recordingIntro": "Ընտրվածի վիդեո կամ GIF՝ Ctrl+R կամ ընտրության կողքի տեսագրման կոճակը։",
     "graphicsCard": "Տեսագրել վիդեոքարտով",
     "graphicsCardDesc": "Վիդեոն կոդավորում է վիդեոքարտը, ուստի տեսագրությունը սահուն է մնում, նույնիսկ երբ պրոցեսորը զբաղված է։ Եթե քարտը չի կարող, տեսագրում է պրոցեսորը։",
+    "framesPerSecond": "Կադր վայրկյանում",
+    "framesPerSecondDesc": "60-ի դեպքում ոլորումն ու մկնիկը ավելի սահուն են շարժվում, իսկ ֆայլը մի փոքր ավելի մեծ է։ Պրոցեսորը տեսագրում է առավելագույնը 30։",
     "ask": "Հարցնել, թե որտեղ պահել",
     "askDesc": "Եթե անջատված է, ֆայլն անմիջապես պահվում է ստորև նշված թղթապանակում։ Ctrl+Shift+S-ը միշտ հարցնում է։",
     "saveCopy": "Պատճենել նաև սեղմատախտակում",
@@ -385,7 +389,8 @@
     "listeningSound": "Ձայն, երբ միկրոֆոնը լսում է",
     "listeningSoundDesc": "Կարճ ձայն, երբ միկրոֆոնը սկսում է լսել բարձրաձայն տրվող հարցը՝ խոսեք դրանից հետո։",
     "kListeningSound": "ձայն ազդանշան միկրոֆոն խոսել լսել sound microphone",
-    "kGraphicsCard": "վիդեոքարտ գրաֆիկական քարտ gpu nvidia amd intel կոդավորիչ սարքային սահուն կախվում ուշացում կադրեր fps պրոցեսոր cpu"
+    "kGraphicsCard": "վիդեոքարտ գրաֆիկական քարտ gpu nvidia amd intel կոդավորիչ սարքային սահուն կախվում ուշացում կադրեր fps պրոցեսոր cpu",
+    "kFramesPerSecond": "կադր վայրկյանում կադրերի հաճախություն fps 30 60 սահուն սահունություն frames per second"
   },
   "guide": {
     "start": "Սկսել",

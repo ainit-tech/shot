@@ -751,6 +751,10 @@ mod tests {
             // processor.
             evaluate("told.length = 0; document.querySelector('#graphics-card').click()");
             seen.push(told("m.type + ':' + m.settings.record_with_graphics_card"));
+            // 60 frames a second by default, and 30 is saved as the other settings are.
+            seen.push(evaluate("document.querySelector('#frames [aria-checked=true]').textContent"));
+            evaluate("told.length = 0; document.querySelector('#frames [data-frames=\"30\"]').click()");
+            seen.push(told("m.type + ':' + m.settings.frames_per_second"));
             // Updates: the switch is saved as the other settings are, and the button asks the
             // program to check, or to install the version available.
             evaluate("told.length = 0; document.querySelector('#autoupdate').click()");
@@ -870,6 +874,8 @@ mod tests {
                 "\"100\"",
                 r#""[\"save:true\"]""#,
                 r#""[\"save:false\"]""#,
+                "\"60\"",
+                r#""[\"save:30\"]""#,
                 r#""[\"save:false\"]""#,
                 r#""[\"checkUpdates\"]""#,
                 r#""[\"installUpdate\"]""#,
