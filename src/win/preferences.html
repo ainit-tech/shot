@@ -520,6 +520,7 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     <button data-section="drawing"><span class="nav-icon" data-icon="pencil"></span><span data-t="drawing"></span><span class="count"></span></button>
     <button data-section="panels"><svg class="glyph"><use href="#i-panels"/></svg><span data-t="panels"></span><span class="count"></span></button>
     <button data-section="saving"><span class="nav-icon" data-icon="save"></span><span data-t="saving"></span><span class="count"></span></button>
+    <button data-section="recording"><span class="nav-icon" data-icon="record"></span><span data-t="recording"></span><span class="count"></span></button>
     <button data-section="buttons"><svg class="glyph"><use href="#i-sparkle"/></svg><span data-t="queryButtons"></span><span class="count"></span></button>
     <button data-section="models"><svg class="glyph"><use href="#i-model"/></svg><span data-t="models"></span><span class="count"></span></button>
     <button data-section="account"><svg class="glyph"><use href="#i-person"/></svg><span data-t="googleAccount"></span><span class="alert hidden" id="account-alert" data-t-title="notSignedIn"></span><span class="count"></span></button>
@@ -664,6 +665,17 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
     </div>
   </section>
 
+  <section id="recording">
+    <h1 data-t="recording"></h1>
+    <p class="intro" data-t="recordingIntro"></p>
+    <div class="rows">
+      <div class="row item" data-k="kGraphicsCard">
+        <div><div class="label find" data-t="graphicsCard"></div><div class="desc find" data-t="graphicsCardDesc"></div></div>
+        <div class="control"><button class="switch" id="graphics-card" role="switch" data-t-aria="graphicsCard"><span class="state"></span><span class="track"></span></button></div>
+      </div>
+    </div>
+  </section>
+
   <section id="buttons">
     <h1 data-t="queryButtons"></h1>
     <p class="intro" data-t="buttonsIntro"></p>
@@ -795,6 +807,7 @@ const TEXT = {
   drawing: "Drawing",
   panels: "Panels",
   saving: "Saving",
+  recording: "Recording",
   queryButtons: "Query buttons",
   googleAccount: "Google account",
   notSignedIn: "Not signed in to Google",
@@ -857,6 +870,9 @@ const TEXT = {
   placeLeftBottom: "Left, bottom",
   placeLeftTop: "Left, top",
   savingIntro: "What the Save button and Ctrl+S do.",
+  recordingIntro: "A video or a GIF of what is selected: Ctrl+R or the record button next to the selection.",
+  graphicsCard: "Record with the graphics card",
+  graphicsCardDesc: "The graphics card encodes the video, so the recording stays smooth while the processor is busy. If the card can't, the processor records.",
   ask: "Ask where to save",
   askDesc: "If off, the file is saved into the folder below at once. Ctrl+Shift+S always asks.",
   saveCopy: "Also copy to the clipboard",
@@ -987,6 +1003,7 @@ const TEXT = {
   kFolder: "folder path directory place saving pictures screenshots recordings videos",
   kName: "file name pattern date time format png",
   kListeningSound: "sound chime beep signal microphone voice aloud speak listen",
+  kGraphicsCard: "video card gpu nvidia amd intel encoder hardware smooth lag jerky stutter frames fps processor cpu",
   kButtons: "add new button query standard default bring back",
   kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
   kBlocksModel: "blocks block model window panel list card mouse selection neural network ai version",
@@ -1092,6 +1109,7 @@ function toSettings(draft) {
     autoupdate: draft.autoupdate,
     privacy_filter: draft.privacy_filter,
     listening_sound: draft.listening_sound,
+    record_with_graphics_card: draft.record_with_graphics_card,
     colors: [...draft.colors],
     width: draft.width,
     save: { ask: draft.save.ask, copy: draft.save.copy, folder: draft.save.folder, name: draft.save.name },
@@ -1524,6 +1542,11 @@ $("#privacy-filter").addEventListener("click", () => {
 $("#listening-sound").addEventListener("click", () => {
   state.draft.listening_sound = !state.draft.listening_sound;
   renderSwitch("listening-sound", state.draft.listening_sound);
+  changed();
+});
+$("#graphics-card").addEventListener("click", () => {
+  state.draft.record_with_graphics_card = !state.draft.record_with_graphics_card;
+  renderSwitch("graphics-card", state.draft.record_with_graphics_card);
   changed();
 });
 $("#filter-pause").addEventListener("click", () => send({ type: "pauseModels", paused: !!state.models && state.models.state !== "paused" }));
@@ -2411,6 +2434,7 @@ function renderAll() {
   renderUpdates();
   renderSwitch("privacy-filter", state.draft.privacy_filter);
   renderSwitch("listening-sound", state.draft.listening_sound);
+  renderSwitch("graphics-card", state.draft.record_with_graphics_card);
   renderModels();
   renderAbout();
   renderColors();

@@ -55,6 +55,10 @@ impl Buffer {
         self.dc
     }
 
+    pub fn size(&self) -> (u32, u32) {
+        (self.width, self.height)
+    }
+
     /// The pixels, to draw on them directly. GDI may still be finishing earlier work on them,
     /// so that is waited for first.
     pub fn frame(&mut self) -> Frame<'_> {

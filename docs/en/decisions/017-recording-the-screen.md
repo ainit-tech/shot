@@ -6,7 +6,7 @@ topic: product
 
 # Recording the screen
 
-Decided: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, a switch of the microphone, pause and stop. Clicks show in the recording as a ring going out. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save. Both put the file into the one folder the settings show, where screenshots go too.
+Decided: the toolbar of the actions has one more button, Record, Ctrl+R. It records what is selected: the frozen screen goes, the screen goes on living inside a thin frame, and after a count of three a small panel in place of the toolbar shows the time, a switch of the microphone, pause and stop. Clicks show in the recording as a ring going out. The hotkey stops the recording too. Then a window plays what was recorded, two handles keep a part of it, and a switch makes it a GIF or a video before Copy or Save. Both put the file into the one folder the settings show, where screenshots go too. The graphics card packs the video, in a process of its own, so a busy processor doesn't make it jerky; a switch in the settings gives the work to the processor.
 
 ## Question
 
@@ -17,10 +17,12 @@ A screenshot doesn't show what moves: how a bug happens, where to click, what a 
 - Reading the screen through GDI, as the frozen screen does, makes the mouse flicker when done many times a second, and it is slow on large screens. The graphics card hands over the picture of a monitor by itself (Desktop Duplication) without either problem, but only of one monitor at a time.
 - Windows has H.264 in Media Foundation, so nothing has to be built into the program. The N editions of Windows come without it. Programs that link to it don't start there, so the program looks for it when it is needed.
 - At 1920 by 880 five seconds of a real page, moving and then still, went into an MP4 file of 314 KB in about 2 seconds; at 2736 by 1624 in about 4 seconds, 7.3 MB. Checked on November 4, 2026.
-- NVIDIA's encoder in the graphics card, which Media Foundation can use, crashed the program in about 2 of 100 test runs: a work of its own ran after it had been let go. The software encoder of Windows, used above, is as fast on a screen, gives the same picture and writes files two to four times smaller: 1.2 MB and 14 MB with the card. Checked on November 4, 2026.
+- NVIDIA's encoder in the graphics card, which Media Foundation can use, crashed the program in about 2 of 100 test runs: a work of its own ran after it had been let go. Given pictures from memory, it was no faster than the software encoder of Windows, used above, and wrote files two to four times larger: 1.2 MB and 14 MB with the card. Checked on November 4, 2026.
+- On a busy computer the encoder of Windows doesn't keep up: while other programs took 85 to 90% of the processor, recordings of 2040 by 1320 had 7 to 10 new pictures a second where something moved, and the rest repeated. It takes about 25 ms of the processor for a frame of that size, and 50 ms at 3440 by 1440. Checked on November 16, 2026.
+- When the picture stays on the graphics card from the screen to the file, the card itself turns its colours into those of a video, and its encoder takes it from there. NVIDIA's took about 1 ms of the processor a frame instead of 15 to 25, packed about 250 frames a second at 2560 by 1200, kept the quality of the encoder of Windows (37.2 against 37.4 dB on a dark page, 43.6 against 41.3 dB on a light window) and wrote files half as large, asked to keep a quality rather than a bitrate. Checked on November 16, 2026.
 - A GIF of those five seconds, 1000 pixels wide and at 15 frames a second, was made in 2.5 seconds and came to 327 KB; of a chat on a patterned wallpaper, 6.4 MB against 1.6 MB of the video. So a GIF is good for short recordings of plain windows, and a video for everything else. Checked on November 4, 2026.
 - Windows' reader converts a frame of 1920 by 1080 in 36 ms by default and in 9 ms with its advanced processing. Checked on November 4, 2026.
-- The encoder of Windows writes the colours of small areas by the old standard for small pictures, whatever it is told. A player shows them a little off: a blue of (47, 111, 235) as (59, 114, 236). At HD sizes the colours are right.
+- The encoder of Windows writes the colours of small areas by the old standard for small pictures, whatever it is told. A player shows them a little off: a blue of (47, 111, 235) as (59, 114, 236). At HD sizes the colours are right. The graphics card's way writes every size by BT.709, which players take a video to have when it doesn't say, and its colours come out right.
 
 ## Options
 
@@ -53,6 +55,13 @@ When the format is chosen:
 | After the recording | The right format can be seen by the length and the sizes; nothing has to be decided in advance | Making a GIF takes a moment |
 | Before the recording | Nothing to make afterwards | The size and the length aren't known yet |
 
+What packs the video:
+
+| Option | For | Against |
+|---|---|---|
+| The graphics card's encoder, the picture staying on the card | Smooth on a busy computer; the processor stays free; files half as large | Cards and their encoders differ; NVIDIA's has crashed the program as it was let go |
+| The encoder of Windows on the processor | The same on every computer | Jerky when the processor is busy |
+
 ## Why
 
 The program's way of working stays: the hotkey, the selection, an action that finishes the work. Recording is one more action, so there is nothing new to learn, and the area comes from the same selection, with the windows lit up. The format comes last because only then is it known what came out; recording goes into an MP4 file anyway, from which a GIF takes a moment and which can be cut.
@@ -61,12 +70,14 @@ One switch is enough for the microphone: silence in a recording does no harm, an
 
 What the program saves has one place, the one the settings show. Someone who has recorded something and copied it into a chat looks for it the next day and has to find it, so a finished recording is never left somewhere temporary.
 
+A recording has to be smooth on the computer it is made on, busy or not, as one made with the NVIDIA app is. On November 16, 2026 the user chose the graphics card by default, with a switch in the settings. A process of its own keeps the crash of the card's encoder away from the program: it ends without letting go of anything. The processor's way stays for a card without an encoder.
+
 ## How it works
 
 - **The button** stands on the toolbar of the actions, before masking; what is drawn on the picture stays behind with the frozen screen.
 - **The count.** The frame is grey for three seconds, for the mouse to get where it should; Stop or the hotkey gives up during the count, and nothing is left behind. Then the frame goes red and the recording begins.
 - **The frame and the panel** are not in the recording, even when the panel has to stand inside the area, on a whole screen: Windows leaves them out of what is read of the screen. Clicks go through the frame. The panel takes no focus away.
-- **The recording** is an MP4 file of H.264 at 30 frames a second, or as many as the computer manages, with their real times. A pause is left out of the time. The mouse pointer is in the picture. The width and the height are even, as H.264 wants; an area beyond 4096 by 2304 is made smaller.
+- **The recording** is an MP4 file of H.264 at 30 frames a second, or as many as the computer manages, with their real times. A pause is left out of the time. The mouse pointer is in the picture. The width and the height are even, as H.264 wants; an area beyond 4096 by 2304 is made smaller. The graphics card packs it: the picture stays on the card from the screen to the file, and only the small part under the pointer and the marks of clicks comes to the processor to be drawn on. If the card can't, or the settings say so with `record_with_graphics_card = false`, the encoder of Windows packs it on the processor. Either way the recording runs in a process of its own, the program itself started again, at a priority above that of programs that only keep the processor busy. Once the file is written, that process ends without letting go of anything, and if it ends otherwise, the program says so.
 - **Clicks.** From a press a thin ring goes out and fades in half a second, and a soft dot lies under the pointer while the button is held. They are in the recording alone, on the screen nothing changes, and there is nothing to turn on.
 - **The microphone** is a switch on the panel. It is off until the user turns it on, and stays as it was left until the program closes. It works at any moment, the count included, and a thin line under it shows how loud it hears. Its sound goes into a file of its own by the time of the recording, and joins the video as AAC when the recording ends, so a problem with it can't hurt the picture and a recording during which it stayed off has no sound at all.
 - **The window of the result** plays the recording in a loop, with its sound, which a button turns off. The handles keep a part of it; a click on the line goes to a place in it. The file is made at once on a thread of its own and its size is shown; a new choice gives up what was being made.
@@ -82,3 +93,4 @@ What the program saves has one place, the one the settings show. Someone who has
 - Drawing, moving the frame and zooming in during a recording are left out: the mouse is busy showing what is recorded.
 - Only the microphone is recorded, not the sound of the computer.
 - Whole-screen games in their own mode may not be recorded.
+- Only NVIDIA's encoder has been tried. On a card whose encoder Media Foundation doesn't find or can't use, the processor records.

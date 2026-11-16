@@ -34,6 +34,10 @@ mod update;
 mod win;
 
 fn main() {
+    // A recording runs in a process of its own: the program started again for it.
+    if std::env::args().nth(1).as_deref() == Some(win::recorder::ARGUMENT) {
+        win::recorder::serve();
+    }
     if let Err(error) = win::app::run() {
         win::app::report(&error.to_string());
         std::process::exit(1);

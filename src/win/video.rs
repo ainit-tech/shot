@@ -1,10 +1,9 @@
 //! Video files through Media Foundation, a part of Windows: nothing of it is built into the
 //! program. A recording goes frame by frame into an MP4 file of H.264; for a GIF or a shorter video
-//! the file is read back frame by frame. It is the encoder of Windows that writes it, not the
-//! graphics card's: on a screen it is as fast and as good, with files half as large or less, and
-//! NVIDIA's crashes the program now and then as it is let go. Its libraries are
-//! looked for when first needed: the N editions of Windows come without them, and the program
-//! has to start there all the same.
+//! the file is read back frame by frame. Here it is the encoder of Windows that writes, on the
+//! processor: the graphics card's own is in `encoder`, for a recording alone. Media Foundation's
+//! libraries are looked for when first needed: the N editions of Windows come without them, and
+//! the program has to start there all the same.
 
 use std::ffi::c_void;
 use std::fs::File;
@@ -49,16 +48,19 @@ const LEAST_RATE: f32 = 1_000_000.0;
 const MOST_RATE: f32 = 40_000_000.0;
 
 /// Where a function of Media Foundation puts what it makes.
-type Made = *mut *mut c_void;
+pub(super) type Made = *mut *mut c_void;
 
 /// The functions of Media Foundation, once found.
-struct Foundation {
+pub(super) struct Foundation {
     attributes: unsafe extern "system" fn(Made, u32) -> HRESULT,
     media_type: unsafe extern "system" fn(Made) -> HRESULT,
     memory_buffer: unsafe extern "system" fn(u32, Made) -> HRESULT,
     sample: unsafe extern "system" fn(Made) -> HRESULT,
-    sink_writer: unsafe extern "system" fn(PCWSTR, *mut c_void, *mut c_void, Made) -> HRESULT,
+    pub(super) sink_writer: unsafe extern "system" fn(PCWSTR, *mut c_void, *mut c_void, Made) -> HRESULT,
     source_reader: unsafe extern "system" fn(PCWSTR, *mut c_void, Made) -> HRESULT,
+    /// What the graphics card's encoder takes its pictures through, and where they come from.
+    pub(super) device_manager: Option<unsafe extern "system" fn(*mut u32, Made) -> HRESULT>,
+    pub(super) sample_allocator: Option<unsafe extern "system" fn(*const GUID, Made) -> HRESULT>,
 }
 
 /// A function of a library, by its name with a zero at the end.
@@ -69,7 +71,7 @@ unsafe fn function<F: Copy>(library: HMODULE, name: &str) -> Option<F> {
 
 /// Finds Media Foundation and starts it for the program, once: it stays for as long as the
 /// program.
-fn foundation() -> Result<&'static Foundation> {
+pub(super) fn foundation() -> Result<&'static Foundation> {
     static FOUNDATION: OnceLock<Option<Foundation>> = OnceLock::new();
     let found = FOUNDATION.get_or_init(|| unsafe {
         let platform = LoadLibraryExW(w!("mfplat.dll"), null_mut(), LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -86,13 +88,15 @@ fn foundation() -> Result<&'static Foundation> {
             sample: function(platform, "MFCreateSample\0")?,
             sink_writer: function(files, "MFCreateSinkWriterFromURL\0")?,
             source_reader: function(files, "MFCreateSourceReaderFromURL\0")?,
+            device_manager: function(platform, "MFCreateDXGIDeviceManager\0"),
+            sample_allocator: function(platform, "MFCreateVideoSampleAllocatorEx\0"),
         })
     });
     found.as_ref().ok_or_else(|| windows_core::Error::new(E_NOTIMPL, tr("This edition of Windows has no Media Feature Pack")))
 }
 
 /// What a function of Media Foundation makes.
-unsafe fn made<T: Interface>(make: impl FnOnce(Made) -> HRESULT) -> Result<T> {
+pub(super) unsafe fn made<T: Interface>(make: impl FnOnce(Made) -> HRESULT) -> Result<T> {
     let mut made = null_mut();
     make(&mut made).ok()?;
     if made.is_null() {
@@ -102,11 +106,11 @@ unsafe fn made<T: Interface>(make: impl FnOnce(Made) -> HRESULT) -> Result<T> {
 }
 
 /// Two numbers as Media Foundation keeps them in one: a size or a fraction.
-fn pair(high: u32, low: u32) -> u64 {
+pub(super) fn pair(high: u32, low: u32) -> u64 {
     (high as u64) << 32 | low as u64
 }
 
-fn attributes(count: u32) -> Result<IMFAttributes> {
+pub(super) fn attributes(count: u32) -> Result<IMFAttributes> {
     let foundation = foundation()?;
     unsafe { made(|place| (foundation.attributes)(place, count)) }
 }
@@ -230,7 +234,7 @@ pub fn mix(picture: &Path, voice: &Path, target: &Path) -> Result<()> {
     }
 }
 
-fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
+pub(super) fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
     let foundation = foundation()?;
     unsafe {
         let kind: IMFMediaType = made(|place| (foundation.media_type)(place))?;
@@ -238,6 +242,21 @@ fn video_type(subtype: &windows_core::GUID) -> Result<IMFMediaType> {
         kind.SetGUID(&MF_MT_SUBTYPE, subtype)?;
         Ok(kind)
     }
+}
+
+/// The frames of a video: their size, their rate and that they are whole frames.
+pub(super) fn frame_of(kind: &IMFMediaType, width: u32, height: u32) -> Result<()> {
+    unsafe {
+        kind.SetUINT32(&MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive.0 as u32)?;
+        kind.SetUINT64(&MF_MT_FRAME_SIZE, pair(width, height))?;
+        kind.SetUINT64(&MF_MT_FRAME_RATE, pair(FRAMES, 1))?;
+        kind.SetUINT64(&MF_MT_PIXEL_ASPECT_RATIO, pair(1, 1))
+    }
+}
+
+/// The bits a second a video of this size has on average.
+pub(super) fn bitrate(width: u32, height: u32) -> u32 {
+    (width as f32 * height as f32 * FRAMES as f32 * BITS).clamp(LEAST_RATE, MOST_RATE) as u32
 }
 
 /// An MP4 file being written.
@@ -257,15 +276,9 @@ impl Writer {
         unsafe {
             let path = HSTRING::from(path);
             let sink: IMFSinkWriter = made(|place| (foundation.sink_writer)(PCWSTR(path.as_ptr()), null_mut(), null_mut(), place))?;
-            let frame = |kind: &IMFMediaType| -> Result<()> {
-                kind.SetUINT32(&MF_MT_INTERLACE_MODE, MFVideoInterlace_Progressive.0 as u32)?;
-                kind.SetUINT64(&MF_MT_FRAME_SIZE, pair(width, height))?;
-                kind.SetUINT64(&MF_MT_FRAME_RATE, pair(FRAMES, 1))?;
-                kind.SetUINT64(&MF_MT_PIXEL_ASPECT_RATIO, pair(1, 1))
-            };
+            let frame = |kind: &IMFMediaType| frame_of(kind, width, height);
             let output = video_type(&MFVideoFormat_H264)?;
-            let rate = (width as f32 * height as f32 * FRAMES as f32 * BITS).clamp(LEAST_RATE, MOST_RATE);
-            output.SetUINT32(&MF_MT_AVG_BITRATE, rate as u32)?;
+            output.SetUINT32(&MF_MT_AVG_BITRATE, bitrate(width, height))?;
             frame(&output)?;
             let stream = sink.AddStream(&output)?;
             let input = video_type(&MFVideoFormat_RGB32)?;

@@ -32,6 +32,8 @@ pub struct Settings {
     pub privacy_filter: bool,
     /// Whether a chime says that the microphone has begun to listen to a question asked aloud.
     pub listening_sound: bool,
+    /// Whether the graphics card packs a recording, if it can: the processor does otherwise.
+    pub record_with_graphics_card: bool,
     pub colors: Vec<String>,
     pub width: f32,
     pub save: Save,
@@ -196,6 +198,7 @@ impl Settings {
             autoupdate: true,
             privacy_filter: true,
             listening_sound: true,
+            record_with_graphics_card: true,
             colors: ["#E53935", "#FB8C00", "#FDD835", "#43A047", "#1E88E5", "#8E24AA", "#212121", "#FFFFFF"]
                 .map(String::from)
                 .into(),
@@ -281,6 +284,9 @@ privacy_filter = {privacy_filter}
 {listening_sound_note}
 listening_sound = {listening_sound}
 
+{record_with_graphics_card_note}
+record_with_graphics_card = {record_with_graphics_card}
+
 {colors_note}
 colors = [{colors}]
 
@@ -321,6 +327,8 @@ first = \"{first}\"
             privacy_filter = self.privacy_filter,
             listening_sound_note = notes.listening_sound,
             listening_sound = self.listening_sound,
+            record_with_graphics_card_note = notes.record_with_graphics_card,
+            record_with_graphics_card = self.record_with_graphics_card,
             colors_note = notes.colors,
             colors = colors.join(", "),
             width_note = notes.width,
@@ -435,6 +443,7 @@ impl Notes {
             autoupdate: tr_in(language, self.autoupdate),
             privacy_filter: tr_in(language, self.privacy_filter),
             listening_sound: tr_in(language, self.listening_sound),
+            record_with_graphics_card: tr_in(language, self.record_with_graphics_card),
             colors: tr_in(language, self.colors),
             width: tr_in(language, self.width),
             ask: tr_in(language, self.ask),
@@ -452,7 +461,7 @@ impl Notes {
 
 /// The comments of the settings file in English, for the test that every catalog has them.
 #[cfg(test)]
-pub fn notes() -> [&'static str; 18] {
+pub fn notes() -> [&'static str; 19] {
     let Notes {
         head,
         hotkey,
@@ -461,6 +470,7 @@ pub fn notes() -> [&'static str; 18] {
         autoupdate,
         privacy_filter,
         listening_sound,
+        record_with_graphics_card,
         colors,
         width,
         ask,
@@ -474,8 +484,8 @@ pub fn notes() -> [&'static str; 18] {
         buttons,
     } = NOTES;
     [
-        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, colors, width, ask, copy, folder, name, panels,
-        tools, queries, first, buttons,
+        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, record_with_graphics_card, colors, width, ask,
+        copy, folder, name, panels, tools, queries, first, buttons,
     ]
 }
 
@@ -488,6 +498,7 @@ struct Notes {
     autoupdate: &'static str,
     privacy_filter: &'static str,
     listening_sound: &'static str,
+    record_with_graphics_card: &'static str,
     colors: &'static str,
     width: &'static str,
     ask: &'static str,
@@ -517,6 +528,8 @@ const NOTES: Notes = Notes {
 # too, not only keys, passwords, cards, e-mail and phones. It runs on the computer. The program
 # downloads it by itself, about 950 MB, and masks without it meanwhile; false removes it.",
     listening_sound: "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.",
+    record_with_graphics_card: "# Record video with the graphics card's encoder: the recording stays smooth while the processor
+# is busy. If false, or if the card has none, the processor records.",
     colors: "# The colours for drawing, as \"#RRGGBB\"; the first one is chosen at once.",
     width: "# The width of the line in pixels at the screen's scale of 100%. While drawing, the mouse wheel changes it.",
     ask: "# Ask where to save. If false, the file is saved into the folder at once.

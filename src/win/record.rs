@@ -1,10 +1,10 @@
 //! Recording what is selected (decision 17). The button on the panel of actions closes the frozen
 //! screen, and the screen goes on living inside a thin frame. After a count of three the
-//! recording runs on a thread of its own, into an MP4 file, with a small panel in place of the
-//! panel of actions: the time, the microphone, pause and stop. The hotkey stops it too. What is
-//! recorded then goes to the window of the result, where it is cut and becomes a GIF or a video.
-//! The frame and the panel stay out of the picture: Windows leaves them out of what is read of the
-//! screen.
+//! recording runs in a process of its own (`recorder`), into an MP4 file, with a small panel in
+//! place of the panel of actions: the time, the microphone, pause and stop. The hotkey stops it
+//! too. What is recorded then goes to the window of the result, where it is cut and becomes a GIF
+//! or a video. The frame and the panel stay out of the picture: Windows leaves them out of what is
+//! read of the screen.
 
 use std::cell::{Cell, RefCell};
 use std::path::{Path, PathBuf};
@@ -35,8 +35,8 @@ use windows_sys::core::PCWSTR;
 use windows_sys::w;
 
 use super::gdi::{self, Buffer, Font};
-use super::grab::Grab;
-use super::video::{self, FRAMES, SECOND, Writer};
+use super::recorder::{self, Order};
+use super::video;
 use super::voice::{self, Line};
 use super::{QUIET, app, last_error, out_of_sight, recorded, shell};
 use crate::color::Rgba;
@@ -90,39 +90,39 @@ thread_local! {
 /// The time of a recording, the same for the picture and the sound. It stands still before the
 /// recording begins and during a pause.
 #[derive(Default)]
-struct Clock {
-    begun: Option<Instant>,
-    paused: Option<Instant>,
+pub(super) struct Clock {
+    pub(super) begun: Option<Instant>,
+    pub(super) paused: Option<Instant>,
     /// The pauses that are over.
-    left_out: Duration,
+    pub(super) left_out: Duration,
 }
 
 impl Clock {
-    fn time(&self) -> Duration {
+    pub(super) fn time(&self) -> Duration {
         let Some(begun) = self.begun else { return Duration::ZERO };
         self.paused.unwrap_or_else(Instant::now).saturating_duration_since(begun).saturating_sub(self.left_out)
     }
 
     /// The time, while it goes.
-    fn now(&self) -> Option<Duration> {
+    pub(super) fn now(&self) -> Option<Duration> {
         (self.begun.is_some() && self.paused.is_none()).then(|| self.time())
     }
 }
 
 /// What the program and the threads of a recording say to each other.
 #[derive(Default)]
-struct Shared {
+pub(super) struct Shared {
     clock: Mutex<Clock>,
     /// The recording is to end.
-    stopped: AtomicBool,
+    pub(super) stopped: AtomicBool,
     /// How much has been recorded, in milliseconds.
-    time: AtomicU64,
+    pub(super) time: AtomicU64,
     /// The microphone.
     line: Line,
 }
 
 impl Shared {
-    fn clock(&self) -> MutexGuard<'_, Clock> {
+    pub(super) fn clock(&self) -> MutexGuard<'_, Clock> {
         self.clock.lock().unwrap_or_else(PoisonError::into_inner)
     }
 }
@@ -137,8 +137,8 @@ pub struct Recorded {
     /// Its length in seconds, and how many frames it has in them.
     pub seconds: f64,
     pub frames: u64,
-    /// The way the screen was seen.
-    pub way: &'static str,
+    /// The way the screen was seen and the video packed.
+    pub way: String,
     /// The microphone's file, which is in the video too, if it was on at any moment.
     pub voice: Option<PathBuf>,
 }
@@ -212,6 +212,14 @@ pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
         Err(error) => return app::notify(not_started(), &error.to_string()),
     };
     let (area, size) = fitted(area);
+    let order = Order {
+        area: [area.left, area.top, area.right, area.bottom],
+        size,
+        scale,
+        panel: [panel.left, panel.top, panel.right, panel.bottom],
+        path: path.clone(),
+        card: app::settings().record_with_graphics_card,
+    };
     let shared = Arc::new(Shared::default());
     shared.line.wanted.store(MICROPHONE.get(), Ordering::Relaxed);
     let recording = match Recording::create(area, panel, monitor, scale, shared.clone()) {
@@ -230,7 +238,17 @@ pub fn start(area: Rect, panel: Rect, monitor: Rect, scale: f32) {
                 voice::listen(&shared.line, || shared.stopped.load(Ordering::Relaxed), || shared.clock().now(), &voice_file)
             })
         };
-        let mut outcome = capture(&shared, area, size, &path, scale, panel);
+        let mut outcome = recorder::capture(&shared, &order).map(|made| {
+            made.map(|made| Recorded {
+                path: path.clone(),
+                width: size.0,
+                height: size.1,
+                seconds: made.seconds,
+                frames: made.frames,
+                way: made.way,
+                voice: None,
+            })
+        });
         // However it has ended, the microphone goes.
         shared.stopped.store(true, Ordering::Relaxed);
         let voiced = listening.join().unwrap_or(false);
@@ -279,62 +297,6 @@ fn fitted(area: Rect) -> (Rect, (u32, u32)) {
     }
     let (width, height) = (width & !1, height & !1);
     (Rect::new(area.left, area.top, area.left + width, area.top + height), (width as u32, height as u32))
-}
-
-/// The thread of a recording: the file is made during the count, for the first frame to come as
-/// soon as it ends, and then frames go into it at their rate, or as fast as they come. When
-/// something goes wrong halfway, what has been recorded is still kept.
-fn capture(shared: &Shared, area: Rect, size: (u32, u32), path: &Path, scale: f32, panel: Rect) -> Result<Option<Recorded>, String> {
-    let mut grab = Grab::new(area, size, scale, panel).map_err(|error| error.to_string())?;
-    let mut writer = Writer::create(path, size.0, size.1, None).map_err(|error| error.to_string())?;
-    while shared.clock().now().is_none() {
-        if shared.stopped.load(Ordering::Relaxed) {
-            return Ok(None);
-        }
-        thread::sleep(Duration::from_millis(10));
-    }
-    grab.forget_clicks();
-    let way = grab.way();
-    let step = Duration::from_secs(1) / FRAMES;
-    let length = SECOND / FRAMES as i64;
-    let (mut frames, mut next) = (0u64, Instant::now());
-    let mut problem = None;
-    while !shared.stopped.load(Ordering::Relaxed) {
-        // During a pause the time stands still.
-        if shared.clock().now().is_none() {
-            thread::sleep(Duration::from_millis(15));
-            next = Instant::now();
-            continue;
-        }
-        let now = Instant::now();
-        if now < next {
-            thread::sleep(next - now);
-        }
-        let Some(time) = shared.clock().now() else { continue };
-        let picture = match grab.take(time) {
-            Ok(picture) => picture,
-            Err(error) => {
-                problem = Some(error.to_string());
-                break;
-            }
-        };
-        let stride = picture.width as usize * 4;
-        if let Err(error) = writer.write(picture.pixels, stride, (time.as_nanos() / 100) as i64, length) {
-            problem = Some(error.to_string());
-            break;
-        }
-        frames += 1;
-        shared.time.store(time.as_millis() as u64, Ordering::Relaxed);
-        // A frame that is late doesn't hurry the next ones.
-        next = (next + step).max(now);
-    }
-    let seconds = shared.clock().time().as_secs_f64();
-    let finished = writer.finish().map_err(|error| error.to_string());
-    match (frames, finished, problem) {
-        (0, _, Some(problem)) | (_, Err(problem), _) => Err(problem),
-        (0, Ok(()), None) => Ok(None),
-        (_, Ok(()), _) => Ok(Some(Recorded { path: path.to_path_buf(), width: size.0, height: size.1, seconds, frames, way, voice: None })),
-    }
 }
 
 /// The hotkey, or a click on the icon: a recording going on stops, and nothing else happens.

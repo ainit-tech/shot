@@ -359,6 +359,7 @@ fn first_look() -> Value {
         "icons": {
             "pencil": parts(icons::PENCIL),
             "save": parts(icons::SAVE),
+            "record": parts(icons::RECORD),
             "images": parts(icons::IMAGES),
             "question": parts(icons::QUESTION),
         },
@@ -709,7 +710,7 @@ mod tests {
             seen.push(evaluate("state.signedIn + ' ' + document.querySelector('#sign-in-callout').checkVisibility()"));
             seen.push(evaluate("state.draft.hotkey + ' ' + [...document.querySelectorAll('#hotkey kbd')].map(k => k.textContent).join('+')"));
             look("general");
-            for section in ["drawing", "panels", "saving", "buttons", "account"] {
+            for section in ["drawing", "panels", "saving", "recording", "buttons", "account"] {
                 evaluate(&format!("document.querySelector('nav [data-section={section}]').click()"));
                 look(section);
             }
@@ -746,6 +747,10 @@ mod tests {
             let told = |what: &str| evaluate(&format!("JSON.stringify(told.map(m => {what}))"));
             evaluate("document.querySelector('#autostart').click()");
             seen.push(told("m.type + ':' + m.settings.autostart"));
+            // Recording: the graphics card records by default, and the switch gives it to the
+            // processor.
+            evaluate("told.length = 0; document.querySelector('#graphics-card').click()");
+            seen.push(told("m.type + ':' + m.settings.record_with_graphics_card"));
             // Updates: the switch is saved as the other settings are, and the button asks the
             // program to check, or to install the version available.
             evaluate("told.length = 0; document.querySelector('#autoupdate').click()");
@@ -864,6 +869,7 @@ mod tests {
                 "\"010 true\"",
                 "\"100\"",
                 r#""[\"save:true\"]""#,
+                r#""[\"save:false\"]""#,
                 r#""[\"save:false\"]""#,
                 r#""[\"checkUpdates\"]""#,
                 r#""[\"installUpdate\"]""#,

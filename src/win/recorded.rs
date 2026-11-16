@@ -785,7 +785,7 @@ mod tests {
             writer.write(&pixels, width * 4, n as i64 * length, length).unwrap();
         }
         writer.finish().unwrap();
-        Recorded { path, width: width as u32, height: height as u32, seconds: 3.0, frames: 90, way: "made by the test", voice: None }
+        Recorded { path, width: width as u32, height: height as u32, seconds: 3.0, frames: 90, way: "made by the test".into(), voice: None }
     }
 
     /// How long a picture of a real screen takes to become a video and a GIF: two seconds of it
