@@ -146,6 +146,13 @@ fn frame(window: HWND) -> Option<RECT> {
     }
 }
 
+/// The main monitor's width and height in pixels, and its scale.
+pub fn main_monitor() -> Option<(u32, u32, f32)> {
+    let corner = Point::new(0, 0);
+    let main = monitors(corner).into_iter().find(|monitor| monitor.rect.contains(corner))?;
+    Some((main.rect.width() as u32, main.rect.height() as u32, main.scale))
+}
+
 fn monitors(origin: Point) -> Vec<Monitor> {
     unsafe extern "system" fn found(monitor: HMONITOR, _: HDC, rect: *mut RECT, list: LPARAM) -> BOOL {
         let list = unsafe { &mut *(list as *mut Vec<(HMONITOR, RECT)>) };

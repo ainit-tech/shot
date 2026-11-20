@@ -10,7 +10,9 @@
 //! little and tries again. Until a model is downloaded, what needs it does without it. A model is
 //! loaded when it is first needed and let go some time after it was last used: loading takes
 //! seconds, and a loaded model holds much memory. Each model runs on the graphics card or on the
-//! processor, as the settings say; one the card can't run runs on the processor.
+//! processor, as the settings say; one the card can't run runs on the processor. The model of
+//! blocks on the card is made ready soon after the program starts, and stays: there loading it
+//! and its first run take ten seconds and more, and each window after them a moment.
 
 use std::fs;
 use std::io::{Read, Write};
@@ -22,10 +24,11 @@ use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
 use windows_sys::Win32::Foundation::HWND;
+use windows_sys::Win32::System::Threading::{GetCurrentProcess, TerminateProcess};
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageW, WM_APP};
 
 use super::http::{self, Failure, Get};
-use super::{app, overlay, preferences};
+use super::{app, capture, overlay, preferences};
 use crate::blocks::Tree;
 use crate::finder::Finder;
 use crate::image::Image;
@@ -37,7 +40,8 @@ use crate::update::Hash;
 
 /// The message the downloads send to the program's window as they go.
 pub const MESSAGE: u32 = WM_APP + 11;
-/// How long a model stays loaded after it was last used.
+/// How long a model stays loaded after it was last used; the model of blocks on the graphics card
+/// stays.
 const KEPT: Duration = Duration::from_secs(10 * 60);
 /// How long the downloads wait after the program starts, so as not to slow it, and after a
 /// failure before they try again.
@@ -220,6 +224,11 @@ pub fn start(window: HWND, wanted: bool) {
     let total = FILTER.iter().map(Download::transfer).sum();
     lock(&STATUS).total = total;
     thread::spawn(run);
+    // As the downloads, a while after the start, so as not to slow it.
+    thread::spawn(|| {
+        thread::sleep(FIRST);
+        make_ready();
+    });
 }
 
 /// Wants OpenAI Privacy Filter or not, as the settings say: it is downloaded, or stopped and removed.
@@ -241,12 +250,16 @@ pub fn prefer(filter: bool, blocks: bool) {
         (cards.filter, cards.filter_ran, cards.filter_turn) = (filter, None, cards.filter_turn.wrapping_add(1));
         let _ = fs::remove_file(Which::Filter.mark());
     }
+    let blocks_to_card = blocks && !cards.blocks;
     if cards.blocks != blocks {
         (cards.blocks, cards.blocks_ran, cards.blocks_turn) = (blocks, None, cards.blocks_turn.wrapping_add(1));
         let _ = fs::remove_file(Which::Blocks.mark());
     }
     drop(cards);
     tell();
+    if blocks_to_card {
+        thread::spawn(make_ready);
+    }
 }
 
 /// The provider of WebGPU, if a model is wanted on the graphics card and the provider is
@@ -418,6 +431,8 @@ fn run() {
                 if !window.is_null() {
                     unsafe { PostMessageW(window, MESSAGE, usize::from(!filter_there), 0) };
                 }
+                // The provider of WebGPU may have come only now.
+                thread::spawn(make_ready);
             }
             Err(Stop::Asked) => {}
             Err(Stop::Problem(problem)) => {
@@ -607,6 +622,8 @@ struct Loaded<T> {
 static FILTER_LOADED: Mutex<Option<Loaded<Filter>>> = Mutex::new(None);
 static BLOCKS_LOADED: Mutex<Option<Loaded<Finder>>> = Mutex::new(None);
 static WATCHED: AtomicBool = AtomicBool::new(false);
+/// Whether a model has run on the graphics card in this process.
+static ON_CARD: AtomicBool = AtomicBool::new(false);
 
 /// Whether OpenAI Privacy Filter is downloaded, with what runs it.
 pub fn filter_ready() -> bool {
@@ -658,6 +675,16 @@ impl Which {
             Which::Filter => "privacy-filter.trying-the-card",
             Which::Blocks => "blocks.trying-the-card",
         })
+    }
+
+    /// Whether the mark is this process's own: it holds the number of the process that left it.
+    fn ours(self) -> bool {
+        fs::read_to_string(self.mark()).is_ok_and(|number| number.trim() == std::process::id().to_string())
+    }
+
+    /// Whether the card took down the process that left the mark, another one.
+    fn crashed(self) -> bool {
+        self.mark().exists() && !self.ours()
     }
 }
 
@@ -715,17 +742,24 @@ fn placed<T: Placed, R>(
     if loaded.is_none() {
         let started = Instant::now();
         let mark = which.mark();
-        let crashed = on_card && mark.exists();
+        // The mark of a crash stays until the settings choose the card again.
+        let crashed = on_card && which.crashed();
         let card = if crashed { None } else { card(on_card) };
-        if card.is_some() {
-            let _ = fs::write(&mark, b"");
+        let trying = card.is_some();
+        if trying {
+            let _ = fs::write(&mark, std::process::id().to_string());
         }
         let model = load(card.as_deref()).inspect_err(|_| {
-            let _ = fs::remove_file(&mark);
+            if trying {
+                let _ = fs::remove_file(&mark);
+            }
         })?;
         let device = if crashed { Device::CardFailed } else { model.device() };
-        if device != Device::Card {
+        if trying && device != Device::Card {
             let _ = fs::remove_file(&mark);
+        }
+        if device == Device::Card {
+            ON_CARD.store(true, Ordering::Release);
         }
         eprintln!("{} loaded in {:.1} s on {device:?}", which.name(), started.elapsed().as_secs_f32());
         *loaded = Some(Loaded { model, used: started, turn, device });
@@ -771,13 +805,52 @@ pub fn blocks(picture: &Image, scale: f32) -> Option<Result<Tree, String>> {
     Some(placed(&BLOCKS_LOADED, Which::Blocks, |card| Finder::load(&runtime, &folder, card), |model| model.find(picture, scale)))
 }
 
+/// Makes the model of blocks ready on the graphics card ahead of a frozen screen, if the settings
+/// want it there and it would run there: loaded, and run once on a blank window as large as the
+/// main monitor, which builds the card's shaders for windows of that size, as maximized ones
+/// come to for the model. The first window then takes a moment, not ten seconds and more. On the
+/// processor the model loads in a moment and isn't loaded ahead.
+fn make_ready() {
+    let (on_card, turn) = lock(&CARDS).wants(Which::Blocks);
+    if !on_card || card(true).is_none() || Which::Blocks.crashed() || !blocks_ready() {
+        return;
+    }
+    if lock(&BLOCKS_LOADED).as_ref().is_some_and(|loaded| !stale(loaded.turn, loaded.device, turn, on_card)) {
+        return;
+    }
+    let (wide, high, scale) = capture::main_monitor().unwrap_or((1280, 800, 1.0));
+    let blank = Image { width: wide, height: high, pixels: vec![255; wide as usize * high as usize * 4] };
+    let started = Instant::now();
+    match blocks(&blank, scale) {
+        Some(Ok(_)) => eprintln!("The model of blocks is ready in {:.1} s", started.elapsed().as_secs_f32()),
+        Some(Err(problem)) => eprintln!("The model of blocks isn't ready: {problem}"),
+        None => {}
+    }
+}
+
+/// The program ends. A mark this process left on a model being loaded on the graphics card goes:
+/// nothing took the program down. Once a model has run on the card, the process ends at once,
+/// without letting its libraries go: that of the card has hung the process at its end after a
+/// model there had been let go, and a process that doesn't end keeps the program from starting
+/// again.
+pub fn end() {
+    for which in [Which::Filter, Which::Blocks] {
+        if which.ours() {
+            let _ = fs::remove_file(which.mark());
+        }
+    }
+    if ON_CARD.load(Ordering::Acquire) {
+        unsafe { TerminateProcess(GetCurrentProcess(), 0) };
+    }
+}
+
 /// Notes where a model has come to run, and tells the settings window.
 fn ran(how: impl FnOnce(&mut Cards)) {
     how(&mut lock(&CARDS));
     tell();
 }
 
-/// Lets the model go once it has lain unused long enough.
+/// Lets a model go once it has lain unused long enough, but for the model of blocks on the card.
 fn watch() {
     if WATCHED.swap(true, Ordering::AcqRel) {
         return;
@@ -792,7 +865,7 @@ fn watch() {
             }
             drop(filter);
             let mut blocks = lock(&BLOCKS_LOADED);
-            if blocks.as_ref().is_some_and(|loaded| loaded.used.elapsed() > KEPT) {
+            if blocks.as_ref().is_some_and(|loaded| loaded.device != Device::Card && loaded.used.elapsed() > KEPT) {
                 *blocks = None;
                 eprintln!("The model of blocks let go");
             }
@@ -892,10 +965,12 @@ mod tests {
     /// Runs the model of blocks as the program does, with ONNX Runtime and the provider of WebGPU
     /// downloaded into a folder of their own and the model beside the test, as it lies beside a
     /// test build: on the graphics card, leaving no mark once it has run; on the processor when the
-    /// settings say so, finding the same blocks; on the processor while a mark is left, as a crash
-    /// on the card leaves it; and on the card again when the settings choose it again. It goes
-    /// online for 20 MB and needs a graphics card, so it runs only when asked: `BLOCKS_MODEL=<folder>
-    /// WINDOW=<picture.png> cargo test -p ainitshot models_run_where -- --ignored --nocapture`.
+    /// settings say so, finding the same blocks; on the processor while a mark of another process
+    /// is left, as a crash on the card leaves it, at the next start and the one after; and on the
+    /// card again when the settings choose it again. It ends its process as the program ends. It
+    /// goes online for 20 MB and needs a graphics card, so it runs only when asked:
+    /// `BLOCKS_MODEL=<folder> WINDOW=<picture.png> cargo test -p ainitshot models_run_where --
+    /// --ignored --nocapture`.
     #[test]
     #[ignore]
     fn models_run_where_the_settings_and_the_card_let_them() {
@@ -921,33 +996,70 @@ mod tests {
         let alike = on_card.iter().filter(|a| on_processor.iter().any(|b| near(a, b))).count();
         println!("{alike} of {} blocks of the card are the processor's", on_card.len());
         assert!(alike * 100 >= on_processor.len().max(on_card.len()) * 98);
-        // A mark left behind, as by a program the card took down, and a new start.
+        // A mark left behind, as by a program the card took down, a new start and another.
         prefer(true, true);
         fs::write(Which::Blocks.mark(), b"").unwrap();
-        *lock(&BLOCKS_LOADED) = None;
-        run();
-        assert_eq!(ran(), Some(Device::CardFailed));
+        for _ in 0..2 {
+            *lock(&BLOCKS_LOADED) = None;
+            run();
+            assert_eq!(ran(), Some(Device::CardFailed));
+            assert!(Which::Blocks.mark().exists());
+        }
         // The card chosen again.
         prefer(true, false);
         prefer(true, true);
         assert!(!Which::Blocks.mark().exists());
         run();
         assert_eq!(ran(), Some(Device::Card));
-        *lock(&BLOCKS_LOADED) = None;
         let _ = fs::remove_dir_all(&beside);
         let _ = fs::remove_dir_all(&root);
+        end();
     }
 
-    /// Leaves the model of blocks loaded on the graphics card as the test ends, as the program
-    /// leaves its models when it ends: the process has to end all the same. Asked for as the test
-    /// above, with `the_program_ends_with_a_model_on_the_card`, a few times.
+    /// Lets the model of blocks on the graphics card go, as the settings moving it do, loads it
+    /// there again, lets it go again and ends as the program ends: the process has to end all the
+    /// same, where one that ended as processes do has hung in the libraries of the card. Asked for
+    /// as the test above, with `the_program_ends_after`, a few times: the command has to come back.
     #[test]
     #[ignore]
-    fn the_program_ends_with_a_model_on_the_card() {
+    fn the_program_ends_after_a_model_on_the_card_was_let_go() {
         let (window, _, _) = beside_the_test();
         prefer(true, true);
-        assert!(blocks(&window, 1.0).expect("the model is beside the test").is_ok());
+        for _ in 0..2 {
+            assert!(blocks(&window, 1.0).expect("the model is beside the test").is_ok());
+            assert_eq!(lock(&CARDS).blocks_ran, Some(Device::Card));
+            *lock(&BLOCKS_LOADED) = None;
+        }
+        end();
+        unreachable!("the process ends once a model has run on the card");
+    }
+
+    /// How long the model of blocks takes on the graphics card: made ready, as after the program's
+    /// start, then for windows of other sizes, one after another, as a frozen screen asks for them:
+    /// the picture of `WINDOW` cut to each size. The first window takes a moment. Asked for as the
+    /// test above, with `window_after_window`, in a release build.
+    #[test]
+    #[ignore]
+    fn window_after_window_on_the_card() {
+        use crate::geometry::Rect;
+        let (window, beside, root) = beside_the_test();
+        prefer(true, true);
+        let started = Instant::now();
+        make_ready();
+        println!("made ready in {:.2?}", started.elapsed());
         assert_eq!(lock(&CARDS).blocks_ran, Some(Device::Card));
+        let sizes = [(3440, 1400), (3440, 1400), (1720, 1400), (2560, 1368), (1200, 800), (900, 640), (1000, 700), (3000, 1300)];
+        for (n, (wide, high)) in sizes.into_iter().enumerate() {
+            let picture = window.crop(Rect::new(0, 0, wide.min(window.width as i32), high.min(window.height as i32)));
+            let started = Instant::now();
+            let tree = blocks(&picture, 1.0).expect("the model is beside the test").unwrap();
+            let time = started.elapsed();
+            println!("{wide}x{high}: {} blocks in {time:.2?}", tree.rects().len());
+            assert!(n > 0 || time < Duration::from_secs(3), "the first window took {time:.2?}");
+        }
+        let _ = fs::remove_dir_all(&beside);
+        let _ = fs::remove_dir_all(&root);
+        end();
     }
 
     /// For the tests on the card: ONNX Runtime and the provider of WebGPU downloaded into a folder

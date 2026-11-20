@@ -408,6 +408,7 @@ pub fn run() -> io::Result<()> {
         }
     }
     ENDED.store(true, Ordering::Release);
+    models::end();
     Ok(())
 }
 
