@@ -9,6 +9,7 @@ use std::path::Path;
 use std::sync::{Mutex, PoisonError};
 
 use ort::environment::Environment;
+use ort::logging::LogLevel;
 use ort::session::Session;
 use ort::session::builder::SessionBuilder;
 
@@ -34,11 +35,18 @@ pub fn environment(library: &Path) -> Result<Environment, String> {
     if let Some(environment) = environment.as_ref() {
         return Ok(environment.clone());
     }
-    let built = ort::init_from(library)
-        .map_err(|error| error.to_string())?
-        .with_telemetry(false)
-        .build()
-        .map_err(|error| error.to_string())?;
+    let mut builder = ort::init_from(library).map_err(|error| error.to_string())?.with_telemetry(false);
+    // ONNX Runtime's own log, for finding out what went wrong: `ORT_LOG=1` gives its warnings and
+    // errors, `ORT_LOG=verbose` everything.
+    if let Some(wanted) = std::env::var_os("ORT_LOG") {
+        let all = wanted == "verbose";
+        builder = builder.with_logger(std::sync::Arc::new(move |level: LogLevel, category: &str, _: &str, place: &str, message: &str| {
+            if all || matches!(level, LogLevel::Warning | LogLevel::Error | LogLevel::Fatal) {
+                eprintln!("ONNX Runtime {level:?} [{category}] {place}: {message}");
+            }
+        }));
+    }
+    let built = builder.build().map_err(|error| error.to_string())?;
     *environment = Some(built.clone());
     Ok(built)
 }

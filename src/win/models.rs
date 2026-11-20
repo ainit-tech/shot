@@ -74,10 +74,12 @@ impl Download {
 }
 
 /// What the models need, in the order it is downloaded: ONNX Runtime 1.31.0 and the provider of
-/// WebGPU 0.6.0 with its compiler of shaders, out of Microsoft's packages on NuGet, then OpenAI
+/// WebGPU 0.5.0 with its compiler of shaders, out of Microsoft's packages on NuGet, then OpenAI
 /// Privacy Filter's description and tokens and its weights, quantized to 4 bits, from OpenAI's
 /// repository at a fixed commit. ONNX Runtime came from Microsoft's releases on GitHub until they
-/// were gone: the file is the same.
+/// were gone: the file is the same. The provider is 0.5.0, built for ONNX Runtime 1.31: 0.6.0 turns
+/// on a preview of DirectX where Windows' Developer Mode is on, and there it took the program down
+/// without the preview's files and failed to compile its shaders with them.
 const FILTER: [Download; 6] = [
     Download {
         folder: "onnxruntime-1.31.0",
@@ -88,20 +90,20 @@ const FILTER: [Download; 6] = [
         zipped: Some((152_948_620, 6_331_918)),
     },
     Download {
-        folder: "webgpu-0.6.0",
+        folder: PROVIDER_FOLDER,
         name: "onnxruntime_providers_webgpu.dll",
-        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.6.0/microsoft.ml.onnxruntime.ep.webgpu.0.6.0.nupkg",
-        size: 14_026_040,
-        sha256: "6bf102c322d6bad5b1b5a04b0b0c3d43191f70f428ad1d6b4c43719674fc57d9",
-        zipped: Some((12_331_830, 5_867_938)),
+        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.5.0/microsoft.ml.onnxruntime.ep.webgpu.0.5.0.nupkg",
+        size: 13_426_488,
+        sha256: "dbbbbe7e22e8323167ca2f4c3f5bd7c72a2cc2ff66d00afe0c80251dadcf6ff0",
+        zipped: Some((8_182_447, 5_784_184)),
     },
     Download {
-        folder: "webgpu-0.6.0",
+        folder: PROVIDER_FOLDER,
         name: "dxcompiler.dll",
-        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.6.0/microsoft.ml.onnxruntime.ep.webgpu.0.6.0.nupkg",
-        size: 17_986_360,
-        sha256: "d833eb71611ae86bcfe73092f8daf5d89c1c084f3b31719b53f9884da64842ba",
-        zipped: Some((4_362_520, 7_969_242)),
+        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.5.0/microsoft.ml.onnxruntime.ep.webgpu.0.5.0.nupkg",
+        size: 17_986_400,
+        sha256: "40fff09e9f79f8b3c8f634b010ef1c22c79aef6bf0e02e702e7efba2532659b1",
+        zipped: Some((46_528, 8_135_851)),
     },
     Download {
         folder: "privacy-filter",
@@ -133,8 +135,11 @@ const FILTER: [Download; 6] = [
 const RUNTIME: usize = 0;
 const PROVIDER: usize = 1;
 const COMPILER: usize = 2;
-/// The folder of OpenAI Privacy Filter's own files.
+/// The folder of OpenAI Privacy Filter's own files, and that of the provider of WebGPU.
 const FILTER_FOLDER: &str = "privacy-filter";
+const PROVIDER_FOLDER: &str = "webgpu-0.5.0";
+/// Folders of files the program downloaded once and no longer uses: removed as it starts.
+const GONE: [&str; 1] = ["webgpu-0.6.0"];
 
 /// The version of OpenAI Privacy Filter, as the settings show it: the commit its files come from.
 const FILTER_VERSION: &str = "7ffa9a0";
@@ -181,18 +186,22 @@ struct Wish {
     changed: bool,
 }
 
-/// Whether the settings want each model on the graphics card, and where each ran when it was last
-/// loaded: nothing until then, and nothing again once the settings have changed.
+/// Whether the settings want each model on the graphics card, how many times that has changed,
+/// and where each ran when it was last loaded: nothing until then, and nothing again once the
+/// settings have changed.
 struct Cards {
     filter: bool,
     blocks: bool,
+    filter_turn: u32,
+    blocks_turn: u32,
     filter_ran: Option<Device>,
     blocks_ran: Option<Device>,
 }
 
 static STATUS: Mutex<Status> = Mutex::new(Status { state: State::Off, done: 0, total: 0, speed: 0.0 });
 static WISH: Mutex<Wish> = Mutex::new(Wish { wanted: false, paused: false, changed: false });
-static CARDS: Mutex<Cards> = Mutex::new(Cards { filter: true, blocks: true, filter_ran: None, blocks_ran: None });
+static CARDS: Mutex<Cards> =
+    Mutex::new(Cards { filter: true, blocks: true, filter_turn: 0, blocks_turn: 0, filter_ran: None, blocks_ran: None });
 static WAKE: Condvar = Condvar::new();
 /// Stops the download under way: the wish has changed.
 static INTERRUPT: AtomicBool = AtomicBool::new(false);
@@ -227,11 +236,14 @@ pub fn pause(paused: bool) {
 /// on the other one is loaded again the next time it is needed.
 pub fn prefer(filter: bool, blocks: bool) {
     let mut cards = lock(&CARDS);
+    // Chosen again, the card is tried again, even after it took the program down.
     if cards.filter != filter {
-        (cards.filter, cards.filter_ran) = (filter, None);
+        (cards.filter, cards.filter_ran, cards.filter_turn) = (filter, None, cards.filter_turn.wrapping_add(1));
+        let _ = fs::remove_file(Which::Filter.mark());
     }
     if cards.blocks != blocks {
-        (cards.blocks, cards.blocks_ran) = (blocks, None);
+        (cards.blocks, cards.blocks_ran, cards.blocks_turn) = (blocks, None, cards.blocks_turn.wrapping_add(1));
+        let _ = fs::remove_file(Which::Blocks.mark());
     }
     drop(cards);
     tell();
@@ -243,11 +255,11 @@ fn card(wanted: bool) -> Option<PathBuf> {
     (wanted && FILTER[PROVIDER].done() && FILTER[COMPILER].done()).then(|| FILTER[PROVIDER].path())
 }
 
-/// Whether a model loaded while the settings wanted the card or not, and running where it does,
-/// is to be loaded again: the settings have changed since, or it runs on the processor only
-/// because the provider of WebGPU wasn't downloaded yet, and now it is.
-fn stale(card_then: bool, device: Device, card_now: bool) -> bool {
-    card_then != card_now || (card_now && device == Device::Processor && card(true).is_some())
+/// Whether a model loaded at a turn of the settings, and running where it does, is to be loaded
+/// again: the settings have changed since, even back to what they were, or it runs on the
+/// processor only because the provider of WebGPU wasn't downloaded yet, and now it is.
+fn stale(turn_then: u32, device: Device, turn_now: u32, card_now: bool) -> bool {
+    turn_then != turn_now || (card_now && device == Device::Processor && card(true).is_some())
 }
 
 fn change(how: impl FnOnce(&mut Wish)) {
@@ -358,6 +370,9 @@ fn tell() {
 
 /// The thread of the downloads: it does what the wish asks, until the program ends.
 fn run() {
+    for gone in GONE {
+        let _ = fs::remove_dir_all(folder().join(gone));
+    }
     let mut first = true;
     loop {
         let (wanted, paused) = {
@@ -445,7 +460,7 @@ fn remove() {
         let _ = fs::remove_file(file.path());
         let _ = fs::remove_file(part(&file.path()));
     }
-    for folder in [FILTER_FOLDER, "onnxruntime-1.31.0", "webgpu-0.6.0"] {
+    for folder in [FILTER_FOLDER, "onnxruntime-1.31.0", PROVIDER_FOLDER] {
         let _ = fs::remove_dir(self::folder().join(folder));
     }
 }
@@ -584,8 +599,8 @@ fn unzip(zipped: &[u8], packed: u64) -> Option<Vec<u8>> {
 struct Loaded<T> {
     model: T,
     used: Instant,
-    /// Whether the settings wanted the graphics card when it was loaded, and where it runs.
-    card: bool,
+    /// The turn of the settings it was loaded at, and where it runs.
+    turn: u32,
     device: Device,
 }
 
@@ -616,28 +631,124 @@ pub fn find(text: &str) -> Option<Result<Vec<Found>, String>> {
     if !filter_ready() {
         return None;
     }
-    let on_card = lock(&CARDS).filter;
-    let mut loaded = lock(&FILTER_LOADED);
-    if loaded.as_ref().is_some_and(|loaded| stale(loaded.card, loaded.device, on_card)) {
+    let (runtime, folder) = (FILTER[RUNTIME].path(), folder().join(FILTER_FOLDER));
+    Some(placed(&FILTER_LOADED, Which::Filter, |card| Filter::load(&runtime, &folder, card), |model| model.find(text)))
+}
+
+/// One of the models, as where it runs is noted and its mark is named.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Which {
+    Filter,
+    Blocks,
+}
+
+impl Which {
+    fn name(self) -> &'static str {
+        match self {
+            Which::Filter => "OpenAI Privacy Filter",
+            Which::Blocks => "The model of blocks",
+        }
+    }
+
+    /// The mark the model leaves while it is loaded on the graphics card and runs there the first
+    /// time. A library of the card that takes the program down there leaves it behind, and the
+    /// program finds it at its next start.
+    fn mark(self) -> PathBuf {
+        folder().join(match self {
+            Which::Filter => "privacy-filter.trying-the-card",
+            Which::Blocks => "blocks.trying-the-card",
+        })
+    }
+}
+
+impl Cards {
+    /// Whether the settings want the model on the card, and their turn.
+    fn wants(&self, which: Which) -> (bool, u32) {
+        match which {
+            Which::Filter => (self.filter, self.filter_turn),
+            Which::Blocks => (self.blocks, self.blocks_turn),
+        }
+    }
+
+    fn note(&mut self, which: Which, device: Device) {
+        match which {
+            Which::Filter => self.filter_ran = Some(device),
+            Which::Blocks => self.blocks_ran = Some(device),
+        }
+    }
+}
+
+/// A model that knows where it runs.
+trait Placed {
+    fn device(&self) -> Device;
+}
+
+impl Placed for Filter {
+    fn device(&self) -> Device {
+        Filter::device(self)
+    }
+}
+
+impl Placed for Finder {
+    fn device(&self) -> Device {
+        Finder::device(self)
+    }
+}
+
+/// Does `work` with a model, loaded by `load` where the settings want it, on the graphics card
+/// through the provider given or on the processor. A model is loaded again when the settings have
+/// changed since, and goes to the card once the provider has come. A model whose loading or first
+/// run on the card took the program down, as its mark tells, runs on the processor, and so does one
+/// the card couldn't run, or that failed there: it is loaded on the processor and does the work
+/// again. A model goes back to the card when the settings choose the card for it again.
+fn placed<T: Placed, R>(
+    slot: &Mutex<Option<Loaded<T>>>,
+    which: Which,
+    load: impl Fn(Option<&Path>) -> Result<T, String>,
+    mut work: impl FnMut(&mut T) -> Result<R, String>,
+) -> Result<R, String> {
+    let (on_card, turn) = lock(&CARDS).wants(which);
+    let mut loaded = lock(slot);
+    if loaded.as_ref().is_some_and(|loaded| stale(loaded.turn, loaded.device, turn, on_card)) {
         *loaded = None;
     }
     if loaded.is_none() {
         let started = Instant::now();
-        let runtime = FILTER[RUNTIME].path();
-        match Filter::load(&runtime, &folder().join(FILTER_FOLDER), card(on_card).as_deref()) {
-            Ok(model) => {
-                let device = model.device();
-                *loaded = Some(Loaded { model, used: started, card: on_card, device });
-                ran(|cards| cards.filter_ran = Some(device));
-            }
-            Err(problem) => return Some(Err(problem)),
+        let mark = which.mark();
+        let crashed = on_card && mark.exists();
+        let card = if crashed { None } else { card(on_card) };
+        if card.is_some() {
+            let _ = fs::write(&mark, b"");
         }
-        eprintln!("OpenAI Privacy Filter loaded in {:.1} s", started.elapsed().as_secs_f32());
+        let model = load(card.as_deref()).inspect_err(|_| {
+            let _ = fs::remove_file(&mark);
+        })?;
+        let device = if crashed { Device::CardFailed } else { model.device() };
+        if device != Device::Card {
+            let _ = fs::remove_file(&mark);
+        }
+        eprintln!("{} loaded in {:.1} s on {device:?}", which.name(), started.elapsed().as_secs_f32());
+        *loaded = Some(Loaded { model, used: started, turn, device });
+        ran(|cards| cards.note(which, device));
         watch();
     }
-    let loaded = loaded.as_mut()?;
-    loaded.used = Instant::now();
-    Some(loaded.model.find(text))
+    let Some(placed) = loaded.as_mut() else {
+        return Err(format!("{} isn't loaded", which.name()));
+    };
+    placed.used = Instant::now();
+    let done = work(&mut placed.model);
+    if placed.device != Device::Card {
+        return done;
+    }
+    // The first run on the card is over, and the program is still here.
+    let _ = fs::remove_file(which.mark());
+    let Err(problem) = &done else {
+        return done;
+    };
+    eprintln!("{} failed on the graphics card ({problem}): the processor runs it", which.name());
+    *placed = Loaded { model: load(None)?, used: Instant::now(), turn, device: Device::CardFailed };
+    ran(|cards| cards.note(which, Device::CardFailed));
+    work(&mut placed.model)
 }
 
 /// The folder of the model of the blocks of a window, if the model is there.
@@ -656,27 +767,8 @@ pub fn blocks_ready() -> bool {
 /// window's thread; windows wait for one another.
 pub fn blocks(picture: &Image, scale: f32) -> Option<Result<Tree, String>> {
     let folder = blocks_folder()?;
-    let on_card = lock(&CARDS).blocks;
-    let mut loaded = lock(&BLOCKS_LOADED);
-    if loaded.as_ref().is_some_and(|loaded| stale(loaded.card, loaded.device, on_card)) {
-        *loaded = None;
-    }
-    if loaded.is_none() {
-        let started = Instant::now();
-        match Finder::load(&FILTER[RUNTIME].path(), &folder, card(on_card).as_deref()) {
-            Ok(model) => {
-                let device = model.device();
-                *loaded = Some(Loaded { model, used: started, card: on_card, device });
-                ran(|cards| cards.blocks_ran = Some(device));
-            }
-            Err(problem) => return Some(Err(problem)),
-        }
-        eprintln!("The model of blocks loaded in {:.1} s", started.elapsed().as_secs_f32());
-        watch();
-    }
-    let loaded = loaded.as_mut()?;
-    loaded.used = Instant::now();
-    Some(loaded.model.find(picture, scale))
+    let runtime = FILTER[RUNTIME].path();
+    Some(placed(&BLOCKS_LOADED, Which::Blocks, |card| Finder::load(&runtime, &folder, card), |model| model.find(picture, scale)))
 }
 
 /// Notes where a model has come to run, and tells the settings window.
@@ -797,15 +889,99 @@ mod tests {
         assert!(own.iter().all(|file| file.url.contains(FILTER_VERSION)));
     }
 
-    /// A model runs where the settings want it; it is loaded again when they change, and on the
-    /// card once the provider of WebGPU has come, but not again after the card couldn't run it.
+    /// Runs the model of blocks as the program does, with ONNX Runtime and the provider of WebGPU
+    /// downloaded into a folder of their own and the model beside the test, as it lies beside a
+    /// test build: on the graphics card, leaving no mark once it has run; on the processor when the
+    /// settings say so, finding the same blocks; on the processor while a mark is left, as a crash
+    /// on the card leaves it; and on the card again when the settings choose it again. It goes
+    /// online for 20 MB and needs a graphics card, so it runs only when asked: `BLOCKS_MODEL=<folder>
+    /// WINDOW=<picture.png> cargo test -p ainitshot models_run_where -- --ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn models_run_where_the_settings_and_the_card_let_them() {
+        use crate::geometry::Rect;
+        let (window, beside, root) = beside_the_test();
+        let run = || {
+            let started = Instant::now();
+            let tree = blocks(&window, 1.0).expect("the model is beside the test").unwrap();
+            (tree.rects(), started.elapsed())
+        };
+        let ran = || lock(&CARDS).blocks_ran;
+        prefer(true, true);
+        let (on_card, first) = run();
+        let (_, then) = run();
+        assert_eq!(ran(), Some(Device::Card));
+        assert!(!Which::Blocks.mark().exists());
+        println!("{} blocks on the card: {first:.2?} the first time, then {then:.2?}", on_card.len());
+        prefer(true, false);
+        let (on_processor, time) = run();
+        assert_eq!(ran(), Some(Device::Processor));
+        println!("{} blocks on the processor: {time:.2?}", on_processor.len());
+        let near = |a: &Rect, b: &Rect| (a.left - b.left).abs() <= 1 && (a.top - b.top).abs() <= 1 && (a.right - b.right).abs() <= 1 && (a.bottom - b.bottom).abs() <= 1;
+        let alike = on_card.iter().filter(|a| on_processor.iter().any(|b| near(a, b))).count();
+        println!("{alike} of {} blocks of the card are the processor's", on_card.len());
+        assert!(alike * 100 >= on_processor.len().max(on_card.len()) * 98);
+        // A mark left behind, as by a program the card took down, and a new start.
+        prefer(true, true);
+        fs::write(Which::Blocks.mark(), b"").unwrap();
+        *lock(&BLOCKS_LOADED) = None;
+        run();
+        assert_eq!(ran(), Some(Device::CardFailed));
+        // The card chosen again.
+        prefer(true, false);
+        prefer(true, true);
+        assert!(!Which::Blocks.mark().exists());
+        run();
+        assert_eq!(ran(), Some(Device::Card));
+        *lock(&BLOCKS_LOADED) = None;
+        let _ = fs::remove_dir_all(&beside);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    /// Leaves the model of blocks loaded on the graphics card as the test ends, as the program
+    /// leaves its models when it ends: the process has to end all the same. Asked for as the test
+    /// above, with `the_program_ends_with_a_model_on_the_card`, a few times.
+    #[test]
+    #[ignore]
+    fn the_program_ends_with_a_model_on_the_card() {
+        let (window, _, _) = beside_the_test();
+        prefer(true, true);
+        assert!(blocks(&window, 1.0).expect("the model is beside the test").is_ok());
+        assert_eq!(lock(&CARDS).blocks_ran, Some(Device::Card));
+    }
+
+    /// For the tests on the card: ONNX Runtime and the provider of WebGPU downloaded into a folder
+    /// of their own, never into the program's, and the model of `BLOCKS_MODEL` beside the test, as
+    /// beside a test build; the picture of `WINDOW`, the folder beside and that of the downloads.
+    fn beside_the_test() -> (Image, PathBuf, PathBuf) {
+        let model = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
+        let window = Image::from_png(&fs::read(std::env::var_os("WINDOW").expect("WINDOW names a picture")).unwrap()).unwrap();
+        let root = std::env::temp_dir().join("ainitshot-models-card");
+        let _ = fs::remove_dir_all(&root);
+        unsafe { std::env::set_var("LOCALAPPDATA", &root) };
+        assert!(folder().starts_with(&root));
+        for file in [&FILTER[RUNTIME], &FILTER[PROVIDER], &FILTER[COMPILER]] {
+            assert!(fetch(file).is_ok(), "{}", file.name);
+        }
+        let beside = std::env::current_exe().unwrap().parent().unwrap().join("blocks");
+        let _ = fs::remove_dir_all(&beside);
+        fs::create_dir_all(&beside).unwrap();
+        for name in ["model.json", "areas.onnx"] {
+            fs::copy(model.join(name), beside.join(name)).unwrap();
+        }
+        (window, beside, root)
+    }
+
+    /// A model runs where the settings want it; it is loaded again when they change, even back to
+    /// what they were, and on the card once the provider of WebGPU has come, but not again after
+    /// the card couldn't run it.
     #[test]
     fn a_model_is_loaded_again_only_when_its_place_changes() {
-        assert!(stale(true, Device::Card, false));
-        assert!(stale(false, Device::Processor, true));
-        assert!(!stale(true, Device::Card, true));
-        assert!(!stale(false, Device::Processor, false));
-        assert!(!stale(true, Device::CardFailed, true));
+        assert!(stale(3, Device::Card, 4, false));
+        assert!(stale(3, Device::CardFailed, 5, true));
+        assert!(!stale(3, Device::Card, 3, true));
+        assert!(!stale(3, Device::Processor, 3, false));
+        assert!(!stale(3, Device::CardFailed, 3, true));
     }
 
     #[test]

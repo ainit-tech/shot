@@ -41,7 +41,8 @@ The recognition with the rectangles of words is already in the program, and a fi
 - **The model** is loaded at the first masking and let go after 10 minutes unused. It runs on the graphics card, through ONNX Runtime's provider of WebGPU, which works over DirectX 12 on any card that has it, or on the processor, as the settings say. A model the card can't run runs on the processor.
 - **The download:**
   - The model is downloaded in the background into `%LOCALAPPDATA%\ainitShot\models`, from OpenAI's repository at a fixed commit.
-  - ONNX Runtime 1.31.0 comes with it, and the provider of WebGPU 0.6.0 with its compiler of shaders. Their files are taken out of Microsoft's packages on NuGet by ranges of bytes: 6 MB of 160, and 14 MB of 56. ONNX Runtime came from Microsoft's releases on GitHub until they were gone in November 2026; the file is the same.
+  - ONNX Runtime 1.31.0 comes with it, and the provider of WebGPU 0.5.0 with its compiler of shaders. Their files are taken out of Microsoft's packages on NuGet by ranges of bytes: 6 MB of 160, and 14 MB of 47. ONNX Runtime came from Microsoft's releases on GitHub until they were gone in November 2026; the file is the same. The provider 0.6.0 turns on a preview of DirectX where Windows' Developer Mode is on: there it took the program down without the preview's files, and with them its compiler failed on the shaders; 0.5.0, built for ONNX Runtime 1.31, has no such preview.
+  - A mark is left while a model is loaded on the card and runs there the first time. If the program ends in between, the model runs on the processor from its next start, until the card is chosen for it again.
   - Every file is checked against its SHA-256 before it takes its place.
   - A download cut short goes on from where it stopped. Without a connection, the program tries again in two minutes.
 - **Until the model is downloaded,** masking works with the rules:

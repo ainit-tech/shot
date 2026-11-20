@@ -204,15 +204,15 @@ mod tests {
 
     /// Runs the model downloaded into the program's folder of models on lines of the kind that
     /// screenshots have, and shows what it marks and how long it takes:
-    /// `cargo test -p ainitshot the_model_marks -- --ignored --nocapture`; with `ON_CARD=1`, on
-    /// the graphics card, through the provider of WebGPU downloaded beside it.
+    /// `cargo test -p ainitshot the_model_marks -- --ignored --nocapture`; with
+    /// `WEBGPU_PROVIDER=<onnxruntime_providers_webgpu.dll>`, on the graphics card.
     #[test]
     #[ignore]
     fn the_model_marks_private_data() {
         let models = std::path::PathBuf::from(std::env::var_os("LOCALAPPDATA").unwrap()).join("ainitShot\\models");
         let started = std::time::Instant::now();
         let runtime = models.join("onnxruntime-1.31.0\\onnxruntime.dll");
-        let card = std::env::var_os("ON_CARD").map(|_| models.join("webgpu-0.6.0\\onnxruntime_providers_webgpu.dll"));
+        let card = std::env::var_os("WEBGPU_PROVIDER").map(std::path::PathBuf::from);
         let mut filter = Filter::load(&runtime, &models.join("privacy-filter"), card.as_deref()).unwrap();
         println!("loaded in {:?} on {:?}", started.elapsed(), filter.device());
         let text = "From: Anna Petrova <anna.petrova@example.com>\nTo: John Smith\nDate: 25 October 2026\n\

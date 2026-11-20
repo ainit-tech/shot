@@ -134,7 +134,7 @@ DOWNLOADED = [
     },
     {
         "name": "ONNX Runtime WebGPU provider",
-        "version": "0.6.0",
+        "version": "0.5.0",
         "license": "MIT",
         "url": "https://www.nuget.org/packages/Microsoft.ML.OnnxRuntime.EP.WebGpu",
         "copyright": "Copyright (c) Microsoft Corporation",

@@ -50,6 +50,12 @@ pub struct Tree {
 }
 
 impl Tree {
+    /// The frames of the blocks, in order, for tests that compare two trees.
+    #[cfg(test)]
+    pub fn rects(&self) -> Vec<Rect> {
+        self.blocks.iter().map(|block| block.rect).collect()
+    }
+
     /// Puts what the model found in order: blocks less sure than `least` go, and their children
     /// go to their parents; a parent and its only child of nearly its size are one block. A parent
     /// that isn't there, or a block that comes back to itself through its parents, stands in the
