@@ -11,12 +11,12 @@
 use std::path::Path;
 
 use ort::session::Session;
-use ort::session::builder::GraphOptimizationLevel;
+use ort::session::builder::{GraphOptimizationLevel, SessionBuilder};
 use ort::value::Tensor;
 use tokenizers::Tokenizer;
 
 use crate::mask::{Found, Kind};
-use crate::runtime;
+use crate::runtime::{self, Device};
 
 /// The kinds of data in the order of the model's labels.
 const KINDS: [Kind; 8] =
@@ -28,18 +28,26 @@ const LABELS: usize = 1 + 4 * KINDS.len();
 pub struct Filter {
     session: Session,
     tokenizer: Tokenizer,
+    device: Device,
 }
 
 impl Filter {
-    /// Loads the model from its folder, with ONNX Runtime from its library.
-    pub fn load(runtime: &Path, folder: &Path) -> Result<Filter, String> {
+    /// Loads the model from its folder, with ONNX Runtime from its library: on the graphics card
+    /// through the provider of WebGPU in `card`, if it is given and the card can, or on the
+    /// processor.
+    pub fn load(runtime: &Path, folder: &Path, card: Option<&Path>) -> Result<Filter, String> {
         let environment = runtime::environment(runtime)?;
-        let session = Session::builder(&environment)
-            .and_then(|builder| builder.with_optimization_level(GraphOptimizationLevel::Level3).map_err(Into::into))
-            .and_then(|mut builder| builder.commit_from_file(folder.join("model_q4.onnx")))
-            .map_err(|error| error.to_string())?;
+        let options = |builder: SessionBuilder| -> ort::Result<SessionBuilder> {
+            Ok(builder.with_optimization_level(GraphOptimizationLevel::Level3)?)
+        };
+        let (session, device) = runtime::session(&environment, &folder.join("model_q4.onnx"), card, options)?;
         let tokenizer = Tokenizer::from_file(folder.join("tokenizer.json")).map_err(|error| error.to_string())?;
-        Ok(Filter { session, tokenizer })
+        Ok(Filter { session, tokenizer, device })
+    }
+
+    /// Where the model runs.
+    pub fn device(&self) -> Device {
+        self.device
     }
 
     /// What the model marks in the text, by its bytes.
@@ -196,15 +204,17 @@ mod tests {
 
     /// Runs the model downloaded into the program's folder of models on lines of the kind that
     /// screenshots have, and shows what it marks and how long it takes:
-    /// `cargo test -p ainitshot the_model_marks -- --ignored --nocapture`.
+    /// `cargo test -p ainitshot the_model_marks -- --ignored --nocapture`; with `ON_CARD=1`, on
+    /// the graphics card, through the provider of WebGPU downloaded beside it.
     #[test]
     #[ignore]
     fn the_model_marks_private_data() {
         let models = std::path::PathBuf::from(std::env::var_os("LOCALAPPDATA").unwrap()).join("ainitShot\\models");
         let started = std::time::Instant::now();
         let runtime = models.join("onnxruntime-1.31.0\\onnxruntime.dll");
-        let mut filter = Filter::load(&runtime, &models.join("privacy-filter")).unwrap();
-        println!("loaded in {:?}", started.elapsed());
+        let card = std::env::var_os("ON_CARD").map(|_| models.join("webgpu-0.6.0\\onnxruntime_providers_webgpu.dll"));
+        let mut filter = Filter::load(&runtime, &models.join("privacy-filter"), card.as_deref()).unwrap();
+        println!("loaded in {:?} on {:?}", started.elapsed(), filter.device());
         let text = "From: Anna Petrova <anna.petrova@example.com>\nTo: John Smith\nDate: 25 October 2026\n\
             Call me at +1 212 555 0123 or come to 221B Baker Street, London.\n\
             My password is hunter2 and the API key is sk-proj-abcdefghijklmnopqrstuvwx1234.\n\

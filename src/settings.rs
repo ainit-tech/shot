@@ -30,6 +30,10 @@ pub struct Settings {
     pub autoupdate: bool,
     /// Whether masking has OpenAI Privacy Filter: the program downloads it, or removes it.
     pub privacy_filter: bool,
+    /// Whether OpenAI Privacy Filter runs on the graphics card, if it can: the processor runs it otherwise.
+    pub privacy_filter_on_graphics_card: bool,
+    /// Whether the model of the blocks of a window runs on the graphics card, if it can.
+    pub blocks_on_graphics_card: bool,
     /// Whether a chime says that the microphone has begun to listen to a question asked aloud.
     pub listening_sound: bool,
     /// Whether the graphics card packs a recording, if it can: the processor does otherwise.
@@ -199,6 +203,8 @@ impl Settings {
             autostart: false,
             autoupdate: true,
             privacy_filter: true,
+            privacy_filter_on_graphics_card: true,
+            blocks_on_graphics_card: true,
             listening_sound: true,
             record_with_graphics_card: true,
             frames_per_second: 60,
@@ -284,6 +290,12 @@ autoupdate = {autoupdate}
 {privacy_filter_note}
 privacy_filter = {privacy_filter}
 
+{privacy_filter_on_graphics_card_note}
+privacy_filter_on_graphics_card = {privacy_filter_on_graphics_card}
+
+{blocks_on_graphics_card_note}
+blocks_on_graphics_card = {blocks_on_graphics_card}
+
 {listening_sound_note}
 listening_sound = {listening_sound}
 
@@ -331,6 +343,10 @@ first = \"{first}\"
             autoupdate = self.autoupdate,
             privacy_filter_note = notes.privacy_filter,
             privacy_filter = self.privacy_filter,
+            privacy_filter_on_graphics_card_note = notes.privacy_filter_on_graphics_card,
+            privacy_filter_on_graphics_card = self.privacy_filter_on_graphics_card,
+            blocks_on_graphics_card_note = notes.blocks_on_graphics_card,
+            blocks_on_graphics_card = self.blocks_on_graphics_card,
             listening_sound_note = notes.listening_sound,
             listening_sound = self.listening_sound,
             record_with_graphics_card_note = notes.record_with_graphics_card,
@@ -453,6 +469,8 @@ impl Notes {
             autostart: tr_in(language, self.autostart),
             autoupdate: tr_in(language, self.autoupdate),
             privacy_filter: tr_in(language, self.privacy_filter),
+            privacy_filter_on_graphics_card: tr_in(language, self.privacy_filter_on_graphics_card),
+            blocks_on_graphics_card: tr_in(language, self.blocks_on_graphics_card),
             listening_sound: tr_in(language, self.listening_sound),
             record_with_graphics_card: tr_in(language, self.record_with_graphics_card),
             frames_per_second: tr_in(language, self.frames_per_second),
@@ -473,7 +491,7 @@ impl Notes {
 
 /// The comments of the settings file in English, for the test that every catalog has them.
 #[cfg(test)]
-pub fn notes() -> [&'static str; 20] {
+pub fn notes() -> [&'static str; 22] {
     let Notes {
         head,
         hotkey,
@@ -481,6 +499,8 @@ pub fn notes() -> [&'static str; 20] {
         autostart,
         autoupdate,
         privacy_filter,
+        privacy_filter_on_graphics_card,
+        blocks_on_graphics_card,
         listening_sound,
         record_with_graphics_card,
         frames_per_second,
@@ -497,8 +517,9 @@ pub fn notes() -> [&'static str; 20] {
         buttons,
     } = NOTES;
     [
-        head, hotkey, language, autostart, autoupdate, privacy_filter, listening_sound, record_with_graphics_card, frames_per_second,
-        colors, width, ask, copy, folder, name, panels, tools, queries, first, buttons,
+        head, hotkey, language, autostart, autoupdate, privacy_filter, privacy_filter_on_graphics_card, blocks_on_graphics_card,
+        listening_sound, record_with_graphics_card, frames_per_second, colors, width, ask, copy, folder, name, panels, tools, queries,
+        first, buttons,
     ]
 }
 
@@ -510,6 +531,8 @@ struct Notes {
     autostart: &'static str,
     autoupdate: &'static str,
     privacy_filter: &'static str,
+    privacy_filter_on_graphics_card: &'static str,
+    blocks_on_graphics_card: &'static str,
     listening_sound: &'static str,
     record_with_graphics_card: &'static str,
     frames_per_second: &'static str,
@@ -541,6 +564,10 @@ const NOTES: Notes = Notes {
     privacy_filter: "# OpenAI Privacy Filter, a model with which masking finds names, addresses, dates and links
 # too, not only keys, passwords, cards, e-mail and phones. It runs on the computer. The program
 # downloads it by itself, about 950 MB, and masks without it meanwhile; false removes it.",
+    privacy_filter_on_graphics_card: "# Run OpenAI Privacy Filter on the graphics card. If false, or if the card can't run it, the
+# processor does.",
+    blocks_on_graphics_card: "# Run the model of the blocks of a window on the graphics card. If false, or if the card can't run
+# it, the processor does.",
     listening_sound: "# A short sound as the microphone begins to listen to a question asked aloud: the sign to speak.",
     record_with_graphics_card: "# Record video with the graphics card's encoder: the recording stays smooth while the processor
 # is busy. If false, or if the card has none, the processor records.",

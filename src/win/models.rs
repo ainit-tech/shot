@@ -1,14 +1,16 @@
 //! The models the program downloads for what rules can't do: now OpenAI Privacy Filter, with which
-//! masking finds names, addresses and other private data, and ONNX Runtime, which runs it. They
-//! live in `%LOCALAPPDATA%\ainitShot\models`. Our own model of the blocks of a window lies next to
-//! the program in a test build, in the folder `blocks`.
+//! masking finds names, addresses and other private data, ONNX Runtime, which runs it, and the
+//! provider of WebGPU, with which ONNX Runtime runs a model on the graphics card. They live in
+//! `%LOCALAPPDATA%\ainitShot\models`. Our own model of the blocks of a window lies next to the
+//! program in a test build, in the folder `blocks`.
 //!
 //! A thread of its own downloads them in the background as the settings want them: a file after a
 //! file, each checked against its SHA-256 before it takes its place, so a file in place is a
 //! whole one. A download cut short goes on from where it stopped; without a connection it waits a
 //! little and tries again. Until a model is downloaded, what needs it does without it. A model is
 //! loaded when it is first needed and let go some time after it was last used: loading takes
-//! seconds, and a loaded model holds much memory.
+//! seconds, and a loaded model holds much memory. Each model runs on the graphics card or on the
+//! processor, as the settings say; one the card can't run runs on the processor.
 
 use std::fs;
 use std::io::{Read, Write};
@@ -29,6 +31,7 @@ use crate::finder::Finder;
 use crate::image::Image;
 use crate::mask::Found;
 use crate::privacy::Filter;
+use crate::runtime::Device;
 use crate::text::tr;
 use crate::update::Hash;
 
@@ -70,17 +73,35 @@ impl Download {
     }
 }
 
-/// What OpenAI Privacy Filter needs, in the order it is downloaded: ONNX Runtime 1.31.0 from
-/// Microsoft's release, the model's description and tokens, then its weights, quantized to 4 bits,
-/// from OpenAI's repository at a fixed commit.
-const FILTER: [Download; 4] = [
+/// What the models need, in the order it is downloaded: ONNX Runtime 1.31.0 and the provider of
+/// WebGPU 0.6.0 with its compiler of shaders, out of Microsoft's packages on NuGet, then OpenAI
+/// Privacy Filter's description and tokens and its weights, quantized to 4 bits, from OpenAI's
+/// repository at a fixed commit. ONNX Runtime came from Microsoft's releases on GitHub until they
+/// were gone: the file is the same.
+const FILTER: [Download; 6] = [
     Download {
         folder: "onnxruntime-1.31.0",
         name: "onnxruntime.dll",
-        url: "https://github.com/microsoft/onnxruntime/releases/download/v1.31.0/onnxruntime-win-x64-1.31.0.zip",
+        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.31.0/microsoft.ml.onnxruntime.1.31.0.nupkg",
         size: 17_253_176,
         sha256: "0c42dc4e278f0968fdf9ebf1b1e54a74c657a9942e70803e453c91993451cf4c",
-        zipped: Some((221_047, 6_178_013)),
+        zipped: Some((152_948_620, 6_331_918)),
+    },
+    Download {
+        folder: "webgpu-0.6.0",
+        name: "onnxruntime_providers_webgpu.dll",
+        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.6.0/microsoft.ml.onnxruntime.ep.webgpu.0.6.0.nupkg",
+        size: 14_026_040,
+        sha256: "6bf102c322d6bad5b1b5a04b0b0c3d43191f70f428ad1d6b4c43719674fc57d9",
+        zipped: Some((12_331_830, 5_867_938)),
+    },
+    Download {
+        folder: "webgpu-0.6.0",
+        name: "dxcompiler.dll",
+        url: "https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime.ep.webgpu/0.6.0/microsoft.ml.onnxruntime.ep.webgpu.0.6.0.nupkg",
+        size: 17_986_360,
+        sha256: "d833eb71611ae86bcfe73092f8daf5d89c1c084f3b31719b53f9884da64842ba",
+        zipped: Some((4_362_520, 7_969_242)),
     },
     Download {
         folder: "privacy-filter",
@@ -107,6 +128,13 @@ const FILTER: [Download; 4] = [
         zipped: None,
     },
 ];
+
+/// The places in the list of ONNX Runtime and of the provider of WebGPU and its compiler.
+const RUNTIME: usize = 0;
+const PROVIDER: usize = 1;
+const COMPILER: usize = 2;
+/// The folder of OpenAI Privacy Filter's own files.
+const FILTER_FOLDER: &str = "privacy-filter";
 
 /// The version of OpenAI Privacy Filter, as the settings show it: the commit its files come from.
 const FILTER_VERSION: &str = "7ffa9a0";
@@ -153,8 +181,18 @@ struct Wish {
     changed: bool,
 }
 
+/// Whether the settings want each model on the graphics card, and where each ran when it was last
+/// loaded: nothing until then, and nothing again once the settings have changed.
+struct Cards {
+    filter: bool,
+    blocks: bool,
+    filter_ran: Option<Device>,
+    blocks_ran: Option<Device>,
+}
+
 static STATUS: Mutex<Status> = Mutex::new(Status { state: State::Off, done: 0, total: 0, speed: 0.0 });
 static WISH: Mutex<Wish> = Mutex::new(Wish { wanted: false, paused: false, changed: false });
+static CARDS: Mutex<Cards> = Mutex::new(Cards { filter: true, blocks: true, filter_ran: None, blocks_ran: None });
 static WAKE: Condvar = Condvar::new();
 /// Stops the download under way: the wish has changed.
 static INTERRUPT: AtomicBool = AtomicBool::new(false);
@@ -183,6 +221,33 @@ pub fn want(wanted: bool) {
 /// Pauses the download, or goes on with it.
 pub fn pause(paused: bool) {
     change(|wish| wish.paused = paused);
+}
+
+/// Runs each model on the graphics card or on the processor, as the settings say: a model loaded
+/// on the other one is loaded again the next time it is needed.
+pub fn prefer(filter: bool, blocks: bool) {
+    let mut cards = lock(&CARDS);
+    if cards.filter != filter {
+        (cards.filter, cards.filter_ran) = (filter, None);
+    }
+    if cards.blocks != blocks {
+        (cards.blocks, cards.blocks_ran) = (blocks, None);
+    }
+    drop(cards);
+    tell();
+}
+
+/// The provider of WebGPU, if a model is wanted on the graphics card and the provider is
+/// downloaded.
+fn card(wanted: bool) -> Option<PathBuf> {
+    (wanted && FILTER[PROVIDER].done() && FILTER[COMPILER].done()).then(|| FILTER[PROVIDER].path())
+}
+
+/// Whether a model loaded while the settings wanted the card or not, and running where it does,
+/// is to be loaded again: the settings have changed since, or it runs on the processor only
+/// because the provider of WebGPU wasn't downloaded yet, and now it is.
+fn stale(card_then: bool, device: Device, card_now: bool) -> bool {
+    card_then != card_now || (card_now && device == Device::Processor && card(true).is_some())
 }
 
 fn change(how: impl FnOnce(&mut Wish)) {
@@ -231,6 +296,13 @@ pub fn describe() -> Value {
         Problem::Damaged => "damaged",
         Problem::Disk => "disk",
     });
+    let ran = |device: Option<Device>| match device {
+        Some(Device::Card) => json!("card"),
+        Some(Device::Processor) => json!("processor"),
+        Some(Device::CardFailed) => json!("card_failed"),
+        None => Value::Null,
+    };
+    let cards = lock(&CARDS);
     json!({
         "state": state,
         "problem": problem,
@@ -239,13 +311,14 @@ pub fn describe() -> Value {
         "speed": status.speed,
         "version": FILTER_VERSION,
         "blocks": describe_blocks(),
+        "ran": { "filter": ran(cards.filter_ran), "blocks": ran(cards.blocks_ran) },
     })
 }
 
 /// What the settings window shows of the model of the blocks of a window, whether it can run, which
 /// takes the ONNX Runtime that comes with OpenAI Privacy Filter: nothing without the model.
 fn describe_blocks() -> Value {
-    blocks_folder().map_or(Value::Null, |folder| described(&folder, FILTER[0].done()))
+    blocks_folder().map_or(Value::Null, |folder| described(&folder, FILTER[RUNTIME].done()))
 }
 
 /// A model in its folder: the version in its `model.json` and the bytes of the folder.
@@ -318,15 +391,17 @@ fn run() {
             }
         }
         set_state(State::Downloading);
+        // Files added to what was downloaded before, as the provider of WebGPU was, come quietly.
+        let filter_there = FILTER.iter().filter(|file| file.folder == FILTER_FOLDER).all(Download::done);
         match FILTER.iter().try_for_each(fetch) {
             Ok(()) => {
                 count();
                 set_state(State::Ready);
-                eprintln!("OpenAI Privacy Filter is downloaded");
-                // The window tells the user, once.
+                eprintln!("OpenAI Privacy Filter and what runs it are downloaded");
+                // The window tells the user, once, when the model itself has come.
                 let window = WINDOW.load(Ordering::Acquire);
                 if !window.is_null() {
-                    unsafe { PostMessageW(window, MESSAGE, 1, 0) };
+                    unsafe { PostMessageW(window, MESSAGE, usize::from(!filter_there), 0) };
                 }
             }
             Err(Stop::Asked) => {}
@@ -370,7 +445,7 @@ fn remove() {
         let _ = fs::remove_file(file.path());
         let _ = fs::remove_file(part(&file.path()));
     }
-    for folder in ["privacy-filter", "onnxruntime-1.31.0"] {
+    for folder in [FILTER_FOLDER, "onnxruntime-1.31.0", "webgpu-0.6.0"] {
         let _ = fs::remove_dir(self::folder().join(folder));
     }
 }
@@ -509,6 +584,9 @@ fn unzip(zipped: &[u8], packed: u64) -> Option<Vec<u8>> {
 struct Loaded<T> {
     model: T,
     used: Instant,
+    /// Whether the settings wanted the graphics card when it was loaded, and where it runs.
+    card: bool,
+    device: Device,
 }
 
 static FILTER_LOADED: Mutex<Option<Loaded<Filter>>> = Mutex::new(None);
@@ -538,12 +616,20 @@ pub fn find(text: &str) -> Option<Result<Vec<Found>, String>> {
     if !filter_ready() {
         return None;
     }
+    let on_card = lock(&CARDS).filter;
     let mut loaded = lock(&FILTER_LOADED);
+    if loaded.as_ref().is_some_and(|loaded| stale(loaded.card, loaded.device, on_card)) {
+        *loaded = None;
+    }
     if loaded.is_none() {
         let started = Instant::now();
-        let runtime = FILTER[0].path();
-        match Filter::load(&runtime, &folder().join("privacy-filter")) {
-            Ok(model) => *loaded = Some(Loaded { model, used: started }),
+        let runtime = FILTER[RUNTIME].path();
+        match Filter::load(&runtime, &folder().join(FILTER_FOLDER), card(on_card).as_deref()) {
+            Ok(model) => {
+                let device = model.device();
+                *loaded = Some(Loaded { model, used: started, card: on_card, device });
+                ran(|cards| cards.filter_ran = Some(device));
+            }
             Err(problem) => return Some(Err(problem)),
         }
         eprintln!("OpenAI Privacy Filter loaded in {:.1} s", started.elapsed().as_secs_f32());
@@ -562,7 +648,7 @@ fn blocks_folder() -> Option<PathBuf> {
 
 /// Whether the model of the blocks of a window is there, with what runs it.
 pub fn blocks_ready() -> bool {
-    FILTER[0].done() && blocks_folder().is_some()
+    FILTER[RUNTIME].done() && blocks_folder().is_some()
 }
 
 /// The blocks of a window on its picture, on a monitor of that scale, or nothing without the
@@ -570,11 +656,19 @@ pub fn blocks_ready() -> bool {
 /// window's thread; windows wait for one another.
 pub fn blocks(picture: &Image, scale: f32) -> Option<Result<Tree, String>> {
     let folder = blocks_folder()?;
+    let on_card = lock(&CARDS).blocks;
     let mut loaded = lock(&BLOCKS_LOADED);
+    if loaded.as_ref().is_some_and(|loaded| stale(loaded.card, loaded.device, on_card)) {
+        *loaded = None;
+    }
     if loaded.is_none() {
         let started = Instant::now();
-        match Finder::load(&FILTER[0].path(), &folder) {
-            Ok(model) => *loaded = Some(Loaded { model, used: started }),
+        match Finder::load(&FILTER[RUNTIME].path(), &folder, card(on_card).as_deref()) {
+            Ok(model) => {
+                let device = model.device();
+                *loaded = Some(Loaded { model, used: started, card: on_card, device });
+                ran(|cards| cards.blocks_ran = Some(device));
+            }
             Err(problem) => return Some(Err(problem)),
         }
         eprintln!("The model of blocks loaded in {:.1} s", started.elapsed().as_secs_f32());
@@ -583,6 +677,12 @@ pub fn blocks(picture: &Image, scale: f32) -> Option<Result<Tree, String>> {
     let loaded = loaded.as_mut()?;
     loaded.used = Instant::now();
     Some(loaded.model.find(picture, scale))
+}
+
+/// Notes where a model has come to run, and tells the settings window.
+fn ran(how: impl FnOnce(&mut Cards)) {
+    how(&mut lock(&CARDS));
+    tell();
 }
 
 /// Lets the model go once it has lain unused long enough.
@@ -640,10 +740,10 @@ mod tests {
         assert_eq!(part(Path::new(r"C:\m\model_q4.onnx_data")), PathBuf::from(r"C:\m\model_q4.onnx_data.part"));
     }
 
-    /// Downloads ONNX Runtime out of its zip archive and the tokenizer of the model into a fresh
-    /// folder of its own, the tokenizer stopped halfway and gone on with: both come whole. It goes
-    /// online and downloads 34 MB, so it runs only when asked:
-    /// `cargo test -p ainitshot downloads_go_on -- --ignored`.
+    /// Downloads ONNX Runtime and the provider of WebGPU with its compiler out of their packages,
+    /// and the tokenizer of the model, into a fresh folder of its own, the tokenizer stopped
+    /// halfway and gone on with: all come whole. It goes online and downloads 48 MB, so it runs
+    /// only when asked: `cargo test -p ainitshot downloads_go_on -- --ignored`.
     #[test]
     #[ignore]
     fn downloads_go_on_where_they_stopped() {
@@ -653,9 +753,11 @@ mod tests {
         unsafe { std::env::set_var("LOCALAPPDATA", &root) };
         assert!(folder().starts_with(&root));
         lock(&STATUS).total = FILTER.iter().map(Download::transfer).sum();
-        assert!(fetch(&FILTER[0]).is_ok());
-        assert!(FILTER[0].done());
-        let tokenizer = &FILTER[2];
+        for file in [&FILTER[RUNTIME], &FILTER[PROVIDER], &FILTER[COMPILER]] {
+            assert!(fetch(file).is_ok(), "{}", file.name);
+            assert!(file.done(), "{}", file.name);
+        }
+        let tokenizer = FILTER.iter().find(|file| file.name == "tokenizer.json").unwrap();
         let started = lock(&STATUS).done;
         let stopper = thread::spawn(move || {
             while lock(&STATUS).done < started + 10_000_000 {
@@ -690,7 +792,20 @@ mod tests {
 
     #[test]
     fn the_version_shown_is_the_commit_of_the_files() {
-        assert!(FILTER[1..].iter().all(|file| file.url.contains(FILTER_VERSION)));
+        let own: Vec<_> = FILTER.iter().filter(|file| file.folder == FILTER_FOLDER).collect();
+        assert_eq!(own.len(), 3);
+        assert!(own.iter().all(|file| file.url.contains(FILTER_VERSION)));
+    }
+
+    /// A model runs where the settings want it; it is loaded again when they change, and on the
+    /// card once the provider of WebGPU has come, but not again after the card couldn't run it.
+    #[test]
+    fn a_model_is_loaded_again_only_when_its_place_changes() {
+        assert!(stale(true, Device::Card, false));
+        assert!(stale(false, Device::Processor, true));
+        assert!(!stale(true, Device::Card, true));
+        assert!(!stale(false, Device::Processor, false));
+        assert!(!stale(true, Device::CardFailed, true));
     }
 
     #[test]

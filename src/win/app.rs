@@ -131,6 +131,10 @@ pub fn save_settings(new: Settings) -> Result<(), String> {
     if new.privacy_filter != old.privacy_filter {
         models::want(new.privacy_filter);
     }
+    let cards = |settings: &Settings| (settings.privacy_filter_on_graphics_card, settings.blocks_on_graphics_card);
+    if cards(&new) != cards(&old) {
+        models::prefer(new.privacy_filter_on_graphics_card, new.blocks_on_graphics_card);
+    }
     let now = modified(&path);
     change_state(|state| {
         state.settings = Rc::new(new);
@@ -358,6 +362,7 @@ pub fn run() -> io::Result<()> {
         }
         let settings = settings();
         models::start(window, settings.privacy_filter);
+        models::prefer(settings.privacy_filter_on_graphics_card, settings.blocks_on_graphics_card);
         match register(window, &settings.hotkey) {
             Ok(hotkey) => change_state(|state| state.hotkey = Some(hotkey)),
             // On the first start the choice of the keys says it, and offers others.
@@ -520,6 +525,10 @@ fn apply(new: Settings) {
     }
     if new.privacy_filter != old.privacy_filter {
         models::want(new.privacy_filter);
+    }
+    let cards = |settings: &Settings| (settings.privacy_filter_on_graphics_card, settings.blocks_on_graphics_card);
+    if cards(&new) != cards(&old) {
+        models::prefer(new.privacy_filter_on_graphics_card, new.blocks_on_graphics_card);
     }
     change_state(|state| {
         state.settings = Rc::new(new);

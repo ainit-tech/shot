@@ -795,6 +795,16 @@ mod tests {
             seen.push(evaluate("document.querySelector('#filter-version').textContent + ' | ' + document.querySelector('#blocks-version').textContent + ' | ' + document.querySelector('#blocks-state').textContent"));
             evaluate(&blocks("{ version: '0.2', size: 2353851, runs: false }"));
             seen.push(evaluate("document.querySelector('#blocks-state').textContent"));
+            // Where each model runs: on the graphics card by default; a click gives a model to the
+            // processor, and a model the card couldn't run says so while the card is chosen.
+            seen.push(evaluate("document.querySelector('#filter-card [aria-checked=true]').textContent + ' | ' + document.querySelector('#blocks-card [aria-checked=true]').textContent"));
+            evaluate("told.length = 0; document.querySelector('#filter-card [data-card=false]').click(); document.querySelector('#blocks-card [data-card=false]').click()");
+            seen.push(told("m.settings.privacy_filter_on_graphics_card + '/' + m.settings.blocks_on_graphics_card"));
+            evaluate("document.querySelector('#filter-card [data-card=true]').click()");
+            let ran = "{ type: 'models', models: { state: 'ready', problem: null, done: 951000000, total: 951000000, speed: 0, version: '7ffa9a0', blocks: { version: '0.9', size: 78662666, runs: true }, ran: { filter: 'card_failed', blocks: 'card_failed' } } }";
+            evaluate(&format!("heard({ran})"));
+            seen.push(evaluate("document.querySelector('#filter-card-state').textContent + ' | ' + document.querySelector('#blocks-card-state').textContent"));
+            look("models-cards");
             evaluate("document.querySelector('nav [data-section=about]').click()");
             look("updates");
             evaluate("told.length = 0; document.querySelector('#hotkey').click()");
@@ -868,7 +878,7 @@ mod tests {
                 "\"2\"",
                 "true",
                 "\"001 Открытые компоненты\"",
-                "\"122 2\"",
+                "\"124 2\"",
                 "true",
                 "\"010 true\"",
                 "\"100\"",
@@ -888,6 +898,9 @@ mod tests {
                 "\"true 1\"",
                 "\"7ffa9a0 | 0.2 | В папке рядом с программой · 2,4 МБ\"",
                 "\"Не работает без ONNX Runtime, он скачивается вместе с OpenAI Privacy Filter\"",
+                "\"На видеокарте | На видеокарте\"",
+                r#""[\"false/true\",\"false/false\"]""#,
+                "\"Видеокарта не смогла её запустить: работает процессор | \"",
                 r#""[\"record:true\",\"record:false\",\"save:Ctrl+Shift+S\"]""#,
                 // The keys read from left to right in every language.
                 "\"\u{2066}Q\u{2069} мешала бы печатать: добавьте Ctrl, Alt или Win.\"",

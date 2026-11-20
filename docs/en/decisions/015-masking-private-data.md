@@ -38,21 +38,21 @@ The recognition with the rectangles of words is already in the program, and a fi
 - **Finding.** In each reading, the rules and the model mark parts of the text. The words of each part are covered: words next to each other on a line by one rectangle, a little bigger than they are. Covers of the two readings that overlap become one.
 - **The rules** find IP addresses of versions 4 and 6 as the recognition reads them: with O, Ø or I for some digits, and a space by a dot or a colon.
 - **The covers** are ordinary filled rectangles in the chosen colour: Delete removes one, and Ctrl+Z takes all of them back in one step.
-- **The model** is loaded at the first masking and let go after 10 minutes unused.
+- **The model** is loaded at the first masking and let go after 10 minutes unused. It runs on the graphics card, through ONNX Runtime's provider of WebGPU, which works over DirectX 12 on any card that has it, or on the processor, as the settings say. A model the card can't run runs on the processor.
 - **The download:**
   - The model is downloaded in the background into `%LOCALAPPDATA%\ainitShot\models`, from OpenAI's repository at a fixed commit.
-  - ONNX Runtime 1.31.0 comes with it. Its one file is taken out of Microsoft's archive by a range of bytes: 6 MB of 83.
+  - ONNX Runtime 1.31.0 comes with it, and the provider of WebGPU 0.6.0 with its compiler of shaders. Their files are taken out of Microsoft's packages on NuGet by ranges of bytes: 6 MB of 160, and 14 MB of 56. ONNX Runtime came from Microsoft's releases on GitHub until they were gone in November 2026; the file is the same.
   - Every file is checked against its SHA-256 before it takes its place.
   - A download cut short goes on from where it stopped. Without a connection, the program tries again in two minutes.
 - **Until the model is downloaded,** masking works with the rules:
   - a thin line under the button's icon shows how far the download has come;
   - the button's hint and a note after masking say that names and addresses aren't looked for yet;
   - when the download ends, one notification says that smart masking is ready.
-- **The settings window** has a section "Models" with the model's switch and version, how its download goes, and a button that pauses it. The switch is `privacy_filter` in the settings file; turning it off removes the model.
+- **The settings window** has a section "Models" with the model's switch and version, how its download goes, and a button that pauses it. The switch is `privacy_filter` in the settings file; turning it off removes the model. A choice under it says where the model runs: on the graphics card, as by default, or on the processor (`privacy_filter_on_graphics_card`); if the card couldn't run it, a line says so.
 
 ## Consequences
 
-- The model takes about 950 MB of the disk, and about 0.9 GB of memory while it is loaded.
+- The model takes about 950 MB of the disk, what runs it 50 MB more, and about 0.9 GB of memory while it is loaded.
 - The model is strongest in English: in other languages, especially those not written in Latin letters, it may miss more.
 - What the recognition misreads isn't found; small and monospaced letters, as in terminals, are the hardest.
 - Faces aren't found: they have no text. A small model of their own can be added later.

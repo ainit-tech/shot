@@ -236,6 +236,7 @@ body.searching .hero, body.searching .group-title { display: none; }
 .meter { height: 4px; margin: 4px 0 8px; border-radius: 2px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
 .meter .fill { height: 100%; width: 0; border-radius: 2px; background: var(--accent); transition: width 0.3s ease; }
 .model-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 32px; color: var(--muted); font-size: 12.5px; }
+.model-line .segmented { flex: none; }
 .row .label .version { margin-inline-start: 4px; color: var(--faint); font-size: 12px; }
 /* Controls. */
 .btn {
@@ -708,11 +709,15 @@ input[type="range"]:hover::-webkit-slider-thumb { background: radial-gradient(ci
         <div class="body model">
           <div class="meter" id="filter-meter"><div class="fill" id="filter-fill"></div></div>
           <div class="model-line"><span id="filter-state"></span><button class="btn quiet" id="filter-pause"></button></div>
+          <div class="model-line" id="filter-place"><span class="segmented" id="filter-card" role="radiogroup" data-t-aria="modelRunsOn"><button role="radio" data-card="true" data-t="onGraphicsCard"></button><button role="radio" data-card="false" data-t="onProcessor"></button></span><span id="filter-card-state"></span></div>
         </div>
       </div>
       <div class="row wide hidden" id="blocks-model" data-k="kBlocksModel">
         <div><div class="label find">ainitShot Blocks <span class="version" id="blocks-version"></span></div><div class="desc find" data-t="blocksModelDesc"></div></div>
-        <div class="body model"><div class="model-line"><span id="blocks-state"></span></div></div>
+        <div class="body model">
+          <div class="model-line"><span id="blocks-state"></span></div>
+          <div class="model-line" id="blocks-place"><span class="segmented" id="blocks-card" role="radiogroup" data-t-aria="modelRunsOn"><button role="radio" data-card="true" data-t="onGraphicsCard"></button><button role="radio" data-card="false" data-t="onProcessor"></button></span><span id="blocks-card-state"></span></div>
+        </div>
       </div>
     </div>
   </section>
@@ -920,6 +925,10 @@ const TEXT = {
   blocksModelDesc: "Finds the blocks of a window: panels, lists, cards. On the frozen screen the block under the mouse lights up, and with Ctrl the whole window.",
   modelBeside: "In the folder next to the program · {size} MB",
   modelNoRuntime: "Doesn't work without ONNX Runtime, which is downloaded with OpenAI Privacy Filter",
+  modelRunsOn: "Where the model runs",
+  onGraphicsCard: "On the graphics card",
+  onProcessor: "On the processor",
+  modelCardFailed: "The graphics card couldn't run it: the processor does",
   pause: "Pause",
   resume: "Resume",
   about: "About",
@@ -1014,8 +1023,8 @@ const TEXT = {
   kGraphicsCard: "video card gpu nvidia amd intel encoder hardware smooth lag jerky stutter frames fps processor cpu",
   kFramesPerSecond: "fps frame rate frames per second 30 60 smooth smoothness",
   kButtons: "add new button query standard default bring back",
-  kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai",
-  kBlocksModel: "blocks block model window panel list card mouse selection neural network ai version",
+  kModels: "models model download privacy filter openai masking mask hide private personal data names addresses neural network ai graphics card video card gpu processor cpu",
+  kBlocksModel: "blocks block model window panel list card mouse selection neural network ai version graphics card video card gpu processor cpu",
   kAbout: "about program version license gpl copyright open source components libraries website site authors ainit",
   kSupport: "support donate donation help thanks author development",
   kAccount: "google account sign in sign out switch profile user login",
@@ -1117,6 +1126,8 @@ function toSettings(draft) {
     autostart: draft.autostart,
     autoupdate: draft.autoupdate,
     privacy_filter: draft.privacy_filter,
+    privacy_filter_on_graphics_card: draft.privacy_filter_on_graphics_card,
+    blocks_on_graphics_card: draft.blocks_on_graphics_card,
     listening_sound: draft.listening_sound,
     record_with_graphics_card: draft.record_with_graphics_card,
     frames_per_second: draft.frames_per_second,
@@ -1575,6 +1586,28 @@ for (const button of $$("#frames [data-frames]")) {
 }
 $("#filter-pause").addEventListener("click", () => send({ type: "pauseModels", paused: !!state.models && state.models.state !== "paused" }));
 
+/** Where each model runs: on the graphics card, the default, or on the processor. A model wanted on
+ * the card that the card couldn't run says so: the processor runs it. */
+const cards = [["filter", "privacy_filter_on_graphics_card"], ["blocks", "blocks_on_graphics_card"]];
+function renderCards() {
+  const ran = (state.models && state.models.ran) || {};
+  for (const [name, key] of cards) {
+    for (const button of $$(`#${name}-card [data-card]`)) {
+      button.setAttribute("aria-checked", String((button.dataset.card === "true") === state.draft[key]));
+    }
+    $(`#${name}-card-state`).textContent = state.draft[key] && ran[name] === "card_failed" ? t("modelCardFailed") : "";
+  }
+}
+for (const [name, key] of cards) {
+  for (const button of $$(`#${name}-card [data-card]`)) {
+    button.addEventListener("click", () => {
+      state.draft[key] = button.dataset.card === "true";
+      renderCards();
+      changed();
+    });
+  }
+}
+
 /** The models and their versions. How the download of OpenAI Privacy Filter goes: a line filled
  * as far as it has come while it is downloaded, what is going on, and the button that pauses it
  * or goes on. The model of blocks shows only where it is: out of sight, the search leaves it out. */
@@ -1607,6 +1640,8 @@ function renderModels() {
   pause.classList.toggle("hidden", !coming);
   pause.textContent = t(models.state === "paused" ? "resume" : "pause");
   $("#filter-version").textContent = models.version || "";
+  $("#filter-place").classList.toggle("hidden", models.state === "off");
+  renderCards();
   const blocks = models.blocks;
   const row = $("#blocks-model");
   row.classList.toggle("hidden", !blocks);
@@ -2460,6 +2495,7 @@ function renderAll() {
   renderSwitch("listening-sound", state.draft.listening_sound);
   renderSwitch("graphics-card", state.draft.record_with_graphics_card);
   renderFrames();
+  renderCards();
   renderModels();
   renderAbout();
   renderColors();

@@ -13,14 +13,14 @@ use std::path::Path;
 use std::thread::available_parallelism;
 
 use ort::session::Session;
-use ort::session::builder::GraphOptimizationLevel;
+use ort::session::builder::{GraphOptimizationLevel, SessionBuilder};
 use ort::value::Tensor;
 use serde::Deserialize;
 
 use crate::blocks::{Found, Tree, fitted};
 use crate::geometry::Rect;
 use crate::image::Image;
-use crate::runtime;
+use crate::runtime::{self, Device};
 
 /// The most threads a graph runs on.
 const THREADS: usize = 8;
@@ -112,11 +112,14 @@ enum Graphs {
 pub struct Finder {
     graphs: Graphs,
     description: Description,
+    device: Device,
 }
 
 impl Finder {
-    /// Loads the model from its folder, with ONNX Runtime from its library.
-    pub fn load(library: &Path, folder: &Path) -> Result<Finder, String> {
+    /// Loads the model from its folder, with ONNX Runtime from its library: on the graphics card
+    /// through the provider of WebGPU in `card`, if it is given and the card can, or on the
+    /// processor.
+    pub fn load(library: &Path, folder: &Path, card: Option<&Path>) -> Result<Finder, String> {
         let text = fs::read_to_string(folder.join("model.json")).map_err(|error| error.to_string())?;
         let mut description: Description = serde_json::from_str(&text).map_err(|error| error.to_string())?;
         if ![3, 5].contains(&description.input.planes) {
@@ -129,14 +132,18 @@ impl Finder {
         let threads = available_parallelism().map_or(THREADS, usize::from).min(THREADS);
         // The threads of the two graphs don't wait on the processor: spinning, they get in each
         // other's way, and a window takes more than twice as long.
-        let session = |file: &str| {
-            Session::builder(&environment)
-                .and_then(|builder| builder.with_optimization_level(GraphOptimizationLevel::Level3).map_err(Into::into))
-                .and_then(|builder| builder.with_intra_threads(threads).map_err(Into::into))
-                .and_then(|builder| builder.with_inter_threads(1).map_err(Into::into))
-                .and_then(|builder| builder.with_intra_op_spinning(false).map_err(Into::into))
-                .and_then(|mut builder| builder.commit_from_file(folder.join(file)))
-                .map_err(|error| error.to_string())
+        let options = |builder: SessionBuilder| -> ort::Result<SessionBuilder> {
+            Ok(builder
+                .with_optimization_level(GraphOptimizationLevel::Level3)?
+                .with_intra_threads(threads)?
+                .with_inter_threads(1)?
+                .with_intra_op_spinning(false)?)
+        };
+        let mut device = Device::Processor;
+        let mut session = |file: &str| {
+            let (session, on) = runtime::session(&environment, &folder.join(file), card, options)?;
+            device = on;
+            Ok::<Session, String>(session)
         };
         let graphs = if description.contract == 6 {
             match (&description.files.graph, description.input.fit) {
@@ -149,7 +156,12 @@ impl Finder {
                 _ => return Err("A model of two graphs names both and says which candidates go on".into()),
             }
         };
-        Ok(Finder { graphs, description })
+        Ok(Finder { graphs, description, device })
+    }
+
+    /// Where the model runs.
+    pub fn device(&self) -> Device {
+        self.device
     }
 
     /// The tree of the blocks that the model finds on the picture of a window, on a monitor of
@@ -172,7 +184,7 @@ impl Finder {
     /// What the model says of a window's picture, in pixels of the window, and how far the
     /// picture was reduced for it.
     fn found(&mut self, picture: &Image, scale: f32) -> Result<(Vec<Found>, f32), String> {
-        let Finder { graphs, description } = self;
+        let Finder { graphs, description, .. } = self;
         let Description { input, over, .. } = &*description;
         let (least_wide, least_high) = input.smallest_window;
         if picture.width < least_wide || picture.height < least_high {
@@ -628,7 +640,7 @@ mod tests {
     fn the_model_finds_what_its_reference_finds() {
         let folder = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
         let library = PathBuf::from(std::env::var_os("ONNX_RUNTIME").expect("ONNX_RUNTIME names the library"));
-        let mut finder = Finder::load(&library, &folder).unwrap();
+        let mut finder = Finder::load(&library, &folder, None).unwrap();
         let (mut all, mut alike, mut to_the_byte) = (0, 0, 0);
         for entry in fs::read_dir(folder.join("check")).unwrap() {
             let path = entry.unwrap().path();
@@ -698,13 +710,16 @@ mod tests {
     /// Runs a version of one graph on the windows of its folder `check` and compares every row of
     /// the graph and the tree after it with what the reference in Python made of them. Rows go by
     /// their frames, not their places: rows of nearly the same score can come in another order.
-    /// Asked for as the test above, with `finder::tests::a_version_of_one_graph_gives_what_its_reference_gives`.
+    /// Asked for as the test above, with `finder::tests::a_version_of_one_graph_gives_what_its_reference_gives`;
+    /// with `WEBGPU_PROVIDER=<onnxruntime_providers_webgpu.dll>` the graph runs on the graphics card.
     #[test]
     #[ignore]
     fn a_version_of_one_graph_gives_what_its_reference_gives() {
         let folder = PathBuf::from(std::env::var_os("BLOCKS_MODEL").expect("BLOCKS_MODEL names a version's folder"));
         let library = PathBuf::from(std::env::var_os("ONNX_RUNTIME").expect("ONNX_RUNTIME names the library"));
-        let mut finder = Finder::load(&library, &folder).unwrap();
+        let card = std::env::var_os("WEBGPU_PROVIDER").map(PathBuf::from);
+        let mut finder = Finder::load(&library, &folder, card.as_deref()).unwrap();
+        println!("on {:?}", finder.device());
         let (over, least) = (finder.description.over, finder.description.score);
         let sides = |rect: Rect| [rect.left, rect.top, rect.right, rect.bottom];
         let near = |a: Rect, b: Rect| sides(a).iter().zip(sides(b)).all(|(a, b)| (a - b).abs() <= 1);
